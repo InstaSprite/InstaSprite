@@ -86,6 +86,8 @@ dependencies {
 
     // --- Network ---
     implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     // --- Testing ---
     testImplementation(libs.junit)

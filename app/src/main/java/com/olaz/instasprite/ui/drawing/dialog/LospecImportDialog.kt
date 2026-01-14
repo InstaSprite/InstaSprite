@@ -119,7 +119,7 @@ fun LospecImportDialog(
                             try {
                                 val colors = onImportColorsFromLospecUrl(trimmedUrl)
                                 if (colors.isEmpty()) {
-                                    Toast.makeText(context, "No colors found in file", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "No colors found", Toast.LENGTH_SHORT).show()
                                     previewColors = null
                                 } else {
                                     previewColors = colors

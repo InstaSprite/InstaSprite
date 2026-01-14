@@ -3,6 +3,7 @@ package com.olaz.instasprite.di
 import android.content.Context
 import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.data.network.lospec.LospecService
 import com.olaz.instasprite.data.repository.*
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.dialog.DialogControllerImpl
@@ -42,15 +43,10 @@ object AppModule {
     }
 
     @Provides
-    @Singleton
-    fun provideColorPaletteRepository(@ApplicationContext context: Context): ColorPaletteRepository {
-        return ColorPaletteRepository(context)
-    }
-
-    @Provides
-    @Singleton
-    fun provideLospecRepository(@ApplicationContext context: Context): LospecColorPaletteRepository {
-        return LospecColorPaletteRepository(context)
+    fun provideColorPaletteRepository(
+        @ApplicationContext context: Context, db: AppDatabase, lospecService: LospecService
+    ): ColorPaletteRepository {
+        return ColorPaletteRepository(context, db.colorPaletteDao(), lospecService)
     }
 
     @Provides

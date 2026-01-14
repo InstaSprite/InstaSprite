@@ -2,17 +2,16 @@ package com.olaz.instasprite.ui.drawing
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
+import com.olaz.instasprite.domain.dialog.Dialog
+import com.olaz.instasprite.ui.drawing.dialog.ColorWheelDialog
+import com.olaz.instasprite.ui.drawing.dialog.ImportOptionsDialog
 import com.olaz.instasprite.ui.drawing.dialog.LoadISpriteDialog
+import com.olaz.instasprite.ui.drawing.dialog.LospecImportDialog
 import com.olaz.instasprite.ui.drawing.dialog.ResizeCanvasDialog
 import com.olaz.instasprite.ui.drawing.dialog.SaveISpriteDialog
 import com.olaz.instasprite.ui.drawing.dialog.SaveImageDialog
-import androidx.compose.runtime.collectAsState
-import com.olaz.instasprite.domain.dialog.Dialog
-import com.olaz.instasprite.ui.drawing.dialog.ColorWheelDialog
-import com.olaz.instasprite.ui.drawing.dialog.FileImportDialog
-import com.olaz.instasprite.ui.drawing.dialog.ImportOptionsDialog
-import com.olaz.instasprite.ui.drawing.dialog.LospecImportDialog
 
 sealed interface DrawingDialog : Dialog {
     data object SaveImage : DrawingDialog
@@ -97,17 +96,8 @@ fun DrawingScreenDialogs(
                     }
                 )
 
-            DrawingDialog.FilePaletteImport ->
-                FileImportDialog(
-                    onDismiss = {
-                        viewModel.closeTopDialog()
-                    },
-                    onImportPaletteFromFile = viewModel::importColorsFromFile,
-                    onImport = {
-                        viewModel.updateColorPalette(it)
-                        viewModel.closeTopDialog()
-                    },
-                )
+            DrawingDialog.FilePaletteImport -> {
+            }
 
             DrawingDialog.LospecPaletteImport ->
                 LospecImportDialog(

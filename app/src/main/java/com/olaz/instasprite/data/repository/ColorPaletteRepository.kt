@@ -5,6 +5,11 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.olaz.instasprite.R
+import com.olaz.instasprite.data.database.ColorPaletteDao
+import com.olaz.instasprite.data.model.toData
+import com.olaz.instasprite.data.network.lospec.LospecService
+import com.olaz.instasprite.data.network.lospec.model.toDomain
+import com.olaz.instasprite.domain.model.ColorPaletteModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +17,11 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.collections.ArrayDeque
 
-class ColorPaletteRepository(private val context: Context) {
+class ColorPaletteRepository(
+    private val context: Context,
+    private val colorPaletteDao: ColorPaletteDao,
+    private val lospecService: LospecService
+) {
 
     private val _colors = MutableStateFlow(
         loadDefaultColorPalette(context)
@@ -46,6 +55,30 @@ class ColorPaletteRepository(private val context: Context) {
         if (colors.isNotEmpty()) {
             _colors.value = colors.toMutableList()
             setActiveColor(colors.first(), addColorToRecent = false)
+        }
+    }
+
+    suspend fun savePaletteToDB(palette: ColorPaletteModel) {
+        colorPaletteDao.insert(palette.toData())
+    }
+
+
+    suspend fun getLospecColorPalette(input: String): ColorPaletteModel? {
+        val paletteName = if (input.contains("lospec.com")) {
+            input.trimEnd('/')
+                .substringAfterLast('/')
+                .removeSuffix(".json")
+        } else {
+            input
+        }
+
+        return try {
+            val palette = lospecService.getPalette(paletteName).toDomain()
+            savePaletteToDB(palette)
+            palette
+        } catch (e: Exception) {
+            Log.e("ColorPaletteRepository", "Failed to fetch color palette", e)
+            null
         }
     }
 

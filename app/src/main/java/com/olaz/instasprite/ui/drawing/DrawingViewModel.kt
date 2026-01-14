@@ -11,11 +11,11 @@ import com.olaz.instasprite.DrawingActivity
 import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
-import com.olaz.instasprite.data.repository.LospecColorPaletteRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.dialog.DialogController
+import com.olaz.instasprite.domain.model.ColorPaletteModel
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
@@ -50,7 +50,6 @@ class DrawingViewModel @Inject constructor(
     private val pixelCanvasRepository: PixelCanvasRepository,
     private val spriteDataRepository: ISpriteDatabaseRepository,
     private val colorPaletteRepository: ColorPaletteRepository,
-    private val lospecColorPaletteRepository: LospecColorPaletteRepository,
     private val dialogController: DialogController<DrawingDialog>
 ) : ViewModel(),
     DialogController<DrawingDialog> by dialogController {
@@ -363,22 +362,23 @@ class DrawingViewModel @Inject constructor(
         }
     }
 
-    suspend fun importColorsFromFile(uri: Uri): List<Color> {
-        return lospecColorPaletteRepository.importPaletteFromFile(uri)
-            .map { it.colors }
-            .getOrElse { emptyList() }
-    }
-
     suspend fun importColorsFromLospecUrl(url: String): List<Color> {
-        return lospecColorPaletteRepository.fetchPaletteFromUrl(url)
-            .map { it.colors }
-            .getOrElse { emptyList() }
+        return colorPaletteRepository.getLospecColorPalette(url)?.colors ?: emptyList()
+
     }
 
     fun updateColorPalette(colors: List<Color>) {
         if (colors.isNotEmpty()) {
             colorPaletteRepository.updatePalette(colors)
             colorPaletteRepository.setActiveColor(colors.first())
+
+            viewModelScope.launch {
+                colorPaletteRepository.savePaletteToDB(
+                    ColorPaletteModel(
+                        colors = colors.toMutableList()
+                    )
+                )
+            }
         }
     }
 }

@@ -30,6 +30,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.olaz.instasprite.data.database.ColorPaletteDao
+import com.olaz.instasprite.data.model.ColorPaletteData
+import com.olaz.instasprite.data.network.lospec.LospecService
+import com.olaz.instasprite.data.network.lospec.model.PaletteDto
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.PencilTool
@@ -205,12 +209,36 @@ private fun DrawingScreenContent(
     }
 }
 
+private class MockColorPaletteDao() : ColorPaletteDao {
+    override suspend fun insert(palette: ColorPaletteData) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAllPalette(): List<ColorPaletteData> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPaletteByName(name: String): ColorPaletteData? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deletePaletteByName(name: String) {
+        TODO("Not yet implemented")
+    }
+
+}
+
+private class MockLospecService() : LospecService {
+    override suspend fun getPalette(paletteName: String): PaletteDto {
+        return PaletteDto()
+    }
+}
 @Preview
 @Composable
 private fun DrawingScreenPreview() {
 
     val context = LocalContext.current
-    val colorPaletteRepository = ColorPaletteRepository(context)
+    val colorPaletteRepository = ColorPaletteRepository(context, colorPaletteDao = MockColorPaletteDao(), lospecService = MockLospecService())
     val colors = colorPaletteRepository.colors.collectAsState()
     val activeColor = colorPaletteRepository.activeColor.collectAsState()
 

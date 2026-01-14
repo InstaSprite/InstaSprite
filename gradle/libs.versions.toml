@@ -3,6 +3,7 @@ accompanistSystemuicontroller = "0.36.0"
 agp = "8.13.2"
 annotations = "26.0.2-1"
 coilCompose = "3.3.0"
+converterGson = "3.0.0"
 coreSplashscreenVersion = "1.2.0"
 datastorePreferences = "1.2.0"
 documentfile = "1.1.0"
@@ -20,6 +21,7 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2025.12.01"
 okhttp = "5.3.2"
+retrofit = "3.0.0"
 roomCompiler = "2.8.4"
 roomKtx = "2.8.4"
 roomRuntime = "2.8.4"
@@ -36,6 +38,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
 compose-material-icons = { group = "androidx.compose.material", name = "material-icons-extended" }
 
@@ -58,6 +61,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 
