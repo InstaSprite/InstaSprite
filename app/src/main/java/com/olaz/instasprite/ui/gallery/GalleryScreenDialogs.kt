@@ -46,6 +46,7 @@ fun GalleryScreenDialogs(
                     spriteName = dialog.spriteName,
                     onConfirm = {
                         viewModel.deleteSpriteById(dialog.spriteId)
+                        viewModel.closeTopDialog()
                     },
                     onDismiss = viewModel::closeTopDialog
                 )
