@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -47,6 +48,24 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+                create("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     // --- Core Android & Kotlin ---
     implementation(libs.androidx.core.ktx)
@@ -74,6 +93,7 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.core.splashscreen)
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.datastore) // Proto DataStore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.zoomable)
     implementation(libs.compose.material.icons)
@@ -83,6 +103,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.annotations) // Javax Annotations (used by Room, etc.)
+    implementation(libs.protobuf.kotlin.lite)
 
     // --- Network ---
     implementation(libs.okhttp)

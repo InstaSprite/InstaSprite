@@ -5,6 +5,7 @@ import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.domain.model.PixelCanvas
 import com.olaz.instasprite.data.network.lospec.LospecService
 import com.olaz.instasprite.data.repository.*
+import com.olaz.instasprite.data.source.SpritePixelDataSource
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.dialog.DialogControllerImpl
 import com.olaz.instasprite.ui.drawing.DrawingDialog
@@ -29,10 +30,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSpriteRepository(db: AppDatabase): SpriteDatabaseRepository {
+    fun provideSpriteRepository(db: AppDatabase, @ApplicationContext context: Context): SpriteDatabaseRepository {
         return SpriteDatabaseRepository(
             dao = db.spriteDataDao(),
-            metaDao = db.spriteMetaDataDao()
+            metaDao = db.spriteMetaDataDao(),
+            pixelDataSource = SpritePixelDataSource(context)
         )
     }
 

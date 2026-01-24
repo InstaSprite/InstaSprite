@@ -7,13 +7,16 @@ import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteMeta as DomainSpriteMetadata
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 
-fun SpriteData.toDomain(): Sprite {
+fun SpriteData.toDomain(
+    pixelsData: List<Int> = emptyList(),
+    colorPalette: List<Int>? = null
+): Sprite {
     return Sprite(
         id = this.id,
         width = this.width,
         height = this.height,
-        pixelsData = this.pixelsData,
-        colorPalette = this.colorPalette
+        pixelsData = pixelsData,
+        colorPalette = colorPalette
     )
 }
 
@@ -21,9 +24,7 @@ fun Sprite.toEntity(): SpriteData {
     return SpriteData(
         id = this.id,
         width = this.width,
-        height = this.height,
-        pixelsData = this.pixelsData,
-        colorPalette = this.colorPalette
+        height = this.height
     )
 }
 
@@ -48,6 +49,13 @@ fun DomainSpriteMetadata.toEntity(): EntitySpriteMetaData {
 fun SpriteWithMetaData.toDomain(): SpriteWithMeta {
     return SpriteWithMeta(
         sprite = this.sprite.toDomain(),
+        meta = this.meta?.toDomain()
+    )
+}
+
+fun SpriteWithMetaData.toDomain(sprite: Sprite): SpriteWithMeta {
+    return SpriteWithMeta(
+        sprite = sprite,
         meta = this.meta?.toDomain()
     )
 }

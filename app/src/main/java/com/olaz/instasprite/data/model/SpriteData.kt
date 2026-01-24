@@ -13,7 +13,5 @@ data class SpriteData(
     val id: String = "",
 
     val width: Int,
-    val height: Int,
-    val pixelsData: List<Int>,
-    val colorPalette: List<Int>? = null
+    val height: Int
 )
