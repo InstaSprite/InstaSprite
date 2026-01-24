@@ -29,8 +29,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSpriteRepository(db: AppDatabase): ISpriteDatabaseRepository {
-        return ISpriteDatabaseRepository(
+    fun provideSpriteRepository(db: AppDatabase): SpriteDatabaseRepository {
+        return SpriteDatabaseRepository(
             dao = db.spriteDataDao(),
             metaDao = db.spriteMetaDataDao()
         )

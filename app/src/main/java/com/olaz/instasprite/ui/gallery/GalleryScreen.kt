@@ -32,9 +32,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
-import com.olaz.instasprite.data.model.SpriteMetaData
+import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.domain.model.SpriteMeta
 import com.olaz.instasprite.ui.components.composable.JumpToTopButton
 import com.olaz.instasprite.ui.gallery.component.HomeBottomBar
 import com.olaz.instasprite.ui.gallery.component.HomeFab
@@ -142,7 +142,7 @@ fun GalleryScreen(
 private fun GalleryScreenContent(
     uiState: GalleryState,
     lazyListState: LazyListState,
-    spriteList: List<ISpriteWithMetaData>,
+    spriteList: List<SpriteWithMeta>,
     searchQuery: String,
     event: GalleryScreenEvent,
 ) {
@@ -246,8 +246,8 @@ private fun GalleryScreenPreview() {
             lazyListState = LazyListState(),
             spriteList =
                 listOf(
-                    ISpriteWithMetaData(
-                        sprite = ISpriteData(
+                    SpriteWithMeta(
+                        sprite = Sprite(
                             id = "1",
                             width = 16,
                             height = 16,
@@ -255,13 +255,13 @@ private fun GalleryScreenPreview() {
                                 CatppuccinUI.CurrentPalette.Flamingo.toArgb()
                             }
                         ),
-                        meta = SpriteMetaData(
+                        meta = SpriteMeta(
                             spriteId = "1",
                             spriteName = "Test",
                         )
                     ),
-                    ISpriteWithMetaData(
-                        sprite = ISpriteData(
+                    SpriteWithMeta(
+                        sprite = Sprite(
                             id = "2",
                             width = 16,
                             height = 16,
@@ -269,7 +269,7 @@ private fun GalleryScreenPreview() {
                                 CatppuccinUI.CurrentPalette.Lavender.toArgb()
                             }
                         ),
-                        meta = SpriteMetaData(
+                        meta = SpriteMeta(
                             spriteId = "2",
                             spriteName = "Test",
                         )

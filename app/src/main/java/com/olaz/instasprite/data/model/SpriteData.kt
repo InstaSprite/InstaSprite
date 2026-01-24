@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Entity(tableName = "sprite_data")
 @TypeConverters(IntListConverter::class)
 @Serializable
-data class ISpriteData(
+data class SpriteData(
     @PrimaryKey(autoGenerate = false)
     val id: String = "",
 

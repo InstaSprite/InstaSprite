@@ -10,17 +10,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.data.model.InputField
 import com.olaz.instasprite.ui.components.dialog.SaveFileDialog
 
 @Composable
 fun SaveImageDialog(
     spriteName: String,
-    iSpriteData: ISpriteData,
+    sprite: Sprite,
     lastSavedUri: Uri?,
     onFolderSelected: (Uri) -> Unit,
-    onSaved: (ISpriteData, Uri, fileName: String, scale: Int) -> Boolean,
+    onSaved: (Sprite, Uri, fileName: String, scale: Int) -> Boolean,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -62,7 +62,7 @@ fun SaveImageDialog(
         onSave = {
             folderUri?.let { uri ->
                 val scale = scalePercent.toIntOrNull()?.coerceIn(25, 20000) ?: 100
-                val success = onSaved(iSpriteData, uri, fileName, scale)
+                val success = onSaved(sprite, uri, fileName, scale)
                 Toast.makeText(
                     context,
                     if (success) "Image saved successfully!" else "Failed to save image",

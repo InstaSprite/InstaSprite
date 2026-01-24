@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.data.mapper.toEntity
+import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.utils.getFormatFromExtension
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException
 
@@ -41,7 +41,7 @@ object SaveFileRepository {
     // Save as .isprite
     fun saveFile(
         context: Context,
-        spriteData: ISpriteData,
+        sprite: Sprite,
         folderUri: Uri,
         fileName: String
     ): Boolean {
@@ -52,6 +52,7 @@ object SaveFileRepository {
         val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return false
 
         return try {
+            val spriteData = sprite.toEntity()
             val jsonData = Json.encodeToString(spriteData)
             outputStream.write(jsonData.toByteArray(Charsets.UTF_8))
             outputStream.flush()

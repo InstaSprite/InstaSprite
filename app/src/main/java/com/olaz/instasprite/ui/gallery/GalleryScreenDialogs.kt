@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
+import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.domain.dialog.Dialog
 import com.olaz.instasprite.ui.gallery.dialog.CreateCanvasDialog
 import com.olaz.instasprite.ui.gallery.dialog.DeleteSpriteConfirmDialog
@@ -15,7 +15,7 @@ import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
 
 sealed interface GalleryDialog : Dialog {
     data object CreateCanvas : GalleryDialog
-    data class SaveImage(val sprite: ISpriteWithMetaData) : GalleryDialog
+    data class SaveImage(val sprite: SpriteWithMeta) : GalleryDialog
     data class Rename(val spriteId: String) : GalleryDialog
     data class DeleteSpriteConfirm(val spriteName: String, val spriteId: String) : GalleryDialog
     data object SelectSortOption : GalleryDialog
@@ -61,7 +61,7 @@ fun GalleryScreenDialogs(
             is GalleryDialog.SaveImage ->
                 SaveImageDialog(
                     spriteName = dialog.sprite.meta!!.spriteName,
-                    iSpriteData = dialog.sprite.sprite,
+                    sprite = dialog.sprite.sprite,
                     lastSavedUri = lastSavedUri,
                     onFolderSelected = viewModel::setLastSavedLocation,
                     onSaved = { sprite, uri, fileName, scale ->

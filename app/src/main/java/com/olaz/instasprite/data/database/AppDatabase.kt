@@ -6,13 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.olaz.instasprite.data.model.ColorPaletteData
-import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.data.model.SpriteData
 import com.olaz.instasprite.data.model.IntListConverter
 import com.olaz.instasprite.data.model.SpriteMetaData
 
 @Database(
     entities = [
-        ISpriteData::class,
+        SpriteData::class,
         SpriteMetaData::class,
         ColorPaletteData::class
     ], version = 1, exportSchema = false

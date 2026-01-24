@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "sprite_metadata",
     foreignKeys = [ForeignKey(
-        entity = ISpriteData::class,
+        entity = SpriteData::class,
         parentColumns = ["id"],
         childColumns = ["spriteId"],
         onDelete = ForeignKey.CASCADE

@@ -17,27 +17,27 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.domain.export.ImageExporter
+import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @Composable
 fun CanvasPreviewer(
-    spriteData: ISpriteData,
+    sprite: Sprite,
     modifier: Modifier = Modifier,
     showBorder: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-    if (spriteData.width == 0 || spriteData.height == 0) return
+    if (sprite.width == 0 || sprite.height == 0) return
 
-    val spriteAspectRatio = spriteData.width.toFloat() / spriteData.height.toFloat()
+    val spriteAspectRatio = sprite.width.toFloat() / sprite.height.toFloat()
 
-    val bitmapImage by remember(spriteData) {
+    val bitmapImage by remember(sprite) {
         mutableStateOf(
             ImageExporter.convertToBitmap(
-                spriteData.pixelsData.map { Color(it) },
-                spriteData.width,
-                spriteData.height,
+                sprite.pixelsData.map { Color(it) },
+                sprite.width,
+                sprite.height,
             )?.asImageBitmap()
         )
     }

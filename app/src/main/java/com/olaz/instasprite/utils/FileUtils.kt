@@ -5,11 +5,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import com.olaz.instasprite.data.model.ISpriteData
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.set
 
 
 fun getFormatFromExtension(fileName: String): Pair<Bitmap.CompressFormat, String>? {

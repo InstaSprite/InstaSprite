@@ -2,7 +2,6 @@ package com.olaz.instasprite.data.repository
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.model.PixelCanvasModel
 
 class PixelCanvasRepository(var model: PixelCanvasModel) {
@@ -84,7 +83,11 @@ class PixelCanvasRepository(var model: PixelCanvasModel) {
         }
     }
 
-    fun getISpriteData(): ISpriteData {
-        return ISpriteData(width = width, height = height, pixelsData =  pixels.map { it.toArgb() })
+    fun getSprite(): com.olaz.instasprite.domain.model.Sprite {
+        return com.olaz.instasprite.domain.model.Sprite(
+            width = width,
+            height = height,
+            pixelsData = pixels.map { it.toArgb() }
+        )
     }
 }

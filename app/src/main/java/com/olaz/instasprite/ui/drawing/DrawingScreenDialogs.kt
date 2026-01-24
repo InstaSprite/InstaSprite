@@ -60,10 +60,10 @@ fun DrawingScreenDialogs(
                     onDismiss = viewModel::closeTopDialog,
 
                     onFilePicked = { uri ->
-                        viewModel.getISpriteDataFromFile(context, uri)
+                        viewModel.getSpriteDataFromFile(context, uri)
                     },
 
-                    onLoad = viewModel::loadISprite
+                    onLoad = viewModel::loadSprite
                 )
 
             DrawingDialog.ResizeCanvas ->

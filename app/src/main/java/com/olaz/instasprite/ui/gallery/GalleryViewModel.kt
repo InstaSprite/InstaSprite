@@ -11,13 +11,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.DrawingActivity
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
-import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.dialog.DialogController
-import com.olaz.instasprite.domain.dialog.DialogControllerImpl
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
@@ -51,7 +50,7 @@ data class GalleryState(
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
-    private val spriteDatabaseRepository: ISpriteDatabaseRepository,
+    private val spriteDatabaseRepository: SpriteDatabaseRepository,
     private val sortSettingRepository: SortSettingRepository,
     private val storageLocationRepository: StorageLocationRepository,
     private val dialogController: DialogController<GalleryDialog>
@@ -64,7 +63,7 @@ class GalleryViewModel @Inject constructor(
     )
     val uiState: StateFlow<GalleryState> = _uiState.asStateFlow()
 
-    val sprites: StateFlow<List<ISpriteWithMetaData>> =
+    val sprites: StateFlow<List<SpriteWithMeta>> =
         spriteDatabaseRepository.getAllSpritesWithMeta()
             .stateIn(
                 viewModelScope,
@@ -83,9 +82,9 @@ class GalleryViewModel @Inject constructor(
 
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var currentSelectedSpriteIndex by mutableIntStateOf(0)
-    var lastSpriteSeenInPager by mutableStateOf<ISpriteData?>(null)
+    var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
 
-    val sortedAndFilteredSprites: StateFlow<List<ISpriteWithMetaData>> = combine(
+    val sortedAndFilteredSprites: StateFlow<List<SpriteWithMeta>> = combine(
         sprites,
         _searchQuery,
         _spriteListOrder
@@ -179,7 +178,7 @@ class GalleryViewModel @Inject constructor(
         )
     }
 
-    fun toggleImagePager(selectedSprite: ISpriteData?) {
+    fun toggleImagePager(selectedSprite: Sprite?) {
         _uiState.value = _uiState.value.copy(
             showImagePager = !_uiState.value.showImagePager
         )
@@ -203,14 +202,14 @@ class GalleryViewModel @Inject constructor(
 
     fun saveImage(
         context: Context,
-        ispriteData: ISpriteData,
+        sprite: Sprite,
         folderUri: Uri,
         fileName: String,
         scalePercent: Int = 100
     ): Boolean {
         val result = saveFileUseCase.saveImageFile(
             context,
-            ispriteData,
+            sprite,
             scalePercent,
             folderUri,
             fileName
@@ -242,7 +241,7 @@ class GalleryViewModel @Inject constructor(
         }
     }
 
-    fun openDrawingActivity(context: Context, sprite: ISpriteData) {
+    fun openDrawingActivity(context: Context, sprite: Sprite) {
         lastEditedSpriteId = sprite.id
         val intent = Intent(context, DrawingActivity::class.java)
         intent.putExtra(DrawingActivity.EXTRA_SPRITE_ID, sprite.id)

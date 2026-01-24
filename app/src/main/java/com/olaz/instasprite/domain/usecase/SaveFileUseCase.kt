@@ -1,17 +1,16 @@
 package com.olaz.instasprite.domain.usecase
 
 import android.content.Context
-import androidx.compose.ui.graphics.Color
 import android.net.Uri
-import androidx.compose.ui.graphics.toArgb
-import com.olaz.instasprite.data.model.ISpriteData
+import androidx.compose.ui.graphics.Color
 import com.olaz.instasprite.data.repository.SaveFileRepository
 import com.olaz.instasprite.domain.export.ImageExporter
+import com.olaz.instasprite.domain.model.Sprite
 
 class SaveFileUseCase {
     fun saveImageFile(
         context: Context,
-        isprite: ISpriteData,
+        sprite: Sprite,
         scalePercent: Int = 100,
         folderUri: Uri,
         fileName: String
@@ -22,9 +21,9 @@ class SaveFileUseCase {
 
         val bitmap =
             ImageExporter.convertToBitmap(
-                isprite.pixelsData.map { Color(it) },
-                isprite.width,
-                isprite.height,
+                sprite.pixelsData.map { Color(it) },
+                sprite.width,
+                sprite.height,
                 scalePercent
             )
         if (bitmap == null) {
@@ -41,7 +40,7 @@ class SaveFileUseCase {
 
     fun saveISpriteFile(
         context: Context,
-        isprite: ISpriteData,
+        sprite: Sprite,
         folderUri: Uri,
         fileName: String
     ): Result<Unit> {
@@ -49,7 +48,7 @@ class SaveFileUseCase {
             return Result.failure(IllegalArgumentException("File name cannot be blank"))
         }
 
-        val success = SaveFileRepository.saveFile(context, isprite, folderUri, fileName)
+        val success = SaveFileRepository.saveFile(context, sprite, folderUri, fileName)
         return if (success) {
             Result.success(Unit)
         } else {

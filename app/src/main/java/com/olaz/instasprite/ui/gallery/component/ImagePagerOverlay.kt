@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
+import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
@@ -59,9 +59,9 @@ import com.olaz.instasprite.utils.toDateString
 @Composable
 fun ImagePagerOverlay(
     onImagePagerEvent: (ImagePagerEvent) -> Unit,
-    spriteList: List<ISpriteWithMetaData>,
+    spriteList: List<SpriteWithMeta>,
     startIndex: Int,
-    onDismiss: (ISpriteData?) -> Unit
+    onDismiss: (Sprite?) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -173,7 +173,7 @@ fun ImagePagerOverlay(
 
 @Composable
 private fun BottomBar(
-    spriteWithMetaData: ISpriteWithMetaData?,
+    spriteWithMetaData: SpriteWithMeta?,
     onSaveImageTap: () -> Unit,
     onEditButtonTap: () -> Unit,
     modifier: Modifier = Modifier

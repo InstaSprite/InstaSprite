@@ -8,9 +8,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.DrawingActivity
-import com.olaz.instasprite.data.model.ISpriteData
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
-import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
@@ -48,7 +48,7 @@ class DrawingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val storageLocationRepository: StorageLocationRepository,
     private val pixelCanvasRepository: PixelCanvasRepository,
-    private val spriteDataRepository: ISpriteDatabaseRepository,
+    private val spriteDataRepository: SpriteDatabaseRepository,
     private val colorPaletteRepository: ColorPaletteRepository,
     private val dialogController: DialogController<DrawingDialog>
 ) : ViewModel(),
@@ -292,7 +292,7 @@ class DrawingViewModel @Inject constructor(
     ): Boolean {
         val result = saveFileUseCase.saveImageFile(
             context,
-            pixelCanvasUseCase.getISpriteData(),
+            pixelCanvasUseCase.getSprite(),
             scalePercent,
             folderUri,
             fileName
@@ -314,7 +314,7 @@ class DrawingViewModel @Inject constructor(
     ): Boolean {
         val result = saveFileUseCase.saveISpriteFile(
             context,
-            pixelCanvasUseCase.getISpriteData(),
+            pixelCanvasUseCase.getSprite(),
             folderUri,
             fileName
         )
@@ -328,15 +328,15 @@ class DrawingViewModel @Inject constructor(
         )
     }
 
-    fun getISpriteDataFromFile(context: Context, fileUri: Uri): ISpriteData? {
+    fun getSpriteDataFromFile(context: Context, fileUri: Uri): Sprite? {
         return loadFileUseCase.loadFile(context, fileUri)
     }
 
-    fun loadISprite(spriteData: ISpriteData) {
-        setCanvasSize(spriteData.width, spriteData.height)
-        pixelCanvasUseCase.setCanvas(spriteData)
-        spriteData.colorPalette?.let {
-            colorPaletteRepository.updatePalette(spriteData.colorPalette.map { Color(it) })
+    fun loadSprite(sprite: Sprite) {
+        setCanvasSize(sprite.width, sprite.height)
+        pixelCanvasUseCase.setCanvas(sprite)
+        sprite.colorPalette?.let {
+            colorPaletteRepository.updatePalette(sprite.colorPalette.map { Color(it) })
         }
         canvasHistoryManager.reset()
         saveState()
@@ -345,8 +345,8 @@ class DrawingViewModel @Inject constructor(
 
     fun saveToDB(spriteName: String? = null) {
         viewModelScope.launch {
-            val spriteData = pixelCanvasUseCase.getISpriteData()
-            spriteDataRepository.saveSprite(spriteData.copy(id = spriteId))
+            val sprite = pixelCanvasUseCase.getSprite()
+            spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
             spriteName?.let {
                 spriteDataRepository.changeName(spriteId, it)
             }
@@ -355,9 +355,9 @@ class DrawingViewModel @Inject constructor(
 
     fun loadFromDB() {
         viewModelScope.launch {
-            val spriteData = spriteDataRepository.loadSprite(spriteId)
-            if (spriteData != null) {
-                loadISprite(spriteData)
+            val sprite = spriteDataRepository.loadSprite(spriteId)
+            if (sprite != null) {
+                loadSprite(sprite)
             }
         }
     }
