@@ -43,9 +43,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.domain.model.SpriteMeta
-import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.ui.components.composable.AsyncCanvasPreviewer
 import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
@@ -69,7 +69,12 @@ fun SpriteList(
         ) { (sprite, meta) ->
             SpriteCard(
                 onDelete = {
-                    onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id))
+                    onSpriteListEvent(
+                        SpriteListEvent.OpenDeleteDialog(
+                            meta!!.spriteName,
+                            sprite.id
+                        )
+                    )
                 },
                 onRename = {
                     onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
@@ -167,8 +172,9 @@ private fun SpriteCard(
                 }
             }
 
-            CanvasPreviewer(
+            AsyncCanvasPreviewer(
                 sprite = sprite,
+                meta = meta,
                 modifier = Modifier
                     .fillMaxWidth(0.95f)
                     .align(Alignment.CenterHorizontally)

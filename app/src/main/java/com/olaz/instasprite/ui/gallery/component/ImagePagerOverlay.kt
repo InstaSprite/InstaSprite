@@ -1,9 +1,6 @@
 package com.olaz.instasprite.ui.gallery.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,9 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
@@ -50,11 +44,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteWithMeta
-import com.olaz.instasprite.domain.export.ImageExporter
-import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
+import com.olaz.instasprite.ui.components.composable.AsyncCanvasPreviewer
+import com.olaz.instasprite.ui.components.composable.AsyncImageZoomableOverlay
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toDateString
+import java.io.File
 
 @Composable
 fun ImagePagerOverlay(
@@ -73,7 +68,7 @@ fun ImagePagerOverlay(
         initialPage = startIndex,
         pageCount = { spriteList.size })
 
-    val sprites = spriteList.map { it.sprite }
+    val sprites = spriteList
     val currentSprite = spriteList.getOrNull(pagerState.currentPage)
 
     var zoomedPageIndex by remember { mutableStateOf<Int?>(null) }
@@ -134,37 +129,25 @@ fun ImagePagerOverlay(
                     .fillMaxSize()
                     .background(CatppuccinUI.BackgroundColorDarker)
             ) { page ->
-                val sprite = sprites[page]
-                val bitmapImage = remember(sprite) {
-                    ImageExporter.convertToBitmap(
-                        sprite.pixelsData.map { Color(it) },
-                        sprite.width,
-                        sprite.height,
-                    )?.asImageBitmap()
-                }
+                val spriteWithMeta = sprites[page]
 
-                if (bitmapImage != null) {
-                    Image(
-                        bitmap = bitmapImage,
-                        contentDescription = "Zoomed Sprite $page",
-                        contentScale = ContentScale.Fit,
-                        filterQuality = FilterQuality.None,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = { zoomedPageIndex = page }
-                            )
+                AsyncCanvasPreviewer(
+                    sprite = spriteWithMeta.sprite,
+                    meta = spriteWithMeta.meta,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    onClick = { zoomedPageIndex = page }
+                )
+
+                if (zoomedPageIndex == page) {
+                    AsyncImageZoomableOverlay(
+                        File(
+                            LocalContext.current.filesDir,
+                            "thumbnail_${spriteWithMeta.sprite.id}.png"
+                        ),
+                        onDismiss = { zoomedPageIndex = null }
                     )
-
-                    if (zoomedPageIndex == page) {
-                        ImageZoomableOverlay(
-                            bitmap = bitmapImage,
-                            onDismiss = { zoomedPageIndex = null }
-                        )
-                    }
                 }
             }
         }

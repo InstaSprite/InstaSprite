@@ -21,7 +21,7 @@ interface SpriteDataDao {
     suspend fun getAllSprites(): List<SpriteData>
 
     @Transaction
-    @Query("SELECT * FROM sprite_data")
+    @Query("SELECT sprite_data.* FROM sprite_data LEFT JOIN sprite_metadata ON sprite_data.id = sprite_metadata.spriteId")
     fun getAllSpritesWithMeta(): Flow<List<SpriteWithMetaData>>
 
     @Query("DELETE FROM sprite_data WHERE id = :id")

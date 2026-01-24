@@ -34,7 +34,8 @@ object AppModule {
         return SpriteDatabaseRepository(
             dao = db.spriteDataDao(),
             metaDao = db.spriteMetaDataDao(),
-            pixelDataSource = SpritePixelDataSource(context)
+            pixelDataSource = SpritePixelDataSource(context),
+            context = context
         )
     }
 

@@ -8,19 +8,22 @@ import com.olaz.instasprite.data.mapper.toEntity
 import com.olaz.instasprite.data.mapper.toSpritePixels
 import com.olaz.instasprite.data.model.SpriteMetaData
 import com.olaz.instasprite.data.source.SpritePixelDataSource
+import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteMeta
 import com.olaz.instasprite.domain.model.SpriteWithMeta
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import java.io.File
 import javax.inject.Inject
 
 class SpriteDatabaseRepository @Inject constructor(
     private val dao: SpriteDataDao,
     private val metaDao: SpriteMetaDataDao,
-    private val pixelDataSource: SpritePixelDataSource
+    private val pixelDataSource: SpritePixelDataSource,
+    @ApplicationContext private val context: android.content.Context
 ) {
     suspend fun saveSprite(sprite: Sprite) {
         Log.d("ISpriteDatabaseRepository", "Saving sprite: $sprite")
@@ -35,11 +38,13 @@ class SpriteDatabaseRepository @Inject constructor(
                 lastModifiedAt = now
             )
 
-        dao.insert(entity)
-        metaDao.insert(meta)
-
         val proto = sprite.toSpritePixels()
         pixelDataSource.getDataStore(sprite.id).updateData { proto }
+
+        ImageExporter.saveThumbnail(sprite, context)
+
+        dao.insert(entity)
+        metaDao.insert(meta)
     }
 
     suspend fun loadSprite(id: String): Sprite? {
@@ -71,6 +76,11 @@ class SpriteDatabaseRepository @Inject constructor(
     fun deleteSpriteById(spriteId: String) {
         dao.delete(spriteId)
         pixelDataSource.deleteDataStore(spriteId)
+        
+        val thumbnailFile = File(context.filesDir, "thumbnail_${spriteId}.png")
+        if (thumbnailFile.exists()) {
+            thumbnailFile.delete()
+        }
     }
 
     suspend fun changeName(spriteId: String, newName: String) {

@@ -1,10 +1,15 @@
 package com.olaz.instasprite.domain.export
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
+import com.olaz.instasprite.domain.model.Sprite
+import java.io.File
+import java.io.FileOutputStream
 
 object ImageExporter {
     fun convertToBitmap(
@@ -27,5 +32,22 @@ object ImageExporter {
         val scaledHeight = (canvasHeight * scale).toInt().coerceAtLeast(1)
 
         return bitmap.scale(scaledWidth, scaledHeight, false)
+    }
+
+    fun saveThumbnail(sprite: Sprite, context: Context) {
+        try {
+            val bitmap = convertToBitmap(
+                sprite.pixelsData.map { Color(it) },
+                sprite.width,
+                sprite.height
+            )
+            val thumbnailFile = File(context.filesDir, "thumbnail_${sprite.id}.png")
+            val outputStream = FileOutputStream(thumbnailFile)
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+        } catch (e: Exception) {
+            Log.e("ImageExporter", "Failed to save thumbnail", e)
+        }
     }
 }
