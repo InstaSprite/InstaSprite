@@ -2,9 +2,9 @@ package com.olaz.instasprite.data.repository
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.domain.model.PixelCanvas
 
-class PixelCanvasRepository(var model: PixelCanvasModel) {
+class PixelCanvasRepository(var model: PixelCanvas) {
     var width: Int
         get() = model.width
         set(value) { model.width = value }

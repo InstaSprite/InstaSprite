@@ -6,10 +6,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.olaz.instasprite.R
 import com.olaz.instasprite.data.database.ColorPaletteDao
-import com.olaz.instasprite.data.model.toData
+import com.olaz.instasprite.data.mapper.toData
 import com.olaz.instasprite.data.network.lospec.LospecService
 import com.olaz.instasprite.data.network.lospec.model.toDomain
-import com.olaz.instasprite.domain.model.ColorPaletteModel
+import com.olaz.instasprite.domain.model.ColorPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,12 +58,12 @@ class ColorPaletteRepository(
         }
     }
 
-    suspend fun savePaletteToDB(palette: ColorPaletteModel) {
+    suspend fun savePaletteToDB(palette: ColorPalette) {
         colorPaletteDao.insert(palette.toData())
     }
 
 
-    suspend fun getLospecColorPalette(input: String): ColorPaletteModel? {
+    suspend fun getLospecColorPalette(input: String): ColorPalette? {
         val paletteName = if (input.contains("lospec.com")) {
             input.trimEnd('/')
                 .substringAfterLast('/')

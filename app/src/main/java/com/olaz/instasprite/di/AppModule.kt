@@ -2,7 +2,7 @@ package com.olaz.instasprite.di
 
 import android.content.Context
 import com.olaz.instasprite.data.database.AppDatabase
-import com.olaz.instasprite.data.model.PixelCanvasModel
+import com.olaz.instasprite.domain.model.PixelCanvas
 import com.olaz.instasprite.data.network.lospec.LospecService
 import com.olaz.instasprite.data.repository.*
 import com.olaz.instasprite.domain.dialog.DialogController
@@ -52,7 +52,7 @@ object AppModule {
     @Provides
     fun providePixelCanvasRepository(): PixelCanvasRepository {
         // Default 16x16, viewModel will resize this based on the Intent extras.
-        return PixelCanvasRepository(PixelCanvasModel(16, 16))
+        return PixelCanvasRepository(PixelCanvas(16, 16))
     }
 
 

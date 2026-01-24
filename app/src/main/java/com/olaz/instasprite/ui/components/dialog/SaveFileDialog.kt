@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import com.olaz.instasprite.data.model.InputField
+import com.olaz.instasprite.domain.model.InputField
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.getFullPathFromTreeUri

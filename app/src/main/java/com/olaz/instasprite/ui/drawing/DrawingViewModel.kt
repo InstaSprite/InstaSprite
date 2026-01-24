@@ -15,7 +15,7 @@ import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.dialog.DialogController
-import com.olaz.instasprite.domain.model.ColorPaletteModel
+import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
@@ -374,7 +374,7 @@ class DrawingViewModel @Inject constructor(
 
             viewModelScope.launch {
                 colorPaletteRepository.savePaletteToDB(
-                    ColorPaletteModel(
+                    ColorPalette(
                         colors = colors.toMutableList()
                     )
                 )

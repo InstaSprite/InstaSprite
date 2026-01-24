@@ -2,7 +2,7 @@ package com.olaz.instasprite.domain.model
 
 import androidx.compose.ui.graphics.Color
 
-data class ColorPaletteModel(
+data class ColorPalette(
     val id: Int = 0,
     val name: String = "Unnamed",
     val author: String = "Anonymous",

@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.data.model.InputField
+import com.olaz.instasprite.domain.model.InputField
 import com.olaz.instasprite.ui.components.dialog.SaveFileDialog
 
 @Composable
