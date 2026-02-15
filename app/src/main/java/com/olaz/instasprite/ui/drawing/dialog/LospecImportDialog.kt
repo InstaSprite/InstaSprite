@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.components.composable.ColorPaletteList
-import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
+import com.olaz.instasprite.ui.components.composable.ColorPaletteView
+import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.theme.CatppuccinTypography
 import com.olaz.instasprite.ui.theme.CatppuccinUI
@@ -84,11 +84,9 @@ fun LospecImportDialog(
                 )
 
                 if (previewColors != null) {
-                    ColorPaletteList(
-                        colorPaletteListOptions = ColorPaletteListOptions(
-                            colors = previewColors!!,
-                            isInteractive = false
-                        )
+                    ColorPaletteView(
+                        colors = previewColors!!,
+                        config = ColorPaletteConfig(isInteractive = false)
                     )
                 }
 

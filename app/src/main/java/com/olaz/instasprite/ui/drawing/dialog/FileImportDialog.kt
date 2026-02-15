@@ -23,8 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import com.olaz.instasprite.ui.components.composable.ColorPaletteList
-import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
+import com.olaz.instasprite.ui.components.composable.ColorPaletteView
+import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.dialog.InputDialog
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import kotlinx.coroutines.launch
@@ -127,11 +127,9 @@ fun FileImportDialog(
         },
         extraBottomContent = {
             if (previewColors != null) {
-                ColorPaletteList(
-                    colorPaletteListOptions = ColorPaletteListOptions(
-                        colors = previewColors!!,
-                        isInteractive = false
-                    )
+                ColorPaletteView(
+                    colors = previewColors!!,
+                    config = ColorPaletteConfig(isInteractive = false)
                 )
             }
         }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,31 +25,36 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
-data class ColorPaletteListOptions(
-    val colors: List<Color>,
-    val activeColor: Color? = null,
+@Immutable
+data class ColorPaletteConfig(
     val backgroundColor: Color = CatppuccinUI.BackgroundColorDarker,
     val itemSpacing: Dp = 0.dp,
     val listHeight: Dp = 40.dp,
     val colorItemSize: Dp = 30.dp,
     val isInteractive: Boolean = true,
-    val onColorSelected: ((Color) -> Unit)? = null,
 ) {
     init {
         require(listHeight >= colorItemSize) {
             "listHeight ($listHeight) must be greater than or equal to colorItemSize ($colorItemSize)"
         }
     }
+
+    companion object {
+        val Default = ColorPaletteConfig()
+    }
 }
 
 @Composable
-fun ColorPaletteList(
-    colorPaletteListOptions: ColorPaletteListOptions,
+fun ColorPaletteView(
+    colors: List<Color>,
     modifier: Modifier = Modifier,
+    activeColor: Color? = null,
+    onColorSelected: ((Color) -> Unit)? = null,
+    config: ColorPaletteConfig = ColorPaletteConfig.Default,
     lazyListState: LazyListState = rememberLazyListState(),
     itemColorModifier: Modifier? = null,
 ) {
-    with(colorPaletteListOptions) {
+    with(config) {
         Box(
             contentAlignment = Alignment.CenterStart,
             modifier = modifier
@@ -132,22 +138,22 @@ fun ActiveColorItem(
 @Preview
 @Composable
 private fun Preview() {
-    ColorPaletteList(
-        colorPaletteListOptions = ColorPaletteListOptions(
-            colors = listOf(
-                Color.White,
-                Color.Green,
-                Color.Blue,
-                Color.Yellow,
-                Color.Magenta,
-                Color.Cyan,
-            ),
-            activeColor = Color.White,
+    ColorPaletteView(
+        colors = listOf(
+            Color.White,
+            Color.Green,
+            Color.Blue,
+            Color.Yellow,
+            Color.Magenta,
+            Color.Cyan,
+        ),
+        activeColor = Color.White,
+        config = ColorPaletteConfig(
             itemSpacing = 0.dp,
             listHeight = 40.dp,
             colorItemSize = 30.dp,
             isInteractive = true,
-            onColorSelected = {},
-        )
+        ),
+        onColorSelected = {},
     )
 }
