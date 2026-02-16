@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -46,6 +45,8 @@ import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.components.composable.AsyncCanvasPreviewer
 import com.olaz.instasprite.ui.components.composable.AsyncImageZoomableOverlay
+import com.olaz.instasprite.ui.components.composable.BackButton
+import com.olaz.instasprite.ui.components.composable.TopBar
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toDateString
@@ -68,7 +69,6 @@ fun ImagePagerOverlay(
         initialPage = startIndex,
         pageCount = { spriteList.size })
 
-    val sprites = spriteList
     val currentSprite = spriteList.getOrNull(pagerState.currentPage)
 
     var zoomedPageIndex by remember { mutableStateOf<Int?>(null) }
@@ -129,7 +129,7 @@ fun ImagePagerOverlay(
                     .fillMaxSize()
                     .background(CatppuccinUI.BackgroundColorDarker)
             ) { page ->
-                val spriteWithMeta = sprites[page]
+                val spriteWithMeta = spriteList[page]
 
                 AsyncCanvasPreviewer(
                     sprite = spriteWithMeta.sprite,
@@ -255,31 +255,11 @@ private fun TopBar(
 ) {
     var dropdownMenuVisible by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .background(CatppuccinUI.BackgroundColor)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-                .align(Alignment.CenterStart)
-        ) {
-            IconButton(
-                onClick = onDismiss
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Dismiss",
-                    tint = CatppuccinUI.DismissButtonColor,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-
+    TopBar(
+        leftSlot = {
+            BackButton(onClick = onDismiss)
+        },
+        rightSlot = {
             Box {
                 IconButton(
                     onClick = { dropdownMenuVisible = true }
@@ -301,7 +281,7 @@ private fun TopBar(
                 )
             }
         }
-    }
+    )
 }
 
 @Composable

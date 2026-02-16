@@ -28,12 +28,14 @@ import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
+import com.olaz.instasprite.utils.DummyData
 
 @Composable
 fun ColorPaletteList(
     palettes: List<ColorPalette>,
     onPaletteSelected: (ColorPalette) -> Unit,
     modifier: Modifier = Modifier,
+    colorPaletteConfig: ColorPaletteConfig = ColorPaletteConfig(isInteractive = false),
     optionSlot: @Composable (ColorPalette) -> Unit = {}
 ) {
     LazyColumn(
@@ -46,6 +48,7 @@ fun ColorPaletteList(
             ListEntry(
                 palette = palette,
                 optionSlot = optionSlot,
+                colorPaletteConfig = colorPaletteConfig,
                 onClick = { onPaletteSelected(palette) }
             )
         }
@@ -56,6 +59,7 @@ fun ColorPaletteList(
 private fun ListEntry(
     palette: ColorPalette,
     onClick: () -> Unit,
+    colorPaletteConfig: ColorPaletteConfig,
     modifier: Modifier = Modifier,
     optionSlot: @Composable (ColorPalette) -> Unit = {}
 ) {
@@ -92,12 +96,7 @@ private fun ListEntry(
 
         ColorPaletteView(
             colors = palette.colors,
-            config = ColorPaletteConfig(
-                itemSpacing = 4.dp,
-                listHeight = 32.dp,
-                colorItemSize = 24.dp,
-                isInteractive = false
-            ),
+            config = colorPaletteConfig,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -107,41 +106,8 @@ private fun ListEntry(
 @Composable
 private fun PreviewColorPaletteList() {
     InstaSpriteTheme {
-        val dummyPalettes = listOf(
-            ColorPalette(
-                id = 1,
-                colors = mutableListOf(
-                    Color(0xFF0077BE),
-                    Color(0xFF0096C7),
-                    Color(0xFF48CAE4),
-                    Color(0xFF90E0EF),
-                    Color(0xFFCAF0F8)
-                )
-            ),
-            ColorPalette(
-                id = 2,
-                colors = mutableListOf(
-                    Color(0xFF355070),
-                    Color(0xFF6D597A),
-                    Color(0xFFB56576),
-                    Color(0xFFE56B6F),
-                    Color(0xFFEAAC8B)
-                )
-            ),
-            ColorPalette(
-                id = 3,
-                colors = mutableListOf(
-                    Color(0xFF2D6A4F),
-                    Color(0xFF40916C),
-                    Color(0xFF52B788),
-                    Color(0xFF74C69D),
-                    Color(0xFF95D5B2)
-                )
-            )
-        )
-
         ColorPaletteList(
-            palettes = dummyPalettes,
+            palettes = DummyData.palettes,
             onPaletteSelected = {}
         )
     }
@@ -151,41 +117,9 @@ private fun PreviewColorPaletteList() {
 @Composable
 private fun PreviewColorPaletteListWithOption() {
     InstaSpriteTheme {
-        val dummyPalettes = listOf(
-            ColorPalette(
-                id = 1,
-                colors = mutableListOf(
-                    Color(0xFF0077BE),
-                    Color(0xFF0096C7),
-                    Color(0xFF48CAE4),
-                    Color(0xFF90E0EF),
-                    Color(0xFFCAF0F8)
-                )
-            ),
-            ColorPalette(
-                id = 2,
-                colors = mutableListOf(
-                    Color(0xFF355070),
-                    Color(0xFF6D597A),
-                    Color(0xFFB56576),
-                    Color(0xFFE56B6F),
-                    Color(0xFFEAAC8B)
-                )
-            ),
-            ColorPalette(
-                id = 3,
-                colors = mutableListOf(
-                    Color(0xFF2D6A4F),
-                    Color(0xFF40916C),
-                    Color(0xFF52B788),
-                    Color(0xFF74C69D),
-                    Color(0xFF95D5B2)
-                )
-            )
-        )
 
         ColorPaletteList(
-            palettes = dummyPalettes,
+            palettes = DummyData.palettes,
             onPaletteSelected = {},
             optionSlot = { palette ->
                 Button(
