@@ -14,4 +14,6 @@ data class DrawingRoute(
     val spriteName: String?
 ) : Route
 
+@Serializable
+object PaletteRoute : Route
 

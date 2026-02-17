@@ -1,6 +1,5 @@
 package com.olaz.instasprite.ui.gallery
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,7 +11,6 @@ import com.olaz.instasprite.ui.gallery.dialog.CreateCanvasDialog
 import com.olaz.instasprite.ui.gallery.dialog.RenameDialog
 import com.olaz.instasprite.ui.gallery.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
-import com.olaz.instasprite.ui.palette.ColorPaletteScreen
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
@@ -44,15 +42,17 @@ fun GalleryScreenDialogs(
                     onDismiss = viewModel::closeTopDialog,
                     onConfirm = { name, width, height ->
                         val id = java.util.UUID.randomUUID().toString()
-                        viewModel.onOpenDrawing(id, width, height, name)
+                        viewModel.onOpenDrawing(id, width, height, name, viewModel.selectedNewCanvasPalette)
                         viewModel.closeTopDialog()
-                    }
+                    },
+                    onPaletteViewClick = viewModel::openColorPaletteScreen,
+                    selectedPalette = viewModel.selectedNewCanvasPalette
                 )
 
             is GalleryDialog.DeleteSpriteConfirm ->
                 ConfirmationDialog(
                     title = "Delete sprite",
-                    text = "Are you sure you want to delete",
+                    text = "Are you sureyou::want to delete",
                     highlightText = dialog.spriteName,
                     confirmButtonText = "Delete",
                     dismissButtonText = "Cancel",

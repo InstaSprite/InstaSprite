@@ -15,6 +15,7 @@ import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.dialog.DialogController
+import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
@@ -81,8 +82,14 @@ class GalleryViewModel @Inject constructor(
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var currentSelectedSpriteIndex by mutableIntStateOf(0)
     var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
+    var selectedNewCanvasPalette by mutableStateOf<ColorPalette?>(null)
 
-    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?) -> Unit = { _, _, _, _-> }
+    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?, palette: ColorPalette?) -> Unit = { _, _, _, _, _ -> }
+    var onOpenPalette: () -> Unit = {}
+
+    fun onCanvasPaletteSelected(palette: ColorPalette) {
+        selectedNewCanvasPalette = palette
+    }
 
     val sortedAndFilteredSprites: StateFlow<List<SpriteWithMeta>> = combine(
         sprites,
@@ -140,7 +147,8 @@ class GalleryViewModel @Inject constructor(
                 event.sprite.id,
                 event.sprite.width,
                 event.sprite.height,
-                event.name
+                event.name,
+                null
             )
 
             is ImagePagerEvent.OpenSaveImageDialog -> openDialog(GalleryDialog.SaveImage(event.sprite))
@@ -168,7 +176,8 @@ class GalleryViewModel @Inject constructor(
                 event.sprite.id,
                 event.sprite.width,
                 event.sprite.height,
-                event.name
+                event.name,
+                null
             )
 
             is SpriteListEvent.OpenPager -> toggleImagePager(event.sprite)
@@ -263,5 +272,9 @@ class GalleryViewModel @Inject constructor(
 
     fun setSpriteListOrder(order: SpriteListOrder) {
         _spriteListOrder.value = order
+    }
+
+    fun openColorPaletteScreen() {
+        onOpenPalette()
     }
 }

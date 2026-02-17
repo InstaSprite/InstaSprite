@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.palette
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -38,6 +39,8 @@ fun ColorPaletteScreen(
     onPaletteSelected: (ColorPalette) -> Unit,
     viewModel: ColorPaletteViewModel = hiltViewModel()
 ) {
+    BackHandler(onBack = onDismiss)
+
     val savedPalettes by viewModel.savedPalettes.collectAsState()
     val dialogState by viewModel.dialogState.collectAsState()
 
@@ -89,7 +92,6 @@ private fun ColorPaletteSelectionContent(
                 lazyListState = lazyListState,
                 onPaletteSelected = {
                     onPaletteSelected(it)
-                    onDismiss()
                 },
                 optionSlot = { palette ->
                     Box(

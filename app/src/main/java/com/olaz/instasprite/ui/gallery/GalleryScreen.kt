@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.domain.model.SpriteMeta
@@ -60,7 +61,8 @@ data class GalleryScreenEvent(
 
 @Composable
 fun GalleryScreen(
-    onNavigateToDrawing: (String, Int, Int, String?) -> Unit,
+    onNavigateToDrawing: (String, Int, Int, String?, ColorPalette?) -> Unit,
+    onNavigateToPalette: () -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
     UiUtils.SetStatusBarColor(CatppuccinUI.TopBarColor)
@@ -122,6 +124,7 @@ fun GalleryScreen(
 
     val event = remember(viewModel) {
         viewModel.onOpenDrawing = onNavigateToDrawing
+        viewModel.onOpenPalette = onNavigateToPalette
 
         GalleryScreenEvent(
             onBottomBarEvent = viewModel::onBottomBarEvent,

@@ -8,12 +8,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.navigation.DrawingRoute
 import com.olaz.instasprite.navigation.GalleryRoute
+import com.olaz.instasprite.navigation.PaletteRoute
 import com.olaz.instasprite.ui.drawing.DrawingScreen
 import com.olaz.instasprite.ui.drawing.DrawingViewModel
 import com.olaz.instasprite.ui.gallery.GalleryScreen
 import com.olaz.instasprite.ui.gallery.GalleryViewModel
+import com.olaz.instasprite.ui.palette.ColorPaletteScreen
+import com.olaz.instasprite.ui.palette.ColorPaletteViewModel
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -34,9 +38,16 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable<GalleryRoute> {
                         val galleryViewModel = hiltViewModel<GalleryViewModel>()
+                        
+                        val selectedPalette = it.savedStateHandle.get<ColorPalette>("selected_palette")
+                        if (selectedPalette != null) {
+                            galleryViewModel.onCanvasPaletteSelected(selectedPalette)
+                            it.savedStateHandle["selected_palette"] = null
+                        }
+
                         GalleryScreen(
                             viewModel = galleryViewModel,
-                            onNavigateToDrawing = { id, width, height, name ->
+                            onNavigateToDrawing = { id, width, height, name, palette ->
                                 navController.navigate(
                                     DrawingRoute(
                                         spriteId = id,
@@ -45,6 +56,9 @@ class MainActivity : ComponentActivity() {
                                         spriteName = name
                                     )
                                 )
+                            },
+                            onNavigateToPalette = {
+                                navController.navigate(PaletteRoute)
                             }
                         )
                     }
@@ -58,6 +72,22 @@ class MainActivity : ComponentActivity() {
                                     drawingViewModel.saveToDB()
                                     navController.popBackStack()
                                 }
+                            }
+                        )
+                    }
+
+                    composable<PaletteRoute> {
+                        val paletteViewModel = hiltViewModel<ColorPaletteViewModel>()
+                        ColorPaletteScreen(
+                            viewModel = paletteViewModel,
+                            onDismiss = {
+                                navController.popBackStack()
+                            },
+                            onPaletteSelected = { palette ->
+                                navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("selected_palette", palette)
+                                navController.popBackStack()
                             }
                         )
                     }
