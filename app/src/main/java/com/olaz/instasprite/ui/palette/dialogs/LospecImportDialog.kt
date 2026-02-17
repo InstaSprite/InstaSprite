@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.drawing.dialog
+package com.olaz.instasprite.ui.palette.dialogs
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -16,9 +16,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
@@ -29,11 +29,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun LospecImportDialog(
     onDismiss: () -> Unit,
-    onImportColorsFromLospecUrl: suspend (String) -> List<Color>,
-    onImport: (List<Color>) -> Unit,
+    onImportColorsFromLospecUrl: suspend (String) -> ColorPalette?,
+    onImport: (ColorPalette) -> Unit,
 ) {
     var paletteUrl by remember { mutableStateOf("") }
-    var previewColors by remember { mutableStateOf<List<Color>?>(null) }
+    var previewColors by remember { mutableStateOf<ColorPalette?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -41,7 +41,7 @@ fun LospecImportDialog(
         title = "Import from Lospec",
         onDismiss = onDismiss,
         onConfirm = {
-            if (previewColors != null && previewColors!!.isNotEmpty()) {
+            if (previewColors != null && previewColors!!.colors.isNotEmpty()) {
                 onImport(previewColors!!)
                 Toast.makeText(
                     context,
@@ -83,9 +83,9 @@ fun LospecImportDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (previewColors != null) {
+                previewColors?.let {
                     ColorPaletteView(
-                        colors = previewColors!!,
+                        colors = it.colors,
                         config = ColorPaletteConfig(isInteractive = false)
                     )
                 }
@@ -115,13 +115,13 @@ fun LospecImportDialog(
                             }
 
                             try {
-                                val colors = onImportColorsFromLospecUrl(trimmedUrl)
-                                if (colors.isEmpty()) {
-                                    Toast.makeText(context, "No colors found", Toast.LENGTH_SHORT).show()
+                                val palette = onImportColorsFromLospecUrl(trimmedUrl)
+                                if (palette == null) {
+                                    Toast.makeText(context, "No palette found", Toast.LENGTH_SHORT).show()
                                     previewColors = null
                                 } else {
-                                    previewColors = colors
-                                    Toast.makeText(context, "Colors loaded successfully!", Toast.LENGTH_SHORT).show()
+                                    previewColors = palette
+                                    Toast.makeText(context, "Palette loaded successfully!", Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
                                 previewColors = null

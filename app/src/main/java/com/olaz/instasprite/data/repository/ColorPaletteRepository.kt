@@ -7,12 +7,15 @@ import androidx.core.graphics.toColorInt
 import com.olaz.instasprite.R
 import com.olaz.instasprite.data.database.ColorPaletteDao
 import com.olaz.instasprite.data.mapper.toData
+import com.olaz.instasprite.data.mapper.toDomain
 import com.olaz.instasprite.data.network.lospec.LospecService
 import com.olaz.instasprite.data.network.lospec.model.toDomain
 import com.olaz.instasprite.domain.model.ColorPalette
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.collections.ArrayDeque
@@ -33,6 +36,9 @@ class ColorPaletteRepository(
 
     private val _recentColors = MutableStateFlow(ArrayDeque<Color>())
     val recentColors: StateFlow<ArrayDeque<Color>> = _recentColors.asStateFlow()
+
+    val savedPalettes: Flow<List<ColorPalette>> = colorPaletteDao.getAllPaletteFlow()
+        .map { list -> list.map { it.toDomain() } }
 
     fun addColorToPalette(color: Color) {
         if (color !in _colors.value) {
@@ -59,7 +65,15 @@ class ColorPaletteRepository(
     }
 
     suspend fun savePaletteToDB(palette: ColorPalette) {
-        colorPaletteDao.insert(palette.toData())
+        val allPalettes = colorPaletteDao.getAllPalette()
+        val exists = allPalettes.any { it.colors == palette.colors }
+        if (!exists) {
+            colorPaletteDao.insert(palette.toData())
+        }
+    }
+
+    suspend fun deletePalette(id: Int) {
+        colorPaletteDao.deletePaletteById(id)
     }
 
 
@@ -92,7 +106,7 @@ class ColorPaletteRepository(
     }
 }
 
-private fun loadDefaultColorPalette(context: Context): MutableList<Color> {
+fun loadDefaultColorPalette(context: Context): MutableList<Color> {
     val resourceId: Int = R.raw.sage57
     val colors = mutableListOf<Color>()
 

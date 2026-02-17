@@ -49,7 +49,9 @@ import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
 import com.olaz.instasprite.ui.drawing.contract.ToolSelectorEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
+import com.olaz.instasprite.utils.DummyData
 import com.olaz.instasprite.utils.UiUtils
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -209,36 +211,17 @@ private fun DrawingScreenContent(
     }
 }
 
-private class MockColorPaletteDao() : ColorPaletteDao {
-    override suspend fun insert(palette: ColorPaletteData) {
-        TODO("Not yet implemented")
-    }
 
-    override suspend fun getAllPalette(): List<ColorPaletteData> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getPaletteByName(name: String): ColorPaletteData? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deletePaletteByName(name: String) {
-        TODO("Not yet implemented")
-    }
-
-}
-
-private class MockLospecService() : LospecService {
-    override suspend fun getPalette(paletteName: String): PaletteDto {
-        return PaletteDto()
-    }
-}
 @Preview
 @Composable
 private fun DrawingScreenPreview() {
 
     val context = LocalContext.current
-    val colorPaletteRepository = ColorPaletteRepository(context, colorPaletteDao = MockColorPaletteDao(), lospecService = MockLospecService())
+    val colorPaletteRepository = ColorPaletteRepository(
+        context,
+        colorPaletteDao = DummyData.MockClass.MockColorPaletteDao(),
+        lospecService = DummyData.MockClass.MockLospecService()
+    )
     val colors = colorPaletteRepository.colors.collectAsState()
     val activeColor = colorPaletteRepository.activeColor.collectAsState()
 

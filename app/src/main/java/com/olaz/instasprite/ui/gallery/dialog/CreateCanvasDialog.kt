@@ -1,11 +1,24 @@
 package com.olaz.instasprite.ui.gallery.dialog
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import com.olaz.instasprite.DrawingActivity
+import com.olaz.instasprite.data.repository.loadDefaultColorPalette
+import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.domain.model.InputField
+import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
+import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.dialog.InputDialog
 import java.util.UUID
 
@@ -13,8 +26,10 @@ import java.util.UUID
 @Composable
 fun CreateCanvasDialog(
     onDismiss: () -> Unit,
+    onPaletteViewClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    var selectedPalette by remember { mutableStateOf<ColorPalette?>(null) }
 
     InputDialog(
         title = "New canvas",
@@ -62,6 +77,24 @@ fun CreateCanvasDialog(
 
             onDismiss()
             context.startActivity(intent)
-        },
-    )
+        }, extraBottomContent = {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    var palette = loadDefaultColorPalette(LocalContext.current)
+                    if (selectedPalette != null) palette = selectedPalette!!.colors
+
+                    ColorPaletteView(
+                        colors = palette,
+                        config = ColorPaletteConfig(
+                            isInteractive = false
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable(true, onClick = onPaletteViewClick)
+                    )
+                }
+            }
+        })
 }

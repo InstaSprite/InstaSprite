@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,10 +37,12 @@ fun ColorPaletteList(
     palettes: List<ColorPalette>,
     onPaletteSelected: (ColorPalette) -> Unit,
     modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState(),
     colorPaletteConfig: ColorPaletteConfig = ColorPaletteConfig(isInteractive = false),
     optionSlot: @Composable (ColorPalette) -> Unit = {}
 ) {
     LazyColumn(
+        state = lazyListState,
         modifier = modifier
             .background(CatppuccinUI.BackgroundColorDarker),
         contentPadding = PaddingValues(16.dp),

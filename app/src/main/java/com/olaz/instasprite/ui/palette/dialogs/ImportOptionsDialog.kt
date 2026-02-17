@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.drawing.dialog
+package com.olaz.instasprite.ui.palette.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.gallery
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -11,6 +12,7 @@ import com.olaz.instasprite.ui.gallery.dialog.CreateCanvasDialog
 import com.olaz.instasprite.ui.gallery.dialog.RenameDialog
 import com.olaz.instasprite.ui.gallery.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
+import com.olaz.instasprite.ui.palette.ColorPaletteScreen
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 

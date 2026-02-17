@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.drawing.dialog
+package com.olaz.instasprite.ui.palette.dialogs
 
 import android.content.Intent
 import android.net.Uri

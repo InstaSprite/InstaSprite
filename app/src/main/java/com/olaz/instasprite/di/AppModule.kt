@@ -10,6 +10,7 @@ import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.dialog.DialogControllerImpl
 import com.olaz.instasprite.ui.drawing.DrawingDialog
 import com.olaz.instasprite.ui.gallery.GalleryDialog
+import com.olaz.instasprite.ui.palette.ColorPaletteDialog
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -71,6 +72,11 @@ object AppModule {
 
     @Provides
     fun provideGalleryDialogController(): DialogController<GalleryDialog> {
+        return DialogControllerImpl()
+    }
+
+    @Provides
+    fun provideColorPaletteDialogController(): DialogController<ColorPaletteDialog> {
         return DialogControllerImpl()
     }
 }
