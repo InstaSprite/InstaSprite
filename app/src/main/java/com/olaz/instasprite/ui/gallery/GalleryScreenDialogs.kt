@@ -4,13 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
-import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.domain.dialog.Dialog
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.ui.components.dialog.ConfirmationDialog
 import com.olaz.instasprite.ui.gallery.dialog.CreateCanvasDialog
-import com.olaz.instasprite.ui.gallery.dialog.DeleteSpriteConfirmDialog
 import com.olaz.instasprite.ui.gallery.dialog.RenameDialog
 import com.olaz.instasprite.ui.gallery.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
 sealed interface GalleryDialog : Dialog {
@@ -42,15 +43,20 @@ fun GalleryScreenDialogs(
                 )
 
             is GalleryDialog.DeleteSpriteConfirm ->
-                DeleteSpriteConfirmDialog(
-                    spriteName = dialog.spriteName,
+                ConfirmationDialog(
+                    title = "Delete sprite",
+                    text = "Are you sure you want to delete",
+                    highlightText = dialog.spriteName,
+                    confirmButtonText = "Delete",
+                    dismissButtonText = "Cancel",
+                    highlightTextColor = CatppuccinUI.DismissButtonColor,
+                    hasQuestionMark = true,
                     onConfirm = {
                         viewModel.deleteSpriteById(dialog.spriteId)
                         viewModel.closeTopDialog()
                     },
                     onDismiss = viewModel::closeTopDialog
                 )
-
             is GalleryDialog.Rename ->
                 RenameDialog(
                     spriteId = dialog.spriteId,
