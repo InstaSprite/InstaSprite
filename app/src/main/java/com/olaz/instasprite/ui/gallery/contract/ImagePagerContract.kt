@@ -7,7 +7,7 @@ import com.olaz.instasprite.domain.model.SpriteWithMeta
 sealed interface ImagePagerEvent {
     data class OpenDeleteDialog(val spriteName: String, val spriteId: String) : ImagePagerEvent
     data class OpenSaveImageDialog(val sprite: SpriteWithMeta) : ImagePagerEvent
-    data class OpenDrawingActivity(val sprite: Sprite, val context: Context) : ImagePagerEvent
+    data class OpenDrawingActivity(val name: String?, val sprite: Sprite, val context: Context) : ImagePagerEvent
 }
 
 

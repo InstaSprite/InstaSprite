@@ -41,7 +41,12 @@ fun GalleryScreenDialogs(
         when (dialog) {
             is GalleryDialog.CreateCanvas ->
                 CreateCanvasDialog(
-                    onDismiss = viewModel::closeTopDialog
+                    onDismiss = viewModel::closeTopDialog,
+                    onConfirm = { name, width, height ->
+                        val id = java.util.UUID.randomUUID().toString()
+                        viewModel.onOpenDrawing(id, width, height, name)
+                        viewModel.closeTopDialog()
+                    }
                 )
 
             is GalleryDialog.DeleteSpriteConfirm ->

@@ -1,6 +1,6 @@
 package com.olaz.instasprite.ui.gallery.dialog
 
-import android.content.Intent
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,19 +13,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import com.olaz.instasprite.DrawingActivity
+
 import com.olaz.instasprite.data.repository.loadDefaultColorPalette
 import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.domain.model.InputField
 import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.dialog.InputDialog
-import java.util.UUID
+
 
 
 @Composable
 fun CreateCanvasDialog(
     onDismiss: () -> Unit,
+    onConfirm: (String, Int, Int) -> Unit,
     onPaletteViewClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -68,15 +69,8 @@ fun CreateCanvasDialog(
             val width = values[1].toInt()
             val height = values[2].toInt()
 
-            val intent = Intent(context, DrawingActivity::class.java).apply {
-                putExtra(DrawingActivity.EXTRA_CANVAS_WIDTH, width)
-                putExtra(DrawingActivity.EXTRA_CANVAS_HEIGHT, height)
-                putExtra(DrawingActivity.EXTRA_SPRITE_ID, UUID.randomUUID().toString())
-                putExtra(DrawingActivity.EXTRA_SPRITE_NAME, name)
-            }
-
+            onConfirm(name, width, height)
             onDismiss()
-            context.startActivity(intent)
         }, extraBottomContent = {
             Column {
                 Row(

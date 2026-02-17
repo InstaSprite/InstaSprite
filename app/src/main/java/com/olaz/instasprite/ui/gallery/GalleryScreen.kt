@@ -60,6 +60,7 @@ data class GalleryScreenEvent(
 
 @Composable
 fun GalleryScreen(
+    onNavigateToDrawing: (String, Int, Int, String?) -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
     UiUtils.SetStatusBarColor(CatppuccinUI.TopBarColor)
@@ -120,6 +121,8 @@ fun GalleryScreen(
     GalleryScreenDialogs(dialogState, viewModel)
 
     val event = remember(viewModel) {
+        viewModel.onOpenDrawing = onNavigateToDrawing
+
         GalleryScreenEvent(
             onBottomBarEvent = viewModel::onBottomBarEvent,
             onImagePagerEvent = viewModel::onImagePagerEvent,

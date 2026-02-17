@@ -2,6 +2,7 @@ package com.olaz.instasprite.ui.drawing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -66,8 +67,11 @@ data class DrawingScreenEvent(
 
 @Composable
 fun DrawingScreen(
+    onNavigateBack: () -> Unit,
     viewModel: DrawingViewModel = hiltViewModel()
 ) {
+    BackHandler(onBack = onNavigateBack)
+
     UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColor)
     UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColor)
 

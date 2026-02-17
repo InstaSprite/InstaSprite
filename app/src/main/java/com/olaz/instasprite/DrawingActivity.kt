@@ -21,7 +21,10 @@ class DrawingActivity : ComponentActivity() {
 
         setContent {
             InstaSpriteTheme {
-                DrawingScreen(viewModel)
+                DrawingScreen(
+                    onNavigateBack = { finish() },
+                    viewModel = viewModel
+                )
             }
         }
     }

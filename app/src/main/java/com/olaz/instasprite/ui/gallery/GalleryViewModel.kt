@@ -1,7 +1,6 @@
 package com.olaz.instasprite.ui.gallery
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -10,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.olaz.instasprite.DrawingActivity
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
@@ -84,6 +82,8 @@ class GalleryViewModel @Inject constructor(
     var currentSelectedSpriteIndex by mutableIntStateOf(0)
     var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
 
+    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?) -> Unit = { _, _, _, _-> }
+
     val sortedAndFilteredSprites: StateFlow<List<SpriteWithMeta>> = combine(
         sprites,
         _searchQuery,
@@ -136,9 +136,11 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenDrawingActivity -> openDrawingActivity(
-                event.context,
-                event.sprite
+            is ImagePagerEvent.OpenDrawingActivity -> onOpenDrawing(
+                event.sprite.id,
+                event.sprite.width,
+                event.sprite.height,
+                event.name
             )
 
             is ImagePagerEvent.OpenSaveImageDialog -> openDialog(GalleryDialog.SaveImage(event.sprite))
@@ -162,9 +164,11 @@ class GalleryViewModel @Inject constructor(
                     )
                 )
 
-            is SpriteListEvent.OpenDrawingActivity -> openDrawingActivity(
-                event.context,
-                event.sprite
+            is SpriteListEvent.OpenDrawingScreen -> onOpenDrawing(
+                event.sprite.id,
+                event.sprite.width,
+                event.sprite.height,
+                event.name
             )
 
             is SpriteListEvent.OpenPager -> toggleImagePager(event.sprite)
@@ -239,13 +243,6 @@ class GalleryViewModel @Inject constructor(
             delay(duration)
             deleteSpriteById(spriteId)
         }
-    }
-
-    fun openDrawingActivity(context: Context, sprite: Sprite) {
-        lastEditedSpriteId = sprite.id
-        val intent = Intent(context, DrawingActivity::class.java)
-        intent.putExtra(DrawingActivity.EXTRA_SPRITE_ID, sprite.id)
-        context.startActivity(intent)
     }
 
     fun renameSprite(spriteId: String, newName: String) {

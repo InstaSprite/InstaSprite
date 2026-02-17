@@ -105,6 +105,7 @@ fun ImagePagerOverlay(
                         currentSprite?.let {
                             onImagePagerEvent(
                                 ImagePagerEvent.OpenDrawingActivity(
+                                    it.meta?.spriteName,
                                     it.sprite,
                                     context
                                 )

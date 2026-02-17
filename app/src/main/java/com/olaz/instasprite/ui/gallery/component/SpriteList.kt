@@ -81,7 +81,7 @@ fun SpriteList(
 
                 },
                 onEdit = {
-                    onSpriteListEvent(SpriteListEvent.OpenDrawingActivity(sprite, context))
+                    onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context))
                 },
                 onClick = {
                     onSpriteListEvent(SpriteListEvent.OpenPager(sprite))

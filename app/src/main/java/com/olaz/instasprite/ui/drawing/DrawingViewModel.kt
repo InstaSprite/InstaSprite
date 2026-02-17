@@ -4,10 +4,14 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.olaz.instasprite.DrawingActivity
+import com.olaz.instasprite.navigation.DrawingRoute
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
@@ -55,12 +59,11 @@ class DrawingViewModel @Inject constructor(
     DialogController<DrawingDialog> by dialogController {
 
 
-    private val spriteId: String = checkNotNull(savedStateHandle[DrawingActivity.EXTRA_SPRITE_ID])
-    private val canvasWidth: Int =
-        savedStateHandle[DrawingActivity.EXTRA_CANVAS_WIDTH] ?: pixelCanvasRepository.width
-    private val canvasHeight: Int =
-        savedStateHandle[DrawingActivity.EXTRA_CANVAS_HEIGHT] ?: pixelCanvasRepository.height
-    private val spriteName: String? = savedStateHandle[DrawingActivity.EXTRA_SPRITE_NAME]
+    private val args = savedStateHandle.toRoute<DrawingRoute>()
+    private val spriteId: String = args.spriteId
+    private val canvasWidth: Int = if(args.width > 0) args.width else pixelCanvasRepository.width
+    private val canvasHeight: Int = if(args.height > 0) args.height else pixelCanvasRepository.height
+    private val spriteName: String? = args.spriteName
     private val canvasHistoryManager = CanvasHistoryManager<PixelCanvasState>()
     private val saveFileUseCase = SaveFileUseCase()
     private val loadFileUseCase = LoadFileUseCase()
@@ -343,22 +346,18 @@ class DrawingViewModel @Inject constructor(
         refreshCanvasState()
     }
 
-    fun saveToDB(spriteName: String? = null) {
-        viewModelScope.launch {
-            val sprite = pixelCanvasUseCase.getSprite()
-            spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
-            spriteName?.let {
-                spriteDataRepository.changeName(spriteId, it)
-            }
+    suspend fun saveToDB(spriteName: String? = null) {
+        val sprite = pixelCanvasUseCase.getSprite()
+        spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
+        spriteName?.let {
+            spriteDataRepository.changeName(spriteId, it)
         }
     }
 
-    fun loadFromDB() {
-        viewModelScope.launch {
-            val sprite = spriteDataRepository.loadSprite(spriteId)
-            if (sprite != null) {
-                loadSprite(sprite)
-            }
+    suspend fun loadFromDB() {
+        val sprite = spriteDataRepository.loadSprite(spriteId)
+        if (sprite != null) {
+            loadSprite(sprite)
         }
     }
 
