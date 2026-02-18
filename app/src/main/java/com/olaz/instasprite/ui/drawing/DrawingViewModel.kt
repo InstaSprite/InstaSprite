@@ -4,10 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
@@ -21,13 +19,15 @@ import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
-import com.olaz.instasprite.navigation.DrawingRoute
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteState
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
 import com.olaz.instasprite.ui.drawing.contract.ToolSelectorEvent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
 data class DrawingScreenState(
@@ -44,9 +43,12 @@ data class DrawingScreenState(
     val toolSize: Int,
 )
 
-@HiltViewModel
-class DrawingViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = DrawingViewModel.Factory::class)
+class DrawingViewModel @AssistedInject constructor(
+    @Assisted("spriteId") val spriteId: String,
+    @Assisted("spriteWidth") private val width: Int,
+    @Assisted("spriteHeight") private val height: Int,
+    @Assisted("spriteName") private val spriteName: String?,
     private val storageLocationRepository: StorageLocationRepository,
     private val pixelCanvasRepository: PixelCanvasRepository,
     private val spriteDataRepository: SpriteDatabaseRepository,
@@ -55,12 +57,18 @@ class DrawingViewModel @Inject constructor(
 ) : ViewModel(),
     DialogController<DrawingDialog> by dialogController {
 
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("spriteId") spriteId: String,
+            @Assisted("spriteWidth") width: Int,
+            @Assisted("spriteHeight") height: Int,
+            @Assisted("spriteName") spriteName: String?
+        ): DrawingViewModel
+    }
 
-    private val args = savedStateHandle.toRoute<DrawingRoute>()
-    val spriteId: String = args.spriteId
-    private val canvasWidth: Int = if(args.width > 0) args.width else pixelCanvasRepository.width
-    private val canvasHeight: Int = if(args.height > 0) args.height else pixelCanvasRepository.height
-    private val spriteName: String? = args.spriteName
+    private val canvasWidth: Int = if(width > 0) width else pixelCanvasRepository.width
+    private val canvasHeight: Int = if(height > 0) height else pixelCanvasRepository.height
     private val canvasHistoryManager = CanvasHistoryManager<PixelCanvasState>()
     private val saveFileUseCase = SaveFileUseCase()
     private val loadFileUseCase = LoadFileUseCase()
