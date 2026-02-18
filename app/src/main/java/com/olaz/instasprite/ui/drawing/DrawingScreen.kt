@@ -1,8 +1,8 @@
 package com.olaz.instasprite.ui.drawing
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,10 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.olaz.instasprite.data.database.ColorPaletteDao
-import com.olaz.instasprite.data.model.ColorPaletteData
-import com.olaz.instasprite.data.network.lospec.LospecService
-import com.olaz.instasprite.data.network.lospec.model.PaletteDto
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.PencilTool
@@ -52,7 +48,6 @@ import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.DummyData
 import com.olaz.instasprite.utils.UiUtils
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -67,10 +62,10 @@ data class DrawingScreenEvent(
 
 @Composable
 fun DrawingScreen(
-    onNavigateBack: () -> Unit,
+    onNavigateBack: (String) -> Unit,
     viewModel: DrawingViewModel = hiltViewModel()
 ) {
-    BackHandler(onBack = onNavigateBack)
+    BackHandler(onBack = { onNavigateBack(viewModel.spriteId) })
 
     UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColor)
     UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColor)

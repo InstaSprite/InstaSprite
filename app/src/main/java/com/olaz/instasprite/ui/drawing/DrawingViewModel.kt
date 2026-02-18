@@ -4,27 +4,24 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.olaz.instasprite.DrawingActivity
-import com.olaz.instasprite.navigation.DrawingRoute
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
-import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
+import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.model.ColorPalette
+import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
+import com.olaz.instasprite.navigation.DrawingRoute
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteState
@@ -60,7 +57,7 @@ class DrawingViewModel @Inject constructor(
 
 
     private val args = savedStateHandle.toRoute<DrawingRoute>()
-    private val spriteId: String = args.spriteId
+    val spriteId: String = args.spriteId
     private val canvasWidth: Int = if(args.width > 0) args.width else pixelCanvasRepository.width
     private val canvasHeight: Int = if(args.height > 0) args.height else pixelCanvasRepository.height
     private val spriteName: String? = args.spriteName

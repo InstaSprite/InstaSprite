@@ -17,3 +17,5 @@ data class DrawingRoute(
 @Serializable
 object PaletteRoute : Route
 
+@Serializable
+object CreateCanvasRoute : Route

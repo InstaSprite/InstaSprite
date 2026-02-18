@@ -7,7 +7,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.olaz.instasprite.domain.dialog.Dialog
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.components.dialog.ConfirmationDialog
-import com.olaz.instasprite.ui.gallery.dialog.CreateCanvasDialog
 import com.olaz.instasprite.ui.gallery.dialog.RenameDialog
 import com.olaz.instasprite.ui.gallery.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
@@ -15,7 +14,6 @@ import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
 sealed interface GalleryDialog : Dialog {
-    data object CreateCanvas : GalleryDialog
     data class SaveImage(val sprite: SpriteWithMeta) : GalleryDialog
     data class Rename(val spriteId: String) : GalleryDialog
     data class DeleteSpriteConfirm(val spriteName: String, val spriteId: String) : GalleryDialog
@@ -37,18 +35,6 @@ fun GalleryScreenDialogs(
 
     dialogState.forEach { dialog ->
         when (dialog) {
-            is GalleryDialog.CreateCanvas ->
-                CreateCanvasDialog(
-                    onDismiss = viewModel::closeTopDialog,
-                    onConfirm = { name, width, height ->
-                        val id = java.util.UUID.randomUUID().toString()
-                        viewModel.onOpenDrawing(id, width, height, name, viewModel.selectedNewCanvasPalette)
-                        viewModel.closeTopDialog()
-                    },
-                    onPaletteViewClick = viewModel::openColorPaletteScreen,
-                    selectedPalette = viewModel.selectedNewCanvasPalette
-                )
-
             is GalleryDialog.DeleteSpriteConfirm ->
                 ConfirmationDialog(
                     title = "Delete sprite",

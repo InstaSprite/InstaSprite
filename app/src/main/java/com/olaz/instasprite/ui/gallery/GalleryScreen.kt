@@ -22,8 +22,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,6 +52,7 @@ import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 data class GalleryScreenEvent(
@@ -63,6 +67,7 @@ data class GalleryScreenEvent(
 fun GalleryScreen(
     onNavigateToDrawing: (String, Int, Int, String?, ColorPalette?) -> Unit,
     onNavigateToPalette: () -> Unit,
+    onNavigateToCreateCanvas: () -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
     UiUtils.SetStatusBarColor(CatppuccinUI.TopBarColor)
@@ -78,22 +83,36 @@ fun GalleryScreen(
 
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(sprites, sortedSprites) {
-        viewModel.lastEditedSpriteId?.let { editedId ->
-            val index = sortedSprites.indexOfFirst { it.sprite.id == editedId }
-            if (index != -1) {
-                scope.launch {
-                    lazyListState.animateScrollToItem(index)
+    LaunchedEffect(Unit) {
+        snapshotFlow { Pair(viewModel.lastEditedSpriteId, sortedSprites) }
+            .collect { (editedId, sprites) ->
+                if (editedId != null) {
+                    val index = sprites.indexOfFirst { it.sprite.id == editedId }
+                    if (index != -1) {
+                        scope.launch {
+                            lazyListState.animateScrollToItem(index)
+                        }
+                    }
                 }
             }
-        }
-        viewModel.lastEditedSpriteId = null
     }
 
-    LaunchedEffect(viewModel.searchQuery) {
-        scope.launch {
-            lazyListState.animateScrollToItem(0)
+    LaunchedEffect(lazyListState) {
+        lazyListState.interactionSource.interactions.collect { interaction ->
+            if (interaction is androidx.compose.foundation.interaction.DragInteraction.Start) {
+                viewModel.lastEditedSpriteId = null
+            }
         }
+    }
+
+    var previousSearchQuery by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(searchQuery) {
+        if (previousSearchQuery != null && previousSearchQuery != searchQuery) {
+            scope.launch {
+                lazyListState.animateScrollToItem(0)
+            }
+        }
+        previousSearchQuery = searchQuery
     }
 
     LaunchedEffect(viewModel.lastSpriteSeenInPager) {
@@ -131,7 +150,7 @@ fun GalleryScreen(
             onImagePagerEvent = viewModel::onImagePagerEvent,
             onSearchBarEvent = viewModel::onSearchBarEvent,
             onSpriteListEvent = viewModel::onSpriteListEvent,
-            onFabClick = { viewModel.openDialog(GalleryDialog.CreateCanvas) }
+            onFabClick = onNavigateToCreateCanvas
         )
     }
 
