@@ -15,8 +15,8 @@ import dagger.hilt.android.scopes.ActivityRetainedScoped
 object ActivityModule {
     @Provides
     @ActivityRetainedScoped
-    fun provideNavigator(): Navigator {
-        return Navigator(Screen.Gallery)
+    fun provideNavigator(eventBus: ResultEventBus): Navigator {
+        return Navigator(Screen.Gallery, eventBus)
     }
 
     @Provides

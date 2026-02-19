@@ -3,6 +3,7 @@ package com.olaz.instasprite
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -27,6 +28,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             InstaSpriteTheme {
+
+                val currentEntry = navigator.backStack.lastOrNull()
+
+                LaunchedEffect(currentEntry) {
+                    navigator.onTransitionComplete()
+                }
+
                 NavDisplay(
                     backStack = navigator.backStack,
                     onBack = { navigator.goBack() },
