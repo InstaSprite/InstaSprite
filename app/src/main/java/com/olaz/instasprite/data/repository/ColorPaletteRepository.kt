@@ -60,7 +60,7 @@ class ColorPaletteRepository(
     fun updatePalette(colors: List<Color>) {
         if (colors.isNotEmpty()) {
             _colors.value = colors.toMutableList()
-            setActiveColor(colors.first(), addColorToRecent = false)
+            setActiveColor(colors.first())
         }
     }
 

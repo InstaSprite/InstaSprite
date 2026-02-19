@@ -52,6 +52,7 @@ import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -65,7 +66,7 @@ data class GalleryScreenEvent(
 
 @Composable
 fun GalleryScreen(
-    onNavigateToDrawing: (String, Int, Int, String?, ColorPalette?) -> Unit,
+    onNavigateToDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit,
     onNavigateToPalette: () -> Unit,
     onNavigateToCreateCanvas: () -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
@@ -83,36 +84,25 @@ fun GalleryScreen(
 
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { Pair(viewModel.lastEditedSpriteId, sortedSprites) }
-            .collect { (editedId, sprites) ->
-                if (editedId != null) {
-                    val index = sprites.indexOfFirst { it.sprite.id == editedId }
-                    if (index != -1) {
-                        scope.launch {
-                            lazyListState.animateScrollToItem(index)
-                        }
-                    }
+    LaunchedEffect(viewModel.lastEditedSpriteId) {
+        val editedId = viewModel.lastEditedSpriteId ?: return@LaunchedEffect
+
+        snapshotFlow { sortedSprites }
+            .collect { list ->
+                val index = list.indexOfFirst { it.sprite.id == editedId }
+                if (index != -1) {
+                    lazyListState.scrollToItem(index)
+                    viewModel.lastEditedSpriteId = null
+                    cancel()
                 }
             }
     }
 
-    LaunchedEffect(lazyListState) {
-        lazyListState.interactionSource.interactions.collect { interaction ->
-            if (interaction is androidx.compose.foundation.interaction.DragInteraction.Start) {
-                viewModel.lastEditedSpriteId = null
-            }
-        }
-    }
 
-    var previousSearchQuery by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(searchQuery) {
-        if (previousSearchQuery != null && previousSearchQuery != searchQuery) {
-            scope.launch {
-                lazyListState.animateScrollToItem(0)
-            }
+        if (searchQuery.isNotBlank()) {
+            lazyListState.scrollToItem(0)
         }
-        previousSearchQuery = searchQuery
     }
 
     LaunchedEffect(viewModel.lastSpriteSeenInPager) {
@@ -143,7 +133,6 @@ fun GalleryScreen(
 
     val event = remember(viewModel) {
         viewModel.onOpenDrawing = onNavigateToDrawing
-        viewModel.onOpenPalette = onNavigateToPalette
 
         GalleryScreenEvent(
             onBottomBarEvent = viewModel::onBottomBarEvent,

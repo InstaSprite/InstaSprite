@@ -75,8 +75,8 @@ fun DrawingScreenDialogs(
                     colorPalette = viewModel.colorPalette.collectAsState().value,
                     onDismiss = viewModel::closeTopDialog,
                     onColorSelected = viewModel::selectColor,
-                    onOpenImportColorPaletteDialog = {
-//                        viewModel.openDialog(DrawingDialog.ImportColorPalettes)
+                    onOpenPaletteScreen = {
+                        viewModel.onOpenPalette()
                     }
                 )
         }

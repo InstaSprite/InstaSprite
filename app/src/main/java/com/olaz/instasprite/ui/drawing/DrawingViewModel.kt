@@ -101,6 +101,8 @@ class DrawingViewModel @AssistedInject constructor(
     var activeColor = colorPaletteRepository.activeColor
     var recentColors = colorPaletteRepository.recentColors
 
+    var onOpenPalette: () -> Unit = {}
+
     val colorPaletteState: StateFlow<ColorPaletteState> = combine(
         colorPaletteRepository.colors,
         colorPaletteRepository.activeColor,
@@ -374,15 +376,6 @@ class DrawingViewModel @AssistedInject constructor(
     fun updateColorPalette(colors: List<Color>) {
         if (colors.isNotEmpty()) {
             colorPaletteRepository.updatePalette(colors)
-            colorPaletteRepository.setActiveColor(colors.first())
-
-            viewModelScope.launch {
-                colorPaletteRepository.savePaletteToDB(
-                    ColorPalette(
-                        colors = colors.toMutableList()
-                    )
-                )
-            }
         }
     }
 }

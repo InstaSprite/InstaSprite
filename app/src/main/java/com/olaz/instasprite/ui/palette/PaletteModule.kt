@@ -26,7 +26,7 @@ object PaletteModule {
                     navigator.goBack()
                 },
                 onPaletteSelected = { palette ->
-                    navigator.goBack()
+                    navigator.goBackWithResult(palette)
                 }
             )
         }

@@ -63,6 +63,7 @@ data class DrawingScreenEvent(
 @Composable
 fun DrawingScreen(
     onNavigateBack: (String) -> Unit,
+    onNavigateToPalette: () -> Unit,
     viewModel: DrawingViewModel = hiltViewModel()
 ) {
     BackHandler(onBack = { onNavigateBack(viewModel.spriteId) })
@@ -78,6 +79,8 @@ fun DrawingScreen(
     DrawingScreenDialogs(dialogState, viewModel)
 
     val event = remember(viewModel) {
+        viewModel.onOpenPalette = onNavigateToPalette
+
         DrawingScreenEvent(
             onColorPaletteEvent = viewModel::onColorPaletteEvent,
             onCanvasMenuEvent = viewModel::onCanvasMenuEvent,

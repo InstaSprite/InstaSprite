@@ -84,7 +84,7 @@ class GalleryViewModel @Inject constructor(
     var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
     var selectedNewCanvasPalette by mutableStateOf<ColorPalette?>(null)
 
-    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?, palette: ColorPalette?) -> Unit = { _, _, _, _, _ -> }
+    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit = { _, _, _, _, _ -> }
     var onOpenPalette: () -> Unit = {}
 
     fun onCanvasPaletteSelected(palette: ColorPalette) {
@@ -272,9 +272,5 @@ class GalleryViewModel @Inject constructor(
 
     fun setSpriteListOrder(order: SpriteListOrder) {
         _spriteListOrder.value = order
-    }
-
-    fun openColorPaletteScreen() {
-        onOpenPalette()
     }
 }
