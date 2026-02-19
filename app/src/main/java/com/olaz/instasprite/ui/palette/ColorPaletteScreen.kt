@@ -116,7 +116,7 @@ private fun ColorPaletteSelectionContent(
             )
 
             AnimatedVisibility(
-                visible = !isFabVisible,
+                visible = isFabVisible,
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 24.dp)
                     .size(70.dp)
