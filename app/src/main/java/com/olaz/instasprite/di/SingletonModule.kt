@@ -21,7 +21,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object SingletonModule {
 
     @Provides
     @Singleton
@@ -44,39 +44,5 @@ object AppModule {
     @Singleton
     fun provideStorageLocationRepository(@ApplicationContext context: Context): StorageLocationRepository {
         return StorageLocationRepository(context)
-    }
-
-    @Provides
-    fun provideColorPaletteRepository(
-        @ApplicationContext context: Context, db: AppDatabase, lospecService: LospecService
-    ): ColorPaletteRepository {
-        return ColorPaletteRepository(context, db.colorPaletteDao(), lospecService)
-    }
-
-    @Provides
-    fun providePixelCanvasRepository(): PixelCanvasRepository {
-        // Default 16x16, viewModel will resize this based on the Intent extras.
-        return PixelCanvasRepository(PixelCanvas(16, 16))
-    }
-
-
-    @Provides
-    fun provideSortSettingRepository(@ApplicationContext context: Context): SortSettingRepository {
-        return SortSettingRepository(context)
-    }
-
-    @Provides
-    fun provideDrawingDialogController(): DialogController<DrawingDialog> {
-        return DialogControllerImpl()
-    }
-
-    @Provides
-    fun provideGalleryDialogController(): DialogController<GalleryDialog> {
-        return DialogControllerImpl()
-    }
-
-    @Provides
-    fun provideColorPaletteDialogController(): DialogController<ColorPaletteDialog> {
-        return DialogControllerImpl()
     }
 }
