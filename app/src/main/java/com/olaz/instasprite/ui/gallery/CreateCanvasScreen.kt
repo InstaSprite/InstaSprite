@@ -36,7 +36,7 @@ import com.olaz.instasprite.domain.model.InputField
 import com.olaz.instasprite.ui.components.composable.BackButton
 import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.composable.ColorPaletteView
-import com.olaz.instasprite.ui.components.composable.TopBar
+import com.olaz.instasprite.ui.components.composable.Bar
 import com.olaz.instasprite.ui.theme.CatppuccinTypography
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
@@ -108,7 +108,7 @@ fun CreateCanvasScreen(
 
     Scaffold(
         topBar = {
-            TopBar(
+            Bar(
                 leftSlot = {
                     BackButton(onClick = onDismiss)
                 },

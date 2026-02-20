@@ -27,7 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.ui.components.composable.BackButton
 import com.olaz.instasprite.ui.components.composable.ColorPaletteList
-import com.olaz.instasprite.ui.components.composable.TopBar
+import com.olaz.instasprite.ui.components.composable.Bar
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.DummyData
@@ -74,7 +74,7 @@ private fun ColorPaletteSelectionContent(
 
     Scaffold(
         topBar = {
-            TopBar(
+            Bar(
                 leftSlot = {
                     BackButton(onClick = onDismiss)
                 }

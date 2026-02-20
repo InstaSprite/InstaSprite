@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -26,18 +27,20 @@ import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 
 @Composable
-fun TopBar(
+fun Bar(
+    modifier: Modifier = Modifier,
     leftSlot: (@Composable () -> Unit)? = null,
     middleSlot: (@Composable () -> Unit)? = null,
     rightSlot: (@Composable () -> Unit)? = null,
-    space: Dp = 16.dp,
-    modifier: Modifier = Modifier
+    height: Dp = 56.dp,
+    backgroundColor: Color = CatppuccinUI.BackgroundColor,
+    space: Dp = 16.dp
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .background(CatppuccinUI.BackgroundColor)
+            .height(height)
+            .background(backgroundColor)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -60,7 +63,7 @@ fun TopBar(
 @Preview
 private fun Preview() {
     InstaSpriteTheme() {
-        TopBar(
+        Bar(
             leftSlot = {
                 BackButton(onClick = {})
             },

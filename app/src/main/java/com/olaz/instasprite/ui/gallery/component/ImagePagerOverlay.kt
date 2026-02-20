@@ -46,7 +46,7 @@ import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.components.composable.AsyncCanvasPreviewer
 import com.olaz.instasprite.ui.components.composable.AsyncImageZoomableOverlay
 import com.olaz.instasprite.ui.components.composable.BackButton
-import com.olaz.instasprite.ui.components.composable.TopBar
+import com.olaz.instasprite.ui.components.composable.Bar
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toDateString
@@ -256,7 +256,7 @@ private fun TopBar(
 ) {
     var dropdownMenuVisible by remember { mutableStateOf(false) }
 
-    TopBar(
+    Bar(
         leftSlot = {
             BackButton(onClick = onDismiss)
         },
