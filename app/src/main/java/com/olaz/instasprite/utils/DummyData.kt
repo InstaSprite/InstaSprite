@@ -7,6 +7,7 @@ import com.olaz.instasprite.data.network.lospec.LospecService
 import com.olaz.instasprite.data.network.lospec.model.PaletteDto
 import com.olaz.instasprite.domain.model.ColorPalette
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 
 object DummyData {
@@ -47,27 +48,26 @@ object DummyData {
     object MockClass {
         class MockColorPaletteDao() : ColorPaletteDao {
             override suspend fun insert(palette: ColorPaletteData) {
-                TODO("Not yet implemented")
             }
 
             override suspend fun getAllPalette(): List<ColorPaletteData> {
-                TODO("Not yet implemented")
+                return emptyList()
             }
 
             override fun getAllPaletteFlow(): Flow<List<ColorPaletteData>> {
-                TODO("Not yet implemented")
+                return flowOf(emptyList())
             }
 
             override suspend fun getPaletteByName(name: String): ColorPaletteData? {
-                TODO("Not yet implemented")
+                return null
             }
 
+
             override suspend fun deletePaletteByName(name: String) {
-                TODO("Not yet implemented")
+
             }
 
             override suspend fun deletePaletteById(id: Int) {
-                TODO("Not yet implemented")
             }
 
         }
