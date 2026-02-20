@@ -42,7 +42,7 @@ fun ToolSizeSlider(
 
         Slider(
             value = toolSizeValue.toFloat(),
-            onValueChange = onValueChange as (Float) -> Unit,
+            onValueChange = { onValueChange(it.toInt()) },
             valueRange = 1f..10f,
             steps = 8,
             modifier = Modifier
