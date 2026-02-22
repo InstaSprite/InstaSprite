@@ -85,9 +85,8 @@ dependencies {
     implementation(libs.navigation3.runtime)
     implementation(libs.navigation3.ui)
     implementation(libs.navigation3.viewmodel)
-
+    implementation(libs.reorderable)
     implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     // --- Dependency Injection
     implementation(libs.hilt.android)
@@ -114,6 +113,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.coil.network.okhttp)
+
 
     // --- Testing ---
     testImplementation(libs.junit)

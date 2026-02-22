@@ -28,6 +28,7 @@ roomCompiler = "2.8.4"
 roomKtx = "2.8.4"
 roomRuntime = "2.8.4"
 zoomable = "2.9.0"
+reorderable = "3.0.0"
 
 protobuf = "4.26.1"
 protobufPlugin = "0.9.4"
@@ -74,7 +75,7 @@ zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 navigation3-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "navigation3ViewModel" }
-
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

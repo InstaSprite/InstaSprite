@@ -2,20 +2,21 @@ package com.olaz.instasprite.data.mapper
 
 import com.olaz.instasprite.data.model.SpriteData
 import com.olaz.instasprite.data.model.SpriteWithMetaData
-import com.olaz.instasprite.data.model.SpriteMetaData as EntitySpriteMetaData
+import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.domain.model.SpriteMeta as DomainSpriteMetadata
 import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.data.model.SpriteMetaData as EntitySpriteMetaData
+import com.olaz.instasprite.domain.model.SpriteMeta as DomainSpriteMetadata
 
 fun SpriteData.toDomain(
-    pixelsData: List<Int> = emptyList(),
+    layers: List<Layer> = emptyList(),
     colorPalette: List<Int>? = null
 ): Sprite {
     return Sprite(
         id = this.id,
         width = this.width,
         height = this.height,
-        pixelsData = pixelsData,
+        layers = layers,
         colorPalette = colorPalette
     )
 }

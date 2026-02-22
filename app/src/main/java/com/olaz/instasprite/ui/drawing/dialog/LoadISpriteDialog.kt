@@ -124,7 +124,7 @@ fun LoadISpriteDialog(
                 if (showOverlay) {
                     val bitmapImage = remember(it) {
                         ImageExporter.convertToBitmap(
-                            it.pixelsData.map { Color(it) },
+                            it.compositedPixels.map { Color(it) },
                             it.width,
                             it.height,
                         )?.asImageBitmap()

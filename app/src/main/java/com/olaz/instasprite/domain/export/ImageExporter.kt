@@ -37,7 +37,7 @@ object ImageExporter {
     fun saveThumbnail(sprite: Sprite, context: Context) {
         try {
             val bitmap = convertToBitmap(
-                sprite.pixelsData.map { Color(it) },
+                sprite.compositedPixels.map { Color(it) },
                 sprite.width,
                 sprite.height
             )

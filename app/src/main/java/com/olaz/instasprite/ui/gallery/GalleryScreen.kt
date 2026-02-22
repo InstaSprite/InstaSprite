@@ -22,10 +22,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,10 +33,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.olaz.instasprite.domain.model.ColorPalette
+import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.domain.model.SpriteMeta
+import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.components.composable.JumpToTopButton
 import com.olaz.instasprite.ui.gallery.component.HomeBottomBar
 import com.olaz.instasprite.ui.gallery.component.HomeFab
@@ -53,7 +51,6 @@ import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 data class GalleryScreenEvent(
@@ -265,9 +262,14 @@ private fun GalleryScreenPreview() {
                             id = "1",
                             width = 16,
                             height = 16,
-                            pixelsData = List(16 * 16) {
-                                CatppuccinUI.CurrentPalette.Flamingo.toArgb()
-                            }
+                            layers = listOf(
+                                Layer(
+                                id = "test1",
+                                name = "Layer 1",
+                                pixels = List(10 * 10) {
+                                    CatppuccinUI.CurrentPalette.Flamingo.toArgb()
+                                }
+                            ))
                         ),
                         meta = SpriteMeta(
                             spriteId = "1",
@@ -279,9 +281,14 @@ private fun GalleryScreenPreview() {
                             id = "2",
                             width = 16,
                             height = 16,
-                            pixelsData = List(16 * 16) {
-                                CatppuccinUI.CurrentPalette.Lavender.toArgb()
-                            }
+                            layers = listOf(
+                                Layer(
+                                id = "test2",
+                                name = "Layer 1",
+                                pixels = List(16 * 16) {
+                                    CatppuccinUI.CurrentPalette.Lavender.toArgb()
+                                }
+                            ))
                         ),
                         meta = SpriteMeta(
                             spriteId = "2",

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,6 +50,7 @@ import com.olaz.instasprite.ui.components.composable.BackButton
 import com.olaz.instasprite.ui.components.composable.Bar
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.utils.drawCheckerboard
 import com.olaz.instasprite.utils.toDateString
 import java.io.File
 
@@ -143,10 +145,16 @@ fun ImagePagerOverlay(
 
                 if (zoomedPageIndex == page) {
                     AsyncImageZoomableOverlay(
-                        File(
+                        model = File(
                             LocalContext.current.filesDir,
                             "thumbnail_${spriteWithMeta.sprite.id}.png"
                         ),
+                        sufModifier = Modifier
+                            .aspectRatio(spriteWithMeta.sprite.width.toFloat() / spriteWithMeta.sprite.height.toFloat())
+                            .drawCheckerboard(
+                                spriteWithMeta.sprite.width,
+                                spriteWithMeta.sprite.height
+                            ),
                         onDismiss = { zoomedPageIndex = null }
                     )
                 }

@@ -3,6 +3,7 @@ package com.olaz.instasprite.ui.components.composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import net.engawapg.lib.zoomable.zoomable
 fun AsyncImageZoomableOverlay(
     model: Any?,
     onDismiss: () -> Unit,
+    sufModifier: Modifier = Modifier,
 ) {
     val zoomState = rememberZoomState()
 
@@ -35,9 +37,10 @@ fun AsyncImageZoomableOverlay(
                 model = model,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .align(Alignment.Center)
-                    .zoomable(zoomState),
+                    .zoomable(zoomState)
+                    .then(sufModifier),
                 contentScale = ContentScale.FillWidth,
                 filterQuality = FilterQuality.None
             )

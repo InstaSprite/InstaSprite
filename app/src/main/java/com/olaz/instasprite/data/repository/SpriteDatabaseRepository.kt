@@ -9,6 +9,7 @@ import com.olaz.instasprite.data.mapper.toSpritePixels
 import com.olaz.instasprite.data.model.SpriteMetaData
 import com.olaz.instasprite.data.source.SpritePixelDataSource
 import com.olaz.instasprite.domain.export.ImageExporter
+import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteMeta
 import com.olaz.instasprite.domain.model.SpriteWithMeta
@@ -31,12 +32,11 @@ class SpriteDatabaseRepository @Inject constructor(
         val entity = sprite.toEntity()
 
         val existingMeta = metaDao.getMetaById(sprite.id)
-        val meta = existingMeta?.copy(lastModifiedAt = now) ?:
-            SpriteMetaData(
-                spriteId = sprite.id,
-                createdAt = now,
-                lastModifiedAt = now
-            )
+        val meta = existingMeta?.copy(lastModifiedAt = now) ?: SpriteMetaData(
+            spriteId = sprite.id,
+            createdAt = now,
+            lastModifiedAt = now
+        )
 
         val proto = sprite.toSpritePixels()
         pixelDataSource.getDataStore(sprite.id).updateData { proto }
@@ -52,8 +52,18 @@ class SpriteDatabaseRepository @Inject constructor(
         val proto = pixelDataSource.getDataStore(id).data.firstOrNull()
 
         if (proto != null) {
+            val layers = proto.layersList.map { layerData ->
+                Layer(
+                    id = layerData.id,
+                    name = layerData.name,
+                    isVisible = layerData.isVisible,
+                    isLocked = layerData.isLocked,
+                    pixels = layerData.pixelsList
+                )
+            }
+
             return entity.toDomain(
-                pixelsData = proto.pixelsList,
+                layers = layers,
                 colorPalette = proto.colorPaletteList,
             )
         }
@@ -76,7 +86,7 @@ class SpriteDatabaseRepository @Inject constructor(
     fun deleteSpriteById(spriteId: String) {
         dao.delete(spriteId)
         pixelDataSource.deleteDataStore(spriteId)
-        
+
         val thumbnailFile = File(context.filesDir, "thumbnail_${spriteId}.png")
         if (thumbnailFile.exists()) {
             thumbnailFile.delete()

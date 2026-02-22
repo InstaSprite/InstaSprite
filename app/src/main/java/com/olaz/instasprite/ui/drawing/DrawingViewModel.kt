@@ -12,7 +12,6 @@ import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.dialog.DialogController
-import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
@@ -20,6 +19,7 @@ import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
+import com.olaz.instasprite.ui.drawing.contract.LayerEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteState
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 data class DrawingScreenState(
     val selectedTool: Tool,
     val toolSize: Int,
+    val showLayerDrawer: Boolean = false
 )
 
 @HiltViewModel(assistedFactory = DrawingViewModel.Factory::class)
@@ -89,7 +90,9 @@ class DrawingViewModel @AssistedInject constructor(
         PixelCanvasState(
             width = pixelCanvasUseCase.getCanvasWidth(),
             height = pixelCanvasUseCase.getCanvasHeight(),
-            pixels = pixelCanvasUseCase.getAllPixels()
+            pixels = pixelCanvasUseCase.getAllPixels(),
+            layers = pixelCanvasUseCase.getLayers().toList(),
+            activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         )
     )
     val canvasState: StateFlow<PixelCanvasState> = _canvasState.asStateFlow()
@@ -148,6 +151,45 @@ class DrawingViewModel @AssistedInject constructor(
         }
     }
 
+    fun onLayerEvent(event: LayerEvent) {
+        when (event) {
+            is LayerEvent.AddLayer -> {
+                saveState()
+                pixelCanvasUseCase.addLayer("Layer ${pixelCanvasUseCase.getLayers().size + 1}")
+                refreshCanvasState()
+            }
+            is LayerEvent.DeleteLayer -> {
+                saveState()
+                pixelCanvasUseCase.removeLayer(event.layerId)
+                refreshCanvasState()
+            }
+            is LayerEvent.SelectLayer -> {
+                pixelCanvasUseCase.setActiveLayer(event.layerId)
+                refreshCanvasState()
+            }
+            is LayerEvent.ToggleLock -> {
+                saveState()
+                pixelCanvasUseCase.toggleLock(event.layerId)
+                refreshCanvasState()
+            }
+            is LayerEvent.ToggleVisibility -> {
+                saveState()
+                pixelCanvasUseCase.toggleVisibility(event.layerId)
+                refreshCanvasState()
+            }
+            is LayerEvent.MergeLayerDown -> {
+                saveState()
+                pixelCanvasUseCase.mergeLayerDown(event.layerId)
+                refreshCanvasState()
+            }
+            is LayerEvent.ReorderLayer -> {
+                saveState()
+                pixelCanvasUseCase.reorderLayer(fromIndex = event.fromIndex, toIndex = event.toIndex)
+                refreshCanvasState()
+            }
+        }
+    }
+
     fun onCanvasEvent(event: PixelCanvasEvent) {
         when (event) {
             is PixelCanvasEvent.OnCanvasTouchStart -> saveState()
@@ -184,6 +226,10 @@ class DrawingViewModel @AssistedInject constructor(
         _uiState.value = _uiState.value.copy(toolSize = size)
     }
 
+    fun toggleLayerDrawer() {
+        _uiState.value = _uiState.value.copy(showLayerDrawer = !_uiState.value.showLayerDrawer)
+    }
+
     fun applyTool(
         row: Int,
         col: Int,
@@ -206,21 +252,29 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun saveState() {
+        val currentLayers = pixelCanvasUseCase.getLayers().map {
+            it.copy(pixels = it.pixels.toList()) // deep copy pixels for history immutability
+        }
+    
         canvasHistoryManager.saveState(
             PixelCanvasState(
                 width = pixelCanvasUseCase.getCanvasWidth(),
                 height = pixelCanvasUseCase.getCanvasHeight(),
-                pixels = pixelCanvasUseCase.getAllPixels()
+                pixels = pixelCanvasUseCase.getAllPixels(),
+                layers = currentLayers,
+                activeLayerId = pixelCanvasUseCase.getActiveLayerId()
             )
         )
     }
 
     fun undo() {
-        canvasHistoryManager.undo()?.let {
-            pixelCanvasUseCase.setCanvas(it.width, it.height, it.pixels)
+        canvasHistoryManager.undo()?.let { state ->
+            pixelCanvasUseCase.setCanvas(Sprite(width = state.width, height = state.height, layers = state.layers))
+            pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
+            
             _canvasState.value = _canvasState.value.copy(
-                width = it.width,
-                height = it.height,
+                width = state.width,
+                height = state.height,
             )
 
             refreshCanvasState()
@@ -228,11 +282,13 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun redo() {
-        canvasHistoryManager.redo()?.let {
-            pixelCanvasUseCase.setCanvas(it.width, it.height, it.pixels)
+        canvasHistoryManager.redo()?.let { state ->
+            pixelCanvasUseCase.setCanvas(Sprite(width = state.width, height = state.height, layers = state.layers))
+            pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
+            
             _canvasState.value = _canvasState.value.copy(
-                width = it.width,
-                height = it.height,
+                width = state.width,
+                height = state.height,
             )
 
             refreshCanvasState()
@@ -240,23 +296,20 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun rotate() {
-        pixelCanvasUseCase.rotateCanvas(pixelCanvasUseCase.getAllPixels())
-
-        _canvasState.value = _canvasState.value.copy(
-            width = pixelCanvasUseCase.getCanvasWidth(),
-            height = pixelCanvasUseCase.getCanvasHeight()
-        )
-
+        pixelCanvasUseCase.rotateCanvas()
+        refreshCanvasState()
         saveState()
     }
 
     fun hFlip() {
-        pixelCanvasUseCase.hFlipCanvas(pixelCanvasUseCase.getAllPixels())
+        pixelCanvasUseCase.hFlipCanvas()
+        refreshCanvasState()
         saveState()
     }
 
     fun vFlip() {
-        pixelCanvasUseCase.vFlipCanvas(pixelCanvasUseCase.getAllPixels())
+        pixelCanvasUseCase.vFlipCanvas()
+        refreshCanvasState()
         saveState()
     }
 
@@ -278,7 +331,9 @@ class DrawingViewModel @AssistedInject constructor(
         _canvasState.value = _canvasState.value.copy(
             pixels = newPixels,
             width = newWidth,
-            height = newHeight
+            height = newHeight,
+            layers = pixelCanvasUseCase.getLayers().toList(),
+            activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         )
     }
 
