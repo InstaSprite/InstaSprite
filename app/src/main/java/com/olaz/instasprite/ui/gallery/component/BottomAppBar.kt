@@ -14,18 +14,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -35,6 +36,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
+import com.olaz.instasprite.ui.components.composable.ExpandableFabMenu
+import com.olaz.instasprite.ui.components.composable.FabMenuItem
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.rememberBottomBarVisibleState
@@ -147,27 +150,40 @@ fun BottomBarItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeFab(
-    onClick: () -> Unit,
+    onCreateCanvas: () -> Unit,
+    onLoadCanvas: () -> Unit,
+    onLoadImage: () -> Unit,
     lazyListState: LazyListState
 ) {
     val isBottomBarVisible by rememberBottomBarVisibleState(lazyListState)
+
+    val menuItems = remember(onCreateCanvas, onLoadCanvas, onLoadImage) {
+        listOf(
+            FabMenuItem(
+                icon = Icons.Default.Create,
+                label = "New Canvas",
+                onClick = onCreateCanvas
+            ),
+            FabMenuItem(
+                icon = Icons.Default.FolderOpen,
+                label = "Load Canvas",
+                onClick = onLoadCanvas
+            ),
+            FabMenuItem(
+                icon = Icons.Default.Image,
+                label = "Load Image",
+                onClick = onLoadImage
+            )
+        )
+    }
+
     AnimatedVisibility(
         visible = isBottomBarVisible,
         enter = fadeIn() + slideInVertically { fullHeight -> fullHeight } + scaleIn(),
         exit = fadeOut() + slideOutVertically { fullHeight -> fullHeight } + scaleOut()
     ) {
-        FloatingActionButton(
-            onClick = onClick,
-            shape = CircleShape,
-            containerColor = CatppuccinUI.SelectedColor,
-            modifier = Modifier.size(70.dp)
-        ) {
-            Icon(
-                Icons.Filled.Add,
-                contentDescription = "Floating action button",
-                tint = CatppuccinUI.TextColorDark,
-                modifier = Modifier.size(30.dp)
-            )
-        }
+        ExpandableFabMenu(
+            items = menuItems
+        )
     }
 }

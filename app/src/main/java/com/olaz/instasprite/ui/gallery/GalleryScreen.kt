@@ -58,7 +58,9 @@ data class GalleryScreenEvent(
     val onImagePagerEvent: (ImagePagerEvent) -> Unit,
     val onSearchBarEvent: (SearchBarContract) -> Unit,
     val onSpriteListEvent: (SpriteListEvent) -> Unit,
-    val onFabClick: () -> Unit
+    val onCreateNewCanvas: () -> Unit,
+    val onLoadCanvas: () -> Unit,
+    val onLoadImage: () -> Unit,
 )
 
 @Composable
@@ -136,7 +138,9 @@ fun GalleryScreen(
             onImagePagerEvent = viewModel::onImagePagerEvent,
             onSearchBarEvent = viewModel::onSearchBarEvent,
             onSpriteListEvent = viewModel::onSpriteListEvent,
-            onFabClick = onNavigateToCreateCanvas
+            onCreateNewCanvas = onNavigateToCreateCanvas,
+            onLoadCanvas = { /* TODO: load canvas screen */ },
+            onLoadImage = { /* TODO: load image screen */ },
         )
     }
 
@@ -240,7 +244,9 @@ private fun GalleryScreenContent(
             contentAlignment = Alignment.Center,
         ) {
             HomeFab(
-                onClick = event.onFabClick,
+                onCreateCanvas = event.onCreateNewCanvas,
+                onLoadCanvas = event.onLoadCanvas,
+                onLoadImage = event.onLoadImage,
                 lazyListState = lazyListState
             )
         }
@@ -302,7 +308,9 @@ private fun GalleryScreenPreview() {
                 onImagePagerEvent = {},
                 onSearchBarEvent = {},
                 onSpriteListEvent = {},
-                onFabClick = {}
+                onCreateNewCanvas = {},
+                onLoadCanvas = {},
+                onLoadImage = {},
             )
         )
     }
