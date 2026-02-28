@@ -68,6 +68,7 @@ fun GalleryScreen(
     onNavigateToDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit,
     onNavigateToPalette: () -> Unit,
     onNavigateToCreateCanvas: () -> Unit,
+    onNavigateToLoadImage: () -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
     UiUtils.SetStatusBarColor(CatppuccinUI.TopBarColor)
@@ -140,7 +141,7 @@ fun GalleryScreen(
             onSpriteListEvent = viewModel::onSpriteListEvent,
             onCreateNewCanvas = onNavigateToCreateCanvas,
             onLoadCanvas = { /* TODO: load canvas screen */ },
-            onLoadImage = { /* TODO: load image screen */ },
+            onLoadImage = onNavigateToLoadImage,
         )
     }
 

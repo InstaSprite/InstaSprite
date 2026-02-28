@@ -10,6 +10,7 @@ import com.olaz.instasprite.navigation.EntryProviderInstaller
 import com.olaz.instasprite.navigation.Navigator
 import com.olaz.instasprite.navigation.ResultEffect
 import com.olaz.instasprite.navigation.Screen
+import com.olaz.instasprite.ui.loadimage.LoadImageScreen
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,6 +50,9 @@ object GalleryModule {
                 onNavigateToCreateCanvas = {
                     navigator.goTo(Screen.CreateCanvas)
                 },
+                onNavigateToLoadImage = {
+                    navigator.goTo(Screen.LoadImage)
+                }
             )
         }
 

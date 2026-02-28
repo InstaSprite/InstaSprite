@@ -17,6 +17,9 @@ sealed interface Screen : NavKey {
     data object CreateCanvas : Screen
 
     @Serializable
+    data object LoadImage : Screen
+
+    @Serializable
     data class Drawing(
         val spriteId: String,
         val width: Int,

@@ -1,0 +1,53 @@
+package com.olaz.instasprite.ui.loadimage
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.olaz.instasprite.domain.model.ColorPalette
+import com.olaz.instasprite.navigation.EntryProviderInstaller
+import com.olaz.instasprite.navigation.Navigator
+import com.olaz.instasprite.navigation.ResultEffect
+import com.olaz.instasprite.navigation.Screen
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.multibindings.IntoSet
+
+
+@Module
+@InstallIn(ActivityRetainedComponent::class)
+object LoadImageModule {
+
+    @IntoSet
+    @Provides
+    fun provideLoadImageEntry(navigator: Navigator): EntryProviderInstaller = {
+        entry<Screen.LoadImage> { args ->
+            var selectedPalette by remember { mutableStateOf<ColorPalette?>(null) }
+
+            ResultEffect<ColorPalette>(navigator.eventBus) { palette ->
+                selectedPalette = palette
+            }
+
+            LoadImageScreen(
+                onDismiss = { navigator.goBack() },
+                onConfirm = { id, width, height, name ->
+                    navigator.replace(
+                        Screen.Drawing(
+                            spriteId = id,
+                            width = width,
+                            height = height,
+                            spriteName = name,
+                            colorPalette = selectedPalette
+                        )
+                    )
+                },
+                onPaletteViewClick = {
+                    navigator.goTo(Screen.Palette)
+                },
+                selectedPalette = selectedPalette
+            )
+        }
+    }
+}
