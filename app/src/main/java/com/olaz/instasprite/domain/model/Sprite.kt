@@ -7,7 +7,7 @@ data class Sprite(
     val layers: List<Layer>,
     val colorPalette: List<Int>? = null
 ) {
-    val compositedPixels: List<Int> get() {
+    val compositedPixels: IntArray get() {
         val result = IntArray(width * height)
         for (layer in layers) {
             if (layer.isVisible) {
@@ -18,6 +18,6 @@ data class Sprite(
                 }
             }
         }
-        return result.toList()
+        return result
     }
 }

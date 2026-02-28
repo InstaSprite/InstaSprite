@@ -1,9 +1,12 @@
 package com.olaz.instasprite.ui.drawing
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
@@ -13,7 +16,10 @@ import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.tool.FillTool
+import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
@@ -29,6 +35,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,9 +43,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.core.graphics.set
 
 
 data class DrawingScreenState(
+    val isLoading: Boolean = true,
     val selectedTool: Tool,
     val toolSize: Int,
     val showLayerDrawer: Boolean = false
@@ -78,6 +88,19 @@ class DrawingViewModel @AssistedInject constructor(
         colorPaletteRepository = colorPaletteRepository
     )
 
+    // bitmap managed by ViewModel for incremental pixel updates
+    private var _bitmap: Bitmap? = null
+    val bitmap: Bitmap? get() = _bitmap
+    private var _drawVersion: Long = 0
+
+    // overlay bitmap for stroke preview
+    private var _overlayBitmap: Bitmap? = null
+    val overlayBitmap: Bitmap? get() = _overlayBitmap
+    private var _overlayVersion: Long = 0
+
+    // Guard to prevent launching multiple concurrent fill operations
+    @Volatile private var _fillRunning: Boolean = false
+
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
             selectedTool = PencilTool,
@@ -90,7 +113,6 @@ class DrawingViewModel @AssistedInject constructor(
         PixelCanvasState(
             width = pixelCanvasUseCase.getCanvasWidth(),
             height = pixelCanvasUseCase.getCanvasHeight(),
-            pixels = pixelCanvasUseCase.getAllPixels(),
             layers = pixelCanvasUseCase.getLayers().toList(),
             activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         )
@@ -130,8 +152,61 @@ class DrawingViewModel @AssistedInject constructor(
         setCanvasSize(canvasWidth, canvasHeight)
 
         viewModelScope.launch {
-            loadFromDB()
-            saveToDB(spriteName)
+            withContext(Dispatchers.IO) {
+                loadFromDB()
+            }
+            refreshFullCanvasState()
+            _uiState.value = _uiState.value.copy(isLoading = false)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _bitmap?.recycle()
+        _bitmap = null
+        _overlayBitmap?.recycle()
+        _overlayBitmap = null
+    }
+
+    private fun ensureBitmap(width: Int, height: Int) {
+        if (_bitmap == null || _bitmap!!.width != width || _bitmap!!.height != height) {
+            _bitmap?.recycle()
+            _bitmap = if (width > 0 && height > 0) createBitmap(width, height) else null
+        }
+    }
+
+    private fun ensureOverlayBitmap() {
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        if (_overlayBitmap == null || _overlayBitmap!!.width != w || _overlayBitmap!!.height != h) {
+            _overlayBitmap?.recycle()
+            _overlayBitmap = if (w > 0 && h > 0) createBitmap(w, h) else null
+        }
+    }
+
+    private fun clearOverlayBitmap() {
+        _overlayBitmap?.eraseColor(android.graphics.Color.TRANSPARENT)
+    }
+
+    private fun applyChangesToOverlay(changes: List<PixelChange>) {
+        ensureOverlayBitmap()
+        val bmp = _overlayBitmap ?: return
+        for (change in changes) {
+            if (change.row in 0 until bmp.height && change.col in 0 until bmp.width) {
+                bmp[change.col, change.row] = change.color
+            }
+        }
+    }
+
+    private fun applyChangesToMainBitmap(changes: List<PixelChange>) {
+        val bmp = _bitmap ?: return
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        for (change in changes) {
+            if (change.row in 0 until h && change.col in 0 until w) {
+                val composited = pixelCanvasUseCase.getCompositedPixelAt(change.row, change.col)
+                bmp[change.col, change.row] = composited
+            }
         }
     }
 
@@ -154,47 +229,66 @@ class DrawingViewModel @AssistedInject constructor(
     fun onLayerEvent(event: LayerEvent) {
         when (event) {
             is LayerEvent.AddLayer -> {
-                saveState()
                 pixelCanvasUseCase.addLayer("Layer ${pixelCanvasUseCase.getLayers().size + 1}")
-                refreshCanvasState()
+                refreshLayerState()
+                refreshActiveLayerState()
+                saveState()
             }
             is LayerEvent.DeleteLayer -> {
-                saveState()
                 pixelCanvasUseCase.removeLayer(event.layerId)
-                refreshCanvasState()
+                refreshLayerState()
+                refreshActiveLayerState()
+                viewModelScope.launch {
+                    refreshBitmapState()
+                }
+                saveState()
             }
             is LayerEvent.SelectLayer -> {
                 pixelCanvasUseCase.setActiveLayer(event.layerId)
-                refreshCanvasState()
+                refreshActiveLayerState()
             }
             is LayerEvent.ToggleLock -> {
-                saveState()
                 pixelCanvasUseCase.toggleLock(event.layerId)
-                refreshCanvasState()
+                refreshLayerState()
+                saveState()
             }
             is LayerEvent.ToggleVisibility -> {
-                saveState()
                 pixelCanvasUseCase.toggleVisibility(event.layerId)
-                refreshCanvasState()
+                refreshLayerState()
+                viewModelScope.launch {
+                    refreshBitmapState()
+                }
+                saveState()
             }
             is LayerEvent.MergeLayerDown -> {
-                saveState()
                 pixelCanvasUseCase.mergeLayerDown(event.layerId)
-                refreshCanvasState()
+                refreshLayerState()
+                refreshActiveLayerState()
+                viewModelScope.launch {
+                    refreshBitmapState()
+                }
+                saveState()
             }
             is LayerEvent.ReorderLayer -> {
-                saveState()
                 pixelCanvasUseCase.reorderLayer(fromIndex = event.fromIndex, toIndex = event.toIndex)
-                refreshCanvasState()
+
+                refreshLayerState()
+
+                viewModelScope.launch {
+                    refreshBitmapState()
+                }
+                saveState()
             }
         }
     }
 
     fun onCanvasEvent(event: PixelCanvasEvent) {
         when (event) {
-            is PixelCanvasEvent.OnCanvasTouchStart -> saveState()
-            is PixelCanvasEvent.DrawAt -> applyTool(event.y, event.x)
-
+            is PixelCanvasEvent.OnStrokeStart -> onStrokeStart(event.y, event.x)
+            is PixelCanvasEvent.OnStrokeMove -> onStrokeMove(event.y, event.x)
+            is PixelCanvasEvent.OnStrokeEnd -> onStrokeEnd()
+            is PixelCanvasEvent.OnStrokeCancel -> onStrokeCancel()
+            is PixelCanvasEvent.OnTapAt -> onTapAt(event.y, event.x)
         }
     }
 
@@ -230,39 +324,158 @@ class DrawingViewModel @AssistedInject constructor(
         _uiState.value = _uiState.value.copy(showLayerDrawer = !_uiState.value.showLayerDrawer)
     }
 
-    fun applyTool(
-        row: Int,
-        col: Int,
-    ) {
+    // --- Stroke lifecycle ---
+
+    private fun onStrokeStart(row: Int, col: Int) {
+        val tool = _uiState.value.selectedTool
+        if (tool !is StrokeTool) return
+
+        saveState()
+
+        val color = activeColor.value
+        val scale = _uiState.value.toolSize
+        val update = tool.beginStroke(pixelCanvasUseCase, row, col, color, scale)
+
+        if (tool.commitsImmediately) {
+            // eraser: pixels already committed by tool, update main bitmap
+            applyChangesToMainBitmap(update.changes)
+            _drawVersion++
+            _canvasState.value = _canvasState.value.copy(drawVersion = _drawVersion)
+        } else {
+            // pencil: draw to overlay for preview
+            clearOverlayBitmap()
+            applyChangesToOverlay(update.changes)
+            _overlayVersion++
+            _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+        }
+    }
+
+    private fun onStrokeMove(row: Int, col: Int) {
+        val tool = _uiState.value.selectedTool
+        if (tool !is StrokeTool) return
+
+        val update = tool.updateStroke(pixelCanvasUseCase, row, col)
+
+        if (tool.commitsImmediately) {
+            applyChangesToMainBitmap(update.changes)
+            _drawVersion++
+            _canvasState.value = _canvasState.value.copy(drawVersion = _drawVersion)
+        } else {
+            if (update.isFullPreview) clearOverlayBitmap()
+            applyChangesToOverlay(update.changes)
+            _overlayVersion++
+            _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+        }
+    }
+
+    private fun onStrokeEnd() {
+        val tool = _uiState.value.selectedTool
+        if (tool !is StrokeTool) return
+
+        val finalChanges = tool.endStroke()
+
+        if (!tool.commitsImmediately && finalChanges.isNotEmpty()) {
+            // batch commit overlay pixels to layer
+            pixelCanvasUseCase.batchSetPixels(finalChanges)
+            applyChangesToMainBitmap(finalChanges)
+            clearOverlayBitmap()
+            _drawVersion++
+            _overlayVersion++
+            _canvasState.value = _canvasState.value.copy(
+                drawVersion = _drawVersion,
+                overlayVersion = _overlayVersion
+            )
+        }
+
+        updateHistoryCurrentState()
+    }
+
+    private fun onStrokeCancel() {
+        val tool = _uiState.value.selectedTool
+        if (tool !is StrokeTool) return
+
+        tool.cancelStroke()
+        clearOverlayBitmap()
+        _overlayVersion++
+
+        // Pop the state we saved when the stroke started
+        undo()
+    }
+
+    private fun onTapAt(row: Int, col: Int) {
         val tool = _uiState.value.selectedTool
         val color = activeColor.value
         val size = _uiState.value.toolSize
 
-        Log.d(
-            "DrawingScreenViewModel",
-            "Applying tool: ${tool.name} at row=$row, col=$col with color=${color.value}"
-        )
+        if (tool is FillTool) {
+            if (_fillRunning) return
+            _fillRunning = true
 
-        tool.apply(pixelCanvasUseCase, row, col, color, size)
-        refreshCanvasState()
+            saveState()
+
+            viewModelScope.launch {
+                val result = withContext(Dispatchers.Default) {
+                    FillTool.fillDirect(pixelCanvasUseCase, row, col, color)
+                }
+
+                _fillRunning = false
+
+                if (result != null) {
+                    refreshBitmapRegion(
+                        result.dirtyMinRow, result.dirtyMinCol,
+                        result.dirtyMaxRow, result.dirtyMaxCol
+                    )
+                    _drawVersion++
+                    _canvasState.value = _canvasState.value.copy(
+                        drawVersion = _drawVersion,
+                        layers = pixelCanvasUseCase.getLayers().toList()
+                    )
+                    updateHistoryCurrentState()
+                }
+            }
+        } else {
+            saveState()
+            tool.apply(pixelCanvasUseCase, row, col, color, size)
+            refreshLayerState()
+            viewModelScope.launch {
+                refreshBitmapState()
+            }
+            updateHistoryCurrentState()
+        }
     }
 
-    fun getPixelData(row: Int, col: Int): Color {
-        return pixelCanvasUseCase.getPixel(row, col)
-    }
 
     fun saveState() {
         val currentLayers = pixelCanvasUseCase.getLayers().map {
-            it.copy(pixels = it.pixels.toList()) // deep copy pixels for history immutability
+            it.copy(pixels = it.pixels.copyOf())
         }
     
         canvasHistoryManager.saveState(
             PixelCanvasState(
                 width = pixelCanvasUseCase.getCanvasWidth(),
                 height = pixelCanvasUseCase.getCanvasHeight(),
-                pixels = pixelCanvasUseCase.getAllPixels(),
                 layers = currentLayers,
                 activeLayerId = pixelCanvasUseCase.getActiveLayerId()
+            )
+        )
+    }
+
+    private fun updateHistoryCurrentState() {
+        val activeLayerId = pixelCanvasUseCase.getActiveLayerId()
+        val currentLayers = pixelCanvasUseCase.getLayers().map {
+            if (it.id == activeLayerId) {
+                it.copy(pixels = it.pixels.copyOf())
+            } else {
+                it
+            }
+        }
+        
+        canvasHistoryManager.setCurrentState(
+            PixelCanvasState(
+                width = pixelCanvasUseCase.getCanvasWidth(),
+                height = pixelCanvasUseCase.getCanvasHeight(),
+                layers = currentLayers,
+                activeLayerId = activeLayerId
             )
         )
     }
@@ -272,12 +485,13 @@ class DrawingViewModel @AssistedInject constructor(
             pixelCanvasUseCase.setCanvas(Sprite(width = state.width, height = state.height, layers = state.layers))
             pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
             
-            _canvasState.value = _canvasState.value.copy(
-                width = state.width,
-                height = state.height,
-            )
-
-            refreshCanvasState()
+            clearOverlayBitmap()
+            refreshCanvasSizeState()
+            refreshLayerState()
+            refreshActiveLayerState()
+            viewModelScope.launch {
+                refreshBitmapState()
+            }
         }
     }
 
@@ -286,56 +500,117 @@ class DrawingViewModel @AssistedInject constructor(
             pixelCanvasUseCase.setCanvas(Sprite(width = state.width, height = state.height, layers = state.layers))
             pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
             
-            _canvasState.value = _canvasState.value.copy(
-                width = state.width,
-                height = state.height,
-            )
-
-            refreshCanvasState()
+            clearOverlayBitmap()
+            refreshCanvasSizeState()
+            refreshLayerState()
+            refreshActiveLayerState()
+            viewModelScope.launch {
+                refreshBitmapState()
+            }
         }
     }
 
     fun rotate() {
         pixelCanvasUseCase.rotateCanvas()
-        refreshCanvasState()
+        refreshCanvasSizeState()
+        refreshLayerState()
+        viewModelScope.launch {
+            refreshBitmapState()
+        }
         saveState()
     }
 
     fun hFlip() {
         pixelCanvasUseCase.hFlipCanvas()
-        refreshCanvasState()
+        refreshLayerState()
+        viewModelScope.launch {
+            refreshBitmapState()
+        }
         saveState()
     }
 
     fun vFlip() {
         pixelCanvasUseCase.vFlipCanvas()
-        refreshCanvasState()
+        refreshLayerState()
+        viewModelScope.launch {
+            refreshBitmapState()
+        }
         saveState()
     }
 
     fun resizeCanvas(width: Int, height: Int) {
         pixelCanvasUseCase.resizeCanvas(width, height)
-        _canvasState.value = _canvasState.value.copy(
-            width = width,
-            height = height
-        )
+        refreshCanvasSizeState()
+        refreshLayerState()
         saveState()
-        refreshCanvasState()
+        viewModelScope.launch {
+            refreshBitmapState()
+        }
     }
 
-    private fun refreshCanvasState() {
-        val newPixels = pixelCanvasUseCase.getAllPixels()
-        val newWidth = pixelCanvasUseCase.getCanvasWidth()
-        val newHeight = pixelCanvasUseCase.getCanvasHeight()
-
+    private fun refreshLayerState() {
         _canvasState.value = _canvasState.value.copy(
-            pixels = newPixels,
-            width = newWidth,
-            height = newHeight,
-            layers = pixelCanvasUseCase.getLayers().toList(),
+            layers = pixelCanvasUseCase.getLayers().toList()
+        )
+    }
+
+    private fun refreshActiveLayerState() {
+        _canvasState.value = _canvasState.value.copy(
             activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         )
     }
+
+    private fun refreshCanvasSizeState() {
+        _canvasState.value = _canvasState.value.copy(
+            width = pixelCanvasUseCase.getCanvasWidth(),
+            height = pixelCanvasUseCase.getCanvasHeight()
+        )
+    }
+
+    private suspend fun refreshBitmapState() {
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        
+        val pixels = withContext(Dispatchers.Default) {
+            pixelCanvasUseCase.getAllPixels()
+        }
+
+        ensureBitmap(w, h)
+        if (pixels.size == w * h) {
+            _bitmap?.setPixels(pixels, 0, w, 0, 0, w, h)
+        }
+        _drawVersion++
+
+        _canvasState.value = _canvasState.value.copy(
+            drawVersion = _drawVersion
+        )
+    }
+
+    private suspend fun refreshFullCanvasState() {
+        refreshCanvasSizeState()
+        refreshLayerState()
+        refreshActiveLayerState()
+        refreshBitmapState()
+    }
+
+    private fun refreshBitmapRegion(startRow: Int, startCol: Int, endRow: Int, endCol: Int) {
+        val bmp = _bitmap ?: return
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+
+        val r0 = startRow.coerceAtLeast(0)
+        val c0 = startCol.coerceAtLeast(0)
+        val r1 = endRow.coerceAtMost(h - 1)
+        val c1 = endCol.coerceAtMost(w - 1)
+
+        val regionW = c1 - c0 + 1
+        val regionH = r1 - r0 + 1
+        if (regionW <= 0 || regionH <= 0) return
+
+        val regionPixels = pixelCanvasUseCase.getAllPixelsInRegion(r0, c0, regionH, regionW)
+        bmp.setPixels(regionPixels, 0, regionW, c0, r0, regionW, regionH)
+    }
+
 
     suspend fun getLastSavedLocation(): Uri? {
         _lastSavedLocation.value = storageLocationRepository.getLastSavedLocation()
@@ -397,15 +672,16 @@ class DrawingViewModel @AssistedInject constructor(
         return loadFileUseCase.loadFile(context, fileUri)
     }
 
-    fun loadSprite(sprite: Sprite) {
+    suspend fun loadSprite(sprite: Sprite) {
         setCanvasSize(sprite.width, sprite.height)
         pixelCanvasUseCase.setCanvas(sprite)
         sprite.colorPalette?.let {
             colorPaletteRepository.updatePalette(sprite.colorPalette.map { Color(it) })
         }
         canvasHistoryManager.reset()
-        saveState()
-        refreshCanvasState()
+        updateHistoryCurrentState()
+
+        refreshFullCanvasState()
     }
 
     suspend fun saveToDB(spriteName: String? = null) {
@@ -420,12 +696,9 @@ class DrawingViewModel @AssistedInject constructor(
         val sprite = spriteDataRepository.loadSprite(spriteId)
         if (sprite != null) {
             loadSprite(sprite)
+        } else {
+            saveToDB(spriteName)
         }
-    }
-
-    suspend fun importColorsFromLospecUrl(url: String): List<Color> {
-        return colorPaletteRepository.getLospecColorPalette(url)?.colors ?: emptyList()
-
     }
 
     fun updateColorPalette(colors: List<Color>) {

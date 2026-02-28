@@ -272,7 +272,7 @@ private fun GalleryScreenPreview() {
                                 Layer(
                                 id = "test1",
                                 name = "Layer 1",
-                                pixels = List(10 * 10) {
+                                pixels = IntArray(10 * 10) {
                                     CatppuccinUI.CurrentPalette.Flamingo.toArgb()
                                 }
                             ))
@@ -291,7 +291,7 @@ private fun GalleryScreenPreview() {
                                 Layer(
                                 id = "test2",
                                 name = "Layer 1",
-                                pixels = List(16 * 16) {
+                                pixels = IntArray(16 * 16) {
                                     CatppuccinUI.CurrentPalette.Lavender.toArgb()
                                 }
                             ))

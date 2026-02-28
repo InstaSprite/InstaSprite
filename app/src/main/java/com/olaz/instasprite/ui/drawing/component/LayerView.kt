@@ -66,7 +66,7 @@ fun LayerView(
     val bitmapImage = remember(layer.pixels, canvasWidth, canvasHeight) {
         if (canvasWidth > 0 && canvasHeight > 0 && layer.pixels.size == canvasWidth * canvasHeight) {
             val bitmap = createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888)
-            val argbPixels = layer.pixels.toIntArray()
+            val argbPixels = layer.pixels
             bitmap.setPixels(argbPixels, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
             bitmap.asImageBitmap()
         } else {
@@ -185,7 +185,7 @@ private fun PreviewActive() {
             layer = Layer(
                 id = "test1",
                 name = "Layer 1",
-                pixels = List(16 * 16) {
+                pixels = IntArray(16 * 16) {
                     CatppuccinUI.CurrentPalette.Flamingo.toArgb()
                 }
             ),
@@ -209,7 +209,7 @@ private fun PreviewInactive() {
             layer = Layer(
                 id = "test1",
                 name = "Layer 1",
-                pixels = List(16 * 16) {
+                pixels = IntArray(16 * 16) {
                     CatppuccinUI.CurrentPalette.Maroon.toArgb()
                 }
             ),

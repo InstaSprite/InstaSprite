@@ -3,6 +3,7 @@ package com.olaz.instasprite.ui.drawing
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.olaz.instasprite.domain.dialog.Dialog
 import com.olaz.instasprite.ui.drawing.dialog.ColorWheelDialog
@@ -10,6 +11,7 @@ import com.olaz.instasprite.ui.drawing.dialog.LoadISpriteDialog
 import com.olaz.instasprite.ui.drawing.dialog.ResizeCanvasDialog
 import com.olaz.instasprite.ui.drawing.dialog.SaveISpriteDialog
 import com.olaz.instasprite.ui.drawing.dialog.SaveImageDialog
+import kotlinx.coroutines.launch
 
 sealed interface DrawingDialog : Dialog {
     data object SaveImage : DrawingDialog
@@ -25,6 +27,7 @@ fun DrawingScreenDialogs(
     viewModel: DrawingViewModel
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var lastSavedUri = viewModel.lastSavedLocation.collectAsState().value
 
@@ -58,7 +61,9 @@ fun DrawingScreenDialogs(
                         viewModel.getSpriteDataFromFile(context, uri)
                     },
 
-                    onLoad = viewModel::loadSprite
+                    onLoad = {
+                        scope.launch { viewModel.loadSprite(it) }
+                    }
                 )
 
             DrawingDialog.ResizeCanvas ->

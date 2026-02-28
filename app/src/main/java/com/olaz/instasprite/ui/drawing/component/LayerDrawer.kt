@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,11 +58,15 @@ fun LayerDrawer(
 
     val lazyListState = rememberLazyListState()
 
+    var layersList by remember(layers) { mutableStateOf(layers) }
+
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        onEvent(LayerEvent.ReorderLayer((layers.size - 1) - from.index,(layers.size - 1) - to.index))
+        layersList = layersList.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
     }
 
-    var previousSize by remember { mutableStateOf(layers.size) }
+    var previousSize by remember { mutableIntStateOf(layers.size) }
 
     LaunchedEffect(layers.size) {
         if (layers.size > previousSize) {
@@ -99,7 +104,7 @@ fun LayerDrawer(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            items(layers, key = { it.id }) { layer ->
+            items(layersList, key = { it.id }) { layer ->
 
                 val dragIndicatorBgColor = if (layer.id == activeLayerId ){
                     CatppuccinUI.CurrentPalette.Blue
@@ -116,7 +121,18 @@ fun LayerDrawer(
                 ReorderableItem(
                     state = reorderableLazyListState,
                     key = layer.id
-                ) {
+                ) { isDragging ->
+
+                    LaunchedEffect(isDragging) {
+                        if (!isDragging) {
+                            val currentIndex = layersList.indexOf(layer)
+                            val originalIndex = layers.indexOf(layer)
+                            if (currentIndex != -1 && originalIndex != -1 && currentIndex != originalIndex) {
+                                onEvent(LayerEvent.ReorderLayer((layers.size - 1) - originalIndex, (layers.size - 1) - currentIndex))
+                            }
+                        }
+                    }
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.background(dragIndicatorBgColor)
@@ -191,14 +207,14 @@ private fun Preview() {
                 Layer(
                     id = "test1",
                     name = "Layer 1",
-                    pixels = List(16 * 16) {
+                    pixels = IntArray(16 * 16) {
                         CatppuccinUI.CurrentPalette.Maroon.toArgb()
                     }
                 ),
                 Layer(
                     id = "test2",
                     name = "Layer 2",
-                    pixels = List(16 * 16) {
+                    pixels = IntArray(16 * 16) {
                         CatppuccinUI.CurrentPalette.Mauve.toArgb()
                     }
                 )

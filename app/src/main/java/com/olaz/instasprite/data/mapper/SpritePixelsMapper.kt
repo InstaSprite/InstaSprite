@@ -13,7 +13,7 @@ fun Sprite.toSpritePixels(): SpritePixels {
             .setName(layer.name)
             .setIsVisible(layer.isVisible)
             .setIsLocked(layer.isLocked)
-            .addAllPixels(layer.pixels)
+            .addAllPixels(layer.pixels.toList())
             .build()
     }
     builder.addAllLayers(layerProtos)

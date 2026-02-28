@@ -41,7 +41,7 @@ class PixelCanvasUseCase(
         return pixelCanvasRepository.getPixel(row, col)
     }
 
-    fun setCanvas(width: Int, height: Int, pixels: List<Color>? = null) {
+    fun setCanvas(width: Int, height: Int, pixels: IntArray? = null) {
         pixelCanvasRepository.setCanvas(width, height, pixels)
     }
 
@@ -49,12 +49,29 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.setCanvasData(sprite.width, sprite.height, sprite.layers)
     }
 
-    fun setAllPixels(pixels: List<Color>) {
+    fun setAllPixels(pixels: IntArray) {
         pixelCanvasRepository.setAllPixels(pixels)
     }
 
-    fun getAllPixels(): List<Color> {
+    fun batchSetPixels(changes: List<com.olaz.instasprite.domain.tool.PixelChange>) {
+        pixelCanvasRepository.batchSetPixels(changes)
+    }
+
+    fun getActiveLayerPixelsDirect(): IntArray? = pixelCanvasRepository.getActiveLayerPixelsDirect()
+
+    fun getAllPixels(): IntArray {
         return pixelCanvasRepository.getAllPixels()
+    }
+
+    fun getCompositedPixelAt(row: Int, col: Int): Int {
+        return pixelCanvasRepository.getCompositedPixelAt(row, col)
+    }
+
+    fun getAllPixelsInRegion(
+        startRow: Int, startCol: Int,
+        regionHeight: Int, regionWidth: Int
+    ): IntArray {
+        return pixelCanvasRepository.getAllPixelsInRegion(startRow, startCol, regionHeight, regionWidth)
     }
 
     fun getSprite(): Sprite {

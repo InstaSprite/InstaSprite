@@ -21,7 +21,7 @@ class SaveFileUseCase {
 
         val bitmap =
             ImageExporter.convertToBitmap(
-                sprite.compositedPixels.map { Color(it) },
+                sprite.compositedPixels,
                 sprite.width,
                 sprite.height,
                 scalePercent

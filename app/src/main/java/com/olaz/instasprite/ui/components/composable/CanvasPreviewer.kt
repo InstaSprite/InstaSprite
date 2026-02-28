@@ -35,7 +35,7 @@ fun CanvasPreviewer(
     val bitmapImage by remember(sprite) {
         mutableStateOf(
             ImageExporter.convertToBitmap(
-                sprite.compositedPixels.map { Color(it) },
+                sprite.compositedPixels,
                 sprite.width,
                 sprite.height,
             )?.asImageBitmap()

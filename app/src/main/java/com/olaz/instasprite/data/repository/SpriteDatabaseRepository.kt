@@ -58,7 +58,7 @@ class SpriteDatabaseRepository @Inject constructor(
                     name = layerData.name,
                     isVisible = layerData.isVisible,
                     isLocked = layerData.isLocked,
-                    pixels = layerData.pixelsList
+                    pixels = layerData.pixelsList.toIntArray()
                 )
             }
 

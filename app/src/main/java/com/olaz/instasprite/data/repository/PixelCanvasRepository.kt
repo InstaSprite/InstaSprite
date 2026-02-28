@@ -5,7 +5,9 @@ import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.PixelCanvas
 import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.tool.PixelChange
 import java.util.UUID
+import java.util.concurrent.CopyOnWriteArrayList
 
 class PixelCanvasRepository(var model: PixelCanvas) {
     var width: Int
@@ -20,7 +22,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             model.height = value
         }
 
-    private val _layers = mutableListOf<Layer>()
+    private val _layers = CopyOnWriteArrayList<Layer>()
     val layers: List<Layer> get() = _layers
 
     var activeLayerId: String = ""
@@ -43,7 +45,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             name = name,
             isVisible = true,
             isLocked = false,
-            pixels = MutableList(width * height) { Color.Transparent.toArgb() }
+            pixels = IntArray(width * height) { Color.Transparent.toArgb() }
         )
 
         _layers.add(newLayer)
@@ -99,11 +101,10 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                 }
             }
 
-            val newLayer = bottomLayer.copy(pixels = mergedPixels.toMutableList())
-            _layers[index - 1] = newLayer
+            _layers[index - 1] = bottomLayer.copy(pixels = mergedPixels)
             _layers.removeAt(index)
             if (activeLayerId == id) {
-                activeLayerId = newLayer.id
+                activeLayerId = _layers[index - 1].id
             }
         }
     }
@@ -130,7 +131,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                     }
                 }
             }
-            _layers[i] = layer.copy(pixels = rotatedPixels.toMutableList())
+            _layers[i] = layer.copy(pixels = rotatedPixels)
         }
         width = oldHeight
         height = oldWidth
@@ -145,7 +146,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                     flipped[row * width + (width - 1 - col)] = layer.pixels[row * width + col]
                 }
             }
-            _layers[i] = layer.copy(pixels = flipped.toMutableList())
+            _layers[i] = layer.copy(pixels = flipped)
 
         }
     }
@@ -159,7 +160,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                     flipped[(height - 1 - row) * width + col] = layer.pixels[row * width + col]
                 }
             }
-            _layers[i] = layer.copy(pixels = flipped.toMutableList())
+            _layers[i] = layer.copy(pixels = flipped)
 
         }
     }
@@ -181,7 +182,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                     newPixels[newIndex] = layer.pixels[oldIndex]
                 }
             }
-            _layers[i] = layer.copy(pixels = newPixels.toMutableList())
+            _layers[i] = layer.copy(pixels = newPixels)
         }
         
         this.width = newWidth
@@ -197,9 +198,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             addLayer("Layer 1")
         } else {
             _layers.addAll(newLayers.map {
-                it.copy(pixels = it.pixels.toMutableList())
+                it.copy(pixels = it.pixels.copyOf())
             })
-            // Default to top layer active
             activeLayerId = _layers.last().id
         }
     }
@@ -210,7 +210,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             if (index < 0 || index >= _layers.size) return
             val layer = _layers[index]
             if (!layer.isLocked && layer.isVisible) {
-                (layer.pixels as MutableList<Int>)[row * width + col] = color.toArgb()
+                layer.pixels[row * width + col] = color.toArgb()
             }
         }
     }
@@ -223,17 +223,14 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
         for (s in 2..scale) {
             if (s % 2 == 0) {
-                // Even scale → expand top-left
                 xStart -= 1
                 yStart -= 1
             } else {
-                // Odd scale → expand bottom-right
                 xEnd += 1
                 yEnd += 1
             }
         }
 
-        // Clamp bounds to stay within matrix limits
         xStart = xStart.coerceAtLeast(0)
         yStart = yStart.coerceAtLeast(0)
         xEnd = xEnd.coerceAtMost(height - 1)
@@ -257,7 +254,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return Color.Transparent
     }
 
-    fun getAllPixels(): List<Color> {
+    fun getAllPixels(): IntArray {
         val composited = IntArray(width * height) { Color.Transparent.toArgb() }
         for (layer in _layers) {
             if (layer.isVisible) {
@@ -269,21 +266,75 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                 }
             }
         }
-        return composited.map { Color(it) }
+        return composited
     }
 
-    fun setAllPixels(colors: List<Color>) {
+    fun getCompositedPixelAt(row: Int, col: Int): Int {
+        if (row !in 0 until height || col !in 0 until width) return Color.Transparent.toArgb()
+        val idx = row * width + col
+        var color = Color.Transparent.toArgb()
+        for (layer in _layers) {
+            if (layer.isVisible && layer.pixels[idx] != 0) {
+                color = layer.pixels[idx]
+            }
+        }
+        return color
+    }
+
+    fun getAllPixelsInRegion(
+        startRow: Int, startCol: Int,
+        regionHeight: Int, regionWidth: Int
+    ): IntArray {
+        val result = IntArray(regionWidth * regionHeight)
+        for (r in 0 until regionHeight) {
+            val canvasRow = startRow + r
+            if (canvasRow !in 0 until height) continue
+            for (c in 0 until regionWidth) {
+                val canvasCol = startCol + c
+                if (canvasCol !in 0 until width) continue
+                val idx = canvasRow * width + canvasCol
+                var color = Color.Transparent.toArgb()
+                for (layer in _layers) {
+                    if (layer.isVisible && layer.pixels[idx] != 0) {
+                        color = layer.pixels[idx]
+                    }
+                }
+                result[r * regionWidth + c] = color
+            }
+        }
+        return result
+    }
+
+    fun setAllPixels(pixels: IntArray) {
         val idx = getActiveLayerIndex()
         if (idx !in _layers.indices) return
         val layer = _layers[idx]
-        if (!layer.isLocked && colors.size == layer.pixels.size) {
-            for (i in colors.indices) {
-                (layer.pixels as MutableList<Int>)[i] = colors[i].toArgb()
+        if (!layer.isLocked && pixels.size == layer.pixels.size) {
+            System.arraycopy(pixels, 0, layer.pixels, 0, pixels.size)
+        }
+    }
+
+    fun batchSetPixels(changes: List<PixelChange>) {
+        val idx = getActiveLayerIndex()
+        if (idx !in _layers.indices) return
+        val layer = _layers[idx]
+        if (layer.isLocked || !layer.isVisible) return
+        for (change in changes) {
+            if (change.row in 0 until height && change.col in 0 until width) {
+                layer.pixels[change.row * width + change.col] = change.color
             }
         }
     }
 
-    fun setCanvas(width: Int, height: Int, pixelsData: List<Color>? = null) {
+    fun getActiveLayerPixelsDirect(): IntArray? {
+        val index = getActiveLayerIndex()
+        if (index !in _layers.indices) return null
+        val layer = _layers[index]
+        if (layer.isLocked || !layer.isVisible) return null
+        return layer.pixels
+    }
+
+    fun setCanvas(width: Int, height: Int, pixelsData: IntArray? = null) {
         this.width = width
         this.height = height
         _layers.clear()
@@ -294,9 +345,9 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             isVisible = true,
             isLocked = false,
             pixels = if (pixelsData != null && pixelsData.size == width * height) {
-                pixelsData.map { it.toArgb() }.toMutableList()
+                pixelsData.copyOf()
             } else {
-                MutableList(width * height) { Color.Transparent.toArgb() }
+                IntArray(width * height) { Color.Transparent.toArgb() }
             }
         )
         _layers.add(newLayer)
@@ -307,7 +358,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return Sprite(
             width = width,
             height = height,
-            layers = _layers.map { it.copy(pixels = it.pixels.toList()) }
+            layers = _layers.map { it.copy(pixels = it.pixels.copyOf()) }
         )
     }
 }

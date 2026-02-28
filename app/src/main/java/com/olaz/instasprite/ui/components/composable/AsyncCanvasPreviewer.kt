@@ -86,8 +86,7 @@ private fun PreviewImage(
 ) {
     val bitmapImage = remember(sprite.compositedPixels, sprite.width, sprite.height) {
         val bitmap = createBitmap(sprite.width, sprite.height, Bitmap.Config.ARGB_8888)
-        val argbPixels = sprite.compositedPixels.toIntArray()
-        bitmap.setPixels(argbPixels, 0, sprite.width, 0, 0, sprite.width, sprite.height)
+        bitmap.setPixels(sprite.compositedPixels, 0, sprite.width, 0, 0, sprite.width, sprite.height)
         bitmap.asImageBitmap()
     }
     Image(

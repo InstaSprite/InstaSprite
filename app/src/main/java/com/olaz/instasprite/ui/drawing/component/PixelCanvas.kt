@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -8,53 +9,58 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
+import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
 import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.drawCheckerboard
 import com.olaz.instasprite.utils.drawingPointerInput
-import com.olaz.instasprite.utils.updateBitmapPixels
 
 @Composable
 fun PixelCanvas(
     modifier: Modifier = Modifier,
     pixelCanvasState: PixelCanvasState,
+    bitmap: Bitmap?,
+    overlayBitmap: Bitmap?,
     selectedTool: Tool?,
+    scale: Float,
+    offset: Offset,
+    onTransform: (Offset, Offset, Float, IntSize) -> Unit,
     onEvent: (PixelCanvasEvent) -> Unit
 ) {
 
-    val (canvasWidth, canvasHeight, pixels) = pixelCanvasState
+    val canvasWidth = pixelCanvasState.width
+    val canvasHeight = pixelCanvasState.height
+    val drawVersion = pixelCanvasState.drawVersion
+    val overlayVersion = pixelCanvasState.overlayVersion
 
-    val bitmap = remember(canvasWidth, canvasHeight) {
-        createBitmap(canvasWidth, canvasHeight)
-    }
+    if (bitmap == null || canvasWidth <= 0 || canvasHeight <= 0) return
 
-    val imageBitmap: ImageBitmap = remember(bitmap, pixels) {
-        if (canvasWidth > 0 && canvasHeight > 0 && pixels.isNotEmpty()) {
-            updateBitmapPixels(
-                bitmap = bitmap,
-                pixels = pixels
-            )
-        }
+    val imageBitmap = remember(bitmap, drawVersion) {
         bitmap.asImageBitmap()
     }
 
-    // Store the stroke and color for the grid overlay once, maybe optimize memory
-    val gridStroke = remember { Stroke(width = 1f) }
-    val gridColor = remember { Color.LightGray.copy(alpha = 0.2f) }
+    val overlayImageBitmap = remember(overlayBitmap, overlayVersion) {
+        overlayBitmap?.asImageBitmap()
+    }
 
     val aspectRatio = canvasWidth.toFloat() / canvasHeight.toFloat()
     val borderSize = 5.dp
@@ -66,6 +72,12 @@ fun PixelCanvas(
 
         Box(
             modifier = Modifier
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
                 .border(borderSize, CatppuccinUI.BackgroundColor)
                 .padding(borderSize)
         ) {
@@ -74,27 +86,66 @@ fun PixelCanvas(
                     .aspectRatio(aspectRatio)
                     .fillMaxWidth(0.9f)
             ) {
+                var canvasLayoutSize by remember { mutableStateOf(IntSize.Zero) }
+
                 Canvas(
                     modifier = Modifier
                         .fillMaxSize()
+                        .onSizeChanged { canvasLayoutSize = it }
                         .drawCheckerboard(
                             canvasWidth = canvasWidth,
                             canvasHeight = canvasHeight
                         )
-                        .drawingPointerInput(canvasWidth, canvasHeight, selectedTool, onEvent)
+                        .drawingPointerInput(
+                            canvasWidth = canvasWidth,
+                            canvasHeight = canvasHeight,
+                            selectedTool = selectedTool,
+                            onEvent = onEvent,
+                            onTransform = { centroid, pan, zoom ->
+                                onTransform(centroid, pan, zoom, canvasLayoutSize)
+                            }
+                        )
                 ) {
+                    val dstSize = IntSize(size.width.toInt(), size.height.toInt())
+
                     drawImage(
                         image = imageBitmap,
                         dstOffset = IntOffset.Zero,
-                        dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                        dstSize = dstSize,
                         filterQuality = FilterQuality.None
                     )
 
-//                    if (canvasWidth < 32 && canvasHeight < 32) {
-//                        drawGridOverlay(canvasWidth, canvasHeight, gridColor, gridStroke)
-//                    }
+                    overlayImageBitmap?.let {
+                        drawImage(
+                            image = it,
+                            dstOffset = IntOffset.Zero,
+                            dstSize = dstSize,
+                            filterQuality = FilterQuality.None
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    InstaSpriteTheme() {
+        PixelCanvas(
+            pixelCanvasState = PixelCanvasState(
+                width = 16,
+                height = 16
+            ),
+            bitmap = createBitmap(16, 16),
+            selectedTool = PencilTool,
+            scale = 1f,
+            offset = Offset.Zero,
+            onTransform = { _, _, _, _ -> },
+            overlayBitmap = null,
+            onEvent = {},
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }

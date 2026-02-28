@@ -3,8 +3,6 @@ package com.olaz.instasprite.domain.export
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import com.olaz.instasprite.domain.model.Sprite
@@ -13,19 +11,15 @@ import java.io.FileOutputStream
 
 object ImageExporter {
     fun convertToBitmap(
-        pixelsData: List<Color>,
+        pixelsData: IntArray,
         canvasWidth: Int,
         canvasHeight: Int,
         scalePercent: Int = 100
     ): Bitmap? {
         if (pixelsData.isEmpty()) return null
 
-        val argbPixels = IntArray(canvasWidth * canvasHeight) { i ->
-            pixelsData[i].toArgb()
-        }
-
         val bitmap = createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(argbPixels, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
+        bitmap.setPixels(pixelsData, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
 
         val scale = scalePercent / 100f
         val scaledWidth = (canvasWidth * scale).toInt().coerceAtLeast(1)
@@ -37,7 +31,7 @@ object ImageExporter {
     fun saveThumbnail(sprite: Sprite, context: Context) {
         try {
             val bitmap = convertToBitmap(
-                sprite.compositedPixels.map { Color(it) },
+                sprite.compositedPixels,
                 sprite.width,
                 sprite.height
             )
