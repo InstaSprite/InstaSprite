@@ -18,3 +18,7 @@ interface StrokeTool : Tool {
     fun endStroke(): List<PixelChange>
     fun cancelStroke()
 }
+
+interface ShapeTool : StrokeTool {
+
+}

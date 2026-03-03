@@ -33,17 +33,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.domain.tool.ShapeTool
 import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.ui.components.composable.DrawerLayout
 import com.olaz.instasprite.ui.components.composable.DrawerSide
 import com.olaz.instasprite.ui.drawing.component.ColorPalette
 import com.olaz.instasprite.ui.drawing.component.LayerDrawer
 import com.olaz.instasprite.ui.drawing.component.PixelCanvas
+import com.olaz.instasprite.ui.drawing.component.ShapeSelector
 import com.olaz.instasprite.ui.drawing.component.ToolSelector
 import com.olaz.instasprite.ui.drawing.component.ToolSizeSlider
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
@@ -177,6 +180,14 @@ private fun DrawingScreenContent(
         },
         bottomBar = {
             Column {
+                ShapeSelector(
+                    isVisible = (uiState.selectedTool is ShapeTool),
+                    selectedTool = uiState.selectedTool,
+                    onShapeSelected = { tool ->
+                        event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
+                    }
+                )
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
