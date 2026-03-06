@@ -9,13 +9,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.model.ColorPalette
+import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 enum class SpriteListOrder {
@@ -215,26 +216,39 @@ class GalleryViewModel @Inject constructor(
 
     fun saveImage(
         context: Context,
-        sprite: Sprite,
+        spriteId: String,
         folderUri: Uri,
         fileName: String,
-        scalePercent: Int = 100
-    ): Boolean {
-        val result = saveFileUseCase.saveImageFile(
-            context,
-            sprite,
-            scalePercent,
-            folderUri,
-            fileName
-        )
-
-        result.fold(
-            onSuccess = { return true },
-            onFailure = { exception ->
-                Log.e("SaveFile", "Failed to save file", exception)
-                return false
+        scalePercent: Int = 100,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val sprite = spriteDatabaseRepository.loadSprite(spriteId)
+            if (sprite == null) {
+                Log.e("SaveFile", "Sprite not found: $spriteId")
+                withContext(Dispatchers.Main) {
+                    onResult(false)
+                }
+                return@launch
             }
-        )
+            val result = saveFileUseCase.saveImageFile(
+                context,
+                sprite,
+                scalePercent,
+                folderUri,
+                fileName
+            )
+            
+            withContext(Dispatchers.Main) {
+                result.fold(
+                    onSuccess = { onResult(true) },
+                    onFailure = { exception ->
+                        Log.e("SaveFile", "Failed to save file", exception)
+                        onResult(false)
+                    }
+                )
+            }
+        }
     }
 
     fun deleteSpriteById(spriteId: String) {

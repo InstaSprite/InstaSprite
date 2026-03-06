@@ -60,11 +60,11 @@ fun GalleryScreenDialogs(
             is GalleryDialog.SaveImage ->
                 SaveImageDialog(
                     spriteName = dialog.sprite.meta!!.spriteName,
-                    sprite = dialog.sprite.sprite,
+                    spriteId = dialog.sprite.sprite.id,
                     lastSavedUri = lastSavedUri,
                     onFolderSelected = viewModel::setLastSavedLocation,
-                    onSaved = { sprite, uri, fileName, scale ->
-                        viewModel.saveImage(context, sprite, uri, "$fileName.png", scale)
+                    onSaved = { spriteId, uri, fileName, scale, onResult ->
+                        viewModel.saveImage(context, spriteId, uri, fileName, scale, onResult)
                     },
                     onDismiss = viewModel::closeTopDialog
                 )
