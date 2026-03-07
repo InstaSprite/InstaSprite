@@ -154,6 +154,7 @@ class DrawingViewModel @AssistedInject constructor(
             }
             refreshFullCanvasState()
             _uiState.value = _uiState.value.copy(isLoading = false)
+            saveState()
         }
     }
 
