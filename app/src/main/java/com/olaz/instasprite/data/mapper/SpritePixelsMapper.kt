@@ -6,6 +6,8 @@ import com.olaz.instasprite.domain.model.Sprite
 
 fun Sprite.toSpritePixels(): SpritePixels {
     val builder = SpritePixels.newBuilder()
+        .setWidth(this.width)
+        .setHeight(this.height)
 
     val layerProtos = this.layers.map { layer ->
         LayerData.newBuilder()

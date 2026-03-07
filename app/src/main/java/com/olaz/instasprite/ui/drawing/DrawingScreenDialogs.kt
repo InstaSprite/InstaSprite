@@ -42,7 +42,7 @@ fun DrawingScreenDialogs(
                     onDismiss = viewModel::closeTopDialog,
                     folderUri = lastSavedUri,
                     onFolderSelected = viewModel::setLastSavedLocation,
-                    onSave = { uri, name -> viewModel.saveISprite(context, uri, name) }
+                    onSave = { uri, name -> viewModel.saveISprite(uri, name) }
                 )
 
             DrawingDialog.SaveImage ->
@@ -50,7 +50,7 @@ fun DrawingScreenDialogs(
                     onDismiss = viewModel::closeTopDialog,
                     folderUri = lastSavedUri,
                     onFolderSelected = viewModel::setLastSavedLocation,
-                    onSave = { uri, name, scale -> viewModel.saveImage(context, uri, name, scale) }
+                    onSave = { uri, name, scale -> viewModel.saveImage(uri, name, scale) }
                 )
 
             DrawingDialog.LoadISprite ->
@@ -58,7 +58,7 @@ fun DrawingScreenDialogs(
                     onDismiss = viewModel::closeTopDialog,
 
                     onFilePicked = { uri ->
-                        viewModel.getSpriteDataFromFile(context, uri)
+                        viewModel.getSpriteDataFromFile(uri)
                     },
 
                     onLoad = {

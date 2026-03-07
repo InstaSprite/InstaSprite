@@ -3,9 +3,7 @@ package com.olaz.instasprite.ui.drawing
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,9 +19,9 @@ import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.domain.tool.Tool
-import com.olaz.instasprite.domain.usecase.LoadFileUseCase
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
-import com.olaz.instasprite.domain.usecase.SaveFileUseCase
+import com.olaz.instasprite.data.repository.FileRepository
+import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
 import com.olaz.instasprite.ui.drawing.contract.LayerEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
@@ -64,6 +62,7 @@ class DrawingViewModel @AssistedInject constructor(
     private val pixelCanvasRepository: PixelCanvasRepository,
     private val spriteDataRepository: SpriteDatabaseRepository,
     private val colorPaletteRepository: ColorPaletteRepository,
+    private val fileRepository: FileRepository,
     private val dialogController: DialogController<DrawingDialog>
 ) : ViewModel(),
     DialogController<DrawingDialog> by dialogController {
@@ -81,8 +80,6 @@ class DrawingViewModel @AssistedInject constructor(
     private val canvasWidth: Int = if(width > 0) width else pixelCanvasRepository.width
     private val canvasHeight: Int = if(height > 0) height else pixelCanvasRepository.height
     private val canvasHistoryManager = CanvasHistoryManager<PixelCanvasState>()
-    private val saveFileUseCase = SaveFileUseCase()
-    private val loadFileUseCase = LoadFileUseCase()
     private val pixelCanvasUseCase = PixelCanvasUseCase(
         pixelCanvasRepository = pixelCanvasRepository,
         colorPaletteRepository = colorPaletteRepository
@@ -625,51 +622,36 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun saveImage(
-        context: Context,
         folderUri: Uri,
         fileName: String,
         scalePercent: Int = 100
     ): Boolean {
-        val result = saveFileUseCase.saveImageFile(
-            context,
-            pixelCanvasUseCase.getSprite(),
-            scalePercent,
-            folderUri,
-            fileName
-        )
+        if (fileName.isBlank()) return false
+        val sprite = pixelCanvasUseCase.getSprite()
+        val bitmap = ImageExporter.convertToBitmap(
+            sprite.compositedPixels,
+            sprite.width,
+            sprite.height,
+            scalePercent
+        ) ?: return false
 
-        result.fold(
-            onSuccess = { return true },
-            onFailure = { exception ->
-                Log.e("SaveFile", "Failed to save file", exception)
-                return false
-            }
-        )
+        return fileRepository.saveFile(bitmap, folderUri, fileName)
     }
 
     fun saveISprite(
-        context: Context,
         folderUri: Uri,
         fileName: String
     ): Boolean {
-        val result = saveFileUseCase.saveISpriteFile(
-            context,
+        if (fileName.isBlank()) return false
+        return fileRepository.saveISpriteFile(
             pixelCanvasUseCase.getSprite(),
             folderUri,
             fileName
         )
-
-        result.fold(
-            onSuccess = { return true },
-            onFailure = { exception ->
-                Log.e("SaveFile", "Failed to save file", exception)
-                return false
-            }
-        )
     }
 
-    fun getSpriteDataFromFile(context: Context, fileUri: Uri): Sprite? {
-        return loadFileUseCase.loadFile(context, fileUri)
+    fun getSpriteDataFromFile(fileUri: Uri): Sprite? {
+        return fileRepository.loadISpriteFile(fileUri)
     }
 
     suspend fun loadSprite(sprite: Sprite) {

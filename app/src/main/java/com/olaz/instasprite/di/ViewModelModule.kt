@@ -4,6 +4,7 @@ import android.content.Context
 import com.olaz.instasprite.data.database.AppDatabase
 import com.olaz.instasprite.data.network.lospec.LospecService
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
+import com.olaz.instasprite.data.repository.FileRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.domain.dialog.DialogController
@@ -39,6 +40,11 @@ object ViewModelModule {
     @Provides
     fun provideSortSettingRepository(@ApplicationContext context: Context): SortSettingRepository {
         return SortSettingRepository(context)
+    }
+
+    @Provides
+    fun provideFileRepository(@ApplicationContext context: Context): FileRepository {
+        return FileRepository(context)
     }
 
     @Provides

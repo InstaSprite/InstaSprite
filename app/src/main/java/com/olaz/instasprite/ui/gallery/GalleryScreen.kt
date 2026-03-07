@@ -140,7 +140,7 @@ fun GalleryScreen(
             onSearchBarEvent = viewModel::onSearchBarEvent,
             onSpriteListEvent = viewModel::onSpriteListEvent,
             onCreateNewCanvas = onNavigateToCreateCanvas,
-            onLoadCanvas = { /* TODO: load canvas screen */ },
+            onLoadCanvas = { viewModel.openDialog(GalleryDialog.LoadISprite) },
             onLoadImage = onNavigateToLoadImage,
         )
     }

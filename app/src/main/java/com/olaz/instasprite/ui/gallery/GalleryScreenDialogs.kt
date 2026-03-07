@@ -10,6 +10,7 @@ import com.olaz.instasprite.ui.components.dialog.ConfirmationDialog
 import com.olaz.instasprite.ui.gallery.dialog.RenameDialog
 import com.olaz.instasprite.ui.gallery.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
+import com.olaz.instasprite.ui.drawing.dialog.LoadISpriteDialog
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
@@ -18,6 +19,7 @@ sealed interface GalleryDialog : Dialog {
     data class Rename(val spriteId: String) : GalleryDialog
     data class DeleteSpriteConfirm(val spriteName: String, val spriteId: String) : GalleryDialog
     data object SelectSortOption : GalleryDialog
+    data object LoadISprite : GalleryDialog
 }
 
 @Composable
@@ -25,7 +27,6 @@ fun GalleryScreenDialogs(
     dialogState: List<GalleryDialog>,
     viewModel: GalleryViewModel
 ) {
-    val context = LocalContext.current
     var lastSavedUri = viewModel.lastSavedLocation.collectAsState().value
     val spriteListOrder = viewModel.spriteListOrder.collectAsState().value
 
@@ -64,7 +65,7 @@ fun GalleryScreenDialogs(
                     lastSavedUri = lastSavedUri,
                     onFolderSelected = viewModel::setLastSavedLocation,
                     onSaved = { spriteId, uri, fileName, scale, onResult ->
-                        viewModel.saveImage(context, spriteId, uri, fileName, scale, onResult)
+                        viewModel.saveImage(spriteId, uri, fileName, scale, onResult)
                     },
                     onDismiss = viewModel::closeTopDialog
                 )
@@ -77,6 +78,13 @@ fun GalleryScreenDialogs(
                     },
                     spriteListOrder = spriteListOrder,
                     onDismiss = viewModel::closeTopDialog
+                )
+
+            is GalleryDialog.LoadISprite ->
+                LoadISpriteDialog(
+                    onDismiss = viewModel::closeTopDialog,
+                    onFilePicked = { uri -> viewModel.getSpriteDataFromFile(uri) },
+                    onLoad = { sprite -> viewModel.importSprite(sprite) }
                 )
         }
     }

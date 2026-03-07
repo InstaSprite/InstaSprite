@@ -15,8 +15,9 @@ import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.model.ColorPalette
+import com.olaz.instasprite.domain.export.ImageExporter
+import com.olaz.instasprite.data.repository.FileRepository
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.domain.usecase.SaveFileUseCase
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.gallery.contract.SearchBarContract
@@ -53,10 +54,10 @@ class GalleryViewModel @Inject constructor(
     private val spriteDatabaseRepository: SpriteDatabaseRepository,
     private val sortSettingRepository: SortSettingRepository,
     private val storageLocationRepository: StorageLocationRepository,
+    private val fileRepository: FileRepository,
     private val dialogController: DialogController<GalleryDialog>
 ) : ViewModel(),
     DialogController<GalleryDialog> by dialogController {
-    private val saveFileUseCase = SaveFileUseCase()
 
     private val _uiState = MutableStateFlow(
         GalleryState()
@@ -215,7 +216,6 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun saveImage(
-        context: Context,
         spriteId: String,
         folderUri: Uri,
         fileName: String,
@@ -231,22 +231,24 @@ class GalleryViewModel @Inject constructor(
                 }
                 return@launch
             }
-            val result = saveFileUseCase.saveImageFile(
-                context,
-                sprite,
-                scalePercent,
-                folderUri,
-                fileName
+            val bitmap = ImageExporter.convertToBitmap(
+                sprite.compositedPixels,
+                sprite.width,
+                sprite.height,
+                scalePercent
             )
             
+            val success = if (bitmap != null) {
+                fileRepository.saveFile(bitmap, folderUri, fileName)
+            } else false
+
             withContext(Dispatchers.Main) {
-                result.fold(
-                    onSuccess = { onResult(true) },
-                    onFailure = { exception ->
-                        Log.e("SaveFile", "Failed to save file", exception)
-                        onResult(false)
-                    }
-                )
+                if (success) {
+                    onResult(true)
+                } else {
+                    Log.e("SaveFile", "Failed to save file")
+                    onResult(false)
+                }
             }
         }
     }
@@ -286,5 +288,23 @@ class GalleryViewModel @Inject constructor(
 
     fun setSpriteListOrder(order: SpriteListOrder) {
         _spriteListOrder.value = order
+    }
+
+    fun getSpriteDataFromFile(fileUri: Uri): Sprite? {
+        return fileRepository.loadISpriteFile(fileUri)
+    }
+
+    fun importSprite(sprite: Sprite) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val newId = java.util.UUID.randomUUID().toString()
+            val newSprite = sprite.copy(id = newId)
+            
+            spriteDatabaseRepository.saveSprite(newSprite)
+            spriteDatabaseRepository.changeName(newId, "Imported Sprite")
+            
+            withContext(Dispatchers.Main) {
+                onOpenDrawing(newId, newSprite.width, newSprite.height, "Imported Sprite", null)
+            }
+        }
     }
 }
