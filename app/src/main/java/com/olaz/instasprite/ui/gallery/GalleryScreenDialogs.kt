@@ -39,7 +39,7 @@ fun GalleryScreenDialogs(
             is GalleryDialog.DeleteSpriteConfirm ->
                 ConfirmationDialog(
                     title = "Delete sprite",
-                    text = "Are you sureyou::want to delete",
+                    text = "Are you sure you want to delete",
                     highlightText = dialog.spriteName,
                     confirmButtonText = "Delete",
                     dismissButtonText = "Cancel",
