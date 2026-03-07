@@ -82,7 +82,7 @@ data class FabMenuColors(
     companion object {
         @Composable
         fun defaults(
-            fab: Color = CatppuccinUI.SelectedColor,
+            fab: Color = CatppuccinUI.TextColorLight,
             fabIcon: Color = CatppuccinUI.TextColorDark,
             itemIcon: Color = CatppuccinUI.CurrentPalette.Blue,
             itemBackground: Color = CatppuccinUI.BackgroundColor,

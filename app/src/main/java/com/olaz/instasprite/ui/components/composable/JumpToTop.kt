@@ -44,7 +44,7 @@ fun JumpToTopButton(
         },
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = CatppuccinUI.CurrentPalette.Peach
+            containerColor = CatppuccinUI.BackgroundColor
         ),
         contentPadding = PaddingValues(0.dp),
         modifier = modifier.size(48.dp)
@@ -52,7 +52,7 @@ fun JumpToTopButton(
         Icon(
             painter = painterResource(R.drawable.ic_arrowup),
             contentDescription = "Jump to top",
-            tint = CatppuccinUI.TextColorDark,
+            tint = CatppuccinUI.TextColorLight,
             modifier = Modifier
                 .size(24.dp)
                 .rotate(rotation.value)
