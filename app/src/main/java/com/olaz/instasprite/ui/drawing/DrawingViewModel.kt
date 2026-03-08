@@ -189,7 +189,8 @@ class DrawingViewModel @AssistedInject constructor(
     private fun applyChangesToOverlay(changes: List<PixelChange>) {
         ensureOverlayBitmap()
         val bmp = _overlayBitmap ?: return
-        for (change in changes) {
+        val visibleChanges = pixelCanvasUseCase.filterVisibleChanges(changes)
+        for (change in visibleChanges) {
             if (change.row in 0 until bmp.height && change.col in 0 until bmp.width) {
                 bmp[change.col, change.row] = change.color
             }

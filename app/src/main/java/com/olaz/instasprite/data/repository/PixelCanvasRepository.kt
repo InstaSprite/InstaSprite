@@ -281,6 +281,34 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return color
     }
 
+    fun filterVisibleChanges(changes: List<PixelChange>): List<PixelChange> {
+        val activeIndex = getActiveLayerIndex()
+        if (activeIndex >= _layers.lastIndex) return changes
+
+        val layersAbove = _layers.subList(activeIndex + 1, _layers.size).filter { it.isVisible }
+        if (layersAbove.isEmpty()) return changes
+
+        val visibleChanges = ArrayList<PixelChange>(changes.size)
+        for (change in changes) {
+            val r = change.row
+            val c = change.col
+            if (r !in 0 until height || c !in 0 until width) continue
+
+            val idx = r * width + c
+            var occluded = false
+            for (i in layersAbove.indices) {
+                if (layersAbove[i].pixels[idx] != 0) {
+                    occluded = true
+                    break
+                }
+            }
+            if (!occluded) {
+                visibleChanges.add(change)
+            }
+        }
+        return visibleChanges
+    }
+
     fun getAllPixelsInRegion(
         startRow: Int, startCol: Int,
         regionHeight: Int, regionWidth: Int

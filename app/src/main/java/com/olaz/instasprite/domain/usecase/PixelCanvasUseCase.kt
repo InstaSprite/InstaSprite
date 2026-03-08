@@ -67,6 +67,10 @@ class PixelCanvasUseCase(
         return pixelCanvasRepository.getCompositedPixelAt(row, col)
     }
 
+    fun filterVisibleChanges(changes: List<com.olaz.instasprite.domain.tool.PixelChange>): List<com.olaz.instasprite.domain.tool.PixelChange> {
+        return pixelCanvasRepository.filterVisibleChanges(changes)
+    }
+
     fun getAllPixelsInRegion(
         startRow: Int, startCol: Int,
         regionHeight: Int, regionWidth: Int
