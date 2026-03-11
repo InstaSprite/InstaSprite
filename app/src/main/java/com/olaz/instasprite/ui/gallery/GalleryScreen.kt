@@ -24,6 +24,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +33,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
-import com.olaz.instasprite.data.model.SpriteMetaData
+import com.olaz.instasprite.domain.model.Layer
+import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.model.SpriteMeta
+import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.components.composable.JumpToTopButton
 import com.olaz.instasprite.ui.gallery.component.HomeBottomBar
 import com.olaz.instasprite.ui.gallery.component.HomeFab
@@ -48,6 +50,7 @@ import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 data class GalleryScreenEvent(
@@ -55,11 +58,17 @@ data class GalleryScreenEvent(
     val onImagePagerEvent: (ImagePagerEvent) -> Unit,
     val onSearchBarEvent: (SearchBarContract) -> Unit,
     val onSpriteListEvent: (SpriteListEvent) -> Unit,
-    val onFabClick: () -> Unit
+    val onCreateNewCanvas: () -> Unit,
+    val onLoadCanvas: () -> Unit,
+    val onLoadImage: () -> Unit,
 )
 
 @Composable
 fun GalleryScreen(
+    onNavigateToDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit,
+    onNavigateToPalette: () -> Unit,
+    onNavigateToCreateCanvas: () -> Unit,
+    onNavigateToLoadImage: () -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
     UiUtils.SetStatusBarColor(CatppuccinUI.TopBarColor)
@@ -75,21 +84,24 @@ fun GalleryScreen(
 
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(sprites, sortedSprites) {
-        viewModel.lastEditedSpriteId?.let { editedId ->
-            val index = sortedSprites.indexOfFirst { it.sprite.id == editedId }
-            if (index != -1) {
-                scope.launch {
-                    lazyListState.animateScrollToItem(index)
+    LaunchedEffect(viewModel.lastEditedSpriteId) {
+        val editedId = viewModel.lastEditedSpriteId ?: return@LaunchedEffect
+
+        snapshotFlow { sortedSprites }
+            .collect { list ->
+                val index = list.indexOfFirst { it.sprite.id == editedId }
+                if (index != -1) {
+                    lazyListState.scrollToItem(index)
+                    viewModel.lastEditedSpriteId = null
+                    cancel()
                 }
             }
-        }
-        viewModel.lastEditedSpriteId = null
     }
 
-    LaunchedEffect(viewModel.searchQuery) {
-        scope.launch {
-            lazyListState.animateScrollToItem(0)
+
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isNotBlank()) {
+            lazyListState.scrollToItem(0)
         }
     }
 
@@ -120,12 +132,16 @@ fun GalleryScreen(
     GalleryScreenDialogs(dialogState, viewModel)
 
     val event = remember(viewModel) {
+        viewModel.onOpenDrawing = onNavigateToDrawing
+
         GalleryScreenEvent(
             onBottomBarEvent = viewModel::onBottomBarEvent,
             onImagePagerEvent = viewModel::onImagePagerEvent,
             onSearchBarEvent = viewModel::onSearchBarEvent,
             onSpriteListEvent = viewModel::onSpriteListEvent,
-            onFabClick = { viewModel.openDialog(GalleryDialog.CreateCanvas) }
+            onCreateNewCanvas = onNavigateToCreateCanvas,
+            onLoadCanvas = { viewModel.openDialog(GalleryDialog.LoadISprite) },
+            onLoadImage = onNavigateToLoadImage,
         )
     }
 
@@ -142,7 +158,7 @@ fun GalleryScreen(
 private fun GalleryScreenContent(
     uiState: GalleryState,
     lazyListState: LazyListState,
-    spriteList: List<ISpriteWithMetaData>,
+    spriteList: List<SpriteWithMeta>,
     searchQuery: String,
     event: GalleryScreenEvent,
 ) {
@@ -229,7 +245,9 @@ private fun GalleryScreenContent(
             contentAlignment = Alignment.Center,
         ) {
             HomeFab(
-                onClick = event.onFabClick,
+                onCreateCanvas = event.onCreateNewCanvas,
+                onLoadCanvas = event.onLoadCanvas,
+                onLoadImage = event.onLoadImage,
                 lazyListState = lazyListState
             )
         }
@@ -246,30 +264,40 @@ private fun GalleryScreenPreview() {
             lazyListState = LazyListState(),
             spriteList =
                 listOf(
-                    ISpriteWithMetaData(
-                        sprite = ISpriteData(
+                    SpriteWithMeta(
+                        sprite = Sprite(
                             id = "1",
                             width = 16,
                             height = 16,
-                            pixelsData = List(16 * 16) {
-                                CatppuccinUI.CurrentPalette.Flamingo.toArgb()
-                            }
+                            layers = listOf(
+                                Layer(
+                                id = "test1",
+                                name = "Layer 1",
+                                pixels = IntArray(10 * 10) {
+                                    CatppuccinUI.CurrentPalette.Flamingo.toArgb()
+                                }
+                            ))
                         ),
-                        meta = SpriteMetaData(
+                        meta = SpriteMeta(
                             spriteId = "1",
                             spriteName = "Test",
                         )
                     ),
-                    ISpriteWithMetaData(
-                        sprite = ISpriteData(
+                    SpriteWithMeta(
+                        sprite = Sprite(
                             id = "2",
                             width = 16,
                             height = 16,
-                            pixelsData = List(16 * 16) {
-                                CatppuccinUI.CurrentPalette.Lavender.toArgb()
-                            }
+                            layers = listOf(
+                                Layer(
+                                id = "test2",
+                                name = "Layer 1",
+                                pixels = IntArray(16 * 16) {
+                                    CatppuccinUI.CurrentPalette.Lavender.toArgb()
+                                }
+                            ))
                         ),
-                        meta = SpriteMetaData(
+                        meta = SpriteMeta(
                             spriteId = "2",
                             spriteName = "Test",
                         )
@@ -281,7 +309,9 @@ private fun GalleryScreenPreview() {
                 onImagePagerEvent = {},
                 onSearchBarEvent = {},
                 onSpriteListEvent = {},
-                onFabClick = {}
+                onCreateNewCanvas = {},
+                onLoadCanvas = {},
+                onLoadImage = {},
             )
         )
     }

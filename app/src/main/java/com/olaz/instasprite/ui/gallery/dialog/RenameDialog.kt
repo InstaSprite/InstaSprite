@@ -2,7 +2,7 @@ package com.olaz.instasprite.ui.gallery.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.KeyboardType
-import com.olaz.instasprite.data.model.InputField
+import com.olaz.instasprite.domain.model.InputField
 import com.olaz.instasprite.ui.components.dialog.InputDialog
 
 @Composable

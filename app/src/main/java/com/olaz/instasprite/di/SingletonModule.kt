@@ -1,0 +1,48 @@
+package com.olaz.instasprite.di
+
+import android.content.Context
+import com.olaz.instasprite.data.database.AppDatabase
+import com.olaz.instasprite.domain.model.PixelCanvas
+import com.olaz.instasprite.data.network.lospec.LospecService
+import com.olaz.instasprite.data.repository.*
+import com.olaz.instasprite.data.source.SpritePixelDataSource
+import com.olaz.instasprite.domain.dialog.DialogController
+import com.olaz.instasprite.domain.dialog.DialogControllerImpl
+import com.olaz.instasprite.ui.drawing.DrawingDialog
+import com.olaz.instasprite.ui.gallery.GalleryDialog
+import com.olaz.instasprite.ui.palette.ColorPaletteDialog
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+
+@Module
+@InstallIn(SingletonComponent::class)
+object SingletonModule {
+
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+        return AppDatabase.getInstance(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSpriteRepository(db: AppDatabase, @ApplicationContext context: Context): SpriteDatabaseRepository {
+        return SpriteDatabaseRepository(
+            dao = db.spriteDataDao(),
+            metaDao = db.spriteMetaDataDao(),
+            pixelDataSource = SpritePixelDataSource(context),
+            context = context
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideStorageLocationRepository(@ApplicationContext context: Context): StorageLocationRepository {
+        return StorageLocationRepository(context)
+    }
+}

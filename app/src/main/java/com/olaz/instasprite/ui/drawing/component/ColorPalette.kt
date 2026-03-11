@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.components.composable.ColorPaletteList
-import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
+import com.olaz.instasprite.ui.components.composable.ColorPaletteView
+import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteState
@@ -95,14 +95,12 @@ fun ColorPalette(
     Column(
         modifier = modifier,
     ) {
-        ColorPaletteList(
-            colorPaletteListOptions = ColorPaletteListOptions(
-                colors = colorPalette,
-                activeColor = activeColor,
-                onColorSelected = { color ->
-                    onColorPaletteEvent(ColorPaletteEvent.SelectColor(color))
-                },
-            ),
+        ColorPaletteView(
+            colors = colorPalette,
+            activeColor = activeColor,
+            onColorSelected = { color ->
+                onColorPaletteEvent(ColorPaletteEvent.SelectColor(color))
+            },
             lazyListState = colorPaletteListState,
         )
 
@@ -149,14 +147,12 @@ fun ColorPalette(
             }
 
             // Recent Colors section
-            ColorPaletteList(
-                colorPaletteListOptions = ColorPaletteListOptions(
-                    colors = recentColors.toList(),
-                    listHeight = 40.dp,
-                    onColorSelected = { color ->
-                        onColorPaletteEvent(ColorPaletteEvent.SelectColor(color))
-                    },
-                ),
+            ColorPaletteView(
+                colors = recentColors.toList(),
+                config = ColorPaletteConfig(listHeight = 40.dp),
+                onColorSelected = { color ->
+                    onColorPaletteEvent(ColorPaletteEvent.SelectColor(color))
+                },
                 lazyListState = recentColorsListState,
                 modifier = Modifier
                     .weight(1f)

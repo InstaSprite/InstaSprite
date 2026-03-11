@@ -16,10 +16,6 @@
         android:theme="@style/Theme.InstaSprite"
         tools:targetApi="31">
         <activity
-            android:name=".DrawingActivity"
-            android:exported="false"
-            android:theme="@style/Theme.InstaSprite" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="InstaSprite"

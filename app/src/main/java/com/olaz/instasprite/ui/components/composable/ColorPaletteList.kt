@@ -1,153 +1,142 @@
 package com.olaz.instasprite.ui.components.composable
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.ui.theme.CatppuccinUI
-
-data class ColorPaletteListOptions(
-    val colors: List<Color>,
-    val activeColor: Color? = null,
-    val backgroundColor: Color = CatppuccinUI.BackgroundColorDarker,
-    val itemSpacing: Dp = 0.dp,
-    val listHeight: Dp = 40.dp,
-    val colorItemSize: Dp = 30.dp,
-    val isInteractive: Boolean = true,
-    val onColorSelected: ((Color) -> Unit)? = null,
-) {
-    init {
-        require(listHeight >= colorItemSize) {
-            "listHeight ($listHeight) must be greater than or equal to colorItemSize ($colorItemSize)"
-        }
-    }
-}
+import com.olaz.instasprite.ui.theme.InstaSpriteTheme
+import com.olaz.instasprite.utils.DummyData
 
 @Composable
 fun ColorPaletteList(
-    colorPaletteListOptions: ColorPaletteListOptions,
+    palettes: List<ColorPalette>,
+    onPaletteSelected: (ColorPalette) -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
-    itemColorModifier: Modifier? = null,
+    colorPaletteConfig: ColorPaletteConfig = ColorPaletteConfig(isInteractive = false),
+    optionSlot: @Composable (ColorPalette) -> Unit = {}
 ) {
-    with(colorPaletteListOptions) {
-        Box(
-            contentAlignment = Alignment.CenterStart,
-            modifier = modifier
-                .height(height = listHeight)
-                .fillMaxWidth()
-                .background(backgroundColor),
-        ) {
-            LazyRow(
-                state = lazyListState,
-                horizontalArrangement = Arrangement.spacedBy(itemSpacing),
-                modifier = Modifier.padding(horizontal = (listHeight - colorItemSize) / 2)
-            ) {
-                items(colors) { color ->
-
-                    val modifier = (itemColorModifier ?: Modifier).size(colorItemSize)
-
-                    if (isInteractive && color == activeColor) {
-                        ActiveColorItem(
-                            color = color,
-                            modifier = modifier,
-                            onClick = { onColorSelected?.invoke(color) }
-                        )
-                    } else {
-                        ColorItem(
-                            color = color,
-                            onColorSelected = onColorSelected,
-                            modifier = modifier
-                        )
-                    }
-                }
-            }
+    LazyColumn(
+        state = lazyListState,
+        modifier = modifier
+            .background(CatppuccinUI.BackgroundColorDarker),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(palettes) { palette ->
+            ListEntry(
+                palette = palette,
+                optionSlot = optionSlot,
+                colorPaletteConfig = colorPaletteConfig,
+                onClick = { onPaletteSelected(palette) }
+            )
         }
     }
 }
 
 @Composable
-fun ColorItem(
-    color: Color,
-    onColorSelected: ((Color) -> Unit)? = null,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .background(color)
-            .then(
-                if (onColorSelected != null) {
-                    Modifier.clickable { onColorSelected(color) }
-                } else {
-                    Modifier
-                }
-            )
-    )
-}
-
-@Composable
-fun ActiveColorItem(
-    color: Color,
+private fun ListEntry(
+    palette: ColorPalette,
+    onClick: () -> Unit,
+    colorPaletteConfig: ColorPaletteConfig,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
+    optionSlot: @Composable (ColorPalette) -> Unit = {}
 ) {
-    val luminance = color.luminance()
-    val indicatorColor = if (luminance < 0.4f) Color.White else Color.Black
-
-    Box(
+    Column(
         modifier = modifier
-            .background(color)
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(CatppuccinUI.BackgroundColor)
+            .clickable(onClick = onClick)
+            .padding(12.dp)
     ) {
-        Canvas(modifier = Modifier.matchParentSize()) {
-            val trianglePath = Path().apply {
-                moveTo(0f, 0f)
-                lineTo(size.width * 0.4f, 0f)
-                lineTo(0f, size.height * 0.4f)
-                close()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = palette.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = CatppuccinUI.TextColorLight
+                )
+                Text(
+                    text = "by ${palette.author}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CatppuccinUI.Subtext0Color
+                )
             }
-            drawPath(trianglePath, color = indicatorColor)
+
+            optionSlot(palette)
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        ColorPaletteView(
+            colors = palette.colors,
+            config = colorPaletteConfig,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
 @Preview
 @Composable
-private fun Preview() {
-    ColorPaletteList(
-        colorPaletteListOptions = ColorPaletteListOptions(
-            colors = listOf(
-                Color.White,
-                Color.Green,
-                Color.Blue,
-                Color.Yellow,
-                Color.Magenta,
-                Color.Cyan,
-            ),
-            activeColor = Color.White,
-            itemSpacing = 0.dp,
-            listHeight = 40.dp,
-            colorItemSize = 30.dp,
-            isInteractive = true,
-            onColorSelected = {},
+private fun PreviewColorPaletteList() {
+    InstaSpriteTheme {
+        ColorPaletteList(
+            palettes = DummyData.palettes,
+            onPaletteSelected = {}
         )
-    )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewColorPaletteListWithOption() {
+    InstaSpriteTheme {
+
+        ColorPaletteList(
+            palettes = DummyData.palettes,
+            onPaletteSelected = {},
+            optionSlot = { palette ->
+                Button(
+                    onClick = {
+
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CatppuccinUI.CurrentPalette.Peach
+                    ),
+                ) {
+                    Text(text = "Test", color = CatppuccinUI.TextColorDark)
+                }
+            }
+        )
+    }
 }

@@ -42,10 +42,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
-import com.olaz.instasprite.data.model.SpriteMetaData
-import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
+import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.model.SpriteMeta
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.ui.components.composable.AsyncCanvasPreviewer
 import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
@@ -53,7 +53,7 @@ import com.olaz.instasprite.ui.theme.CatppuccinUI
 @Composable
 fun SpriteList(
     onSpriteListEvent: (SpriteListEvent) -> Unit,
-    spriteList: List<ISpriteWithMetaData>,
+    spriteList: List<SpriteWithMeta>,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
@@ -69,14 +69,19 @@ fun SpriteList(
         ) { (sprite, meta) ->
             SpriteCard(
                 onDelete = {
-                    onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id))
+                    onSpriteListEvent(
+                        SpriteListEvent.OpenDeleteDialog(
+                            meta!!.spriteName,
+                            sprite.id
+                        )
+                    )
                 },
                 onRename = {
                     onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
 
                 },
                 onEdit = {
-                    onSpriteListEvent(SpriteListEvent.OpenDrawingActivity(sprite, context))
+                    onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context))
                 },
                 onClick = {
                     onSpriteListEvent(SpriteListEvent.OpenPager(sprite))
@@ -95,8 +100,8 @@ private fun SpriteCard(
     onRename: () -> Unit = {},
     onEdit: () -> Unit = {},
     onClick: () -> Unit = {},
-    sprite: ISpriteData,
-    meta: SpriteMetaData?,
+    sprite: Sprite,
+    meta: SpriteMeta?,
     modifier: Modifier = Modifier,
 ) {
 
@@ -167,8 +172,9 @@ private fun SpriteCard(
                 }
             }
 
-            CanvasPreviewer(
-                spriteData = sprite,
+            AsyncCanvasPreviewer(
+                sprite = sprite,
+                meta = meta,
                 modifier = Modifier
                     .fillMaxWidth(0.95f)
                     .align(Alignment.CenterHorizontally)

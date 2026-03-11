@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.data.model.ISpriteData
+import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
 import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
@@ -39,13 +39,13 @@ import com.olaz.instasprite.utils.getFileName
 @Composable
 fun LoadISpriteDialog(
     onDismiss: () -> Unit,
-    onFilePicked: (Uri) -> ISpriteData?,
-    onLoad: (ISpriteData) -> Unit
+    onFilePicked: (Uri) -> Sprite?,
+    onLoad: (Sprite) -> Unit
 ) {
     val context = LocalContext.current
 
     var fileUri by remember { mutableStateOf<Uri?>(null) }
-    var spriteData by remember { mutableStateOf<ISpriteData?>(null) }
+    var spriteData by remember { mutableStateOf<Sprite?>(null) }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(), onResult = { uri: Uri? ->
@@ -111,7 +111,7 @@ fun LoadISpriteDialog(
                 var showOverlay by remember { mutableStateOf(false) }
 
                 CanvasPreviewer(
-                    spriteData!!,
+                    sprite = spriteData!!,
                     showBorder = true,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -124,7 +124,7 @@ fun LoadISpriteDialog(
                 if (showOverlay) {
                     val bitmapImage = remember(it) {
                         ImageExporter.convertToBitmap(
-                            it.pixelsData.map { Color(it) },
+                            it.compositedPixels,
                             it.width,
                             it.height,
                         )?.asImageBitmap()

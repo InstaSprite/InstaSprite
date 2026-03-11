@@ -1,7 +1,6 @@
 package com.olaz.instasprite.ui.gallery
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -10,15 +9,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.olaz.instasprite.DrawingActivity
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
-import com.olaz.instasprite.data.repository.ISpriteDatabaseRepository
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.SortSettingRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.dialog.DialogController
-import com.olaz.instasprite.domain.dialog.DialogControllerImpl
-import com.olaz.instasprite.domain.usecase.SaveFileUseCase
+import com.olaz.instasprite.domain.model.ColorPalette
+import com.olaz.instasprite.domain.export.ImageExporter
+import com.olaz.instasprite.data.repository.FileRepository
+import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.gallery.contract.SearchBarContract
@@ -33,6 +32,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 enum class SpriteListOrder {
@@ -51,20 +51,20 @@ data class GalleryState(
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
-    private val spriteDatabaseRepository: ISpriteDatabaseRepository,
+    private val spriteDatabaseRepository: SpriteDatabaseRepository,
     private val sortSettingRepository: SortSettingRepository,
     private val storageLocationRepository: StorageLocationRepository,
+    private val fileRepository: FileRepository,
     private val dialogController: DialogController<GalleryDialog>
 ) : ViewModel(),
     DialogController<GalleryDialog> by dialogController {
-    private val saveFileUseCase = SaveFileUseCase()
 
     private val _uiState = MutableStateFlow(
         GalleryState()
     )
     val uiState: StateFlow<GalleryState> = _uiState.asStateFlow()
 
-    val sprites: StateFlow<List<ISpriteWithMetaData>> =
+    val sprites: StateFlow<List<SpriteWithMeta>> =
         spriteDatabaseRepository.getAllSpritesWithMeta()
             .stateIn(
                 viewModelScope,
@@ -83,9 +83,17 @@ class GalleryViewModel @Inject constructor(
 
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var currentSelectedSpriteIndex by mutableIntStateOf(0)
-    var lastSpriteSeenInPager by mutableStateOf<ISpriteData?>(null)
+    var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
+    var selectedNewCanvasPalette by mutableStateOf<ColorPalette?>(null)
 
-    val sortedAndFilteredSprites: StateFlow<List<ISpriteWithMetaData>> = combine(
+    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit = { _, _, _, _, _ -> }
+    var onOpenPalette: () -> Unit = {}
+
+    fun onCanvasPaletteSelected(palette: ColorPalette) {
+        selectedNewCanvasPalette = palette
+    }
+
+    val sortedAndFilteredSprites: StateFlow<List<SpriteWithMeta>> = combine(
         sprites,
         _searchQuery,
         _spriteListOrder
@@ -137,9 +145,12 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenDrawingActivity -> openDrawingActivity(
-                event.context,
-                event.sprite
+            is ImagePagerEvent.OpenDrawingActivity -> onOpenDrawing(
+                event.sprite.id,
+                event.sprite.width,
+                event.sprite.height,
+                event.name,
+                null
             )
 
             is ImagePagerEvent.OpenSaveImageDialog -> openDialog(GalleryDialog.SaveImage(event.sprite))
@@ -163,9 +174,12 @@ class GalleryViewModel @Inject constructor(
                     )
                 )
 
-            is SpriteListEvent.OpenDrawingActivity -> openDrawingActivity(
-                event.context,
-                event.sprite
+            is SpriteListEvent.OpenDrawingScreen -> onOpenDrawing(
+                event.sprite.id,
+                event.sprite.width,
+                event.sprite.height,
+                event.name,
+                null
             )
 
             is SpriteListEvent.OpenPager -> toggleImagePager(event.sprite)
@@ -179,7 +193,7 @@ class GalleryViewModel @Inject constructor(
         )
     }
 
-    fun toggleImagePager(selectedSprite: ISpriteData?) {
+    fun toggleImagePager(selectedSprite: Sprite?) {
         _uiState.value = _uiState.value.copy(
             showImagePager = !_uiState.value.showImagePager
         )
@@ -202,27 +216,41 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun saveImage(
-        context: Context,
-        ispriteData: ISpriteData,
+        spriteId: String,
         folderUri: Uri,
         fileName: String,
-        scalePercent: Int = 100
-    ): Boolean {
-        val result = saveFileUseCase.saveImageFile(
-            context,
-            ispriteData,
-            scalePercent,
-            folderUri,
-            fileName
-        )
-
-        result.fold(
-            onSuccess = { return true },
-            onFailure = { exception ->
-                Log.e("SaveFile", "Failed to save file", exception)
-                return false
+        scalePercent: Int = 100,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val sprite = spriteDatabaseRepository.loadSprite(spriteId)
+            if (sprite == null) {
+                Log.e("SaveFile", "Sprite not found: $spriteId")
+                withContext(Dispatchers.Main) {
+                    onResult(false)
+                }
+                return@launch
             }
-        )
+            val bitmap = ImageExporter.convertToBitmap(
+                sprite.compositedPixels,
+                sprite.width,
+                sprite.height,
+                scalePercent
+            )
+            
+            val success = if (bitmap != null) {
+                fileRepository.saveFile(bitmap, folderUri, fileName)
+            } else false
+
+            withContext(Dispatchers.Main) {
+                if (success) {
+                    onResult(true)
+                } else {
+                    Log.e("SaveFile", "Failed to save file")
+                    onResult(false)
+                }
+            }
+        }
     }
 
     fun deleteSpriteById(spriteId: String) {
@@ -240,13 +268,6 @@ class GalleryViewModel @Inject constructor(
             delay(duration)
             deleteSpriteById(spriteId)
         }
-    }
-
-    fun openDrawingActivity(context: Context, sprite: ISpriteData) {
-        lastEditedSpriteId = sprite.id
-        val intent = Intent(context, DrawingActivity::class.java)
-        intent.putExtra(DrawingActivity.EXTRA_SPRITE_ID, sprite.id)
-        context.startActivity(intent)
     }
 
     fun renameSprite(spriteId: String, newName: String) {
@@ -267,5 +288,23 @@ class GalleryViewModel @Inject constructor(
 
     fun setSpriteListOrder(order: SpriteListOrder) {
         _spriteListOrder.value = order
+    }
+
+    fun getSpriteDataFromFile(fileUri: Uri): Sprite? {
+        return fileRepository.loadISpriteFile(fileUri)
+    }
+
+    fun importSprite(sprite: Sprite) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val newId = java.util.UUID.randomUUID().toString()
+            val newSprite = sprite.copy(id = newId)
+            
+            spriteDatabaseRepository.saveSprite(newSprite)
+            spriteDatabaseRepository.changeName(newId, "Imported Sprite")
+            
+            withContext(Dispatchers.Main) {
+                onOpenDrawing(newId, newSprite.width, newSprite.height, "Imported Sprite", null)
+            }
+        }
     }
 }

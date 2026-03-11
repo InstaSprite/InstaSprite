@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.protobuf)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -47,6 +49,24 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+                create("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     // --- Core Android & Kotlin ---
     implementation(libs.androidx.core.ktx)
@@ -62,8 +82,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
+    implementation(libs.navigation3.viewmodel)
+    implementation(libs.reorderable)
     implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     // --- Dependency Injection
     implementation(libs.hilt.android)
@@ -74,6 +97,7 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.core.splashscreen)
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.datastore) // Proto DataStore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.zoomable)
     implementation(libs.compose.material.icons)
@@ -83,9 +107,14 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.annotations) // Javax Annotations (used by Room, etc.)
+    implementation(libs.protobuf.kotlin.lite)
 
     // --- Network ---
     implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.coil.network.okhttp)
+
 
     // --- Testing ---
     testImplementation(libs.junit)

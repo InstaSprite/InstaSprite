@@ -2,14 +2,24 @@ package com.olaz.instasprite.domain.usecase
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
+import com.olaz.instasprite.data.repository.PixelCanvasRepository
+import com.olaz.instasprite.domain.model.Layer
+import com.olaz.instasprite.domain.model.Sprite
 
 class PixelCanvasUseCase(
     private val pixelCanvasRepository: PixelCanvasRepository,
     private val colorPaletteRepository: ColorPaletteRepository,
 ) {
+    fun getLayers(): List<Layer> = pixelCanvasRepository.layers
+    fun getActiveLayerId(): String = pixelCanvasRepository.activeLayerId
+    fun addLayer(name: String) = pixelCanvasRepository.addLayer(name)
+    fun removeLayer(id: String) = pixelCanvasRepository.removeLayer(id)
+    fun setActiveLayer(id: String) = pixelCanvasRepository.setActiveLayer(id)
+    fun toggleVisibility(id: String) = pixelCanvasRepository.toggleVisibility(id)
+    fun toggleLock(id: String) = pixelCanvasRepository.toggleLock(id)
+    fun mergeLayerDown(id: String) = pixelCanvasRepository.mergeLayerDown(id)
+    fun reorderLayer(fromIndex: Int, toIndex: Int) = pixelCanvasRepository.reorderLayer(fromIndex, toIndex)
 
     fun getCanvasWidth(): Int {
         return pixelCanvasRepository.width
@@ -31,97 +41,65 @@ class PixelCanvasUseCase(
         return pixelCanvasRepository.getPixel(row, col)
     }
 
-    fun setCanvas(width: Int, height: Int, pixels: List<Color>? = null) {
+    fun setCanvas(width: Int, height: Int, pixels: IntArray? = null) {
         pixelCanvasRepository.setCanvas(width, height, pixels)
     }
 
-    fun setCanvas(spriteData: ISpriteData) {
-        val decodedPixels = spriteData.pixelsData.map { Color(it) }
-        setCanvas(spriteData.width, spriteData.height, decodedPixels)
+    fun setCanvas(sprite: Sprite) {
+        pixelCanvasRepository.setCanvasData(sprite.width, sprite.height, sprite.layers)
     }
 
-    fun setAllPixels(pixels: List<Color>) {
+    fun setAllPixels(pixels: IntArray) {
         pixelCanvasRepository.setAllPixels(pixels)
     }
 
-    fun getAllPixels(): List<Color> {
+    fun batchSetPixels(changes: List<com.olaz.instasprite.domain.tool.PixelChange>) {
+        pixelCanvasRepository.batchSetPixels(changes)
+    }
+
+    fun getActiveLayerPixelsDirect(): IntArray? = pixelCanvasRepository.getActiveLayerPixelsDirect()
+
+    fun getAllPixels(): IntArray {
         return pixelCanvasRepository.getAllPixels()
     }
 
-    fun getISpriteData(): ISpriteData {
+    fun getCompositedPixelAt(row: Int, col: Int): Int {
+        return pixelCanvasRepository.getCompositedPixelAt(row, col)
+    }
+
+    fun filterVisibleChanges(changes: List<com.olaz.instasprite.domain.tool.PixelChange>): List<com.olaz.instasprite.domain.tool.PixelChange> {
+        return pixelCanvasRepository.filterVisibleChanges(changes)
+    }
+
+    fun getAllPixelsInRegion(
+        startRow: Int, startCol: Int,
+        regionHeight: Int, regionWidth: Int
+    ): IntArray {
+        return pixelCanvasRepository.getAllPixelsInRegion(startRow, startCol, regionHeight, regionWidth)
+    }
+
+    fun getSprite(): Sprite {
         val colorPalette = colorPaletteRepository.colors.value.map { it.toArgb() }
-        return pixelCanvasRepository.getISpriteData().copy(colorPalette = colorPalette)
+        return pixelCanvasRepository.getSprite().copy(colorPalette = colorPalette)
     }
 
     fun selectColor(color: Color) {
         colorPaletteRepository.setActiveColor(color)
     }
 
-    fun rotateCanvas(pixels: List<Color>) {
-        val oldWidth = pixelCanvasRepository.width
-        val oldHeight = pixelCanvasRepository.height
-        val rotatedPixels = MutableList(pixels.size) { Color.Transparent }
-
-        for (row in 0 until oldHeight) {
-            for (col in 0 until oldWidth) {
-                val oldIndex = row * oldWidth + col
-                val newRow = col
-                val newCol = oldHeight - 1 - row
-                val newIndex = newRow * oldHeight + newCol
-                if (newIndex in rotatedPixels.indices && oldIndex in pixels.indices) {
-                    rotatedPixels[newIndex] = pixels[oldIndex]
-                }
-            }
-        }
-
-        return pixelCanvasRepository.setCanvas(oldHeight, oldWidth, rotatedPixels)
+    fun rotateCanvas() {
+        pixelCanvasRepository.rotate()
     }
 
-    fun hFlipCanvas(pixels: List<Color>) {
-        val width = pixelCanvasRepository.width
-        val height = pixelCanvasRepository.height
-        val flippedPixels = mutableListOf<Color>()
-
-        for (row in 0 until height) {
-            for (col in width - 1 downTo 0) {
-                flippedPixels.add(pixels[row * width + col])
-            }
-        }
-        return setAllPixels(flippedPixels)
+    fun hFlipCanvas() {
+        pixelCanvasRepository.horizontalFlip()
     }
 
-    fun vFlipCanvas(pixels: List<Color>) {
-        val width = pixelCanvasRepository.width
-        val height = pixelCanvasRepository.height
-        val flippedPixels = mutableListOf<Color>()
-
-        for (row in height - 1 downTo 0) {
-            for (col in 0 until width) {
-                flippedPixels.add(pixels[row * width + col])
-            }
-        }
-
-        return setAllPixels(flippedPixels)
+    fun vFlipCanvas() {
+        pixelCanvasRepository.verticalFlip()
     }
 
     fun resizeCanvas(newWidth: Int, newHeight: Int) {
-        val oldWidth = pixelCanvasRepository.width
-        val oldHeight = pixelCanvasRepository.height
-        val oldPixels = pixelCanvasRepository.getAllPixels()
-
-        val newPixels = MutableList(newWidth * newHeight) { Color.Transparent }
-
-        val copyWidth = minOf(oldWidth, newWidth)
-        val copyHeight = minOf(oldHeight, newHeight)
-
-        for (row in 0 until copyHeight) {
-            for (col in 0 until copyWidth) {
-                val oldIndex = row * oldWidth + col
-                val newIndex = row * newWidth + col
-                newPixels[newIndex] = oldPixels[oldIndex]
-            }
-        }
-
-        pixelCanvasRepository.setCanvas(newWidth, newHeight, newPixels)
+        pixelCanvasRepository.resizeCanvas(newWidth, newHeight)
     }
 }

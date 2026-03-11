@@ -8,11 +8,9 @@ class CanvasHistoryManager<T> {
     private var currentState: T? = null
 
     fun saveState(state: T) {
-        if (currentState == null || currentState != state) {
-            currentState?.let { undoStack.addLast(it) }
-            currentState = state
-            redoStack.clear()
-        }
+        currentState?.let { undoStack.addLast(it) }
+        currentState = state
+        redoStack.clear()
     }
 
 
@@ -45,5 +43,10 @@ class CanvasHistoryManager<T> {
     fun reset() {
         undoStack.clear()
         redoStack.clear()
+        currentState = null
+    }
+
+    fun setCurrentState(state: T) {
+        currentState = state
     }
 }

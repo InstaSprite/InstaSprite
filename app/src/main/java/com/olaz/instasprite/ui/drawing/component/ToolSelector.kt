@@ -29,7 +29,9 @@ import com.olaz.instasprite.domain.tool.EyedropperTool
 import com.olaz.instasprite.domain.tool.FillTool
 import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.domain.tool.ShapeToolPlaceholder
 import com.olaz.instasprite.domain.tool.Tool
+import com.olaz.instasprite.domain.tool.shape.LineTool
 import com.olaz.instasprite.ui.drawing.contract.ToolSelectorEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
@@ -44,6 +46,7 @@ fun ToolSelector(
 
     val tools = listOf(
         PencilTool,
+        ShapeToolPlaceholder,
         EraserTool,
         FillTool,
         EyedropperTool,
@@ -81,7 +84,11 @@ fun ToolSelector(
                         },
                         text = { Text(tool.name) },
                         onClick = {
-                            onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
+                            if (tool == ShapeToolPlaceholder) {
+                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(LineTool))
+                            } else {
+                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
+                            }
                             toolListVisible = false
                         }
                     )

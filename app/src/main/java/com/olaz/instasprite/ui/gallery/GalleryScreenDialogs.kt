@@ -4,21 +4,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
 import com.olaz.instasprite.domain.dialog.Dialog
-import com.olaz.instasprite.ui.gallery.dialog.CreateCanvasDialog
-import com.olaz.instasprite.ui.gallery.dialog.DeleteSpriteConfirmDialog
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.ui.components.dialog.ConfirmationDialog
 import com.olaz.instasprite.ui.gallery.dialog.RenameDialog
 import com.olaz.instasprite.ui.gallery.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
+import com.olaz.instasprite.ui.drawing.dialog.LoadISpriteDialog
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 
 sealed interface GalleryDialog : Dialog {
-    data object CreateCanvas : GalleryDialog
-    data class SaveImage(val sprite: ISpriteWithMetaData) : GalleryDialog
+    data class SaveImage(val sprite: SpriteWithMeta) : GalleryDialog
     data class Rename(val spriteId: String) : GalleryDialog
     data class DeleteSpriteConfirm(val spriteName: String, val spriteId: String) : GalleryDialog
     data object SelectSortOption : GalleryDialog
+    data object LoadISprite : GalleryDialog
 }
 
 @Composable
@@ -26,7 +27,6 @@ fun GalleryScreenDialogs(
     dialogState: List<GalleryDialog>,
     viewModel: GalleryViewModel
 ) {
-    val context = LocalContext.current
     var lastSavedUri = viewModel.lastSavedLocation.collectAsState().value
     val spriteListOrder = viewModel.spriteListOrder.collectAsState().value
 
@@ -36,20 +36,21 @@ fun GalleryScreenDialogs(
 
     dialogState.forEach { dialog ->
         when (dialog) {
-            is GalleryDialog.CreateCanvas ->
-                CreateCanvasDialog(
-                    onDismiss = viewModel::closeTopDialog
-                )
-
             is GalleryDialog.DeleteSpriteConfirm ->
-                DeleteSpriteConfirmDialog(
-                    spriteName = dialog.spriteName,
+                ConfirmationDialog(
+                    title = "Delete sprite",
+                    text = "Are you sure you want to delete",
+                    highlightText = dialog.spriteName,
+                    confirmButtonText = "Delete",
+                    dismissButtonText = "Cancel",
+                    highlightTextColor = CatppuccinUI.DismissButtonColor,
+                    hasQuestionMark = true,
                     onConfirm = {
                         viewModel.deleteSpriteById(dialog.spriteId)
+                        viewModel.closeTopDialog()
                     },
                     onDismiss = viewModel::closeTopDialog
                 )
-
             is GalleryDialog.Rename ->
                 RenameDialog(
                     spriteId = dialog.spriteId,
@@ -60,11 +61,11 @@ fun GalleryScreenDialogs(
             is GalleryDialog.SaveImage ->
                 SaveImageDialog(
                     spriteName = dialog.sprite.meta!!.spriteName,
-                    iSpriteData = dialog.sprite.sprite,
+                    spriteId = dialog.sprite.sprite.id,
                     lastSavedUri = lastSavedUri,
                     onFolderSelected = viewModel::setLastSavedLocation,
-                    onSaved = { sprite, uri, fileName, scale ->
-                        viewModel.saveImage(context, sprite, uri, "$fileName.png", scale)
+                    onSaved = { spriteId, uri, fileName, scale, onResult ->
+                        viewModel.saveImage(spriteId, uri, fileName, scale, onResult)
                     },
                     onDismiss = viewModel::closeTopDialog
                 )
@@ -77,6 +78,13 @@ fun GalleryScreenDialogs(
                     },
                     spriteListOrder = spriteListOrder,
                     onDismiss = viewModel::closeTopDialog
+                )
+
+            is GalleryDialog.LoadISprite ->
+                LoadISpriteDialog(
+                    onDismiss = viewModel::closeTopDialog,
+                    onFilePicked = { uri -> viewModel.getSpriteDataFromFile(uri) },
+                    onLoad = { sprite -> viewModel.importSprite(sprite) }
                 )
         }
     }

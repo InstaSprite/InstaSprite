@@ -1,20 +1,28 @@
 package com.olaz.instasprite.ui.drawing
 
+import android.graphics.Bitmap
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,70 +31,113 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.olaz.instasprite.data.repository.ColorPaletteRepository
-import com.olaz.instasprite.domain.tool.EraserTool
 import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.domain.tool.ShapeTool
+import com.olaz.instasprite.domain.tool.StrokeTool
+import com.olaz.instasprite.ui.components.composable.DrawerLayout
+import com.olaz.instasprite.ui.components.composable.DrawerSide
 import com.olaz.instasprite.ui.drawing.component.ColorPalette
+import com.olaz.instasprite.ui.drawing.component.LayerDrawer
 import com.olaz.instasprite.ui.drawing.component.PixelCanvas
+import com.olaz.instasprite.ui.drawing.component.ShapeSelector
 import com.olaz.instasprite.ui.drawing.component.ToolSelector
 import com.olaz.instasprite.ui.drawing.component.ToolSizeSlider
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteState
+import com.olaz.instasprite.ui.drawing.contract.LayerEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
 import com.olaz.instasprite.ui.drawing.contract.ToolSelectorEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
+import com.olaz.instasprite.utils.DummyData
 import com.olaz.instasprite.utils.UiUtils
-import kotlinx.coroutines.launch
-import net.engawapg.lib.zoomable.ZoomState
-import net.engawapg.lib.zoomable.zoomable
+import com.olaz.instasprite.utils.calculateNewScaleAndOffset
 
 data class DrawingScreenEvent(
     val onColorPaletteEvent: (ColorPaletteEvent) -> Unit,
     val onCanvasMenuEvent: (CanvasMenuEvent) -> Unit,
     val onToolSelectorEvent: (ToolSelectorEvent) -> Unit,
     val onCanvasEvent: (PixelCanvasEvent) -> Unit,
-    val onToolSizeChange: (Int) -> Unit
+    val onToolSizeChange: (Int) -> Unit,
+    val onToggleLayerDrawer: () -> Unit,
+    val onLayerEvent: (LayerEvent) -> Unit
 )
 
 @Composable
 fun DrawingScreen(
+    onNavigateBack: (String) -> Unit,
+    onNavigateToPalette: () -> Unit,
     viewModel: DrawingViewModel = hiltViewModel()
 ) {
-    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColor)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColor)
+    BackHandler(onBack = { onNavigateBack(viewModel.spriteId) })
+
 
     val colorPaletteState by viewModel.colorPaletteState.collectAsState()
     val canvasState by viewModel.canvasState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val dialogState by viewModel.dialogState.collectAsState()
 
+    // reverse the layer list in ui since use reverseLayout = true in LazyColumn kinda broke with Reorderable lib
+    val uiLayers = canvasState.layers.asReversed()
+
+
+    if (uiState.showLayerDrawer) {
+        UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
+        UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+    } else {
+        UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColor)
+        UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColor)
+    }
+
     DrawingScreenDialogs(dialogState, viewModel)
 
     val event = remember(viewModel) {
+        viewModel.onOpenPalette = onNavigateToPalette
+
         DrawingScreenEvent(
             onColorPaletteEvent = viewModel::onColorPaletteEvent,
             onCanvasMenuEvent = viewModel::onCanvasMenuEvent,
             onToolSelectorEvent = viewModel::onToolSelectorEvent,
             onCanvasEvent = viewModel::onCanvasEvent,
-            onToolSizeChange = viewModel::setToolSize
+            onToolSizeChange = viewModel::setToolSize,
+            onToggleLayerDrawer = viewModel::toggleLayerDrawer,
+            onLayerEvent = viewModel::onLayerEvent
         )
     }
 
-    DrawingScreenContent(
-        uiState = uiState,
-        canvasState = canvasState,
-        colorPaletteState = colorPaletteState,
-        event = event
+    DrawerLayout(
+        isOpen = uiState.showLayerDrawer,
+        onDrawerClose = viewModel::toggleLayerDrawer,
+        side = DrawerSide.End,
+        drawerContent = {
+            LayerDrawer(
+                layers = uiLayers,
+                activeLayerId = canvasState.activeLayerId,
+                canvasWidth = canvasState.width,
+                canvasHeight = canvasState.height,
+                onEvent = event.onLayerEvent,
+                onBack = viewModel::toggleLayerDrawer
+            )
+        },
+        content = {
+            DrawingScreenContent(
+                uiState = uiState,
+                canvasState = canvasState,
+                colorPaletteState = colorPaletteState,
+                event = event,
+                bitmap = viewModel.bitmap,
+                overlayBitmap = viewModel.overlayBitmap
+            )
+        }
     )
 }
 
@@ -95,7 +146,9 @@ private fun DrawingScreenContent(
     uiState: DrawingScreenState,
     canvasState: PixelCanvasState,
     colorPaletteState: ColorPaletteState,
-    event: DrawingScreenEvent
+    event: DrawingScreenEvent,
+    bitmap: Bitmap?,
+    overlayBitmap: Bitmap?
 ) {
     val maxScale by remember(canvasState.width, canvasState.height) {
         derivedStateOf {
@@ -104,11 +157,8 @@ private fun DrawingScreenContent(
         }
     }
 
-    val canvasZoomState = remember(maxScale) {
-        ZoomState(maxScale = maxScale)
-    }
-
-    val layoutSize = remember { mutableStateOf(IntSize.Zero) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
 
     val coroutineScope = rememberCoroutineScope()
     var toolSizeValue by remember { mutableIntStateOf(uiState.toolSize) }
@@ -125,44 +175,52 @@ private fun DrawingScreenContent(
                     onCanvasMenuEvent = event.onCanvasMenuEvent
                 )
 
-                if (uiState.selectedTool in listOf(PencilTool, EraserTool)) {
-                    ToolSizeSlider(
-                        toolSizeValue = toolSizeValue,
-                        onValueChange = {
-                            toolSizeValue = it
-                            event.onToolSizeChange(it)
-                        }
-                    )
-                }
+
             }
         },
         bottomBar = {
             Column {
-                Slider(
-                    value = canvasZoomState.scale,
-                    onValueChange = {
-                        coroutineScope.launch {
-                            canvasZoomState.changeScale(
-                                targetScale = it,
-                                position = Offset(
-                                    x = layoutSize.value.width / 2f,
-                                    y = layoutSize.value.height / 2f
-                                )
-                            )
-                        }
-                    },
-                    valueRange = 1f..maxScale,
-                    colors = SliderDefaults.colors(
-                        thumbColor = CatppuccinUI.SelectedColor,
-                        activeTrackColor = CatppuccinUI.Foreground0Color,
-                        inactiveTrackColor = CatppuccinUI.Foreground0Color
-                    ),
+                ShapeSelector(
+                    isVisible = (uiState.selectedTool is ShapeTool),
+                    selectedTool = uiState.selectedTool,
+                    onShapeSelected = { tool ->
+                        event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
+                    }
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                         .background(CatppuccinUI.BackgroundColor)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                        .padding(12.dp)
+                ) {
+
+                    Box(modifier = Modifier.weight(9f)) {
+                        if (uiState.selectedTool is StrokeTool) {
+                            ToolSizeSlider(
+                                toolSizeValue = toolSizeValue,
+                                onValueChange = {
+                                    toolSizeValue = it
+                                    event.onToolSizeChange(it)
+                                }
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = { event.onToggleLayerDrawer() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Layers,
+                            contentDescription = "Layers",
+                            tint = CatppuccinUI.TextColorLight
+                        )
+                    }
+                }
 
                 ToolSelector(
                     modifier = Modifier
@@ -175,55 +233,80 @@ private fun DrawingScreenContent(
             }
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(CatppuccinUI.BackgroundColorDarker)
-                .zoomable(
-                    zoomState = canvasZoomState,
-                    enableOneFingerZoom = false,
-                    onTap = null,
-                    onDoubleTap = null,
-                    onLongPress = null
-                )
-                .onSizeChanged {
-                    layoutSize.value = it
-                }
-        ) {
-            PixelCanvas(
+
+        if (uiState.isLoading) {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(10.dp)
                     .fillMaxSize()
-                    .fillMaxHeight(0.7f),
-                pixelCanvasState = canvasState,
-                selectedTool = uiState.selectedTool,
-                onEvent = event.onCanvasEvent
-            )
+                    .background(CatppuccinUI.BackgroundColorDarker),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .background(CatppuccinUI.BackgroundColorDarker)
+
+            ) {
+                PixelCanvas(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(10.dp)
+                        .fillMaxSize()
+                        .fillMaxHeight(0.7f),
+                    pixelCanvasState = canvasState,
+                    bitmap = bitmap,
+                    overlayBitmap = overlayBitmap,
+                    selectedTool = uiState.selectedTool,
+                    scale = scale,
+                    offset = offset,
+                    onTransform = { centroid, panChange, zoomChange, canvasSize ->
+                        val (newScale, newOffset) = calculateNewScaleAndOffset(
+                            centroid = centroid,
+                            panChange = panChange,
+                            zoomChange = zoomChange,
+                            currentScale = scale,
+                            currentOffset = offset,
+                            layoutSize = canvasSize,
+                            maxScale = maxScale
+                        )
+                        scale = newScale
+                        offset = newOffset
+                    },
+                    onEvent = event.onCanvasEvent
+                )
+            }
         }
     }
 }
 
+
 @Preview
 @Composable
-private fun DrawingScreenPreview() {
+private fun DrawingScreenPreviewLoading() {
 
     val context = LocalContext.current
-    val colorPaletteRepository = ColorPaletteRepository(context)
+    val colorPaletteRepository = ColorPaletteRepository(
+        context,
+        colorPaletteDao = DummyData.MockClass.MockColorPaletteDao(),
+        lospecService = DummyData.MockClass.MockLospecService()
+    )
     val colors = colorPaletteRepository.colors.collectAsState()
     val activeColor = colorPaletteRepository.activeColor.collectAsState()
 
     InstaSpriteTheme {
         DrawingScreenContent(
             uiState = DrawingScreenState(
+                isLoading = false,
                 selectedTool = PencilTool,
                 toolSize = 1
             ),
             canvasState = PixelCanvasState(
                 width = 16,
-                height = 16,
-                pixels = List(16 * 16) { Color.Transparent }
+                height = 16
             ),
             colorPaletteState = ColorPaletteState(
                 colorPalette = colors.value,
@@ -235,8 +318,55 @@ private fun DrawingScreenPreview() {
                 onCanvasMenuEvent = {},
                 onToolSelectorEvent = {},
                 onCanvasEvent = {},
-                onToolSizeChange = {}
-            )
+                onToolSizeChange = {},
+                onLayerEvent = {},
+                onToggleLayerDrawer = {}
+            ),
+            bitmap = createBitmap(16, 16),
+            overlayBitmap = null
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DrawingScreenPreview() {
+
+    val context = LocalContext.current
+    val colorPaletteRepository = ColorPaletteRepository(
+        context,
+        colorPaletteDao = DummyData.MockClass.MockColorPaletteDao(),
+        lospecService = DummyData.MockClass.MockLospecService()
+    )
+    val colors = colorPaletteRepository.colors.collectAsState()
+    val activeColor = colorPaletteRepository.activeColor.collectAsState()
+
+    InstaSpriteTheme {
+        DrawingScreenContent(
+            uiState = DrawingScreenState(
+                selectedTool = PencilTool,
+                toolSize = 1
+            ),
+            canvasState = PixelCanvasState(
+                width = 16,
+                height = 16
+            ),
+            colorPaletteState = ColorPaletteState(
+                colorPalette = colors.value,
+                activeColor = activeColor.value,
+                recentColors = emptyList()
+            ),
+            event = DrawingScreenEvent(
+                onColorPaletteEvent = {},
+                onCanvasMenuEvent = {},
+                onToolSelectorEvent = {},
+                onCanvasEvent = {},
+                onToolSizeChange = {},
+                onLayerEvent = {},
+                onToggleLayerDrawer = {}
+            ),
+            bitmap = createBitmap(16, 16),
+            overlayBitmap = null
         )
     }
 }

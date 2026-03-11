@@ -1,14 +1,12 @@
 package com.olaz.instasprite.ui.gallery.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -39,29 +36,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import com.olaz.instasprite.data.model.ISpriteData
-import com.olaz.instasprite.data.model.ISpriteWithMetaData
-import com.olaz.instasprite.domain.export.ImageExporter
-import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
+import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.model.SpriteWithMeta
+import com.olaz.instasprite.ui.components.composable.AsyncCanvasPreviewer
+import com.olaz.instasprite.ui.components.composable.AsyncImageZoomableOverlay
+import com.olaz.instasprite.ui.components.composable.BackButton
+import com.olaz.instasprite.ui.components.composable.Bar
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.utils.drawCheckerboard
 import com.olaz.instasprite.utils.toDateString
+import java.io.File
 
 @Composable
 fun ImagePagerOverlay(
     onImagePagerEvent: (ImagePagerEvent) -> Unit,
-    spriteList: List<ISpriteWithMetaData>,
+    spriteList: List<SpriteWithMeta>,
     startIndex: Int,
-    onDismiss: (ISpriteData?) -> Unit
+    onDismiss: (Sprite?) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -73,7 +71,6 @@ fun ImagePagerOverlay(
         initialPage = startIndex,
         pageCount = { spriteList.size })
 
-    val sprites = spriteList.map { it.sprite }
     val currentSprite = spriteList.getOrNull(pagerState.currentPage)
 
     var zoomedPageIndex by remember { mutableStateOf<Int?>(null) }
@@ -110,6 +107,7 @@ fun ImagePagerOverlay(
                         currentSprite?.let {
                             onImagePagerEvent(
                                 ImagePagerEvent.OpenDrawingActivity(
+                                    it.meta?.spriteName,
                                     it.sprite,
                                     context
                                 )
@@ -134,37 +132,31 @@ fun ImagePagerOverlay(
                     .fillMaxSize()
                     .background(CatppuccinUI.BackgroundColorDarker)
             ) { page ->
-                val sprite = sprites[page]
-                val bitmapImage = remember(sprite) {
-                    ImageExporter.convertToBitmap(
-                        sprite.pixelsData.map { Color(it) },
-                        sprite.width,
-                        sprite.height,
-                    )?.asImageBitmap()
-                }
+                val spriteWithMeta = spriteList[page]
 
-                if (bitmapImage != null) {
-                    Image(
-                        bitmap = bitmapImage,
-                        contentDescription = "Zoomed Sprite $page",
-                        contentScale = ContentScale.Fit,
-                        filterQuality = FilterQuality.None,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = { zoomedPageIndex = page }
-                            )
+                AsyncCanvasPreviewer(
+                    sprite = spriteWithMeta.sprite,
+                    meta = spriteWithMeta.meta,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    onClick = { zoomedPageIndex = page }
+                )
+
+                if (zoomedPageIndex == page) {
+                    AsyncImageZoomableOverlay(
+                        model = File(
+                            LocalContext.current.filesDir,
+                            "thumbnail_${spriteWithMeta.sprite.id}.png"
+                        ),
+                        sufModifier = Modifier
+                            .aspectRatio(spriteWithMeta.sprite.width.toFloat() / spriteWithMeta.sprite.height.toFloat())
+                            .drawCheckerboard(
+                                spriteWithMeta.sprite.width,
+                                spriteWithMeta.sprite.height
+                            ),
+                        onDismiss = { zoomedPageIndex = null }
                     )
-
-                    if (zoomedPageIndex == page) {
-                        ImageZoomableOverlay(
-                            bitmap = bitmapImage,
-                            onDismiss = { zoomedPageIndex = null }
-                        )
-                    }
                 }
             }
         }
@@ -173,7 +165,7 @@ fun ImagePagerOverlay(
 
 @Composable
 private fun BottomBar(
-    spriteWithMetaData: ISpriteWithMetaData?,
+    spriteWithMetaData: SpriteWithMeta?,
     onSaveImageTap: () -> Unit,
     onEditButtonTap: () -> Unit,
     modifier: Modifier = Modifier
@@ -272,31 +264,11 @@ private fun TopBar(
 ) {
     var dropdownMenuVisible by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .background(CatppuccinUI.BackgroundColor)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-                .align(Alignment.CenterStart)
-        ) {
-            IconButton(
-                onClick = onDismiss
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Dismiss",
-                    tint = CatppuccinUI.DismissButtonColor,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-
+    Bar(
+        leftSlot = {
+            BackButton(onClick = onDismiss)
+        },
+        rightSlot = {
             Box {
                 IconButton(
                     onClick = { dropdownMenuVisible = true }
@@ -318,7 +290,7 @@ private fun TopBar(
                 )
             }
         }
-    }
+    )
 }
 
 @Composable

@@ -15,6 +15,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.theme.CatppuccinUI
@@ -26,6 +27,7 @@ fun CustomDialog(
     onConfirm: () -> Unit,
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
+    confirmButtonColor: Color = CatppuccinUI.AccentButtonColor,
     content: @Composable () -> Unit
 ) {
     AlertDialog(
@@ -58,7 +60,7 @@ fun CustomDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(containerColor = CatppuccinUI.AccentButtonColor,)
+                colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor,)
             ) {
                 Text(confirmButtonText, color = CatppuccinUI.TextColorDark)
             }

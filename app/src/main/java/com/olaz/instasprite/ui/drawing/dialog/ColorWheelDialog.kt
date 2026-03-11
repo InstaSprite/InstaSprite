@@ -51,8 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toRect
 import com.olaz.instasprite.ui.components.composable.ColorItem
-import com.olaz.instasprite.ui.components.composable.ColorPaletteList
-import com.olaz.instasprite.ui.components.composable.ColorPaletteListOptions
+import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.theme.CatppuccinTypography
 import com.olaz.instasprite.ui.theme.CatppuccinUI
@@ -67,7 +66,7 @@ fun ColorWheelDialog(
     colorPalette: List<Color>,
     onDismiss: () -> Unit,
     onColorSelected: (Color) -> Unit,
-    onOpenImportColorPaletteDialog: () -> Unit,
+    onOpenPaletteScreen: () -> Unit,
 ) {
 
     val hsv = remember {
@@ -172,16 +171,14 @@ fun ColorWheelDialog(
                     )
                 }
 
-                ColorPaletteList(
-                    colorPaletteListOptions = ColorPaletteListOptions(
-                        colors = colorPalette,
-                        onColorSelected = { color ->
-                            val hsvArray = floatArrayOf(0f, 0f, 0f)
-                            AndroidColor.colorToHSV(color.toArgb(), hsvArray)
-                            hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
-                            updateInputFields()
-                        },
-                    )
+                ColorPaletteView(
+                    colors = colorPalette,
+                    onColorSelected = { color ->
+                        val hsvArray = floatArrayOf(0f, 0f, 0f)
+                        AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                        hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                        updateInputFields()
+                    },
                 )
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -256,13 +253,13 @@ fun ColorWheelDialog(
                 }
 
                 Button(
-                    onClick = onOpenImportColorPaletteDialog,
+                    onClick = onOpenPaletteScreen,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = CatppuccinUI.AccentButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Import Color Palettes", color = CatppuccinUI.TextColorDark)
+                    Text(text = "Choose another palette", color = CatppuccinUI.TextColorDark)
                 }
             }
         }
