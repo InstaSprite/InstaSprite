@@ -1,0 +1,27 @@
+package com.olaz.instasprite.data.repository
+
+import com.olaz.instasprite.data.model.AlarmData
+import com.olaz.instasprite.data.network.api.AlarmApi
+import com.olaz.instasprite.data.network.getBodyOrError
+import com.olaz.instasprite.di.RetrofitModule
+import javax.inject.Inject
+
+class AlarmRepository @Inject constructor(
+    private val alarmApi: AlarmApi
+) {
+
+    suspend fun getAlarms(page: Int, size: Int): Result<List<AlarmData>> {
+        return try {
+            val response = alarmApi.getAlarms(page, size)
+            val body = response.getBodyOrError(RetrofitModule.gson)
+            if (body != null && body.status == 200) {
+                Result.success(emptyList())
+            } else {
+                val errorMessage = body?.message ?: "Failed to get alarms"
+                Result.failure(Exception(errorMessage))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+}

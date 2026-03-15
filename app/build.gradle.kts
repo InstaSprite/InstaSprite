@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,7 +9,14 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.google.services)
     id("kotlin-parcelize")
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
 }
 
 android {
@@ -15,10 +25,13 @@ android {
 
     defaultConfig {
         applicationId = "com.olaz.instasprite"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL", "\"\""))
+        buildConfigField("String", "GOOGLE_WEBCLIENT_ID", localProperties.getProperty("GOOGLE_WEBCLIENT_ID", "\"\""))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -46,6 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -87,6 +101,8 @@ dependencies {
     implementation(libs.navigation3.viewmodel)
     implementation(libs.reorderable)
     implementation(libs.coil.compose)
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 
     // --- Dependency Injection
     implementation(libs.hilt.android)
@@ -114,6 +130,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.okhttp3.logging.interceptor)
 
 
     // --- Testing ---
@@ -128,4 +145,17 @@ dependencies {
     // --- Debugging ---
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // --- Coroutines ---
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.play.services.auth.coroutines)
+
+    // --- Firebase & Auth ---
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 }
