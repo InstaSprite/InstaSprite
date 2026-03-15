@@ -22,6 +22,8 @@ import com.olaz.instasprite.data.repository.ProfileRepository
 import com.olaz.instasprite.domain.model.PostData
 import com.olaz.instasprite.ui.social.PostInteractionEvent
 import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
+import com.olaz.instasprite.ui.social.session.SocialSessionManager
+import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -76,13 +78,15 @@ class FeedViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val profileRepository: ProfileRepository,
     private val followRepository: FollowRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val sessionManager: SocialSessionManager
 ) : ViewModel() {
 
     private val _contentState = MutableStateFlow(FeedContentState())
     val contentState: StateFlow<FeedContentState> = _contentState.asStateFlow()
 
     private var currentTopPostId: Long = 0L
+    private var isLoggedIn: Boolean = false
 
     var profileImageRefreshCounter by mutableIntStateOf(0)
 
@@ -110,7 +114,24 @@ class FeedViewModel @Inject constructor(
     init {
         _contentState.update { it.copy(pagedPosts = pagedPosts) }
 
+        observeSession()
         observeEvents()
+    }
+
+    private fun observeSession() {
+        viewModelScope.launch {
+            sessionManager.sessionState.collectLatest { sessionState ->
+                val loggedInNow = sessionState is SocialSessionState.LoggedIn
+                isLoggedIn = loggedInNow
+
+                if (loggedInNow) {
+                    getCurrentProfile()
+                    loadProfileImage()
+                } else {
+                    clearFeed()
+                }
+            }
+        }
     }
 
     private fun observeEvents() {
@@ -172,6 +193,7 @@ class FeedViewModel @Inject constructor(
     suspend fun startPolling() {
         while (viewModelScope.isActive) {
             delay(30_000)
+            if (!isLoggedIn) continue
             if (currentTopPostId == 0L) continue
 
             if (!_contentState.value.hasNewPosts && currentTopPostId > 0) {
@@ -211,6 +233,7 @@ class FeedViewModel @Inject constructor(
     }
 
     fun getCurrentProfile() {
+        if (!isLoggedIn) return
         if (_contentState.value.profileState.isLoading) return
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -274,6 +297,7 @@ class FeedViewModel @Inject constructor(
     }
 
     fun loadProfileImage() {
+        if (!isLoggedIn) return
         if (_contentState.value.profileImageState.isLoading) return
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -438,6 +462,7 @@ class FeedViewModel @Inject constructor(
     }
 
     fun clearFeed() {
+        currentTopPostId = 0L
         _contentState.update {
             it.copy(
                 localLikeState = emptyMap(),

@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.olaz.instasprite.data.network.model.JwtDto
 import com.olaz.instasprite.data.network.model.RefreshTokenRequestDto
 import com.olaz.instasprite.data.network.model.ResultResponse
+import com.olaz.instasprite.ui.social.session.SocialSessionManager
 import com.olaz.instasprite.utils.Constants
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
     private val tokenUtils: TokenManager,
-    private val authStateUtils: AuthStateManager
+    private val sessionManager: SocialSessionManager
 ) : Interceptor {
     private val gson = Gson()
     private val baseUrl = Constants.BASE_URL
@@ -48,12 +49,11 @@ class AuthInterceptor @Inject constructor(
                     }
 
                     if (refreshResponse != null) {
-                        // Save new tokens
-                        tokenUtils.saveTokens(
-                            refreshResponse.accessToken,
-                            refreshResponse.refreshToken,
-                            refreshResponse.type,
-                            refreshResponse.username
+                        sessionManager.onTokensRefreshed(
+                            accessToken = refreshResponse.accessToken,
+                            refreshToken = refreshResponse.refreshToken,
+                            tokenType = refreshResponse.type,
+                            username = refreshResponse.username
                         )
 
                         // Retry the original request with new token
@@ -66,14 +66,10 @@ class AuthInterceptor @Inject constructor(
                         return chain.proceed(retryRequest)
                     }
                 } catch (e: Exception) {
-                    // If refresh fails, clear tokens and let the request fail
-                    tokenUtils.clearTokens()
-                    authStateUtils.updateAuthState()
+                    sessionManager.onLogout()
                 }
             } else {
-                // No refresh token available, clear all tokens
-                tokenUtils.clearTokens()
-                authStateUtils.updateAuthState()
+                sessionManager.onLogout()
             }
         }
 

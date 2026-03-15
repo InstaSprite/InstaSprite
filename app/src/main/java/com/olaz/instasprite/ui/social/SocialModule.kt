@@ -36,7 +36,6 @@ object SocialModule {
     fun provideFeedEntry(navigator: Navigator): EntryProviderInstaller = {
         entry<Screen.Feed> {
             FeedScreen(
-                loginState = false, // Login state is handled inside FeedViewModel/FeedScreen via effects
                 listState = rememberLazyListState(),
                 onLoginClick = { navigator.goTo(Screen.Auth) },
                 onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },

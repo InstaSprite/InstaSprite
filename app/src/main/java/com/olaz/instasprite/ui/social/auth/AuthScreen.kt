@@ -57,6 +57,8 @@ import com.olaz.instasprite.ui.social.auth.contract.AuthScreenEvent
 import com.olaz.instasprite.ui.social.auth.contract.GoogleAuthUiState
 import com.olaz.instasprite.ui.social.auth.dialog.ForgotPasswordDialog
 import com.olaz.instasprite.ui.social.auth.dialog.SavedAccountLoginDialog
+import com.olaz.instasprite.ui.social.session.SocialSessionState
+import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
@@ -66,6 +68,7 @@ import com.olaz.instasprite.utils.UiUtils
 fun AuthScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel(),
+    sessionViewModel: SocialSessionViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit = {},
 ) {
     UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
@@ -75,6 +78,7 @@ fun AuthScreen(
     val activity = context as? Activity
     val scope = rememberCoroutineScope()
     val state by viewModel.contentState.collectAsState(initial = AuthContentState())
+    val sessionState by sessionViewModel.sessionState.collectAsState()
 
     var isGoogleLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -97,8 +101,8 @@ fun AuthScreen(
         }
     }
 
-    LaunchedEffect(state.uiState.jwt, state.uiState.isFirstTime) {
-        state.uiState.jwt?.let {
+    LaunchedEffect(state.uiState.jwt, sessionState) {
+        if (state.uiState.jwt != null && sessionState is SocialSessionState.LoggedIn) {
             isGoogleLoading = false
             onLoginSuccess()
         }

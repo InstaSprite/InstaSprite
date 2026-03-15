@@ -6,7 +6,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -17,23 +16,25 @@ import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
 import com.olaz.instasprite.ui.social.feed.contract.FeedScreenEvent
 import com.olaz.instasprite.ui.social.feed.dialog.PostFilterDialog
 import com.olaz.instasprite.ui.social.feed.dialog.VerifyEmailDialog
+import com.olaz.instasprite.ui.social.session.SocialSessionState
+import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 @Composable
 fun FeedScreen(
     viewModel: FeedViewModel = hiltViewModel(),
-    loginState: Boolean,
+    sessionViewModel: SocialSessionViewModel = hiltViewModel(),
     listState: LazyListState,
     onLoginClick: () -> Unit,
     onOpenComments: (commentId: Long) -> Unit,
     onOpenProfile: (profileUserId: String) -> Unit,
 ) {
-    val state by viewModel.contentState.collectAsState(initial = FeedContentState(loginState = loginState))
+    val state by viewModel.contentState.collectAsState(initial = FeedContentState())
+    val sessionState by sessionViewModel.sessionState.collectAsState()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val isLoggedIn = sessionState is SocialSessionState.LoggedIn
 
     LaunchedEffect(viewModel, lifecycle) {
-        viewModel.getCurrentProfile()
-        viewModel.loadProfileImage()
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.startPolling()
         }
@@ -59,7 +60,8 @@ fun FeedScreen(
     }
 
     FeedContent(
-        state = state.copy(loginState = loginState),
+        isLoggedIn = isLoggedIn,
+        state = state,
         listState = listState,
         event = event
     )
@@ -67,11 +69,12 @@ fun FeedScreen(
 
 @Composable
 fun FeedContent(
+    isLoggedIn: Boolean,
     state: FeedContentState,
     listState: LazyListState,
     event: FeedScreenEvent,
 ) {
-    val context = LocalContext.current
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     if (state.verifyEmailState.showVerifyDialog) {
         VerifyEmailDialog(
@@ -91,7 +94,7 @@ fun FeedContent(
         )
     }
 
-    if (state.loginState) {
+    if (isLoggedIn) {
         PostList(
             state = state,
             event = event,
@@ -107,7 +110,8 @@ fun FeedContent(
 private fun FeedContentLoggedOutPreview() {
     InstaSpriteTheme {
         FeedContent(
-            state = FeedContentState(loginState = false),
+            isLoggedIn = false,
+            state = FeedContentState(),
             listState = LazyListState(),
             event = FeedScreenEvent(
                 onLoginClick = {},
@@ -134,7 +138,8 @@ private fun FeedContentLoggedOutPreview() {
 private fun FeedContentLoggedInPreview() {
     InstaSpriteTheme {
         FeedContent(
-            state = FeedContentState(loginState = true),
+            isLoggedIn = true,
+            state = FeedContentState(),
             listState = LazyListState(),
             event = FeedScreenEvent(
                 onLoginClick = {},

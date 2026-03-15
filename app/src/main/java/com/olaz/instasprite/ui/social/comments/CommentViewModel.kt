@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.R
-import com.olaz.instasprite.data.network.TokenManager
 import com.olaz.instasprite.data.network.api.FollowApi
 import com.olaz.instasprite.data.network.api.ProfileApi
 import com.olaz.instasprite.data.repository.CommentRepository
@@ -14,6 +13,7 @@ import com.olaz.instasprite.ui.social.PostInteractionEvent
 import com.olaz.instasprite.ui.social.comments.contract.Comment
 import com.olaz.instasprite.ui.social.comments.contract.CommentState
 import com.olaz.instasprite.ui.social.comments.contract.PostAuthor
+import com.olaz.instasprite.ui.social.session.SocialSessionManager
 import com.olaz.instasprite.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,10 +29,10 @@ import javax.inject.Inject
 class CommentViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val postRepository: PostRepository,
-    private val tokenUtils: TokenManager,
     private val commentRepository: CommentRepository,
     private val followApi: FollowApi,
-    private val profileApi: ProfileApi
+    private val profileApi: ProfileApi,
+    private val sessionManager: SocialSessionManager
 ) : ViewModel() {
 
     private val prefs by lazy {
@@ -74,7 +74,7 @@ class CommentViewModel @Inject constructor(
                                 profileImageRes = R.drawable.ic_launcher,
                                 isFollowing = p.isFollowing
                             ),
-                            isOwnPost = tokenUtils.getUsername()
+                            isOwnPost = sessionManager.currentUsername()
                                 ?.equals(p.member.memberUsername, ignoreCase = true) == true
                         )
                     }
@@ -117,7 +117,7 @@ class CommentViewModel @Inject constructor(
     private fun loadFullComments(postId: Long) {
         viewModelScope.launch {
             try {
-                val currentUsername = tokenUtils.getUsername()
+                val currentUsername = sessionManager.currentUsername()
                 val uiComments = mutableListOf<Comment>()
                 val seenIds = mutableSetOf<String>()
 
@@ -330,7 +330,7 @@ class CommentViewModel @Inject constructor(
         val postId = _uiState.value.backendPost?.postId ?: return
         val parentId = _uiState.value.replyParentId ?: 0L
         val tempId = "temp_${System.currentTimeMillis()}"
-        val username = tokenUtils.getUsername() ?: context.getString(R.string.you)
+        val username = sessionManager.currentUsername() ?: context.getString(R.string.you)
         val optimistic = Comment(
             id = tempId,
             userId = username,

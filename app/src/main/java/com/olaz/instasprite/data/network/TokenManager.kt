@@ -6,13 +6,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-class TokenManager @Inject constructor(private val dataStore: DataStore<TokenPreferences>) {
+class TokenManager @Inject constructor(
+    private val dataStore: DataStore<TokenPreferences>
+) : SessionTokenStore {
 
-    fun saveTokens(
+    override fun saveTokens(
         accessToken: String,
         refreshToken: String,
-        tokenType: String = "Bearer",
-        username: String? = null
+        tokenType: String,
+        username: String?
     ) {
         runBlocking {
             dataStore.updateData { prefs ->
@@ -26,35 +28,35 @@ class TokenManager @Inject constructor(private val dataStore: DataStore<TokenPre
         }
     }
 
-    fun clearTokens() {
+    override fun clearTokens() {
         runBlocking {
             dataStore.updateData { TokenPreferences() }
         }
     }
 
-    fun getAccessToken(): String? = runBlocking {
+    override fun getAccessToken(): String? = runBlocking {
         dataStore.data.first().keyAccessToken
     }
 
-    fun getRefreshToken(): String? = runBlocking {
+    override fun getRefreshToken(): String? = runBlocking {
         dataStore.data.first().keyRefreshToken
     }
 
-    fun getTokenType(): String = runBlocking {
+    override fun getTokenType(): String = runBlocking {
         dataStore.data.first().keyTokenType ?: "Bearer"
     }
 
-    fun getUsername(): String? = runBlocking {
+    override fun getUsername(): String? = runBlocking {
         dataStore.data.first().keyUsername
     }
 
-    fun getAuthorizationHeader(): String? {
+    override fun getAuthorizationHeader(): String? {
         val token = getAccessToken()
         val type = getTokenType()
         return if (token != null) "$type $token" else null
     }
 
-    fun isLoggedIn(): Boolean {
+    override fun isLoggedIn(): Boolean {
         return getAccessToken() != null
     }
 }

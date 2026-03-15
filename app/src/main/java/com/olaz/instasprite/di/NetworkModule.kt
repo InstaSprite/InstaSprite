@@ -127,7 +127,7 @@ object ApiModule {
 
     @Provides
     @Singleton
-    fun provideCommentApi(@sMainApi retrofit: Retrofit): CommentApi =
+    fun provideCommentApi(@MainApi retrofit: Retrofit): CommentApi =
         retrofit.create(CommentApi::class.java)
 
     @Provides

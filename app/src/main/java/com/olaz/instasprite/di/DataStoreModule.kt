@@ -7,6 +7,7 @@ import com.olaz.instasprite.data.crypto.EncryptedSerializer
 import com.olaz.instasprite.data.model.AccountMapPreferences
 import com.olaz.instasprite.data.model.SettingPreferences
 import com.olaz.instasprite.data.model.TokenPreferences
+import com.olaz.instasprite.data.network.SessionTokenStore
 import com.olaz.instasprite.data.network.TokenManager
 import dagger.Module
 import dagger.Provides
@@ -65,5 +66,11 @@ object DataStoreModule {
     @Singleton
     fun provideTokenUtils(dataStore: DataStore<TokenPreferences>): TokenManager {
         return TokenManager(dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSessionTokenStore(tokenManager: TokenManager): SessionTokenStore {
+        return tokenManager
     }
 }

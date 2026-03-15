@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
 data class FeedContentState(
-    val loginState: Boolean = false,
     val uiState: FeedUiState = FeedUiState(),
     val verifyEmailState: VerifyEmailState = VerifyEmailState(),
     val profileImageState: ProfileImageState = ProfileImageState(),

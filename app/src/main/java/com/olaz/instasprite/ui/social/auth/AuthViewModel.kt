@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.olaz.instasprite.data.model.AccountPreferences
 import com.olaz.instasprite.data.model.AccountType
-import com.olaz.instasprite.data.network.TokenManager
 import com.olaz.instasprite.data.network.model.GoogleLoginRequestDto
 import com.olaz.instasprite.data.repository.AccountRepository
 import com.olaz.instasprite.data.repository.AuthRepository
@@ -18,6 +17,7 @@ import com.olaz.instasprite.ui.social.auth.contract.AuthContentState
 import com.olaz.instasprite.ui.social.auth.contract.AuthMode
 import com.olaz.instasprite.ui.social.auth.contract.ForgotPasswordUiState
 import com.olaz.instasprite.ui.social.auth.contract.GoogleAuthUiState
+import com.olaz.instasprite.ui.social.session.SocialSessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,8 +34,8 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
-    private val tokenUtils: TokenManager,
-    private val notificationRepository: NotificationRepository
+    private val notificationRepository: NotificationRepository,
+    private val sessionManager: SocialSessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GoogleAuthUiState())
@@ -66,12 +66,7 @@ class AuthViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { jwt: Jwt ->
-                    tokenUtils.saveTokens(
-                        accessToken = jwt.accessToken,
-                        refreshToken = jwt.refreshToken,
-                        tokenType = jwt.type,
-                        username = jwt.username
-                    )
+                    sessionManager.onLoginSuccess(jwt)
 
                     accountRepository.addAccount(
                         AccountPreferences(
@@ -164,12 +159,7 @@ class AuthViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { jwt: Jwt ->
-                    tokenUtils.saveTokens(
-                        accessToken = jwt.accessToken,
-                        refreshToken = jwt.refreshToken,
-                        tokenType = jwt.type,
-                        username = jwt.username
-                    )
+                    sessionManager.onLoginSuccess(jwt)
 
                     sendFcmTokenToBackend()
 
