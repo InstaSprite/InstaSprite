@@ -43,6 +43,7 @@ object HomeModule {
                 onLoginClick = { navigator.goTo(Screen.Auth) },
                 onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
                 onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
+                onOpenNotifications = { navigator.goTo(Screen.Notification) },
                 onNavigateToCreatePost = { navigator.goTo(Screen.CreatePost) },
             )
         }

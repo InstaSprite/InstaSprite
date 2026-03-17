@@ -23,4 +23,8 @@ class SocialSessionViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5_000),
             sessionManager.isLoggedIn()
         )
+
+    fun logout() {
+        sessionManager.onLogout()
+    }
 }

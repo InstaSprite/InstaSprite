@@ -16,11 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +51,7 @@ import com.olaz.instasprite.ui.gallery.component.SearchBar
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.home.component.FeedFab
 import com.olaz.instasprite.ui.home.component.HomeBottomBar
+import com.olaz.instasprite.ui.home.component.HomeDrawer
 import com.olaz.instasprite.ui.home.component.HomeFab
 import com.olaz.instasprite.ui.social.feed.FeedContent
 import com.olaz.instasprite.ui.social.feed.FeedViewModel
@@ -73,6 +77,7 @@ fun HomeScreen(
     onLoginClick: () -> Unit,
     onOpenComments: (postId: Long) -> Unit,
     onOpenProfile: (userId: String) -> Unit,
+    onOpenNotifications: () -> Unit,
     onNavigateToCreatePost: () -> Unit,
     galleryViewModel: GalleryViewModel = hiltViewModel(),
     feedViewModel: FeedViewModel = hiltViewModel(),
@@ -83,6 +88,7 @@ fun HomeScreen(
 
     val tabs = HomeTab.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     val galleryUiState by galleryViewModel.uiState.collectAsState()
@@ -95,6 +101,9 @@ fun HomeScreen(
     val sessionState by sessionViewModel.sessionState.collectAsState()
     val feedListState = rememberLazyListState()
     val isLoggedIn = sessionState is SocialSessionState.LoggedIn
+    val currentUsername = (sessionState as? SocialSessionState.LoggedIn)?.username
+        ?.takeIf { it.isNotBlank() }
+        ?: feedState.profileState.memberUsername.takeIf { it.isNotBlank() }
 
 
     LaunchedEffect(galleryViewModel.lastEditedSpriteId) {
@@ -178,125 +187,164 @@ fun HomeScreen(
         derivedStateOf { galleryListState.firstVisibleItemIndex > 0 }
     }
 
-    Box {
-        Scaffold(
-            topBar = {
-                SecondaryTabRow(
-                    selectedTabIndex = pagerState.currentPage,
-                    containerColor = CatppuccinUI.TopBarColor,
-                    contentColor = CatppuccinUI.TextColorLight,
-                    indicator = {
-                        TabRowDefaults.SecondaryIndicator(
-                            modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
-                            color = CatppuccinUI.SelectedColor
+    fun launchDrawerAction(action: () -> Unit = {}) {
+        scope.launch {
+            drawerState.close()
+            action()
+        }
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            HomeDrawer(
+                isLoggedIn = isLoggedIn,
+                profileState = feedState.profileState,
+                profileImageState = feedState.profileImageState,
+                username = currentUsername,
+                onHomeClick = { launchDrawerAction() },
+                onProfileClick = {
+                    launchDrawerAction {
+                        currentUsername?.let(onOpenProfile) ?: onLoginClick()
+                    }
+                },
+                onLoginClick = { launchDrawerAction(onLoginClick) },
+                onNotificationsClick = { launchDrawerAction(onOpenNotifications) },
+                onSettingsClick = { launchDrawerAction() },
+                onAboutClick = { launchDrawerAction() },
+                onLogoutClick = {
+                    launchDrawerAction {
+                        sessionViewModel.logout()
+                    }
+                }
+            )
+        }
+    ) {
+        Box {
+            Scaffold(
+                topBar = {
+                    SecondaryTabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        containerColor = CatppuccinUI.TopBarColor,
+                        contentColor = CatppuccinUI.TextColorLight,
+                        indicator = {
+                            TabRowDefaults.SecondaryIndicator(
+                                color = CatppuccinUI.SelectedColor
+                            )
+                        },
+                        divider = {}
+                    ) {
+                        tabs.forEachIndexed { index, tab ->
+                            Tab(
+                                selected = pagerState.currentPage == index,
+                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                                text = {
+                                    Text(
+                                        text = tab.title,
+                                        color = if (pagerState.currentPage == index)
+                                            CatppuccinUI.TextColorLight
+                                        else
+                                            CatppuccinUI.Subtext0Color
+                                    )
+                                }
+                            )
+                        }
+                    }
+
+                    AnimatedVisibility(
+                        visible = galleryUiState.showSearchBar && pagerState.currentPage == 0,
+                        enter = slideInVertically(initialOffsetY = { -it }),
+                        exit = slideOutVertically(targetOffsetY = { -it }),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        SearchBar(
+                            onSearchBarEvent = galleryEvent.onSearchBarEvent,
+                            searchQuery = searchQuery,
                         )
-                    },
-                    divider = {}
-                ) {
-                    tabs.forEachIndexed { index, tab ->
-                        Tab(
-                            selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                            text = {
-                                Text(
-                                    text = tab.title,
-                                    color = if (pagerState.currentPage == index)
-                                        CatppuccinUI.TextColorLight
-                                    else
-                                        CatppuccinUI.Subtext0Color
-                                )
+                    }
+                },
+                bottomBar = {
+                    HomeBottomBar(
+                        onBottomBarEvent = if (pagerState.currentPage == 0)
+                            galleryEvent.onBottomBarEvent
+                        else
+                            { _: BottomBarEvent -> },
+                        onMenuClick = {
+                            scope.launch {
+                                drawerState.open()
                             }
+                        },
+                        modifier = Modifier.height(56.dp)
+                    )
+                },
+            ) { innerPadding ->
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = innerPadding.calculateTopPadding())
+                ) { page ->
+                    when (page) {
+                        0 -> GalleryPageContent(
+                            uiState = galleryUiState,
+                            lazyListState = galleryListState,
+                            spriteList = sortedSprites,
+                            searchQuery = searchQuery,
+                            event = galleryEvent,
+                            modifier = Modifier.fillMaxSize()
+                        )
+
+                        1 -> FeedContent(
+                            isLoggedIn = isLoggedIn,
+                            state = feedState,
+                            listState = feedListState,
+                            event = feedEvent,
                         )
                     }
                 }
+            }
+
+            AnimatedVisibility(
+                visible = firstGalleryItemVisible && pagerState.currentPage == 0,
+                enter = scaleIn(),
+                exit = scaleOut(),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 56.dp)
+            ) {
+                JumpToTopButton(listState = galleryListState)
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 21.dp)
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.Center,
+            ) {
+                AnimatedVisibility(
+                    visible = pagerState.currentPage == 0,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    HomeFab(
+                        onCreateCanvas = galleryEvent.onCreateNewCanvas,
+                        onLoadCanvas = galleryEvent.onLoadCanvas,
+                        onLoadImage = galleryEvent.onLoadImage,
+                    )
+                }
 
                 AnimatedVisibility(
-                    visible = galleryUiState.showSearchBar && pagerState.currentPage == 0,
-                    enter = slideInVertically(initialOffsetY = { -it }),
-                    exit = slideOutVertically(targetOffsetY = { -it }),
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    visible = pagerState.currentPage == 1,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
                 ) {
-                    SearchBar(
-                        onSearchBarEvent = galleryEvent.onSearchBarEvent,
-                        searchQuery = searchQuery,
+                    FeedFab(
+                        onCreatePost = onNavigateToCreatePost,
                     )
                 }
-            },
-            bottomBar = {
-                HomeBottomBar(
-                    onBottomBarEvent = if (pagerState.currentPage == 0)
-                        galleryEvent.onBottomBarEvent
-                    else
-                        { _: BottomBarEvent -> },
-                    modifier = Modifier.height(56.dp)
-                )
-            },
-        ) { innerPadding ->
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding())
-            ) { page ->
-                when (page) {
-                    0 -> GalleryPageContent(
-                        uiState = galleryUiState,
-                        lazyListState = galleryListState,
-                        spriteList = sortedSprites,
-                        searchQuery = searchQuery,
-                        event = galleryEvent,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    1 -> FeedContent(
-                        isLoggedIn = isLoggedIn,
-                        state = feedState,
-                        listState = feedListState,
-                        event = feedEvent,
-                    )
-                }
-            }
-        }
-
-        AnimatedVisibility(
-            visible = firstGalleryItemVisible && pagerState.currentPage == 0,
-            enter = scaleIn(),
-            exit = scaleOut(),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 56.dp)
-        ) {
-            JumpToTopButton(listState = galleryListState)
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 21.dp)
-                .background(Color.Transparent),
-            contentAlignment = Alignment.Center,
-        ) {
-            AnimatedVisibility(
-                visible = pagerState.currentPage == 0,
-                enter = fadeIn() + scaleIn(),
-                exit = fadeOut() + scaleOut()
-            ) {
-                HomeFab(
-                    onCreateCanvas = galleryEvent.onCreateNewCanvas,
-                    onLoadCanvas = galleryEvent.onLoadCanvas,
-                    onLoadImage = galleryEvent.onLoadImage,
-                )
-            }
-
-            AnimatedVisibility(
-                visible = pagerState.currentPage == 1,
-                enter = fadeIn() + scaleIn(),
-                exit = fadeOut() + scaleOut()
-            ) {
-                FeedFab(
-                    onCreatePost = onNavigateToCreatePost,
-                )
             }
         }
     }

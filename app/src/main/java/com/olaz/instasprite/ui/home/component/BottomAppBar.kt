@@ -37,6 +37,7 @@ import com.olaz.instasprite.ui.theme.CatppuccinUI
 @Composable
 fun HomeBottomBar(
     onBottomBarEvent: (BottomBarEvent) -> Unit,
+    onMenuClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     BottomAppBar(
@@ -56,9 +57,7 @@ fun HomeBottomBar(
         ) {
             BottomBarItem(
                 imageVector = Icons.Default.Menu,
-                onClick = {
-                    // TODO
-                },
+                onClick = onMenuClick,
                 iconTint = CatppuccinUI.TextColorLight,
             )
         }
