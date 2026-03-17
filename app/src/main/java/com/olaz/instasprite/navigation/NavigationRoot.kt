@@ -50,5 +50,8 @@ sealed interface Screen : NavKey {
     data object Notification : Screen
 
     @Serializable
+    data object Setting : Screen
+
+    @Serializable
     data class Profile(val userId: String? = null) : Screen
 }

@@ -81,6 +81,7 @@ fun HomeScreen(
     onOpenComments: (postId: Long) -> Unit,
     onOpenProfile: (userId: String) -> Unit,
     onOpenNotifications: () -> Unit,
+    onOpenSetting: () -> Unit,
     onNavigateToCreatePost: () -> Unit,
     galleryViewModel: GalleryViewModel = hiltViewModel(),
     feedViewModel: FeedViewModel = hiltViewModel(),
@@ -213,7 +214,7 @@ fun HomeScreen(
                 },
                 onLoginClick = { launchDrawerAction(onLoginClick) },
                 onNotificationsClick = { launchDrawerAction(onOpenNotifications) },
-                onSettingsClick = { launchDrawerAction() },
+                onSettingsClick = { launchDrawerAction(onOpenSetting) },
                 onAboutClick = { launchDrawerAction() },
                 onLogoutClick = {
                     launchDrawerAction {
