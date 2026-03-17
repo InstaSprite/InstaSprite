@@ -11,6 +11,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.olaz.instasprite.navigation.EntryProviderInstaller
 import com.olaz.instasprite.navigation.Navigator
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
+import com.olaz.instasprite.utils.AppSettings
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -23,6 +24,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var entryProviderScopes: Set<@JvmSuppressWildcards EntryProviderInstaller>
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(AppSettings.onAttach(newBase))
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
