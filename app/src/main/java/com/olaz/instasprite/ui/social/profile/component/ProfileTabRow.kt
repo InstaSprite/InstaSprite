@@ -2,6 +2,7 @@ package com.olaz.instasprite.ui.social.profile.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -21,13 +22,13 @@ fun ProfileTabRow(
     tabs: Array<ProfileTab>,
     onTabSelected: (Int) -> Unit
 ) {
-    TabRow(
+    PrimaryTabRow(
         selectedTabIndex = selectedTabIndex,
         containerColor = CatppuccinUI.BackgroundColorDarker,
         contentColor = CatppuccinUI.TextColorLight,
-        indicator = { tabPositions ->
+        indicator = {
             TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                modifier = Modifier.tabIndicatorOffset(selectedTabIndex),
                 color = CatppuccinUI.TextColorLight
             )
         },

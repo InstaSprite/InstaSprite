@@ -18,10 +18,12 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -35,6 +37,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -223,13 +226,15 @@ fun HomeScreen(
         Box {
             Scaffold(
                 topBar = {
-                    SecondaryTabRow(
+                    PrimaryTabRow(
                         selectedTabIndex = pagerState.currentPage,
                         containerColor = CatppuccinUI.TopBarColor,
                         contentColor = CatppuccinUI.TextColorLight,
                         indicator = {
                             TabRowDefaults.SecondaryIndicator(
-                                color = CatppuccinUI.SelectedColor
+                                color = CatppuccinUI.SelectedColor,
+                                modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
+
                             )
                         },
                         divider = {}
