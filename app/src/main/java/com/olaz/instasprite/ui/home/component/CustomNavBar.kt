@@ -1,4 +1,4 @@
-package com.olaz.instasprite.ui.gallery.component
+package com.olaz.instasprite.ui.home.component
 
 
 import androidx.compose.foundation.background

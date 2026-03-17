@@ -16,7 +16,7 @@ object ActivityModule {
     @Provides
     @ActivityRetainedScoped
     fun provideNavigator(eventBus: ResultEventBus): Navigator {
-        return Navigator(Screen.Gallery, eventBus)
+        return Navigator(Screen.Home, eventBus)
     }
 
     @Provides

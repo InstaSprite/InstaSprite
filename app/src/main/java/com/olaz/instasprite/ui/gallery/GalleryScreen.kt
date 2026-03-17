@@ -38,8 +38,6 @@ import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteMeta
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.components.composable.JumpToTopButton
-import com.olaz.instasprite.ui.gallery.component.HomeBottomBar
-import com.olaz.instasprite.ui.gallery.component.HomeFab
 import com.olaz.instasprite.ui.gallery.component.ImagePagerOverlay
 import com.olaz.instasprite.ui.gallery.component.SearchBar
 import com.olaz.instasprite.ui.gallery.component.SpriteList
@@ -47,6 +45,8 @@ import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
 import com.olaz.instasprite.ui.gallery.contract.SearchBarContract
 import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
+import com.olaz.instasprite.ui.home.component.HomeBottomBar
+import com.olaz.instasprite.ui.home.component.HomeFab
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
@@ -155,6 +155,31 @@ fun GalleryScreen(
 }
 
 @Composable
+fun GalleryPageContent(
+    uiState: GalleryState,
+    lazyListState: LazyListState,
+    spriteList: List<SpriteWithMeta>,
+    searchQuery: String,
+    event: GalleryScreenEvent,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(CatppuccinUI.BackgroundColorDarker)
+            .animateContentSize()
+    ) {
+        SpriteList(
+            onSpriteListEvent = event.onSpriteListEvent,
+            spriteList = spriteList,
+            lazyListState = lazyListState,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
+    }
+}
+
+@Composable
 private fun GalleryScreenContent(
     uiState: GalleryState,
     lazyListState: LazyListState,
@@ -201,14 +226,13 @@ private fun GalleryScreenContent(
             bottomBar = {
                 HomeBottomBar(
                     onBottomBarEvent = event.onBottomBarEvent,
-                    lazyListState = lazyListState,
                     modifier = Modifier.height(56.dp)
                 )
             },
         ) { innerPadding ->
             Box(
                 modifier = Modifier
-                    .padding(top = innerPadding.calculateTopPadding())
+                    .padding(innerPadding)
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(CatppuccinUI.BackgroundColorDarker)
@@ -248,7 +272,6 @@ private fun GalleryScreenContent(
                 onCreateCanvas = event.onCreateNewCanvas,
                 onLoadCanvas = event.onLoadCanvas,
                 onLoadImage = event.onLoadImage,
-                lazyListState = lazyListState
             )
         }
     }

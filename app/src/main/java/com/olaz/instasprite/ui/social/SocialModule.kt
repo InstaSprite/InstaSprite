@@ -1,6 +1,5 @@
 package com.olaz.instasprite.ui.social
 
-import androidx.compose.foundation.lazy.rememberLazyListState
 import com.olaz.instasprite.navigation.EntryProviderInstaller
 import com.olaz.instasprite.navigation.Navigator
 import com.olaz.instasprite.navigation.Screen
@@ -8,7 +7,6 @@ import com.olaz.instasprite.ui.social.auth.AuthScreen
 import com.olaz.instasprite.ui.social.comments.CommentScreen
 import com.olaz.instasprite.ui.social.completionprofile.ProfileCompletionScreen
 import com.olaz.instasprite.ui.social.createpost.CreatePostScreen
-import com.olaz.instasprite.ui.social.feed.FeedScreen
 import com.olaz.instasprite.ui.social.notification.NotificationScreen
 import com.olaz.instasprite.ui.social.profile.ProfileScreen
 import dagger.Module
@@ -31,18 +29,6 @@ object SocialModule {
         }
     }
 
-    @IntoSet
-    @Provides
-    fun provideFeedEntry(navigator: Navigator): EntryProviderInstaller = {
-        entry<Screen.Feed> {
-            FeedScreen(
-                listState = rememberLazyListState(),
-                onLoginClick = { navigator.goTo(Screen.Auth) },
-                onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
-                onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
-            )
-        }
-    }
 
     @Provides
     @IntoSet
