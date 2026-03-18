@@ -289,7 +289,7 @@ fun HomeScreen(
                     state = pagerState,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = innerPadding.calculateTopPadding())
+                        .padding(innerPadding)
                 ) { page ->
                     when (page) {
                         0 -> GalleryPageContent(
