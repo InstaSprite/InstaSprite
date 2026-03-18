@@ -26,6 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -43,6 +44,10 @@ annotation class LospecApi
 object OkHttpModule {
 
     private const val CACHE_SIZE = 10 * 1024 * 1024L
+    private const val CONNECT_TIMEOUT_SECONDS = 15L
+    private const val READ_TIMEOUT_SECONDS = 30L
+    private const val WRITE_TIMEOUT_SECONDS = 30L
+    private const val CALL_TIMEOUT_SECONDS = 45L
 
     @Provides
     @Singleton
@@ -62,6 +67,10 @@ object OkHttpModule {
         val cache = Cache(File(context.cacheDir, "http_cache"), CACHE_SIZE)
 
         return OkHttpClient.Builder()
+            .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .callTimeout(CALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
             .cache(cache)
