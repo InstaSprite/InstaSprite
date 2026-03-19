@@ -640,7 +640,7 @@ class DrawingViewModel @AssistedInject constructor(
         return fileRepository.saveFile(bitmap, folderUri, fileName)
     }
 
-    fun saveISprite(
+    suspend fun saveISprite(
         folderUri: Uri,
         fileName: String
     ): Boolean {
