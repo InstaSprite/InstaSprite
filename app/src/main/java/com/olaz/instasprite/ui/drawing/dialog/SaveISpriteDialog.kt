@@ -18,13 +18,13 @@ import kotlinx.coroutines.launch
 fun SaveISpriteDialog(
     onDismiss: () -> Unit,
     folderUri: Uri?,
+    isSaving: Boolean,
     onFolderSelected: (Uri) -> Unit,
     onSave: suspend (folderUri: Uri, fileName: String) -> Boolean
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var fileName by remember { mutableStateOf("Sprite") }
-    var isSaving by remember { mutableStateOf(false) }
 
     SaveFileDialog(
         title = "Save ISprite",
@@ -45,12 +45,8 @@ fun SaveISpriteDialog(
         onSave = {
             folderUri?.let { uri ->
                 if (!isSaving) {
-                    isSaving = true
-
                     scope.launch {
                         val success = onSave(uri, fileName)
-
-                        isSaving = false
 
                         Toast.makeText(
                             context,

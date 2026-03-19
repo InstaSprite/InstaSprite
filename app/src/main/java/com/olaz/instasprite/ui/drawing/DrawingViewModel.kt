@@ -47,6 +47,7 @@ import androidx.core.graphics.set
 
 data class DrawingScreenState(
     val isLoading: Boolean = true,
+    val isSaving: Boolean = false,
     val selectedTool: Tool,
     val toolSize: Int,
     val showLayerDrawer: Boolean = false
@@ -645,11 +646,20 @@ class DrawingViewModel @AssistedInject constructor(
         fileName: String
     ): Boolean {
         if (fileName.isBlank()) return false
-        return fileRepository.saveISpriteFile(
-            pixelCanvasUseCase.getSprite(),
-            folderUri,
-            fileName
-        )
+        if (_uiState.value.isSaving) return false
+
+        _uiState.value = _uiState.value.copy(isSaving = true)
+        return try {
+            withContext(Dispatchers.IO) {
+                fileRepository.saveISpriteFile(
+                    pixelCanvasUseCase.getSprite(),
+                    folderUri,
+                    fileName
+                )
+            }
+        } finally {
+            _uiState.value = _uiState.value.copy(isSaving = false)
+        }
     }
 
     fun getSpriteDataFromFile(fileUri: Uri): Sprite? {
@@ -669,10 +679,19 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     suspend fun saveToDB(spriteName: String? = null) {
-        val sprite = pixelCanvasUseCase.getSprite()
-        spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
-        spriteName?.let {
-            spriteDataRepository.changeName(spriteId, it)
+        if (_uiState.value.isSaving) return
+
+        _uiState.value = _uiState.value.copy(isSaving = true)
+        try {
+            withContext(Dispatchers.IO) {
+                val sprite = pixelCanvasUseCase.getSprite()
+                spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
+                spriteName?.let {
+                    spriteDataRepository.changeName(spriteId, it)
+                }
+            }
+        } finally {
+            _uiState.value = _uiState.value.copy(isSaving = false)
         }
     }
 
