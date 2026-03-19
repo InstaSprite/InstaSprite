@@ -8,10 +8,10 @@ message LayerData {
   string name = 2;
   bool is_visible = 3;
   bool is_locked = 4;
-  repeated int32 pixels = 5;
+  bytes pixels = 5;
 }
 
-message SpritePixels {
+message ISprite {
   repeated LayerData layers = 1;
   repeated int32 color_palette = 2;
   int32 width = 3;

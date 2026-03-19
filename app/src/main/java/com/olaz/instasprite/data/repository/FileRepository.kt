@@ -4,10 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import com.olaz.instasprite.SpritePixels
+import com.olaz.instasprite.ISprite
 import com.olaz.instasprite.data.mapper.toSprite
-import com.olaz.instasprite.data.mapper.toSpritePixels
-import com.olaz.instasprite.domain.model.Layer
+import com.olaz.instasprite.data.mapper.toISprite
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.utils.getFormatFromExtension
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +31,7 @@ class FileRepository(val context: Context) {
 
         try {
             GZIPOutputStream(outputStream).use { gzipStream ->
-                val proto = sprite.toSpritePixels()
+                val proto = sprite.toISprite()
                 proto.writeTo(gzipStream)
                 gzipStream.finish()
             }
@@ -59,7 +58,7 @@ class FileRepository(val context: Context) {
 
                 val finalStream = if (isGzipped) GZIPInputStream(pushbackStream) else pushbackStream
 
-                val proto = SpritePixels.parseFrom(finalStream)
+                val proto = ISprite.parseFrom(finalStream)
 
                 proto.toSprite()
             }

@@ -2,18 +2,17 @@ package com.olaz.instasprite.data.serializer
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.google.protobuf.InvalidProtocolBufferException
-import com.olaz.instasprite.SpritePixels
+import com.olaz.instasprite.ISprite
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PushbackInputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-object SpritePixelsSerializer : Serializer<SpritePixels> {
-    override val defaultValue: SpritePixels = SpritePixels.getDefaultInstance()
+object ISpriteSerializer : Serializer<ISprite> {
+    override val defaultValue: ISprite = ISprite.getDefaultInstance()
 
-    override suspend fun readFrom(input: InputStream): SpritePixels {
+    override suspend fun readFrom(input: InputStream): ISprite {
         val pushbackStream = PushbackInputStream(input, 2)
         val header = ByteArray(2)
         val bytesRead = pushbackStream.read(header)
@@ -30,17 +29,17 @@ object SpritePixelsSerializer : Serializer<SpritePixels> {
         return try {
             if (isCompressed) {
                 GZIPInputStream(pushbackStream).use { gzip ->
-                    SpritePixels.parseFrom(gzip)
+                    ISprite.parseFrom(gzip)
                 }
             } else {
-                SpritePixels.parseFrom(pushbackStream)
+                ISprite.parseFrom(pushbackStream)
             }
         } catch (exception: Exception) {
             throw CorruptionException("Cannot read proto.", exception)
         }
     }
 
-    override suspend fun writeTo(t: SpritePixels, output: OutputStream) {
+    override suspend fun writeTo(t: ISprite, output: OutputStream) {
         GZIPOutputStream(output).use { gzipStream ->
             t.writeTo(gzipStream)
             gzipStream.finish()
