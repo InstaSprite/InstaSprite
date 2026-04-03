@@ -43,6 +43,7 @@ import com.olaz.instasprite.ui.drawing.contract.LayerEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.drawCheckerboard
+import com.olaz.instasprite.utils.inflateCel
 
 
 @Composable
@@ -64,10 +65,10 @@ fun LayerView(
     else
         CatppuccinUI.BackgroundColorDarker
 
-    val bitmapImage = remember(layer.cel.pixels, canvasWidth, canvasHeight) {
-        if (canvasWidth > 0 && canvasHeight > 0 && layer.cel.pixels.size == canvasWidth * canvasHeight) {
+    val bitmapImage = remember(layer.cel, canvasWidth, canvasHeight) {
+        if (canvasWidth > 0 && canvasHeight > 0) {
             val bitmap = createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888)
-            val argbPixels = layer.cel.pixels
+            val argbPixels = inflateCel(layer.cel, canvasWidth, canvasHeight)
             bitmap.setPixels(argbPixels, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
             bitmap.asImageBitmap()
         } else {

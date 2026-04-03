@@ -7,9 +7,9 @@ import com.olaz.instasprite.LayerData
 import com.olaz.instasprite.domain.model.Cel
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.utils.calculateBoundingBox
-import com.olaz.instasprite.utils.extractCel
-import com.olaz.instasprite.utils.inflateCel
+import com.olaz.instasprite.utils.celToTiles
+import com.olaz.instasprite.utils.decodeTilesFromByteArray
+import com.olaz.instasprite.utils.encodeTilesToByteArray
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -23,27 +23,15 @@ fun Sprite.toISprite(): ISprite {
         .setHeight(this.height)
 
     val layerProtos = this.layers.map { layer ->
-        val cel = calculateBoundingBox(
-            pixels = layer.cel.pixels,
-            canvasWidth = width,
-            canvasHeight = height
-        )?.let { bounds ->
-            extractCel(
-                pixels = layer.cel.pixels,
-                bounds = bounds,
-                canvasWidth = width
-            )
-        }
-
         val layerBuilder = LayerData.newBuilder()
             .setId(layer.id)
             .setName(layer.name)
             .setIsVisible(layer.isVisible)
             .setIsLocked(layer.isLocked)
 
-        if (cel != null) {
-            layerBuilder.setCel(cel.toProto())
-        } else if (layer.cel.pixels.isNotEmpty()) {
+        if (layer.tiles.isNotEmpty()) {
+            layerBuilder.setCel(layer.toProtoCel())
+        } else {
             layerBuilder.setCel(
                 CelData.newBuilder()
                     .setWidth(0)
@@ -64,36 +52,27 @@ fun Sprite.toISprite(): ISprite {
 
 fun ISprite.toSprite(): Sprite {
     val layers = this.layersList.map { layerData ->
-        val cel = when {
-            layerData.hasCel() -> layerData.cel.toDomain()
-            !layerData.pixels.isEmpty -> Cel(
-                x = 0,
-                y = 0,
-                width = width,
-                height = height,
-                pixels = layerData.pixels.toIntArray()
-            )
-            else -> null
-        }
-
-        val intArray = inflateCel(
-            cel = cel,
-            canvasWidth = width,
-            canvasHeight = height
-        )
-
         Layer(
             id = layerData.id,
             name = layerData.name,
             isVisible = layerData.isVisible,
             isLocked = layerData.isLocked,
-            cel = Cel(
-                x = 0,
-                y = 0,
-                width = width,
-                height = height,
-                pixels = intArray
-            )
+            tiles = when {
+                layerData.hasCel() -> {
+                    val decodedTiles = decodeTilesFromByteArray(layerData.cel.pixels.toByteArray())
+                    decodedTiles ?: celToTiles(layerData.cel.toDomain())
+                }
+                !layerData.pixels.isEmpty -> celToTiles(
+                    Cel(
+                        x = 0,
+                        y = 0,
+                        width = width,
+                        height = height,
+                        pixels = layerData.pixels.toIntArray()
+                    )
+                )
+                else -> emptyMap()
+            }
         )
     }
     return Sprite(
@@ -105,17 +84,14 @@ fun ISprite.toSprite(): Sprite {
     )
 }
 
-private fun Cel.toProto(): CelData {
-    val byteBuffer = ByteBuffer.allocate(pixels.size * Int.SIZE_BYTES)
-        .order(ByteOrder.LITTLE_ENDIAN)
-    byteBuffer.asIntBuffer().put(pixels)
-
+private fun Layer.toProtoCel(): CelData {
+    val cel = this.cel
     return CelData.newBuilder()
-        .setX(x)
-        .setY(y)
-        .setWidth(width)
-        .setHeight(height)
-        .setPixels(ByteString.copyFrom(gzip(byteBuffer.array())))
+        .setX(cel.x)
+        .setY(cel.y)
+        .setWidth(cel.width)
+        .setHeight(cel.height)
+        .setPixels(ByteString.copyFrom(encodeTilesToByteArray(this.tiles)))
         .build()
 }
 
