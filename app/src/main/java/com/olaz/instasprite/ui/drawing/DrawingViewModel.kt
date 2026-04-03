@@ -447,7 +447,7 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun saveState() {
         val currentLayers = pixelCanvasUseCase.getLayers().map {
-            it.copy(pixels = it.pixels.copyOf())
+            it.copy(cel = it.cel.copy(pixels = it.cel.pixels.copyOf()))
         }
     
         canvasHistoryManager.saveState(
@@ -464,7 +464,7 @@ class DrawingViewModel @AssistedInject constructor(
         val activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         val currentLayers = pixelCanvasUseCase.getLayers().map {
             if (it.id == activeLayerId) {
-                it.copy(pixels = it.pixels.copyOf())
+                it.copy(cel = it.cel.copy(pixels = it.cel.pixels.copyOf()))
             } else {
                 it
             }

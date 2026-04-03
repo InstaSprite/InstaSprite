@@ -24,12 +24,12 @@ fun Sprite.toISprite(): ISprite {
 
     val layerProtos = this.layers.map { layer ->
         val cel = calculateBoundingBox(
-            pixels = layer.pixels,
+            pixels = layer.cel.pixels,
             canvasWidth = width,
             canvasHeight = height
         )?.let { bounds ->
             extractCel(
-                pixels = layer.pixels,
+                pixels = layer.cel.pixels,
                 bounds = bounds,
                 canvasWidth = width
             )
@@ -43,7 +43,7 @@ fun Sprite.toISprite(): ISprite {
 
         if (cel != null) {
             layerBuilder.setCel(cel.toProto())
-        } else if (layer.pixels.isNotEmpty()) {
+        } else if (layer.cel.pixels.isNotEmpty()) {
             layerBuilder.setCel(
                 CelData.newBuilder()
                     .setWidth(0)
@@ -87,8 +87,13 @@ fun ISprite.toSprite(): Sprite {
             name = layerData.name,
             isVisible = layerData.isVisible,
             isLocked = layerData.isLocked,
-            pixels = intArray,
-            cel = cel
+            cel = Cel(
+                x = 0,
+                y = 0,
+                width = width,
+                height = height,
+                pixels = intArray
+            )
         )
     }
     return Sprite(

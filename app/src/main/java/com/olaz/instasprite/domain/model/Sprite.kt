@@ -11,9 +11,9 @@ data class Sprite(
         val result = IntArray(width * height)
         for (layer in layers) {
             if (layer.isVisible) {
-                for (i in layer.pixels.indices) {
-                    if (layer.pixels[i] != 0) {
-                        result[i] = layer.pixels[i]
+                for (i in layer.cel.pixels.indices) {
+                    if (layer.cel.pixels[i] != 0) {
+                        result[i] = layer.cel.pixels[i]
                     }
                 }
             }

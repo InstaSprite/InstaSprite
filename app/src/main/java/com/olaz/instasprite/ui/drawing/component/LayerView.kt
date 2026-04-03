@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.createBitmap
+import com.olaz.instasprite.domain.model.Cel
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.ui.drawing.contract.LayerEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
@@ -63,10 +64,10 @@ fun LayerView(
     else
         CatppuccinUI.BackgroundColorDarker
 
-    val bitmapImage = remember(layer.pixels, canvasWidth, canvasHeight) {
-        if (canvasWidth > 0 && canvasHeight > 0 && layer.pixels.size == canvasWidth * canvasHeight) {
+    val bitmapImage = remember(layer.cel.pixels, canvasWidth, canvasHeight) {
+        if (canvasWidth > 0 && canvasHeight > 0 && layer.cel.pixels.size == canvasWidth * canvasHeight) {
             val bitmap = createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888)
-            val argbPixels = layer.pixels
+            val argbPixels = layer.cel.pixels
             bitmap.setPixels(argbPixels, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
             bitmap.asImageBitmap()
         } else {
@@ -185,9 +186,15 @@ private fun PreviewActive() {
             layer = Layer(
                 id = "test1",
                 name = "Layer 1",
-                pixels = IntArray(16 * 16) {
-                    CatppuccinUI.CurrentPalette.Flamingo.toArgb()
-                }
+                cel = Cel(
+                    x = 0,
+                    y = 0,
+                    width = 16,
+                    height = 16,
+                    pixels = IntArray(16 * 16) {
+                        CatppuccinUI.CurrentPalette.Flamingo.toArgb()
+                    }
+                )
             ),
             onEvent = {},
             canvasWidth = 16,
@@ -209,9 +216,15 @@ private fun PreviewInactive() {
             layer = Layer(
                 id = "test1",
                 name = "Layer 1",
-                pixels = IntArray(16 * 16) {
-                    CatppuccinUI.CurrentPalette.Maroon.toArgb()
-                }
+                cel = Cel(
+                    x = 0,
+                    y = 0,
+                    width = 16,
+                    height = 16,
+                    pixels = IntArray(16 * 16) {
+                        CatppuccinUI.CurrentPalette.Maroon.toArgb()
+                    }
+                )
             ),
             onEvent = {},
             canvasWidth = 16,

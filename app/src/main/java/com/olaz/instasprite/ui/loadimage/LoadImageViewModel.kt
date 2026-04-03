@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.domain.image2pixel.PixelArtConfig
 import com.olaz.instasprite.domain.image2pixel.PixelArtConverter
+import com.olaz.instasprite.domain.model.Cel
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -120,7 +121,13 @@ class LoadImageViewModel @Inject constructor(
         val layer = Layer(
             id = UUID.randomUUID().toString(),
             name = "Layer 1",
-            pixels = pixels
+            cel = Cel(
+                x = 0,
+                y = 0,
+                width = width,
+                height = height,
+                pixels = pixels
+            )
         )
 
         val sprite = Sprite(
