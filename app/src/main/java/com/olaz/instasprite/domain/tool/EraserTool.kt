@@ -18,12 +18,12 @@ object EraserTool : StrokeTool {
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
 
-    override fun apply(canvas: PixelCanvasUseCase, x: Int, y: Int, color: Color) {
-        canvas.setPixel(x, y, Color.Transparent)
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
+        canvas.setPixel(row, col, Color.Transparent)
     }
 
-    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, size: Int) {
-        canvas.setPixel(row, col, Color.Transparent, size)
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int) {
+        canvas.setPixel(row, col, Color.Transparent, scale)
     }
 
     override fun beginStroke(
@@ -36,7 +36,14 @@ object EraserTool : StrokeTool {
         canvasHeight = canvas.getCanvasHeight()
 
         canvas.setPixel(row, col, Color.Transparent, scale)
-        val changes = brushPixels(row, col)
+        val changes = ArrayList<PixelChange>()
+        val seen = HashSet<Int>()
+        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+            val key = r * canvasWidth + c
+            if (seen.add(key)) {
+                changes.add(PixelChange(r, c, Color.Transparent.toArgb()))
+            }
+        }
         return StrokeUpdate(changes)
     }
 
@@ -44,10 +51,16 @@ object EraserTool : StrokeTool {
         canvas: PixelCanvasUseCase, row: Int, col: Int
     ): StrokeUpdate {
         val points = bresenhamLine(lastCol, lastRow, col, row)
-        val allChanges = mutableListOf<PixelChange>()
+        val allChanges = ArrayList<PixelChange>()
+        val seen = HashSet<Int>()
         for ((px, py) in points) {
             canvas.setPixel(py, px, Color.Transparent, strokeScale)
-            allChanges.addAll(brushPixels(py, px))
+            forEachBrushPixel(py, px, strokeScale, canvasWidth, canvasHeight) { r, c ->
+                val key = r * canvasWidth + c
+                if (seen.add(key)) {
+                    allChanges.add(PixelChange(r, c, Color.Transparent.toArgb()))
+                }
+            }
         }
         lastRow = row
         lastCol = col
@@ -63,22 +76,4 @@ object EraserTool : StrokeTool {
         lastCol = 0
     }
 
-    private fun brushPixels(row: Int, col: Int): List<PixelChange> {
-        val result = mutableListOf<PixelChange>()
-        var rStart = row; var rEnd = row
-        var cStart = col; var cEnd = col
-        for (s in 2..strokeScale) {
-            if (s % 2 == 0) { rStart--; cStart-- } else { rEnd++; cEnd++ }
-        }
-        rStart = rStart.coerceAtLeast(0)
-        cStart = cStart.coerceAtLeast(0)
-        rEnd = rEnd.coerceAtMost(canvasHeight - 1)
-        cEnd = cEnd.coerceAtMost(canvasWidth - 1)
-        for (r in rStart..rEnd) {
-            for (c in cStart..cEnd) {
-                result.add(PixelChange(r, c, Color.Transparent.toArgb()))
-            }
-        }
-        return result
-    }
 }

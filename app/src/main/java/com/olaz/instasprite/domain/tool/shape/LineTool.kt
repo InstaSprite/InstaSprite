@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.R
 import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.domain.tool.ShapeTool
-import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.domain.tool.StrokeUpdate
+import com.olaz.instasprite.domain.tool.forEachBrushPixel
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.utils.bresenhamLine
 
@@ -25,14 +25,14 @@ object LineTool : ShapeTool {
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
 
-    private val accumulated = mutableListOf<PixelChange>()
+    private val accumulatedByPixel = LinkedHashMap<Int, PixelChange>()
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
     }
 
-    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, size: Int) {
-        canvas.setPixel(row, col, color, size)
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int) {
+        canvas.setPixel(row, col, color, scale)
     }
 
     override fun beginStroke(
@@ -46,11 +46,14 @@ object LineTool : ShapeTool {
         strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
-        accumulated.clear()
+        accumulatedByPixel.clear()
 
-        val changes = brushPixels(row, col)
-        accumulated.addAll(changes)
-        return StrokeUpdate(changes, isFullPreview = true)
+        val initialChanges = ArrayList<PixelChange>()
+        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+            addIfNew(accumulatedByPixel, r, c)
+        }
+        initialChanges.addAll(accumulatedByPixel.values)
+        return StrokeUpdate(initialChanges, isFullPreview = true)
     }
 
     override fun updateStroke(
@@ -58,57 +61,43 @@ object LineTool : ShapeTool {
     ): StrokeUpdate {
         lastRow = row
         lastCol = col
-        
-        val newChanges = generateLine(startRow, startCol, lastRow, lastCol)
-        
-        accumulated.clear()
-        accumulated.addAll(newChanges)
-        
-        return StrokeUpdate(newChanges, isFullPreview = true)
+
+        rebuildLinePreview(startRow, startCol, lastRow, lastCol)
+        return StrokeUpdate(accumulatedByPixel.values.toList(), isFullPreview = true)
     }
 
     override fun endStroke(): List<PixelChange> {
-        val result = accumulated.toList()
-        accumulated.clear()
+        val result = accumulatedByPixel.values.toList()
+        accumulatedByPixel.clear()
         return result
     }
 
     override fun cancelStroke() {
-        accumulated.clear()
+        accumulatedByPixel.clear()
         startRow = 0
         startCol = 0
         lastRow = 0
         lastCol = 0
     }
 
-    private fun generateLine(r1: Int, c1: Int, r2: Int, c2: Int): List<PixelChange> {
-        // bresenhamLine takes (x0, y0, x1, y1) -> (col0, row0, col1, row1)
+    private fun rebuildLinePreview(r1: Int, c1: Int, r2: Int, c2: Int) {
+        val next = LinkedHashMap<Int, PixelChange>()
         val points = bresenhamLine(c1, r1, c2, r2)
-        val newChanges = mutableListOf<PixelChange>()
-        
-        for ((px, py) in points) {
-            newChanges.addAll(brushPixels(py, px))
-        }
-        
-        return newChanges.distinct()
-    }
 
-    private fun brushPixels(row: Int, col: Int): List<PixelChange> {
-        val result = mutableListOf<PixelChange>()
-        var rStart = row; var rEnd = row
-        var cStart = col; var cEnd = col
-        for (s in 2..strokeScale) {
-            if (s % 2 == 0) { rStart--; cStart-- } else { rEnd++; cEnd++ }
-        }
-        rStart = rStart.coerceAtLeast(0)
-        cStart = cStart.coerceAtLeast(0)
-        rEnd = rEnd.coerceAtMost(canvasHeight - 1)
-        cEnd = cEnd.coerceAtMost(canvasWidth - 1)
-        for (r in rStart..rEnd) {
-            for (c in cStart..cEnd) {
-                result.add(PixelChange(r, c, strokeColor))
+        for ((px, py) in points) {
+            forEachBrushPixel(py, px, strokeScale, canvasWidth, canvasHeight) { r, c ->
+                addIfNew(next, r, c)
             }
         }
-        return result
+
+        accumulatedByPixel.clear()
+        accumulatedByPixel.putAll(next)
+    }
+
+    private fun addIfNew(target: MutableMap<Int, PixelChange>, row: Int, col: Int) {
+        val key = row * canvasWidth + col
+        if (!target.containsKey(key)) {
+            target[key] = PixelChange(row, col, strokeColor)
+        }
     }
 }

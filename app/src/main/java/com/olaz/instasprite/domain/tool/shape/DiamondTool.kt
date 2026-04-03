@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.R
 import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.domain.tool.ShapeTool
-import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.domain.tool.StrokeUpdate
+import com.olaz.instasprite.domain.tool.forEachBrushPixel
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.utils.bresenhamLine
 
@@ -25,14 +25,14 @@ object DiamondTool : ShapeTool {
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
 
-    private val accumulated = mutableListOf<PixelChange>()
+    private val accumulatedByPixel = LinkedHashMap<Int, PixelChange>()
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
     }
 
-    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, size: Int) {
-        canvas.setPixel(row, col, color, size)
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int) {
+        canvas.setPixel(row, col, color, scale)
     }
 
     override fun beginStroke(
@@ -46,11 +46,10 @@ object DiamondTool : ShapeTool {
         strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
-        accumulated.clear()
+        accumulatedByPixel.clear()
 
-        val changes = brushPixels(row, col)
-        accumulated.addAll(changes)
-        return StrokeUpdate(changes, isFullPreview = true)
+        stampBrush(accumulatedByPixel, row, col)
+        return StrokeUpdate(accumulatedByPixel.values.toList(), isFullPreview = true)
     }
 
     override fun updateStroke(
@@ -58,79 +57,67 @@ object DiamondTool : ShapeTool {
     ): StrokeUpdate {
         lastRow = row
         lastCol = col
-        
-        val newChanges = generateDiamond(startRow, startCol, lastRow, lastCol)
-        
-        accumulated.clear()
-        accumulated.addAll(newChanges)
-        
-        return StrokeUpdate(newChanges, isFullPreview = true)
+
+        rebuildDiamondPreview(startRow, startCol, lastRow, lastCol)
+        return StrokeUpdate(accumulatedByPixel.values.toList(), isFullPreview = true)
     }
 
     override fun endStroke(): List<PixelChange> {
-        val result = accumulated.toList()
-        accumulated.clear()
+        val result = accumulatedByPixel.values.toList()
+        accumulatedByPixel.clear()
         return result
     }
 
     override fun cancelStroke() {
-        accumulated.clear()
+        accumulatedByPixel.clear()
         startRow = 0
         startCol = 0
         lastRow = 0
         lastCol = 0
     }
 
-    private fun generateDiamond(r1: Int, c1: Int, r2: Int, c2: Int): List<PixelChange> {
-        // Find bounding box
+    private fun rebuildDiamondPreview(r1: Int, c1: Int, r2: Int, c2: Int) {
+        val next = LinkedHashMap<Int, PixelChange>()
+
         val minRow = minOf(r1, r2)
         val maxRow = maxOf(r1, r2)
         val minCol = minOf(c1, c2)
         val maxCol = maxOf(c1, c2)
 
         if (minRow == maxRow && minCol == maxCol) {
-            return brushPixels(r1, c1)
+            stampBrush(next, r1, c1)
+            accumulatedByPixel.clear()
+            accumulatedByPixel.putAll(next)
+            return
         }
 
-        // Calculate midpoints
         val midRow = minRow + (maxRow - minRow) / 2
         val midCol = minCol + (maxCol - minCol) / 2
 
         val points = mutableListOf<Pair<Int, Int>>()
-        
-        // Connect top-center to right-center
         points.addAll(bresenhamLine(midCol, minRow, maxCol, midRow))
-        // Connect right-center to bottom-center
         points.addAll(bresenhamLine(maxCol, midRow, midCol, maxRow))
-        // Connect bottom-center to left-center
         points.addAll(bresenhamLine(midCol, maxRow, minCol, midRow))
-        // Connect left-center back to top-center
         points.addAll(bresenhamLine(minCol, midRow, midCol, minRow))
 
-        val changes = mutableListOf<PixelChange>()
         for ((px, py) in points) {
-            changes.addAll(brushPixels(py, px))
+            stampBrush(next, py, px)
         }
 
-        return changes.distinct()
+        accumulatedByPixel.clear()
+        accumulatedByPixel.putAll(next)
     }
 
-    private fun brushPixels(row: Int, col: Int): List<PixelChange> {
-        val result = mutableListOf<PixelChange>()
-        var rStart = row; var rEnd = row
-        var cStart = col; var cEnd = col
-        for (s in 2..strokeScale) {
-            if (s % 2 == 0) { rStart--; cStart-- } else { rEnd++; cEnd++ }
+    private fun stampBrush(target: MutableMap<Int, PixelChange>, row: Int, col: Int) {
+        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+            addIfNew(target, r, c)
         }
-        rStart = rStart.coerceAtLeast(0)
-        cStart = cStart.coerceAtLeast(0)
-        rEnd = rEnd.coerceAtMost(canvasHeight - 1)
-        cEnd = cEnd.coerceAtMost(canvasWidth - 1)
-        for (r in rStart..rEnd) {
-            for (c in cStart..cEnd) {
-                result.add(PixelChange(r, c, strokeColor))
-            }
+    }
+
+    private fun addIfNew(target: MutableMap<Int, PixelChange>, row: Int, col: Int) {
+        val key = row * canvasWidth + col
+        if (!target.containsKey(key)) {
+            target[key] = PixelChange(row, col, strokeColor)
         }
-        return result
     }
 }

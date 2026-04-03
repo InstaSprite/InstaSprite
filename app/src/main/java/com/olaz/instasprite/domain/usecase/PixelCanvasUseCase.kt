@@ -6,6 +6,7 @@ import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
+import com.olaz.instasprite.domain.tool.PixelChange
 
 class PixelCanvasUseCase(
     private val pixelCanvasRepository: PixelCanvasRepository,
@@ -53,7 +54,7 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.setAllPixels(pixels)
     }
 
-    fun batchSetPixels(changes: List<com.olaz.instasprite.domain.tool.PixelChange>) {
+    fun batchSetPixels(changes: List<PixelChange>) {
         pixelCanvasRepository.batchSetPixels(changes)
     }
 

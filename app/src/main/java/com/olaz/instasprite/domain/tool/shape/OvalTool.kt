@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.R
 import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.domain.tool.ShapeTool
-import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.domain.tool.StrokeUpdate
+import com.olaz.instasprite.domain.tool.forEachBrushPixel
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 
 object OvalTool : ShapeTool {
@@ -24,14 +24,14 @@ object OvalTool : ShapeTool {
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
 
-    private val accumulated = mutableListOf<PixelChange>()
+    private val accumulatedByPixel = LinkedHashMap<Int, PixelChange>()
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
     }
 
-    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, size: Int) {
-        canvas.setPixel(row, col, color, size)
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int) {
+        canvas.setPixel(row, col, color, scale)
     }
 
     override fun beginStroke(
@@ -45,11 +45,10 @@ object OvalTool : ShapeTool {
         strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
-        accumulated.clear()
+        accumulatedByPixel.clear()
 
-        val changes = brushPixels(row, col)
-        accumulated.addAll(changes)
-        return StrokeUpdate(changes, isFullPreview = true)
+        stampBrush(accumulatedByPixel, row, col)
+        return StrokeUpdate(accumulatedByPixel.values.toList(), isFullPreview = true)
     }
 
     override fun updateStroke(
@@ -57,31 +56,27 @@ object OvalTool : ShapeTool {
     ): StrokeUpdate {
         lastRow = row
         lastCol = col
-        
-        val newChanges = generateOval(startRow, startCol, lastRow, lastCol)
-        
-        accumulated.clear()
-        accumulated.addAll(newChanges)
-        
-        return StrokeUpdate(newChanges, isFullPreview = true)
+
+        rebuildOvalPreview(startRow, startCol, lastRow, lastCol)
+        return StrokeUpdate(accumulatedByPixel.values.toList(), isFullPreview = true)
     }
 
     override fun endStroke(): List<PixelChange> {
-        val result = accumulated.toList()
-        accumulated.clear()
+        val result = accumulatedByPixel.values.toList()
+        accumulatedByPixel.clear()
         return result
     }
 
     override fun cancelStroke() {
-        accumulated.clear()
+        accumulatedByPixel.clear()
         startRow = 0
         startCol = 0
         lastRow = 0
         lastCol = 0
     }
 
-    private fun generateOval(r1: Int, c1: Int, r2: Int, c2: Int): List<PixelChange> {
-        val changes = mutableListOf<PixelChange>()
+    private fun rebuildOvalPreview(r1: Int, c1: Int, r2: Int, c2: Int) {
+        val next = LinkedHashMap<Int, PixelChange>()
 
         val minCol = minOf(c1, c2)
         val maxCol = maxOf(c1, c2)
@@ -91,27 +86,25 @@ object OvalTool : ShapeTool {
         val w = maxCol - minCol
         val h = maxRow - minRow
 
-        // Center coordinates
         val cx = minCol + w / 2
         val cy = minRow + h / 2
 
-        // Semi-axes
         val a = w / 2
         val b = h / 2
 
         if (a == 0 && b == 0) {
-            changes.addAll(brushPixels(r1, c1))
-            return changes
+            stampBrush(next, r1, c1)
+            accumulatedByPixel.clear()
+            accumulatedByPixel.putAll(next)
+            return
         }
 
-        // Midpoint ellipse algorithm
         var x = 0
         var y = b
         var d1 = b * b - a * a * b + a * a / 4
 
-        drawOvalPoints(cx, cy, x, y, changes)
+        stampOvalPoints(next, cx, cy, x, y)
 
-        // Region 1
         while (a * a * (y - 0.5) > b * b * (x + 1)) {
             if (d1 < 0) {
                 d1 += b * b * (2 * x + 3)
@@ -120,10 +113,9 @@ object OvalTool : ShapeTool {
                 y--
             }
             x++
-            drawOvalPoints(cx, cy, x, y, changes)
+            stampOvalPoints(next, cx, cy, x, y)
         }
 
-        // Region 2
         var d2 = b * b * (x + 0.5) * (x + 0.5) + a * a * (y - 1) * (y - 1) - a * a * b * b
         while (y > 0) {
             if (d2 < 0) {
@@ -133,35 +125,30 @@ object OvalTool : ShapeTool {
                 d2 += a * a * (-2 * y + 3)
             }
             y--
-            drawOvalPoints(cx, cy, x, y, changes)
+            stampOvalPoints(next, cx, cy, x, y)
         }
 
-        return changes.distinct()
+        accumulatedByPixel.clear()
+        accumulatedByPixel.putAll(next)
     }
 
-    private fun drawOvalPoints(cx: Int, cy: Int, x: Int, y: Int, changes: MutableList<PixelChange>) {
-        changes.addAll(brushPixels(cy + y, cx + x))
-        changes.addAll(brushPixels(cy + y, cx - x))
-        changes.addAll(brushPixels(cy - y, cx + x))
-        changes.addAll(brushPixels(cy - y, cx - x))
+    private fun stampOvalPoints(target: MutableMap<Int, PixelChange>, cx: Int, cy: Int, x: Int, y: Int) {
+        stampBrush(target, cy + y, cx + x)
+        stampBrush(target, cy + y, cx - x)
+        stampBrush(target, cy - y, cx + x)
+        stampBrush(target, cy - y, cx - x)
     }
 
-    private fun brushPixels(row: Int, col: Int): List<PixelChange> {
-        val result = mutableListOf<PixelChange>()
-        var rStart = row; var rEnd = row
-        var cStart = col; var cEnd = col
-        for (s in 2..strokeScale) {
-            if (s % 2 == 0) { rStart--; cStart-- } else { rEnd++; cEnd++ }
+    private fun stampBrush(target: MutableMap<Int, PixelChange>, row: Int, col: Int) {
+        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+            addIfNew(target, r, c)
         }
-        rStart = rStart.coerceAtLeast(0)
-        cStart = cStart.coerceAtLeast(0)
-        rEnd = rEnd.coerceAtMost(canvasHeight - 1)
-        cEnd = cEnd.coerceAtMost(canvasWidth - 1)
-        for (r in rStart..rEnd) {
-            for (c in cStart..cEnd) {
-                result.add(PixelChange(r, c, strokeColor))
-            }
+    }
+
+    private fun addIfNew(target: MutableMap<Int, PixelChange>, row: Int, col: Int) {
+        val key = row * canvasWidth + col
+        if (!target.containsKey(key)) {
+            target[key] = PixelChange(row, col, strokeColor)
         }
-        return result
     }
 }

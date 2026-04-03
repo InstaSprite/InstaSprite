@@ -18,14 +18,14 @@ object PencilTool : StrokeTool {
     private var strokeScale: Int = 1
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
-    private val accumulated = mutableListOf<PixelChange>()
+    private val accumulatedByPixel = LinkedHashMap<Int, PixelChange>()
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
     }
 
-    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, size: Int) {
-        canvas.setPixel(row, col, color, size)
+    override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int) {
+        canvas.setPixel(row, col, color, scale)
     }
 
     override fun beginStroke(
@@ -37,53 +37,46 @@ object PencilTool : StrokeTool {
         strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
-        accumulated.clear()
+        accumulatedByPixel.clear()
 
-        val changes = brushPixels(row, col)
-        accumulated.addAll(changes)
-        return StrokeUpdate(changes)
+        val newChanges = ArrayList<PixelChange>()
+        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+            addIfNew(r, c, newChanges)
+        }
+        return StrokeUpdate(newChanges)
     }
 
     override fun updateStroke(
         canvas: PixelCanvasUseCase, row: Int, col: Int
     ): StrokeUpdate {
         val points = bresenhamLine(lastCol, lastRow, col, row)
-        val newChanges = mutableListOf<PixelChange>()
+        val newChanges = ArrayList<PixelChange>()
         for ((px, py) in points) {
-            newChanges.addAll(brushPixels(py, px))
+            forEachBrushPixel(py, px, strokeScale, canvasWidth, canvasHeight) { r, c ->
+                addIfNew(r, c, newChanges)
+            }
         }
-        accumulated.addAll(newChanges)
         lastRow = row
         lastCol = col
         return StrokeUpdate(newChanges)
     }
 
     override fun endStroke(): List<PixelChange> {
-        return accumulated.toList()
+        return accumulatedByPixel.values.toList()
     }
 
     override fun cancelStroke() {
-        accumulated.clear()
+        accumulatedByPixel.clear()
         lastRow = 0
         lastCol = 0
     }
 
-    private fun brushPixels(row: Int, col: Int): List<PixelChange> {
-        val result = mutableListOf<PixelChange>()
-        var rStart = row; var rEnd = row
-        var cStart = col; var cEnd = col
-        for (s in 2..strokeScale) {
-            if (s % 2 == 0) { rStart--; cStart-- } else { rEnd++; cEnd++ }
-        }
-        rStart = rStart.coerceAtLeast(0)
-        cStart = cStart.coerceAtLeast(0)
-        rEnd = rEnd.coerceAtMost(canvasHeight - 1)
-        cEnd = cEnd.coerceAtMost(canvasWidth - 1)
-        for (r in rStart..rEnd) {
-            for (c in cStart..cEnd) {
-                result.add(PixelChange(r, c, strokeColor))
-            }
-        }
-        return result
+    private fun addIfNew(row: Int, col: Int, out: MutableList<PixelChange>) {
+        val key = row * canvasWidth + col
+        if (accumulatedByPixel.containsKey(key)) return
+        val change = PixelChange(row, col, strokeColor)
+        accumulatedByPixel[key] = change
+        out.add(change)
     }
+
 }
