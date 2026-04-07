@@ -19,21 +19,24 @@ data object ShapeToolPlaceholder : ShapeTool {
         row: Int,
         col: Int,
         color: Color,
-        scale: Int
+        scale: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
-        return StrokeUpdate(emptyList())
+        return StrokeUpdate()
     }
 
     override fun updateStroke(
         canvas: PixelCanvasUseCase,
         row: Int,
-        col: Int
+        col: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
-        return StrokeUpdate(emptyList())
+        return StrokeUpdate()
     }
 
-    override fun endStroke(): List<PixelChange> {
-        return emptyList()
+    override fun endStroke() {
     }
 
     override fun cancelStroke() {

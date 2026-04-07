@@ -1,7 +1,6 @@
 package com.olaz.instasprite.domain.tool
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.R
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 import com.olaz.instasprite.utils.bresenhamLine
@@ -27,7 +26,13 @@ object EraserTool : StrokeTool {
     }
 
     override fun beginStroke(
-        canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        color: Color,
+        scale: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
         lastRow = row
         lastCol = col
@@ -35,40 +40,28 @@ object EraserTool : StrokeTool {
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
 
-        canvas.setPixel(row, col, Color.Transparent, scale)
-        val changes = ArrayList<PixelChange>()
-        val seen = HashSet<Int>()
-        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
-            val key = r * canvasWidth + c
-            if (seen.add(key)) {
-                changes.add(PixelChange(r, c, Color.Transparent.toArgb()))
-            }
-        }
-        return StrokeUpdate(changes)
+        stampCommittedBrush(canvas, row, col, onCommittedPixel)
+        return StrokeUpdate()
     }
 
     override fun updateStroke(
-        canvas: PixelCanvasUseCase, row: Int, col: Int
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
         val points = bresenhamLine(lastCol, lastRow, col, row)
-        val allChanges = ArrayList<PixelChange>()
-        val seen = HashSet<Int>()
         for ((px, py) in points) {
-            canvas.setPixel(py, px, Color.Transparent, strokeScale)
-            forEachBrushPixel(py, px, strokeScale, canvasWidth, canvasHeight) { r, c ->
-                val key = r * canvasWidth + c
-                if (seen.add(key)) {
-                    allChanges.add(PixelChange(r, c, Color.Transparent.toArgb()))
-                }
-            }
+            stampCommittedBrush(canvas, py, px, onCommittedPixel)
         }
         lastRow = row
         lastCol = col
-        return StrokeUpdate(allChanges)
+        return StrokeUpdate()
     }
 
-    override fun endStroke(): List<PixelChange> {
-        return emptyList()
+    override fun endStroke() {
+        // No-op for immediate commit tools.
     }
 
     override fun cancelStroke() {
@@ -76,4 +69,15 @@ object EraserTool : StrokeTool {
         lastCol = 0
     }
 
+    private fun stampCommittedBrush(
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
+    ) {
+        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+            canvas.setPixel(r, c, Color.Transparent)
+            onCommittedPixel(r, c)
+        }
+    }
 }

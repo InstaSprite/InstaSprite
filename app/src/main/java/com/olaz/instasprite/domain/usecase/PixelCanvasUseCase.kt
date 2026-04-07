@@ -6,7 +6,6 @@ import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.domain.tool.PixelChange
 
 class PixelCanvasUseCase(
     private val pixelCanvasRepository: PixelCanvasRepository,
@@ -54,8 +53,8 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.setAllPixels(pixels)
     }
 
-    fun batchSetPixels(changes: List<PixelChange>) {
-        pixelCanvasRepository.batchSetPixels(changes)
+    fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int) {
+        pixelCanvasRepository.batchSetPixels(indices, colors, count)
     }
 
     fun getActiveLayerPixelsDirect(): IntArray? = pixelCanvasRepository.getActiveLayerPixelsDirect()
@@ -66,10 +65,6 @@ class PixelCanvasUseCase(
 
     fun getCompositedPixelAt(row: Int, col: Int): Int {
         return pixelCanvasRepository.getCompositedPixelAt(row, col)
-    }
-
-    fun filterVisibleChanges(changes: List<com.olaz.instasprite.domain.tool.PixelChange>): List<com.olaz.instasprite.domain.tool.PixelChange> {
-        return pixelCanvasRepository.filterVisibleChanges(changes)
     }
 
     fun getAllPixelsInRegion(

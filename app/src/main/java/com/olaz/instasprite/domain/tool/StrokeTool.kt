@@ -3,19 +3,32 @@ package com.olaz.instasprite.domain.tool
 import androidx.compose.ui.graphics.Color
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
 
-data class PixelChange(val row: Int, val col: Int, val color: Int)
-
 data class StrokeUpdate(
-    val changes: List<PixelChange>,
     val isFullPreview: Boolean = false
 )
 
 interface StrokeTool : Tool {
     val commitsImmediately: Boolean
 
-    fun beginStroke(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int): StrokeUpdate
-    fun updateStroke(canvas: PixelCanvasUseCase, row: Int, col: Int): StrokeUpdate
-    fun endStroke(): List<PixelChange>
+    fun beginStroke(
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        color: Color,
+        scale: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
+    ): StrokeUpdate
+
+    fun updateStroke(
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
+    ): StrokeUpdate
+
+    fun endStroke()
     fun cancelStroke()
 }
 
@@ -31,6 +44,7 @@ inline fun forEachBrushPixel(
     canvasHeight: Int,
     action: (Int, Int) -> Unit
 ) {
+
     var rStart = row
     var rEnd = row
     var cStart = col
@@ -50,6 +64,11 @@ inline fun forEachBrushPixel(
     cStart = cStart.coerceAtLeast(0)
     rEnd = rEnd.coerceAtMost(canvasHeight - 1)
     cEnd = cEnd.coerceAtMost(canvasWidth - 1)
+
+    // Skip if the brush area is completely out of bounds after clamping
+    if (rStart > rEnd || cStart > cEnd) {
+        return
+    }
 
     for (r in rStart..rEnd) {
         for (c in cStart..cEnd) {

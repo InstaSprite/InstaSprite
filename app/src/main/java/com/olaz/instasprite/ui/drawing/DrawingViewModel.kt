@@ -1,6 +1,5 @@
 package com.olaz.instasprite.ui.drawing
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
@@ -15,8 +14,8 @@ import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.tool.FillTool
-import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.domain.tool.ShapeTool
 import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.usecase.PixelCanvasUseCase
@@ -43,6 +42,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.graphics.set
+import androidx.core.graphics.get
 
 
 data class DrawingScreenState(
@@ -95,6 +95,12 @@ class DrawingViewModel @AssistedInject constructor(
     private var _overlayBitmap: Bitmap? = null
     val overlayBitmap: Bitmap? get() = _overlayBitmap
     private var _overlayVersion: Long = 0
+
+    // Reused stroke buffers to avoid per-move allocations.
+    private var strokeTouchMarks: IntArray = IntArray(0)
+    private var strokeTouchedIndices: IntArray = IntArray(0)
+    private var strokeTouchedCount: Int = 0
+    private var strokeGeneration: Int = 1
 
     // Guard to prevent launching multiple concurrent fill operations
     @Volatile private var _fillRunning: Boolean = false
@@ -187,25 +193,78 @@ class DrawingViewModel @AssistedInject constructor(
         _overlayBitmap?.eraseColor(android.graphics.Color.TRANSPARENT)
     }
 
-    private fun applyChangesToOverlay(changes: List<PixelChange>) {
-        ensureOverlayBitmap()
-        val bmp = _overlayBitmap ?: return
-        val visibleChanges = pixelCanvasUseCase.filterVisibleChanges(changes)
-        for (change in visibleChanges) {
-            if (change.row in 0 until bmp.height && change.col in 0 until bmp.width) {
-                bmp[change.col, change.row] = change.color
-            }
+    private fun ensureStrokeTrackingCapacity(width: Int, height: Int) {
+        val total = width * height
+        if (strokeTouchMarks.size != total) {
+            strokeTouchMarks = IntArray(total)
+            strokeGeneration = 1
+        }
+        if (strokeTouchedIndices.size < 1024) {
+            strokeTouchedIndices = IntArray(1024)
         }
     }
 
-    private fun applyChangesToMainBitmap(changes: List<PixelChange>) {
+    private fun beginOverlayStrokeTracking() {
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        ensureStrokeTrackingCapacity(w, h)
+        strokeTouchedCount = 0
+        strokeGeneration += 1
+        if (strokeGeneration == Int.MAX_VALUE) {
+            strokeTouchMarks.fill(0)
+            strokeGeneration = 1
+        }
+        clearOverlayBitmap()
+    }
+
+    private fun plotOverlayPixel(row: Int, col: Int, color: Int) {
+        val bmp = _overlayBitmap ?: return
+        if (row !in 0 until bmp.height || col !in 0 until bmp.width) return
+        val index = row * bmp.width + col
+        if (strokeTouchMarks[index] == strokeGeneration) return
+        strokeTouchMarks[index] = strokeGeneration
+        if (strokeTouchedCount >= strokeTouchedIndices.size) {
+            strokeTouchedIndices = strokeTouchedIndices.copyOf(strokeTouchedIndices.size * 2)
+        }
+        strokeTouchedIndices[strokeTouchedCount++] = index
+        bmp[col, row] = color
+    }
+
+    private fun applyCommittedPixelToMainBitmap(row: Int, col: Int) {
         val bmp = _bitmap ?: return
         val w = pixelCanvasUseCase.getCanvasWidth()
         val h = pixelCanvasUseCase.getCanvasHeight()
-        for (change in changes) {
-            if (change.row in 0 until h && change.col in 0 until w) {
-                val composited = pixelCanvasUseCase.getCompositedPixelAt(change.row, change.col)
-                bmp[change.col, change.row] = composited
+        if (row !in 0 until h || col !in 0 until w) return
+        val composited = pixelCanvasUseCase.getCompositedPixelAt(row, col)
+        bmp[col, row] = composited
+    }
+
+    private fun commitOverlayStrokeToLayer() {
+        if (strokeTouchedCount <= 0) return
+        val bmp = _overlayBitmap ?: return
+        val indices = IntArray(strokeTouchedCount)
+        val colors = IntArray(strokeTouchedCount)
+        val width = bmp.width
+        for (i in 0 until strokeTouchedCount) {
+            val idx = strokeTouchedIndices[i]
+            indices[i] = idx
+            val row = idx / width
+            val col = idx % width
+            colors[i] = bmp[col, row]
+        }
+        pixelCanvasUseCase.batchSetPixels(indices, colors, strokeTouchedCount)
+    }
+
+    private fun applyTouchedOverlayToMainBitmap() {
+        val bmp = _bitmap ?: return
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        for (i in 0 until strokeTouchedCount) {
+            val idx = strokeTouchedIndices[i]
+            val row = idx / w
+            val col = idx % w
+            if (row in 0 until h && col in 0 until w) {
+                bmp[col, row] = pixelCanvasUseCase.getCompositedPixelAt(row, col)
             }
         }
     }
@@ -334,17 +393,25 @@ class DrawingViewModel @AssistedInject constructor(
 
         val color = activeColor.value
         val scale = _uiState.value.toolSize
-        val update = tool.beginStroke(pixelCanvasUseCase, row, col, color, scale)
+        ensureOverlayBitmap()
+        if (!tool.commitsImmediately) {
+            beginOverlayStrokeTracking()
+        }
+
+        tool.beginStroke(
+            canvas = pixelCanvasUseCase,
+            row = row,
+            col = col,
+            color = color,
+            scale = scale,
+            plotPreviewPixel = { r, c, argb -> plotOverlayPixel(r, c, argb) },
+            onCommittedPixel = { r, c -> applyCommittedPixelToMainBitmap(r, c) }
+        )
 
         if (tool.commitsImmediately) {
-            // eraser: pixels already committed by tool, update main bitmap
-            applyChangesToMainBitmap(update.changes)
             _drawVersion++
             _canvasState.value = _canvasState.value.copy(drawVersion = _drawVersion)
         } else {
-            // pencil: draw to overlay for preview
-            clearOverlayBitmap()
-            applyChangesToOverlay(update.changes)
             _overlayVersion++
             _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
         }
@@ -354,30 +421,44 @@ class DrawingViewModel @AssistedInject constructor(
         val tool = _uiState.value.selectedTool
         if (tool !is StrokeTool) return
 
-        val update = tool.updateStroke(pixelCanvasUseCase, row, col)
-
         if (tool.commitsImmediately) {
-            applyChangesToMainBitmap(update.changes)
+            tool.updateStroke(
+                canvas = pixelCanvasUseCase,
+                row = row,
+                col = col,
+                plotPreviewPixel = { _, _, _ -> },
+                onCommittedPixel = { r, c -> applyCommittedPixelToMainBitmap(r, c) }
+            )
             _drawVersion++
             _canvasState.value = _canvasState.value.copy(drawVersion = _drawVersion)
-        } else {
-            if (update.isFullPreview) clearOverlayBitmap()
-            applyChangesToOverlay(update.changes)
-            _overlayVersion++
-            _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+            return
         }
+
+        if (tool is ShapeTool) {
+            beginOverlayStrokeTracking()
+        }
+
+        tool.updateStroke(
+            canvas = pixelCanvasUseCase,
+            row = row,
+            col = col,
+            plotPreviewPixel = { r, c, argb -> plotOverlayPixel(r, c, argb) },
+            onCommittedPixel = { _, _ -> }
+        )
+
+        _overlayVersion++
+        _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
     }
 
     private fun onStrokeEnd() {
         val tool = _uiState.value.selectedTool
         if (tool !is StrokeTool) return
 
-        val finalChanges = tool.endStroke()
+        tool.endStroke()
 
-        if (!tool.commitsImmediately && finalChanges.isNotEmpty()) {
-            // batch commit overlay pixels to layer
-            pixelCanvasUseCase.batchSetPixels(finalChanges)
-            applyChangesToMainBitmap(finalChanges)
+        if (!tool.commitsImmediately && strokeTouchedCount > 0) {
+            commitOverlayStrokeToLayer()
+            applyTouchedOverlayToMainBitmap()
             clearOverlayBitmap()
             _drawVersion++
             _overlayVersion++
@@ -386,6 +467,8 @@ class DrawingViewModel @AssistedInject constructor(
                 overlayVersion = _overlayVersion
             )
         }
+
+        strokeTouchedCount = 0
 
         updateHistoryCurrentState()
     }
@@ -447,7 +530,7 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun saveState() {
         val currentLayers = pixelCanvasUseCase.getLayers().map {
-            it.copy(cel = it.cel.copy(pixels = it.cel.pixels.copyOf()))
+            it.copy()
         }
     
         canvasHistoryManager.saveState(
@@ -464,7 +547,7 @@ class DrawingViewModel @AssistedInject constructor(
         val activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         val currentLayers = pixelCanvasUseCase.getLayers().map {
             if (it.id == activeLayerId) {
-                it.copy(cel = it.cel.copy(pixels = it.cel.pixels.copyOf()))
+                it.copy()
             } else {
                 it
             }

@@ -18,7 +18,6 @@ object PencilTool : StrokeTool {
     private var strokeScale: Int = 1
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
-    private val accumulatedByPixel = LinkedHashMap<Int, PixelChange>()
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
@@ -29,7 +28,13 @@ object PencilTool : StrokeTool {
     }
 
     override fun beginStroke(
-        canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        color: Color,
+        scale: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
         lastRow = row
         lastCol = col
@@ -37,46 +42,44 @@ object PencilTool : StrokeTool {
         strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
-        accumulatedByPixel.clear()
 
-        val newChanges = ArrayList<PixelChange>()
-        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
-            addIfNew(r, c, newChanges)
-        }
-        return StrokeUpdate(newChanges)
+        stampBrush(row, col, plotPreviewPixel)
+        return StrokeUpdate()
     }
 
     override fun updateStroke(
-        canvas: PixelCanvasUseCase, row: Int, col: Int
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
         val points = bresenhamLine(lastCol, lastRow, col, row)
-        val newChanges = ArrayList<PixelChange>()
         for ((px, py) in points) {
-            forEachBrushPixel(py, px, strokeScale, canvasWidth, canvasHeight) { r, c ->
-                addIfNew(r, c, newChanges)
-            }
+            stampBrush(py, px, plotPreviewPixel)
         }
         lastRow = row
         lastCol = col
-        return StrokeUpdate(newChanges)
+        return StrokeUpdate()
     }
 
-    override fun endStroke(): List<PixelChange> {
-        return accumulatedByPixel.values.toList()
+    override fun endStroke() {
+        // No-op: preview pixels are committed by DrawingViewModel from touched overlay indices.
     }
 
     override fun cancelStroke() {
-        accumulatedByPixel.clear()
         lastRow = 0
         lastCol = 0
     }
 
-    private fun addIfNew(row: Int, col: Int, out: MutableList<PixelChange>) {
-        val key = row * canvasWidth + col
-        if (accumulatedByPixel.containsKey(key)) return
-        val change = PixelChange(row, col, strokeColor)
-        accumulatedByPixel[key] = change
-        out.add(change)
+    private fun stampBrush(
+        row: Int,
+        col: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit
+    ) {
+        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+            plotPreviewPixel(r, c, strokeColor)
+        }
     }
 
 }

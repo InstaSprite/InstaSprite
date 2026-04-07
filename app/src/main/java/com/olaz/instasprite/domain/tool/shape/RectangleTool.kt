@@ -3,7 +3,6 @@ package com.olaz.instasprite.domain.tool.shape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.R
-import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.domain.tool.ShapeTool
 import com.olaz.instasprite.domain.tool.StrokeUpdate
 import com.olaz.instasprite.domain.tool.forEachBrushPixel
@@ -24,8 +23,6 @@ object RectangleTool : ShapeTool {
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
 
-    private val accumulatedByPixel = LinkedHashMap<Int, PixelChange>()
-
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
     }
@@ -35,7 +32,13 @@ object RectangleTool : ShapeTool {
     }
 
     override fun beginStroke(
-        canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        color: Color,
+        scale: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
         startRow = row
         startCol = col
@@ -45,70 +48,56 @@ object RectangleTool : ShapeTool {
         strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
-        accumulatedByPixel.clear()
 
-        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
-            addIfNew(accumulatedByPixel, r, c)
-        }
-        return StrokeUpdate(accumulatedByPixel.values.toList(), isFullPreview = true)
+        stampBrush(row, col, plotPreviewPixel)
+        return StrokeUpdate(isFullPreview = true)
     }
 
     override fun updateStroke(
-        canvas: PixelCanvasUseCase, row: Int, col: Int
+        canvas: PixelCanvasUseCase,
+        row: Int,
+        col: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
+        onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
         lastRow = row
         lastCol = col
 
-        rebuildRectanglePreview(startRow, startCol, lastRow, lastCol)
-        return StrokeUpdate(accumulatedByPixel.values.toList(), isFullPreview = true)
+        val minRow = minOf(startRow, lastRow)
+        val maxRow = maxOf(startRow, lastRow)
+        val minCol = minOf(startCol, lastCol)
+        val maxCol = maxOf(startCol, lastCol)
+
+        for (c in minCol..maxCol) {
+            stampBrush(minRow, c, plotPreviewPixel)
+            stampBrush(maxRow, c, plotPreviewPixel)
+        }
+
+        for (r in (minRow + 1) until maxRow) {
+            stampBrush(r, minCol, plotPreviewPixel)
+            stampBrush(r, maxCol, plotPreviewPixel)
+        }
+
+        return StrokeUpdate(isFullPreview = true)
     }
 
-    override fun endStroke(): List<PixelChange> {
-        val result = accumulatedByPixel.values.toList()
-        accumulatedByPixel.clear()
-        return result
+    override fun endStroke() {
     }
 
     override fun cancelStroke() {
-        accumulatedByPixel.clear()
         startRow = 0
         startCol = 0
         lastRow = 0
         lastCol = 0
     }
 
-    private fun rebuildRectanglePreview(r1: Int, c1: Int, r2: Int, c2: Int) {
-        val next = LinkedHashMap<Int, PixelChange>()
-
-        val minRow = minOf(r1, r2)
-        val maxRow = maxOf(r1, r2)
-        val minCol = minOf(c1, c2)
-        val maxCol = maxOf(c1, c2)
-
-        for (c in minCol..maxCol) {
-            stampBrush(next, minRow, c)
-            stampBrush(next, maxRow, c)
-        }
-
-        for (r in (minRow + 1) until maxRow) {
-            stampBrush(next, r, minCol)
-            stampBrush(next, r, maxCol)
-        }
-
-        accumulatedByPixel.clear()
-        accumulatedByPixel.putAll(next)
-    }
-
-    private fun stampBrush(target: MutableMap<Int, PixelChange>, row: Int, col: Int) {
+    private fun stampBrush(
+        row: Int,
+        col: Int,
+        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit
+    ) {
         forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
-            addIfNew(target, r, c)
-        }
-    }
-
-    private fun addIfNew(target: MutableMap<Int, PixelChange>, row: Int, col: Int) {
-        val key = row * canvasWidth + col
-        if (!target.containsKey(key)) {
-            target[key] = PixelChange(row, col, strokeColor)
+            plotPreviewPixel(r, c, strokeColor)
         }
     }
 }

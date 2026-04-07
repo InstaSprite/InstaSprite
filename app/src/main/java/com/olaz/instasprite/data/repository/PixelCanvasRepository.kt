@@ -6,7 +6,6 @@ import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.PixelCanvas
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.TileCoord
-import com.olaz.instasprite.domain.tool.PixelChange
 import com.olaz.instasprite.utils.TILE_SIZE
 import com.olaz.instasprite.utils.pixelToTileCoord
 import com.olaz.instasprite.utils.pixelsToTiles
@@ -396,33 +395,6 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return color
     }
 
-    fun filterVisibleChanges(changes: List<PixelChange>): List<PixelChange> {
-        val activeIndex = getActiveLayerIndex()
-        if (activeIndex >= _layers.lastIndex) return changes
-
-        val layersAbove = _layers.subList(activeIndex + 1, _layers.size).filter { it.isVisible }
-        if (layersAbove.isEmpty()) return changes
-
-        val visibleChanges = ArrayList<PixelChange>(changes.size)
-        for (change in changes) {
-            val r = change.row
-            val c = change.col
-            if (r !in 0 until height || c !in 0 until width) continue
-
-            var occluded = false
-            for (layer in layersAbove) {
-                if (tilePixelAt(layer.tiles, r, c) != transparentArgb) {
-                    occluded = true
-                    break
-                }
-            }
-            if (!occluded) {
-                visibleChanges.add(change)
-            }
-        }
-        return visibleChanges
-    }
-
     fun getAllPixelsInRegion(
         startRow: Int, startCol: Int,
         regionHeight: Int, regionWidth: Int
@@ -470,19 +442,61 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         }
     }
 
-    fun batchSetPixels(changes: List<PixelChange>) {
+    fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int) {
         val idx = getActiveLayerIndex()
         if (idx !in _layers.indices) return
         val layer = _layers[idx]
-        if (layer.isLocked || !layer.isVisible || changes.isEmpty()) return
+        if (layer.isLocked || !layer.isVisible || count <= 0) return
 
-        var updated = layer
-        for (change in changes) {
-            if (change.row in 0 until height && change.col in 0 until width) {
-                updated = setLayerPixel(updated, change.row, change.col, change.color)
+        val writeCount = minOf(count, indices.size, colors.size)
+        if (writeCount <= 0) return
+
+        val updatedTiles = LinkedHashMap(layer.tiles)
+        val copiedTiles = HashSet<TileCoord>()
+        val touchedTiles = HashSet<TileCoord>()
+
+        for (i in 0 until writeCount) {
+            val pixelIndex = indices[i]
+            if (pixelIndex !in 0 until (width * height)) continue
+
+            val row = pixelIndex / width
+            val col = pixelIndex % width
+            val color = colors[i]
+
+            val coord = pixelToTileCoord(row, col)
+            touchedTiles.add(coord)
+
+            var tile = updatedTiles[coord]
+            if (tile == null) {
+                if (color == transparentArgb) continue
+                tile = IntArray(TILE_SIZE * TILE_SIZE)
+                updatedTiles[coord] = tile
+                copiedTiles.add(coord)
+            } else if (coord !in copiedTiles) {
+                tile = tile.copyOf()
+                updatedTiles[coord] = tile
+                copiedTiles.add(coord)
+            }
+
+            val localRow = row - coord.y * TILE_SIZE
+            val localCol = col - coord.x * TILE_SIZE
+            tile[localRow * TILE_SIZE + localCol] = color
+        }
+
+        for (coord in touchedTiles) {
+            val tile = updatedTiles[coord] ?: continue
+            if (isTileEmpty(tile)) {
+                updatedTiles.remove(coord)
             }
         }
-        _layers[idx] = updated
+
+        _layers[idx] = Layer(
+            id = layer.id,
+            name = layer.name,
+            isVisible = layer.isVisible,
+            isLocked = layer.isLocked,
+            tiles = updatedTiles
+        )
     }
 
     fun getActiveLayerPixelsDirect(): IntArray? {
