@@ -11,6 +11,11 @@ import com.olaz.instasprite.data.repository.PixelCanvasRepository
 import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.data.repository.StorageLocationRepository
 import com.olaz.instasprite.domain.canvashistory.CanvasHistoryManager
+import com.olaz.instasprite.domain.canvashistory.HistoryCanvasState
+import com.olaz.instasprite.domain.canvashistory.OperationEntry
+import com.olaz.instasprite.domain.canvashistory.TileChangeTracker
+import com.olaz.instasprite.domain.canvashistory.TransformEntry
+import com.olaz.instasprite.domain.canvashistory.TransformType
 import com.olaz.instasprite.domain.dialog.DialogController
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.tool.FillTool
@@ -80,11 +85,12 @@ class DrawingViewModel @AssistedInject constructor(
 
     private val canvasWidth: Int = if(width > 0) width else pixelCanvasRepository.width
     private val canvasHeight: Int = if(height > 0) height else pixelCanvasRepository.height
-    private val canvasHistoryManager = CanvasHistoryManager<PixelCanvasState>()
+    private val canvasHistoryManager = CanvasHistoryManager()
     private val pixelCanvasUseCase = PixelCanvasUseCase(
         pixelCanvasRepository = pixelCanvasRepository,
         colorPaletteRepository = colorPaletteRepository
     )
+    private var activeHistoryTracker: TileChangeTracker? = null
 
     // bitmap managed by ViewModel for incremental pixel updates
     private var _bitmap: Bitmap? = null
@@ -161,7 +167,6 @@ class DrawingViewModel @AssistedInject constructor(
             }
             refreshFullCanvasState()
             _uiState.value = _uiState.value.copy(isLoading = false)
-            saveState()
         }
     }
 
@@ -288,55 +293,61 @@ class DrawingViewModel @AssistedInject constructor(
     fun onLayerEvent(event: LayerEvent) {
         when (event) {
             is LayerEvent.AddLayer -> {
-                pixelCanvasUseCase.addLayer("Layer ${pixelCanvasUseCase.getLayers().size + 1}")
+                recordOperationHistory {
+                    pixelCanvasUseCase.addLayer("Layer ${pixelCanvasUseCase.getLayers().size + 1}")
+                }
                 refreshLayerState()
                 refreshActiveLayerState()
-                saveState()
             }
             is LayerEvent.DeleteLayer -> {
-                pixelCanvasUseCase.removeLayer(event.layerId)
+                recordOperationHistory {
+                    pixelCanvasUseCase.removeLayer(event.layerId)
+                }
                 refreshLayerState()
                 refreshActiveLayerState()
                 viewModelScope.launch {
                     refreshBitmapState()
                 }
-                saveState()
             }
             is LayerEvent.SelectLayer -> {
                 pixelCanvasUseCase.setActiveLayer(event.layerId)
                 refreshActiveLayerState()
             }
             is LayerEvent.ToggleLock -> {
-                pixelCanvasUseCase.toggleLock(event.layerId)
+                recordOperationHistory {
+                    pixelCanvasUseCase.toggleLock(event.layerId)
+                }
                 refreshLayerState()
-                saveState()
             }
             is LayerEvent.ToggleVisibility -> {
-                pixelCanvasUseCase.toggleVisibility(event.layerId)
+                recordOperationHistory {
+                    pixelCanvasUseCase.toggleVisibility(event.layerId)
+                }
                 refreshLayerState()
                 viewModelScope.launch {
                     refreshBitmapState()
                 }
-                saveState()
             }
             is LayerEvent.MergeLayerDown -> {
-                pixelCanvasUseCase.mergeLayerDown(event.layerId)
+                recordOperationHistory {
+                    pixelCanvasUseCase.mergeLayerDown(event.layerId)
+                }
                 refreshLayerState()
                 refreshActiveLayerState()
                 viewModelScope.launch {
                     refreshBitmapState()
                 }
-                saveState()
             }
             is LayerEvent.ReorderLayer -> {
-                pixelCanvasUseCase.reorderLayer(fromIndex = event.fromIndex, toIndex = event.toIndex)
+                recordOperationHistory {
+                    pixelCanvasUseCase.reorderLayer(fromIndex = event.fromIndex, toIndex = event.toIndex)
+                }
 
                 refreshLayerState()
 
                 viewModelScope.launch {
                     refreshBitmapState()
                 }
-                saveState()
             }
         }
     }
@@ -478,11 +489,9 @@ class DrawingViewModel @AssistedInject constructor(
         if (tool !is StrokeTool) return
 
         tool.cancelStroke()
+        restorePendingHistoryCapture()
         clearOverlayBitmap()
         _overlayVersion++
-
-        // Pop the state we saved when the stroke started
-        undo()
     }
 
     private fun onTapAt(row: Int, col: Int) {
@@ -514,6 +523,8 @@ class DrawingViewModel @AssistedInject constructor(
                         layers = pixelCanvasUseCase.getLayers().toList()
                     )
                     updateHistoryCurrentState()
+                } else {
+                    discardHistoryCapture()
                 }
             }
         } else {
@@ -529,45 +540,30 @@ class DrawingViewModel @AssistedInject constructor(
 
 
     fun saveState() {
-        val currentLayers = pixelCanvasUseCase.getLayers().map {
-            it.copy()
+        if (activeHistoryTracker == null) {
+            activeHistoryTracker = TileChangeTracker()
+            pixelCanvasUseCase.beginTileHistory(activeHistoryTracker!!)
         }
-    
-        canvasHistoryManager.saveState(
-            PixelCanvasState(
-                width = pixelCanvasUseCase.getCanvasWidth(),
-                height = pixelCanvasUseCase.getCanvasHeight(),
-                layers = currentLayers,
-                activeLayerId = pixelCanvasUseCase.getActiveLayerId()
-            )
-        )
     }
 
     private fun updateHistoryCurrentState() {
-        val activeLayerId = pixelCanvasUseCase.getActiveLayerId()
-        val currentLayers = pixelCanvasUseCase.getLayers().map {
-            if (it.id == activeLayerId) {
-                it.copy()
-            } else {
-                it
-            }
+        val tracker = activeHistoryTracker ?: return
+        pixelCanvasUseCase.endTileHistory()
+        activeHistoryTracker = null
+
+        val entry = tracker.buildUndoEntry()
+        if (entry.deltas.isNotEmpty()) {
+            canvasHistoryManager.push(entry)
         }
-        
-        canvasHistoryManager.setCurrentState(
-            PixelCanvasState(
-                width = pixelCanvasUseCase.getCanvasWidth(),
-                height = pixelCanvasUseCase.getCanvasHeight(),
-                layers = currentLayers,
-                activeLayerId = activeLayerId
-            )
-        )
     }
 
     fun undo() {
-        canvasHistoryManager.undo()?.let { state ->
-            pixelCanvasUseCase.setCanvas(Sprite(width = state.width, height = state.height, layers = state.layers))
-            pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
-            
+        discardHistoryCapture()
+
+        val restoredState = canvasHistoryManager.undo(captureHistoryCanvasState())
+        if (restoredState != null) {
+            applyHistoryCanvasState(restoredState)
+
             clearOverlayBitmap()
             refreshCanvasSizeState()
             refreshLayerState()
@@ -579,10 +575,12 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun redo() {
-        canvasHistoryManager.redo()?.let { state ->
-            pixelCanvasUseCase.setCanvas(Sprite(width = state.width, height = state.height, layers = state.layers))
-            pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
-            
+        discardHistoryCapture()
+
+        val restoredState = canvasHistoryManager.redo(captureHistoryCanvasState())
+        if (restoredState != null) {
+            applyHistoryCanvasState(restoredState)
+
             clearOverlayBitmap()
             refreshCanvasSizeState()
             refreshLayerState()
@@ -594,41 +592,96 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun rotate() {
-        pixelCanvasUseCase.rotateCanvas()
+        recordTransformHistory(TransformType.ROTATE_CW) {
+            pixelCanvasUseCase.rotateCanvas()
+        }
         refreshCanvasSizeState()
         refreshLayerState()
         viewModelScope.launch {
             refreshBitmapState()
         }
-        saveState()
     }
 
     fun hFlip() {
-        pixelCanvasUseCase.hFlipCanvas()
+        recordTransformHistory(TransformType.FLIP_H) {
+            pixelCanvasUseCase.hFlipCanvas()
+        }
         refreshLayerState()
         viewModelScope.launch {
             refreshBitmapState()
         }
-        saveState()
     }
 
     fun vFlip() {
-        pixelCanvasUseCase.vFlipCanvas()
+        recordTransformHistory(TransformType.FLIP_V) {
+            pixelCanvasUseCase.vFlipCanvas()
+        }
         refreshLayerState()
         viewModelScope.launch {
             refreshBitmapState()
         }
-        saveState()
     }
 
     fun resizeCanvas(width: Int, height: Int) {
-        pixelCanvasUseCase.resizeCanvas(width, height)
+        recordOperationHistory {
+            pixelCanvasUseCase.resizeCanvas(width, height)
+        }
         refreshCanvasSizeState()
         refreshLayerState()
-        saveState()
         viewModelScope.launch {
             refreshBitmapState()
         }
+    }
+
+    private fun captureHistoryCanvasState(): HistoryCanvasState {
+        return HistoryCanvasState(
+            width = pixelCanvasUseCase.getCanvasWidth(),
+            height = pixelCanvasUseCase.getCanvasHeight(),
+            layers = pixelCanvasUseCase.getLayers().map { it.copy() },
+            activeLayerId = pixelCanvasUseCase.getActiveLayerId()
+        )
+    }
+
+    private fun applyHistoryCanvasState(state: HistoryCanvasState) {
+        pixelCanvasUseCase.setCanvas(
+            Sprite(
+                width = state.width,
+                height = state.height,
+                layers = state.layers.map { it.copy() }
+            )
+        )
+        pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
+    }
+
+    private inline fun recordOperationHistory(operation: () -> Unit) {
+        discardHistoryCapture()
+        val before = captureHistoryCanvasState()
+        operation()
+        val after = captureHistoryCanvasState()
+        if (before != after) {
+            canvasHistoryManager.push(OperationEntry(before = before, after = after))
+        }
+    }
+
+    private inline fun recordTransformHistory(transform: TransformType, operation: () -> Unit) {
+        discardHistoryCapture()
+        operation()
+        canvasHistoryManager.push(TransformEntry(transform))
+    }
+
+    private fun discardHistoryCapture() {
+        if (activeHistoryTracker != null) {
+            pixelCanvasUseCase.endTileHistory()
+            activeHistoryTracker = null
+        }
+    }
+
+    private fun restorePendingHistoryCapture() {
+        val tracker = activeHistoryTracker ?: return
+        val entry = tracker.buildUndoEntry()
+        val restored = canvasHistoryManager.restore(entry, captureHistoryCanvasState())
+        applyHistoryCanvasState(restored)
+        discardHistoryCapture()
     }
 
     private fun refreshLayerState() {
@@ -756,7 +809,7 @@ class DrawingViewModel @AssistedInject constructor(
             colorPaletteRepository.updatePalette(sprite.colorPalette.map { Color(it) })
         }
         canvasHistoryManager.reset()
-        updateHistoryCurrentState()
+        discardHistoryCapture()
 
         refreshFullCanvasState()
     }
