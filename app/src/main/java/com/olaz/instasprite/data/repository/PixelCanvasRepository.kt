@@ -5,11 +5,17 @@ import androidx.compose.ui.graphics.toArgb
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.PixelCanvas
 import com.olaz.instasprite.domain.model.Sprite
-import com.olaz.instasprite.domain.tool.PixelChange
+import com.olaz.instasprite.domain.model.TileCoord
+import com.olaz.instasprite.utils.TILE_SIZE
+import com.olaz.instasprite.utils.pixelToTileCoord
+import com.olaz.instasprite.utils.pixelsToTiles
+import com.olaz.instasprite.utils.tilesToPixels
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 
 class PixelCanvasRepository(var model: PixelCanvas) {
+    private val transparentArgb = Color.Transparent.toArgb()
+
     var width: Int
         get() = model.width
         set(value) {
@@ -39,13 +45,120 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return if (index >= 0) index else 0
     }
 
+    private fun deepCopyTiles(source: Map<TileCoord, IntArray>): Map<TileCoord, IntArray> {
+        if (source.isEmpty()) return emptyMap()
+        return source.mapValues { it.value.copyOf() }
+    }
+
+    private fun isTileEmpty(tile: IntArray): Boolean = tile.all { it == transparentArgb }
+
+    private fun mutableTileCopy(source: Map<TileCoord, IntArray>): LinkedHashMap<TileCoord, IntArray> {
+        return LinkedHashMap<TileCoord, IntArray>(source.size).apply {
+            for ((coord, pixels) in source) {
+                put(coord, pixels.copyOf())
+            }
+        }
+    }
+
+    private fun composeTileIntoBuffer(
+        tileCoord: TileCoord,
+        tilePixels: IntArray,
+        buffer: IntArray,
+        bufferWidth: Int,
+        bufferHeight: Int,
+        startRow: Int = 0,
+        startCol: Int = 0,
+        regionWidth: Int = bufferWidth,
+        regionHeight: Int = bufferHeight
+    ) {
+        val originX = tileCoord.x * TILE_SIZE
+        val originY = tileCoord.y * TILE_SIZE
+        val rowStart = maxOf(startRow, originY)
+        val rowEnd = minOf(startRow + regionHeight, originY + TILE_SIZE, bufferHeight)
+        val colStart = maxOf(startCol, originX)
+        val colEnd = minOf(startCol + regionWidth, originX + TILE_SIZE, bufferWidth)
+        if (rowStart >= rowEnd || colStart >= colEnd) return
+
+        for (row in rowStart until rowEnd) {
+            val tileRow = row - originY
+            val dstBase = (row - startRow) * regionWidth
+            val srcBase = tileRow * TILE_SIZE
+            for (col in colStart until colEnd) {
+                val argb = tilePixels[srcBase + (col - originX)]
+                if (argb != transparentArgb) {
+                    buffer[dstBase + (col - startCol)] = argb
+                }
+            }
+        }
+    }
+
+    private fun tilePixelAt(tiles: Map<TileCoord, IntArray>, row: Int, col: Int): Int {
+        val coord = pixelToTileCoord(row, col)
+        val tile = tiles[coord] ?: return transparentArgb
+        val localRow = row - coord.y * TILE_SIZE
+        val localCol = col - coord.x * TILE_SIZE
+        return tile[localRow * TILE_SIZE + localCol]
+    }
+
+    private fun setTilePixel(
+        tiles: Map<TileCoord, IntArray>,
+        row: Int,
+        col: Int,
+        argb: Int
+    ): Map<TileCoord, IntArray> {
+        if (row !in 0 until height || col !in 0 until width) return tiles
+
+        val coord = pixelToTileCoord(row, col)
+        val localRow = row - coord.y * TILE_SIZE
+        val localCol = col - coord.x * TILE_SIZE
+        val mutable = mutableTileCopy(tiles)
+        val tile = mutable[coord]?.copyOf() ?: IntArray(TILE_SIZE * TILE_SIZE)
+        tile[localRow * TILE_SIZE + localCol] = argb
+
+        if (isTileEmpty(tile)) {
+            mutable.remove(coord)
+        } else {
+            mutable[coord] = tile
+        }
+        return mutable
+    }
+
+    private fun setLayerPixel(layer: Layer, row: Int, col: Int, argb: Int): Layer {
+        val updatedTiles = setTilePixel(layer.tiles, row, col, argb)
+        return layer.copy(tiles = updatedTiles)
+    }
+
+    private fun mergeTiles(bottom: Map<TileCoord, IntArray>, top: Map<TileCoord, IntArray>): Map<TileCoord, IntArray> {
+        if (bottom.isEmpty() && top.isEmpty()) return emptyMap()
+        val result = mutableTileCopy(bottom)
+        for ((coord, topTile) in top) {
+            val bottomTile = result[coord]?.copyOf() ?: IntArray(TILE_SIZE * TILE_SIZE)
+            var changed = false
+            for (i in topTile.indices) {
+                val px = topTile[i]
+                if (px != transparentArgb) {
+                    bottomTile[i] = px
+                    changed = true
+                }
+            }
+            if (changed) {
+                if (isTileEmpty(bottomTile)) result.remove(coord) else result[coord] = bottomTile
+            }
+        }
+        return result
+    }
+
+    private fun inflateLayerPixels(layer: Layer): IntArray {
+        return tilesToPixels(layer.tiles, width, height)
+    }
+
     fun addLayer(name: String) {
         val newLayer = Layer(
             id = UUID.randomUUID().toString(),
             name = name,
             isVisible = true,
             isLocked = false,
-            pixels = IntArray(width * height) { Color.Transparent.toArgb() }
+            tiles = emptyMap()
         )
 
         _layers.add(newLayer)
@@ -91,17 +204,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         if (index > 0) {
             val topLayer = _layers[index]
             val bottomLayer = _layers[index - 1]
-            val mergedPixels = IntArray(width * height)
-
-            for (i in mergedPixels.indices) {
-                if (topLayer.pixels[i] != 0) {
-                    mergedPixels[i] = topLayer.pixels[i]
-                } else {
-                    mergedPixels[i] = bottomLayer.pixels[i]
-                }
-            }
-
-            _layers[index - 1] = bottomLayer.copy(pixels = mergedPixels)
+            val merged = mergeTiles(bottomLayer.tiles, topLayer.tiles)
+            _layers[index - 1] = bottomLayer.copy(tiles = merged)
             _layers.removeAt(index)
             if (activeLayerId == id) {
                 activeLayerId = _layers[index - 1].id
@@ -110,6 +214,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     }
 
     fun reorderLayer(fromIndex: Int, toIndex: Int) {
+        if (fromIndex !in _layers.indices || toIndex !in _layers.indices) return
         val layer = _layers.removeAt(fromIndex)
         _layers.add(toIndex, layer)
     }
@@ -117,74 +222,74 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     fun rotate() {
         val oldWidth = width
         val oldHeight = height
+        val rotatedCanvasWidth = oldHeight
+        val rotatedCanvasHeight = oldWidth
 
         for (i in _layers.indices) {
-            val layer = _layers[i]
-            val rotatedPixels = IntArray(oldHeight * oldWidth) { Color.Transparent.toArgb() }
+            val source = inflateLayerPixels(_layers[i])
+            val rotated = IntArray(rotatedCanvasWidth * rotatedCanvasHeight) { transparentArgb }
             for (row in 0 until oldHeight) {
                 for (col in 0 until oldWidth) {
+                    val argb = source[row * oldWidth + col]
+                    if (argb == transparentArgb) continue
+                    val newRow = col
                     val newCol = oldHeight - 1 - row
-                    val newIndex = col * oldHeight + newCol
-                    val oldIndex = row * oldWidth + col
-                    if (newIndex in rotatedPixels.indices && oldIndex in layer.pixels.indices) {
-                        rotatedPixels[newIndex] = layer.pixels[oldIndex]
-                    }
+                    rotated[newRow * rotatedCanvasWidth + newCol] = argb
                 }
             }
-            _layers[i] = layer.copy(pixels = rotatedPixels)
+            _layers[i] = _layers[i].copy(tiles = pixelsToTiles(rotated, rotatedCanvasWidth, rotatedCanvasHeight))
         }
-        width = oldHeight
-        height = oldWidth
+
+        width = rotatedCanvasWidth
+        height = rotatedCanvasHeight
     }
 
     fun horizontalFlip() {
         for (i in _layers.indices) {
-            val layer = _layers[i]
-            val flipped = IntArray(width * height) { Color.Transparent.toArgb() }
+            val source = inflateLayerPixels(_layers[i])
+            val flipped = IntArray(width * height) { transparentArgb }
             for (row in 0 until height) {
                 for (col in 0 until width) {
-                    flipped[row * width + (width - 1 - col)] = layer.pixels[row * width + col]
+                    val argb = source[row * width + col]
+                    if (argb == transparentArgb) continue
+                    flipped[row * width + (width - 1 - col)] = argb
                 }
             }
-            _layers[i] = layer.copy(pixels = flipped)
-
+            _layers[i] = _layers[i].copy(tiles = pixelsToTiles(flipped, width, height))
         }
     }
 
     fun verticalFlip() {
         for (i in _layers.indices) {
-            val layer = _layers[i]
-            val flipped = IntArray(width * height) { Color.Transparent.toArgb() }
+            val source = inflateLayerPixels(_layers[i])
+            val flipped = IntArray(width * height) { transparentArgb }
             for (row in 0 until height) {
                 for (col in 0 until width) {
-                    flipped[(height - 1 - row) * width + col] = layer.pixels[row * width + col]
+                    val argb = source[row * width + col]
+                    if (argb == transparentArgb) continue
+                    flipped[(height - 1 - row) * width + col] = argb
                 }
             }
-            _layers[i] = layer.copy(pixels = flipped)
-
+            _layers[i] = _layers[i].copy(tiles = pixelsToTiles(flipped, width, height))
         }
     }
 
     fun resizeCanvas(newWidth: Int, newHeight: Int) {
-        val oldWidth = this.width
-        val oldHeight = this.height
-
-        val copyWidth = minOf(oldWidth, newWidth)
-        val copyHeight = minOf(oldHeight, newHeight)
+        if (newWidth <= 0 || newHeight <= 0) return
 
         for (i in _layers.indices) {
-            val layer = _layers[i]
-            val newPixels = IntArray(newWidth * newHeight) { Color.Transparent.toArgb() }
+            val source = inflateLayerPixels(_layers[i])
+            val resized = IntArray(newWidth * newHeight) { transparentArgb }
+            val copyWidth = minOf(width, newWidth)
+            val copyHeight = minOf(height, newHeight)
             for (row in 0 until copyHeight) {
                 for (col in 0 until copyWidth) {
-                    val oldIndex = row * oldWidth + col
-                    val newIndex = row * newWidth + col
-                    newPixels[newIndex] = layer.pixels[oldIndex]
+                    resized[row * newWidth + col] = source[row * width + col]
                 }
             }
-            _layers[i] = layer.copy(pixels = newPixels)
+            _layers[i] = _layers[i].copy(tiles = pixelsToTiles(resized, newWidth, newHeight))
         }
-        
+
         this.width = newWidth
         this.height = newHeight
     }
@@ -197,9 +302,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         if (newLayers.isEmpty()) {
             addLayer("Layer 1")
         } else {
-            _layers.addAll(newLayers.map {
-                it.copy(pixels = it.pixels.copyOf())
-            })
+            _layers.addAll(newLayers.map { it.copy() })
             activeLayerId = _layers.last().id
         }
     }
@@ -207,10 +310,10 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     fun setPixel(row: Int, col: Int, color: Color) {
         if (row in 0 until height && col in 0 until width) {
             val index = getActiveLayerIndex()
-            if (index < 0 || index >= _layers.size) return
+            if (index !in _layers.indices) return
             val layer = _layers[index]
             if (!layer.isLocked && layer.isVisible) {
-                layer.pixels[row * width + col] = color.toArgb()
+                _layers[index] = setLayerPixel(layer, row, col, color.toArgb())
             }
         }
     }
@@ -247,21 +350,31 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         if (row in 0 until height && col in 0 until width) {
             val idx = getActiveLayerIndex()
             if (idx in _layers.indices) {
-                val layer = _layers[idx]
-                return Color(layer.pixels[row * width + col])
+                return Color(tilePixelAt(_layers[idx].tiles, row, col))
             }
         }
         return Color.Transparent
     }
 
     fun getAllPixels(): IntArray {
-        val composited = IntArray(width * height) { Color.Transparent.toArgb() }
+        val composited = IntArray(width * height) { transparentArgb }
         for (layer in _layers) {
-            if (layer.isVisible) {
-                for (i in layer.pixels.indices) {
-                    val layerColor = layer.pixels[i]
-                    if (layerColor != Color.Transparent.toArgb()) {
-                        composited[i] = layerColor
+            if (!layer.isVisible) continue
+            for ((coord, tilePixels) in layer.tiles) {
+                val originX = coord.x * TILE_SIZE
+                val originY = coord.y * TILE_SIZE
+                for (localRow in 0 until TILE_SIZE) {
+                    val canvasRow = originY + localRow
+                    if (canvasRow !in 0 until height) continue
+                    val dstBase = canvasRow * width
+                    val srcBase = localRow * TILE_SIZE
+                    for (localCol in 0 until TILE_SIZE) {
+                        val canvasCol = originX + localCol
+                        if (canvasCol !in 0 until width) continue
+                        val argb = tilePixels[srcBase + localCol]
+                        if (argb != transparentArgb) {
+                            composited[dstBase + canvasCol] = argb
+                        }
                     }
                 }
             }
@@ -270,66 +383,53 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     }
 
     fun getCompositedPixelAt(row: Int, col: Int): Int {
-        if (row !in 0 until height || col !in 0 until width) return Color.Transparent.toArgb()
-        val idx = row * width + col
-        var color = Color.Transparent.toArgb()
+        if (row !in 0 until height || col !in 0 until width) return transparentArgb
+        var color = transparentArgb
         for (layer in _layers) {
-            if (layer.isVisible && layer.pixels[idx] != 0) {
-                color = layer.pixels[idx]
+            if (!layer.isVisible) continue
+            val argb = tilePixelAt(layer.tiles, row, col)
+            if (argb != transparentArgb) {
+                color = argb
             }
         }
         return color
-    }
-
-    fun filterVisibleChanges(changes: List<PixelChange>): List<PixelChange> {
-        val activeIndex = getActiveLayerIndex()
-        if (activeIndex >= _layers.lastIndex) return changes
-
-        val layersAbove = _layers.subList(activeIndex + 1, _layers.size).filter { it.isVisible }
-        if (layersAbove.isEmpty()) return changes
-
-        val visibleChanges = ArrayList<PixelChange>(changes.size)
-        for (change in changes) {
-            val r = change.row
-            val c = change.col
-            if (r !in 0 until height || c !in 0 until width) continue
-
-            val idx = r * width + c
-            var occluded = false
-            for (i in layersAbove.indices) {
-                if (layersAbove[i].pixels[idx] != 0) {
-                    occluded = true
-                    break
-                }
-            }
-            if (!occluded) {
-                visibleChanges.add(change)
-            }
-        }
-        return visibleChanges
     }
 
     fun getAllPixelsInRegion(
         startRow: Int, startCol: Int,
         regionHeight: Int, regionWidth: Int
     ): IntArray {
-        val result = IntArray(regionWidth * regionHeight)
-        for (r in 0 until regionHeight) {
-            val canvasRow = startRow + r
-            if (canvasRow !in 0 until height) continue
-            for (c in 0 until regionWidth) {
-                val canvasCol = startCol + c
-                if (canvasCol !in 0 until width) continue
-                val idx = canvasRow * width + canvasCol
-                var color = Color.Transparent.toArgb()
-                for (layer in _layers) {
-                    if (layer.isVisible && layer.pixels[idx] != 0) {
-                        color = layer.pixels[idx]
+        val result = IntArray(regionWidth * regionHeight) { transparentArgb }
+        if (regionHeight <= 0 || regionWidth <= 0) return result
+
+        val regionEndRow = startRow + regionHeight
+        val regionEndCol = startCol + regionWidth
+
+        for (layer in _layers) {
+            if (!layer.isVisible) continue
+            for ((coord, tilePixels) in layer.tiles) {
+                val originX = coord.x * TILE_SIZE
+                val originY = coord.y * TILE_SIZE
+                val startCanvasRow = maxOf(startRow, originY)
+                val endCanvasRow = minOf(regionEndRow, originY + TILE_SIZE, height)
+                val startCanvasCol = maxOf(startCol, originX)
+                val endCanvasCol = minOf(regionEndCol, originX + TILE_SIZE, width)
+                if (startCanvasRow >= endCanvasRow || startCanvasCol >= endCanvasCol) continue
+
+                for (row in startCanvasRow until endCanvasRow) {
+                    val tileRow = row - originY
+                    val dstBase = (row - startRow) * regionWidth
+                    val srcBase = tileRow * TILE_SIZE
+                    for (col in startCanvasCol until endCanvasCol) {
+                        val argb = tilePixels[srcBase + (col - originX)]
+                        if (argb != transparentArgb) {
+                            result[dstBase + (col - startCol)] = argb
+                        }
                     }
                 }
-                result[r * regionWidth + c] = color
             }
         }
+
         return result
     }
 
@@ -337,21 +437,66 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         val idx = getActiveLayerIndex()
         if (idx !in _layers.indices) return
         val layer = _layers[idx]
-        if (!layer.isLocked && pixels.size == layer.pixels.size) {
-            System.arraycopy(pixels, 0, layer.pixels, 0, pixels.size)
+        if (!layer.isLocked && pixels.size == width * height) {
+            _layers[idx] = layer.copy(tiles = pixelsToTiles(pixels, width, height))
         }
     }
 
-    fun batchSetPixels(changes: List<PixelChange>) {
+    fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int) {
         val idx = getActiveLayerIndex()
         if (idx !in _layers.indices) return
         val layer = _layers[idx]
-        if (layer.isLocked || !layer.isVisible) return
-        for (change in changes) {
-            if (change.row in 0 until height && change.col in 0 until width) {
-                layer.pixels[change.row * width + change.col] = change.color
+        if (layer.isLocked || !layer.isVisible || count <= 0) return
+
+        val writeCount = minOf(count, indices.size, colors.size)
+        if (writeCount <= 0) return
+
+        val updatedTiles = LinkedHashMap(layer.tiles)
+        val copiedTiles = HashSet<TileCoord>()
+        val touchedTiles = HashSet<TileCoord>()
+
+        for (i in 0 until writeCount) {
+            val pixelIndex = indices[i]
+            if (pixelIndex !in 0 until (width * height)) continue
+
+            val row = pixelIndex / width
+            val col = pixelIndex % width
+            val color = colors[i]
+
+            val coord = pixelToTileCoord(row, col)
+            touchedTiles.add(coord)
+
+            var tile = updatedTiles[coord]
+            if (tile == null) {
+                if (color == transparentArgb) continue
+                tile = IntArray(TILE_SIZE * TILE_SIZE)
+                updatedTiles[coord] = tile
+                copiedTiles.add(coord)
+            } else if (coord !in copiedTiles) {
+                tile = tile.copyOf()
+                updatedTiles[coord] = tile
+                copiedTiles.add(coord)
+            }
+
+            val localRow = row - coord.y * TILE_SIZE
+            val localCol = col - coord.x * TILE_SIZE
+            tile[localRow * TILE_SIZE + localCol] = color
+        }
+
+        for (coord in touchedTiles) {
+            val tile = updatedTiles[coord] ?: continue
+            if (isTileEmpty(tile)) {
+                updatedTiles.remove(coord)
             }
         }
+
+        _layers[idx] = Layer(
+            id = layer.id,
+            name = layer.name,
+            isVisible = layer.isVisible,
+            isLocked = layer.isLocked,
+            tiles = updatedTiles
+        )
     }
 
     fun getActiveLayerPixelsDirect(): IntArray? {
@@ -359,7 +504,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         if (index !in _layers.indices) return null
         val layer = _layers[index]
         if (layer.isLocked || !layer.isVisible) return null
-        return layer.pixels
+        return tilesToPixels(layer.tiles, width, height)
     }
 
     fun setCanvas(width: Int, height: Int, pixelsData: IntArray? = null) {
@@ -372,12 +517,13 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             name = "Layer 1",
             isVisible = true,
             isLocked = false,
-            pixels = if (pixelsData != null && pixelsData.size == width * height) {
-                pixelsData.copyOf()
+            tiles = if (pixelsData != null && pixelsData.size == width * height) {
+                pixelsToTiles(pixelsData, width, height)
             } else {
-                IntArray(width * height) { Color.Transparent.toArgb() }
+                emptyMap()
             }
         )
+
         _layers.add(newLayer)
         activeLayerId = newLayer.id
     }
@@ -386,7 +532,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return Sprite(
             width = width,
             height = height,
-            layers = _layers.map { it.copy(pixels = it.pixels.copyOf()) }
+            layers = _layers.map { it.copy() }
         )
     }
 }

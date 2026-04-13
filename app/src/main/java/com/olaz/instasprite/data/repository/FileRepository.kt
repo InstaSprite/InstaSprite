@@ -4,59 +4,65 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import com.olaz.instasprite.SpritePixels
-import com.olaz.instasprite.data.mapper.toSpritePixels
-import com.olaz.instasprite.domain.model.Layer
+import com.olaz.instasprite.ISprite
+import com.olaz.instasprite.data.mapper.toSprite
+import com.olaz.instasprite.data.mapper.toISprite
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.utils.getFormatFromExtension
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.io.PushbackInputStream
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 
 class FileRepository(val context: Context) {
-    fun saveISpriteFile(
+    suspend fun saveISpriteFile(
         sprite: Sprite,
         folderUri: Uri,
         fileName: String
-    ): Boolean {
+    ): Boolean = withContext(Dispatchers.IO) {
         val finalFileName = if (fileName.endsWith(".isprite")) fileName else "$fileName.isprite"
 
         val folder = DocumentFile.fromTreeUri(context, folderUri)
-        val file = folder?.createFile("application/isprite", finalFileName) ?: return false
-        val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return false
+        val file = folder?.createFile("application/isprite", finalFileName) ?: return@withContext false
 
-        return try {
-            val proto = sprite.toSpritePixels()
-            proto.writeTo(outputStream)
-            outputStream.flush()
+        val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return@withContext false
+
+        try {
+            GZIPOutputStream(outputStream).use { gzipStream ->
+                val proto = sprite.toISprite()
+                proto.writeTo(gzipStream)
+                gzipStream.finish()
+            }
             true
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             false
-        } finally {
-            outputStream.close()
         }
     }
 
     fun loadISpriteFile(fileUri: Uri): Sprite? {
         val inputStream = context.contentResolver.openInputStream(fileUri) ?: return null
         return try {
-            val proto = SpritePixels.parseFrom(inputStream)
-            val layers = proto.layersList.map { layerData ->
-                Layer(
-                    id = layerData.id,
-                    name = layerData.name,
-                    isVisible = layerData.isVisible,
-                    isLocked = layerData.isLocked,
-                    pixels = layerData.pixelsList.toIntArray()
-                )
+            PushbackInputStream(inputStream, 2).use { pushbackStream ->
+                val header = ByteArray(2)
+                val bytesRead = pushbackStream.read(header)
+
+                if (bytesRead != -1) pushbackStream.unread(header, 0, bytesRead)
+
+                // gzip magic number
+                val isGzipped = bytesRead == 2 &&
+                        (header[0].toInt() and 0xFF == 0x1F) &&
+                        (header[1].toInt() and 0xFF == 0x8B)
+
+                val finalStream = if (isGzipped) GZIPInputStream(pushbackStream) else pushbackStream
+
+                val proto = ISprite.parseFrom(finalStream)
+
+                proto.toSprite()
             }
-            Sprite(
-                id = "", // Generates empty ID; app creates unique DB ID on save
-                width = proto.width,
-                height = proto.height,
-                layers = layers,
-                colorPalette = proto.colorPaletteList.takeIf { it.isNotEmpty() }
-            )
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         } finally {

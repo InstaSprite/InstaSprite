@@ -4,28 +4,27 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import com.olaz.instasprite.SpritePixels
-import com.olaz.instasprite.data.serializer.SpritePixelsSerializer
+import com.olaz.instasprite.ISprite
+import com.olaz.instasprite.data.serializer.ISpriteSerializer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SpritePixelDataSource @Inject constructor(
+class ISpriteDatSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val dataStoreCache = mutableMapOf<String, DataStore<SpritePixels>>()
+    private val dataStoreCache = mutableMapOf<String, DataStore<ISprite>>()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    fun getDataStore(spriteId: String): DataStore<SpritePixels> {
+    fun getDataStore(spriteId: String): DataStore<ISprite> {
         return synchronized(dataStoreCache) {
             dataStoreCache.getOrPut(spriteId) {
                 DataStoreFactory.create(
-                    serializer = SpritePixelsSerializer,
+                    serializer = ISpriteSerializer,
                     scope = scope,
                     produceFile = { context.dataStoreFile("sprite_pixels_$spriteId.pb") }
                 )

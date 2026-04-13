@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.olaz.instasprite.domain.model.Cel
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteMeta
@@ -294,12 +295,19 @@ private fun GalleryScreenPreview() {
                             height = 16,
                             layers = listOf(
                                 Layer(
-                                id = "test1",
-                                name = "Layer 1",
-                                pixels = IntArray(10 * 10) {
-                                    CatppuccinUI.CurrentPalette.Flamingo.toArgb()
-                                }
-                            ))
+                                    id = "test1",
+                                    name = "Layer 1",
+                                    cel = Cel(
+                                        x = 0,
+                                        y = 0,
+                                        width = 16,
+                                        height = 16,
+                                        pixels = IntArray(16 * 16) {
+                                            CatppuccinUI.CurrentPalette.Flamingo.toArgb()
+                                        }
+                                    )
+                                )
+                            )
                         ),
                         meta = SpriteMeta(
                             spriteId = "1",
@@ -313,12 +321,19 @@ private fun GalleryScreenPreview() {
                             height = 16,
                             layers = listOf(
                                 Layer(
-                                id = "test2",
-                                name = "Layer 1",
-                                pixels = IntArray(16 * 16) {
-                                    CatppuccinUI.CurrentPalette.Lavender.toArgb()
-                                }
-                            ))
+                                    id = "test2",
+                                    name = "Layer 1",
+                                    cel = Cel(
+                                        x = 0,
+                                        y = 0,
+                                        width = 16,
+                                        height = 16,
+                                        pixels = IntArray(16 * 16) {
+                                            CatppuccinUI.CurrentPalette.Lavender.toArgb()
+                                        }
+                                    )
+                                )
+                            )
                         ),
                         meta = SpriteMeta(
                             spriteId = "2",

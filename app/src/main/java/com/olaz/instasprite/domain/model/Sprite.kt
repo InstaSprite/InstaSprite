@@ -1,5 +1,7 @@
 package com.olaz.instasprite.domain.model
 
+import com.olaz.instasprite.utils.inflateCel
+
 data class Sprite(
     val id: String = "",
     val width: Int,
@@ -11,9 +13,10 @@ data class Sprite(
         val result = IntArray(width * height)
         for (layer in layers) {
             if (layer.isVisible) {
-                for (i in layer.pixels.indices) {
-                    if (layer.pixels[i] != 0) {
-                        result[i] = layer.pixels[i]
+                val pixels = inflateCel(layer.cel, width, height)
+                for (i in pixels.indices) {
+                    if (pixels[i] != 0) {
+                        result[i] = pixels[i]
                     }
                 }
             }

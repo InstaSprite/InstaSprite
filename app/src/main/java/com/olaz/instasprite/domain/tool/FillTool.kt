@@ -128,6 +128,9 @@ object FillTool : Tool {
             }
         }
 
+        // Persist back into the active layer since the repository now returns an inflated buffer.
+        canvas.setAllPixels(pixels)
+
         return FillResult(
             dirtyMinRow = minRow,
             dirtyMinCol = minCol,
