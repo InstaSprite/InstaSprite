@@ -32,6 +32,7 @@ class CommentRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
@@ -48,6 +49,7 @@ class CommentRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
@@ -64,6 +66,7 @@ class CommentRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
@@ -80,6 +83,7 @@ class CommentRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
@@ -97,6 +101,7 @@ class CommentRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
@@ -114,6 +119,7 @@ class CommentRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }

@@ -37,6 +37,7 @@ class FileRepository(val context: Context) {
             }
             true
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             e.printStackTrace()
             false
         }
@@ -63,6 +64,7 @@ class FileRepository(val context: Context) {
                 proto.toSprite()
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             e.printStackTrace()
             null
         } finally {

@@ -6,9 +6,37 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+
 class TokenManager @Inject constructor(
     private val dataStore: DataStore<TokenPreferences>
 ) : SessionTokenStore {
+
+    @Volatile
+    private var cachedTokens: TokenPreferences? = null
+    
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    init {
+        // Hydrate cache synchronously on first access, but observe changes
+        scope.launch {
+            dataStore.data.collect { prefs ->
+                cachedTokens = prefs
+            }
+        }
+    }
+
+    private fun getPrefs(): TokenPreferences {
+        var current = cachedTokens
+        if (current == null) {
+            current = runBlocking { dataStore.data.first() }
+            cachedTokens = current
+        }
+        return current
+    }
 
     override fun saveTokens(
         accessToken: String,
@@ -16,9 +44,15 @@ class TokenManager @Inject constructor(
         tokenType: String,
         username: String?
     ) {
-        runBlocking {
-            dataStore.updateData { prefs ->
-                prefs.copy(
+        cachedTokens = TokenPreferences(
+            keyAccessToken = accessToken,
+            keyRefreshToken = refreshToken,
+            keyTokenType = tokenType,
+            keyUsername = username
+        )
+        scope.launch {
+            dataStore.updateData {
+                it.copy(
                     keyAccessToken = accessToken,
                     keyRefreshToken = refreshToken,
                     keyTokenType = tokenType,
@@ -29,26 +63,19 @@ class TokenManager @Inject constructor(
     }
 
     override fun clearTokens() {
-        runBlocking {
+        cachedTokens = TokenPreferences()
+        scope.launch {
             dataStore.updateData { TokenPreferences() }
         }
     }
 
-    override fun getAccessToken(): String? = runBlocking {
-        dataStore.data.first().keyAccessToken
-    }
+    override fun getAccessToken(): String? = getPrefs().keyAccessToken
 
-    override fun getRefreshToken(): String? = runBlocking {
-        dataStore.data.first().keyRefreshToken
-    }
+    override fun getRefreshToken(): String? = getPrefs().keyRefreshToken
 
-    override fun getTokenType(): String = runBlocking {
-        dataStore.data.first().keyTokenType ?: "Bearer"
-    }
+    override fun getTokenType(): String = getPrefs().keyTokenType ?: "Bearer"
 
-    override fun getUsername(): String? = runBlocking {
-        dataStore.data.first().keyUsername
-    }
+    override fun getUsername(): String? = getPrefs().keyUsername
 
     override fun getAuthorizationHeader(): String? {
         val token = getAccessToken()

@@ -2,13 +2,14 @@ package com.olaz.instasprite.data.network.api
 
 import com.olaz.instasprite.data.network.model.ResultResponse
 import com.olaz.instasprite.data.network.model.FollowerDto
-import com.olaz.instasprite.data.network.model.FollowingDto
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
+import com.olaz.instasprite.data.network.model.SpringPageDto
 
 interface FollowApi {
     @Headers("Content-Type: application/json")
@@ -21,11 +22,19 @@ interface FollowApi {
 
     @Headers("Content-Type: application/json")
     @GET("/api/v1/{memberUsername}/following")
-    suspend fun getFollowings(@Path("memberUsername") username: String): Response<ResultResponse<List<FollowingDto>>>
+    suspend fun getFollowings(
+        @Path("memberUsername") username: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10
+    ): Response<ResultResponse<SpringPageDto<FollowerDto>>>
 
     @Headers("Content-Type: application/json")
     @GET("/api/v1/{memberUsername}/followers")
-    suspend fun getFollowers(@Path("memberUsername") username: String): Response<ResultResponse<List<FollowerDto>>>
+    suspend fun getFollowers(
+        @Path("memberUsername") username: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10
+    ): Response<ResultResponse<SpringPageDto<FollowerDto>>>
 }
 
 

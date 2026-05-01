@@ -4,7 +4,7 @@ import com.olaz.instasprite.di.RetrofitModule
 import com.olaz.instasprite.data.network.api.FollowApi
 import com.olaz.instasprite.data.network.getBodyOrError
 import com.olaz.instasprite.data.network.model.FollowerDto
-import com.olaz.instasprite.data.network.model.FollowingDto
+import com.olaz.instasprite.data.network.model.SpringPageDto
 
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ class FollowRepository @Inject constructor(
     suspend fun follow(username: String): Result<Boolean> {
         return try {
             val response = followApi.follow(username)
-            val body = response.getBodyOrError(RetrofitModule.gson)
+            val body = response.getBodyOrError<Boolean>(RetrofitModule.gson)
             if (body != null && body.status == 200 && body.data != null) {
                 Result.success(body.data)
             } else {
@@ -24,6 +24,7 @@ class FollowRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
@@ -32,7 +33,7 @@ class FollowRepository @Inject constructor(
     suspend fun unfollow(username: String): Result<Boolean> {
         return try {
             val response = followApi.unfollow(username)
-            val body = response.getBodyOrError(RetrofitModule.gson)
+            val body = response.getBodyOrError<Boolean>(RetrofitModule.gson)
             if (body != null && body.status == 200 && body.data != null) {
                 Result.success(body.data)
             } else {
@@ -41,15 +42,16 @@ class FollowRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
 
 
-    suspend fun getFollowings(username: String): Result<List<FollowingDto>> {
+    suspend fun getFollowings(username: String): Result<SpringPageDto<FollowerDto>> {
         return try {
             val response = followApi.getFollowings(username)
-            val body = response.getBodyOrError(RetrofitModule.gson)
+            val body = response.getBodyOrError<SpringPageDto<FollowerDto>>(RetrofitModule.gson)
             if (body != null && body.status == 200 && body.data != null) {
                 Result.success(body.data)
             } else {
@@ -58,14 +60,15 @@ class FollowRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }
 
-    suspend fun getFollowers(username: String): Result<List<FollowerDto>> {
+    suspend fun getFollowers(username: String): Result<SpringPageDto<FollowerDto>> {
         return try {
             val response = followApi.getFollowers(username)
-            val body = response.getBodyOrError(RetrofitModule.gson)
+            val body = response.getBodyOrError<SpringPageDto<FollowerDto>>(RetrofitModule.gson)
             if (body != null && body.status == 200 && body.data != null) {
                 Result.success(body.data)
             } else {
@@ -74,6 +77,7 @@ class FollowRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }

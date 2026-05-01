@@ -97,6 +97,7 @@ open class ProfileRepository @Inject constructor(
                 null
             )
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             ResultResponse(
                 status = 500,
                 code = "UPLOAD_ERROR",
@@ -122,6 +123,7 @@ open class ProfileRepository @Inject constructor(
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             android.util.Log.e("ProfileRepository", "Error getting recent posts", e)
             Result.failure(e)
         }
@@ -146,6 +148,7 @@ open class ProfileRepository @Inject constructor(
                             }
                         hydrated.add(detailed ?: p)
                     } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
                         Log.w("ProfileRepository", "Failed to hydrate post ${p.postId}", e)
                         hydrated.add(p)
                     }
@@ -160,6 +163,7 @@ open class ProfileRepository @Inject constructor(
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Log.e("ProfileRepository", "Error getting saved posts", e)
             Result.failure(e)
         }
@@ -177,6 +181,7 @@ open class ProfileRepository @Inject constructor(
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Result.failure(e)
         }
     }

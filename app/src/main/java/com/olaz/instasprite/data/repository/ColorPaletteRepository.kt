@@ -91,6 +91,7 @@ class ColorPaletteRepository(
             savePaletteToDB(palette)
             palette
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Log.e("ColorPaletteRepository", "Failed to fetch color palette", e)
             null
         }
@@ -129,6 +130,7 @@ fun loadDefaultColorPalette(context: Context): MutableList<Color> {
         }
         reader.close()
     } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
         e.printStackTrace()
         return ColorPaletteFallback.ColorsList.toMutableList()
     }

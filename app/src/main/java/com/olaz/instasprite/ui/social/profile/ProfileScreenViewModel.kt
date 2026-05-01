@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.R
 import com.olaz.instasprite.data.network.model.EditProfileRequestDto
 import com.olaz.instasprite.data.network.model.FollowerDto
-import com.olaz.instasprite.data.network.model.FollowingDto
+    // Removed FollowingDto
 import com.olaz.instasprite.data.network.model.UserProfileDto
 import com.olaz.instasprite.data.repository.FollowRepository
 import com.olaz.instasprite.data.repository.ProfileRepository
@@ -357,7 +357,7 @@ class ProfileScreenViewModel @Inject constructor(
                     onSuccess = { followers ->
                         _contentState.update {
                             it.copy(
-                                followers = followers.map(::mapFollowerDto),
+                                followers = followers.content.map(::mapFollowerDto),
                                 followersLoading = false
                             )
                         }
@@ -383,7 +383,7 @@ class ProfileScreenViewModel @Inject constructor(
                     onSuccess = { following ->
                         _contentState.update {
                             it.copy(
-                                following = following.map(::mapFollowingDto),
+                                following = following.content.map(::mapFollowerDto),
                                 followingLoading = false
                             )
                         }
@@ -525,18 +525,6 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     private fun mapFollowerDto(dto: FollowerDto): FollowerUser {
-        return FollowerUser(
-            id = dto.member.id.toString(),
-            username = dto.member.username,
-            displayName = dto.member.name,
-            profileImageUrl = dto.member.image?.imageUrl?.let { imageUrl ->
-                "${Constants.BASE_URL}/images/$imageUrl"
-            },
-            isFollowing = dto.following
-        )
-    }
-
-    private fun mapFollowingDto(dto: FollowingDto): FollowerUser {
         return FollowerUser(
             id = dto.member.id.toString(),
             username = dto.member.username,

@@ -27,6 +27,7 @@ class NotificationRepository @Inject constructor(
                 Result.failure(Exception("$errorCode: $errorMessage"))
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             if (e is CancellationException) throw e
             Log.e("NotificationRepository", "Error registering FCM token", e)
             Result.failure(e)
