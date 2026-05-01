@@ -135,6 +135,10 @@ dependencies {
 
     // --- Testing ---
     testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation("app.cash.turbine:turbine:1.2.0")
+    testImplementation("androidx.paging:paging-testing:3.3.6")
 
     // Android Instrumentation Tests
     androidTestImplementation(libs.androidx.junit)
