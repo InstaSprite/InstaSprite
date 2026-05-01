@@ -384,5 +384,29 @@ class PostRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun getHashtagPosts(hashtag: String, page: Int = 1, size: Int = 10): Result<PageData> {
+        return try {
+            val response = postApi.getHashtagPosts(page = page, size = size, hashtag = hashtag)
+            val body = response.getBodyOrError<com.olaz.instasprite.data.network.model.SpringPageDto<PostDto>>(RetrofitModule.gson)
+
+            if (body != null && body.status == 200 && body.data != null) {
+                val posts = body.data.content.map { it.toDomain() }
+                val pageData = PageData(
+                    content = posts,
+                    nextCursor = posts.lastOrNull()?.postId,
+                    hasNext = !body.data.last
+                )
+                Result.success(pageData)
+            } else {
+                val errorMessage = body?.message ?: "Failed to get hashtag posts"
+                val errorCode = body?.code ?: response.code().toString()
+                Result.failure(Exception("$errorCode: $errorMessage"))
+            }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            Result.failure(e)
+        }
+    }
 }
 

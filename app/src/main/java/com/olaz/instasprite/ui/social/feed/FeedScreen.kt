@@ -55,7 +55,8 @@ fun FeedScreen(
             onDeletePost = viewModel::deletePost,
             onRefreshed = viewModel::onRefreshed,
             onConsumeRefreshPending = viewModel::consumeRefreshPending,
-            onUpdateTopPostId = viewModel::updateTopPostId
+            onUpdateTopPostId = viewModel::updateTopPostId,
+            onOpenHashtag = {}
         )
     }
 
@@ -127,7 +128,8 @@ private fun FeedContentLoggedOutPreview() {
                 onDeletePost = {},
                 onRefreshed = {},
                 onConsumeRefreshPending = {},
-                onUpdateTopPostId = {}
+                onUpdateTopPostId = {},
+                onOpenHashtag = {}
             )
         )
     }
@@ -155,7 +157,8 @@ private fun FeedContentLoggedInPreview() {
                 onDeletePost = {},
                 onRefreshed = {},
                 onConsumeRefreshPending = {},
-                onUpdateTopPostId = {}
+                onUpdateTopPostId = {},
+                onOpenHashtag = {}
             )
         )
     }

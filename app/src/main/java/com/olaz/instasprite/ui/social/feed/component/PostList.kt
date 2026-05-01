@@ -168,6 +168,8 @@ fun PostList(
                             post = effectivePost,
                             onPostClick = { event.onOpenComments(rawPost.postId) },
                             onProfileClick = event.onOpenProfile,
+                            onHashtagClick = event.onOpenHashtag,
+                            onMentionClick = { mention -> event.onOpenProfile(mention.removePrefix("@")) },
                             onFollowClick = { username, following ->
                                 if (!isOwnPost) event.onToggleFollow(username, following)
                             },

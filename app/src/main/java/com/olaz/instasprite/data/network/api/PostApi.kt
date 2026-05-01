@@ -3,6 +3,7 @@ package com.olaz.instasprite.data.network.api
 import com.olaz.instasprite.data.network.model.PageDto
 import com.olaz.instasprite.data.network.model.PostDto
 import com.olaz.instasprite.data.network.model.ResultResponse
+import com.olaz.instasprite.data.network.model.SpringPageDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -77,7 +78,7 @@ interface PostApi {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("hashtag") hashtag: String
-    ): Response<ResultResponse<List<PostDto>>>
+    ): Response<ResultResponse<SpringPageDto<PostDto>>>
 
     @Headers("Content-Type: application/json")
     @GET("/api/v1/posts/most-liked")

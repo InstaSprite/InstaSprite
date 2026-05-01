@@ -40,5 +40,6 @@ data class FeedScreenEvent(
     val onDeletePost: (postId: Long) -> Unit,
     val onRefreshed: () -> Unit,
     val onConsumeRefreshPending: () -> Unit,
-    val onUpdateTopPostId: (Long) -> Unit
+    val onUpdateTopPostId: (Long) -> Unit,
+    val onOpenHashtag: (hashtag: String) -> Unit
 )

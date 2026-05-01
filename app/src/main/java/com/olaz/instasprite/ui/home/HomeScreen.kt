@@ -183,7 +183,8 @@ fun HomeScreen(
             onDeletePost = feedViewModel::deletePost,
             onRefreshed = feedViewModel::onRefreshed,
             onConsumeRefreshPending = feedViewModel::consumeRefreshPending,
-            onUpdateTopPostId = feedViewModel::updateTopPostId
+            onUpdateTopPostId = feedViewModel::updateTopPostId,
+            onOpenHashtag = {}
         )
     }
 

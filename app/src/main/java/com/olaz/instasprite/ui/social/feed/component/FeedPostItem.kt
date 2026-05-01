@@ -62,6 +62,8 @@ fun FeedPostItem(
     onBookmarkClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onDeleteClick: (Long) -> Unit = {},
+    onHashtagClick: (String) -> Unit = {},
+    onMentionClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     showFollowButton: Boolean = true,
     showDeleteButton: Boolean = false,
@@ -170,14 +172,17 @@ fun FeedPostItem(
             Spacer(modifier = Modifier.height(12.dp))
 
             if (post.postContent.isNotEmpty()) {
-                Text(
+                com.olaz.instasprite.ui.components.composable.ParsedPostText(
                     text = post.postContent,
-                    color = CatppuccinUI.TextColorLight,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onPostClick() }
+                    textColor = CatppuccinUI.TextColorLight,
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp
+                    ),
+                    onHashtagClick = { hashtag -> onHashtagClick(hashtag) },
+                    onMentionClick = { mention -> onMentionClick(mention) },
+                    onTextClick = { onPostClick() },
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
