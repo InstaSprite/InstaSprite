@@ -27,12 +27,20 @@ class AuthInterceptor @Inject constructor(
 
         val authHeader = tokenUtils.getAuthorizationHeader()
 
+        val isGuestAware = originalRequest.header("Guest-Aware") == "true"
+        val requestBuilder = originalRequest.newBuilder().removeHeader("Guest-Aware")
+
         val newRequest = if (authHeader != null) {
-            originalRequest.newBuilder()
+            requestBuilder
                 .addHeader("Authorization", authHeader)
                 .build()
         } else {
-            originalRequest
+            if (isGuestAware && originalRequest.method == "GET") {
+                val newUrl = originalRequest.url.newBuilder().addPathSegment("without").build()
+                requestBuilder.url(newUrl).build()
+            } else {
+                requestBuilder.build()
+            }
         }
 
         val response = chain.proceed(newRequest)

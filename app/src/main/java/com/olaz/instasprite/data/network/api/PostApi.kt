@@ -19,7 +19,7 @@ interface PostApi {
         @Part("commentFlag") commentFlag: RequestBody
     ): Response<ResultResponse<Any>>
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts")
     suspend fun getPostPage(
         @Query("cursor") lastPostId: Long?
@@ -29,7 +29,7 @@ interface PostApi {
     @GET("/api/v1/posts/recent")
     suspend fun getRecent10Posts(): Response<ResultResponse<List<PostDto>>>
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts/recent/page")
     suspend fun getRecentPostsPage(
         @Query("cursor") lastPostId: Long?
@@ -41,7 +41,7 @@ interface PostApi {
         @Query("postId") postId: Long
     ): Response<ResultResponse<String>>
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts/{postId}")
     suspend fun getPost(
         @Path("postId") postId: Long
@@ -71,7 +71,7 @@ interface PostApi {
         @Query("postId") postId: Long
     ): Response<ResultResponse<String>>
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts/hashtags")
     suspend fun getHashtagPosts(
         @Query("page") page: Int,

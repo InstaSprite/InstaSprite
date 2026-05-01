@@ -14,7 +14,7 @@ interface ProfileApi {
     @GET("/api/v1/accounts/profile")
     suspend fun getCurrentUserProfile(): Response<ResultResponse<UserProfileDto>>
     
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/accounts/{username}")
     suspend fun getUserProfile(@Path("username") username: String): Response<ResultResponse<UserProfileDto>>
 
