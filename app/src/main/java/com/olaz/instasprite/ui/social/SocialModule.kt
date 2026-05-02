@@ -97,4 +97,17 @@ object SocialModule {
             )
         }
     }
+
+    @Provides
+    @IntoSet
+    fun provideSearchEntry(navigator: Navigator): EntryProviderInstaller = {
+        entry<Screen.Search> {
+            com.olaz.instasprite.ui.social.search.SearchScreen(
+                onBackClick = { navigator.goBack() },
+                onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
+                onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
+                onOpenHashtag = { hashtag -> navigator.goTo(Screen.Hashtag(hashtag)) }
+            )
+        }
+    }
 }

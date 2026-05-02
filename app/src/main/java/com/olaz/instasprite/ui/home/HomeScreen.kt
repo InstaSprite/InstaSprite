@@ -81,6 +81,7 @@ fun HomeScreen(
     onOpenComments: (postId: Long) -> Unit,
     onOpenProfile: (userId: String) -> Unit,
     onOpenNotifications: () -> Unit,
+    onOpenSearch: () -> Unit,
     onOpenSetting: () -> Unit,
     onNavigateToCreatePost: () -> Unit,
     galleryViewModel: GalleryViewModel = hiltViewModel(),
@@ -215,6 +216,7 @@ fun HomeScreen(
                 },
                 onLoginClick = { launchDrawerAction(onLoginClick) },
                 onNotificationsClick = { launchDrawerAction(onOpenNotifications) },
+                onSearchClick = { launchDrawerAction(onOpenSearch) },
                 onSettingsClick = { launchDrawerAction(onOpenSetting) },
                 onAboutClick = { launchDrawerAction() },
                 onLogoutClick = {
@@ -276,7 +278,9 @@ fun HomeScreen(
                         onBottomBarEvent = if (pagerState.currentPage == 0)
                             galleryEvent.onBottomBarEvent
                         else
-                            { _: BottomBarEvent -> },
+                            { event: BottomBarEvent ->
+                                if (event is BottomBarEvent.ToggleSearchBar) onOpenSearch()
+                            },
                         onMenuClick = {
                             scope.launch {
                                 drawerState.open()

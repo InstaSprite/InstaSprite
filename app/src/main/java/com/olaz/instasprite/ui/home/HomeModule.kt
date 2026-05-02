@@ -45,6 +45,7 @@ object HomeModule {
                 onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
                 onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
                 onOpenNotifications = { navigator.goTo(Screen.Notification) },
+                onOpenSearch = { navigator.goTo(Screen.Search) },
                 onOpenSetting = { navigator.goTo(Screen.Setting) },
                 onNavigateToCreatePost = { navigator.goTo(Screen.CreatePost) },
             )

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -49,6 +50,7 @@ fun HomeDrawer(
     onProfileClick: () -> Unit,
     onLoginClick: () -> Unit,
     onNotificationsClick: () -> Unit,
+    onSearchClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onAboutClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -152,6 +154,14 @@ fun HomeDrawer(
                 selected = false,
                 colors = drawerItemColors,
                 onClick = onNotificationsClick
+            )
+
+            HomeDrawerItem(
+                icon = Icons.Default.Search,
+                label = "Search",
+                selected = false,
+                colors = drawerItemColors,
+                onClick = onSearchClick
             )
 
             HomeDrawerItem(
