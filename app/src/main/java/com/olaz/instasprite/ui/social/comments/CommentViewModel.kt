@@ -191,8 +191,14 @@ class CommentViewModel @Inject constructor(
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
     }
+    private val isLoggedIn: Boolean
+        get() = sessionManager.sessionState.value is com.olaz.instasprite.ui.social.session.SocialSessionState.LoggedIn
 
     fun toggleLike() {
+        if (!isLoggedIn) {
+            _uiState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val postId = _uiState.value.backendPost?.postId ?: return
         val currentLiked = _uiState.value.isLiked
         val newLiked = !currentLiked
@@ -212,6 +218,10 @@ class CommentViewModel @Inject constructor(
     }
 
     fun toggleBookmark() {
+        if (!isLoggedIn) {
+            _uiState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val postId = _uiState.value.backendPost?.postId ?: return
         val currentBookmarked = _uiState.value.isBookmarked
         val newBookmarked = !currentBookmarked
@@ -250,6 +260,10 @@ class CommentViewModel @Inject constructor(
     }
 
     fun toggleFollow() {
+        if (!isLoggedIn) {
+            _uiState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val author = _uiState.value.postAuthor ?: return
         val newFollowing = !author.isFollowing
 
@@ -285,6 +299,10 @@ class CommentViewModel @Inject constructor(
     }
 
     fun toggleCommentLike(commentId: String) {
+        if (!isLoggedIn) {
+            _uiState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val previous = _uiState.value.comments
         val target = previous.find { it.id == commentId } ?: return
         val newLiked = !target.isLiked
@@ -313,6 +331,10 @@ class CommentViewModel @Inject constructor(
     }
 
     fun deleteComment(commentId: String) {
+        if (!isLoggedIn) {
+            _uiState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val postId = _uiState.value.backendPost?.postId ?: return
         val prev = _uiState.value.comments
         _uiState.update { it.copy(comments = prev.filter { it.id != commentId }) }
@@ -329,6 +351,10 @@ class CommentViewModel @Inject constructor(
     }
 
     fun addComment(content: String) {
+        if (!isLoggedIn) {
+            _uiState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         if (content.isBlank()) return
         val postId = _uiState.value.backendPost?.postId ?: return
         val parentId = _uiState.value.replyParentId ?: 0L
@@ -398,6 +424,10 @@ class CommentViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun consumeLoginRequiredError() {
+        _uiState.update { it.copy(showLoginRequiredError = false) }
     }
 }
 

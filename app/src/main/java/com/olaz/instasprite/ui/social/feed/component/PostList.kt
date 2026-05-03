@@ -32,6 +32,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.JumpToTopButton
+import com.olaz.instasprite.ui.components.composable.MaintenanceScreen
 import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
 import com.olaz.instasprite.ui.social.feed.contract.FeedScreenEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
@@ -44,6 +45,7 @@ fun PostList(
     state: FeedContentState,
     event: FeedScreenEvent,
     lazyListState: LazyListState,
+    isOnline: Boolean
 ) {
     val pagedItems = state.pagedPosts.collectAsLazyPagingItems()
     val context = LocalContext.current
@@ -94,18 +96,24 @@ fun PostList(
             .fillMaxSize()
             .background(CatppuccinUI.BackgroundColorDarker)
     ) {
-        if (pagedItems.loadState.refresh is LoadState.Loading) {
+        val isRefreshError = pagedItems.loadState.refresh is LoadState.Error
+        val error = if (isRefreshError) (pagedItems.loadState.refresh as LoadState.Error).error else null
+
+        if (pagedItems.loadState.refresh is LoadState.Loading && pagedItems.itemCount == 0) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
             }
-        } else if (pagedItems.loadState.refresh is LoadState.Error) {
-            val error = (pagedItems.loadState.refresh as LoadState.Error).error
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = "${stringResource(R.string.error)}: ${error.toUserMessage(context)}",
-                    color = CatppuccinUI.TextColorLight,
-                    textAlign = TextAlign.Center
-                )
+        } else if (isRefreshError && pagedItems.itemCount == 0) {
+            if (isOnline) {
+                MaintenanceScreen(onReload = { pagedItems.retry() })
+            } else {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "${stringResource(R.string.error)}: ${error?.toUserMessage(context)}",
+                        color = CatppuccinUI.TextColorLight,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         } else if (pagedItems.loadState.refresh is LoadState.NotLoading && pagedItems.itemCount == 0) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

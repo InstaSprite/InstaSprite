@@ -39,7 +39,8 @@ data class CommentState(
     val isOwnPost: Boolean = false,
     val comments: List<Comment> = emptyList(),
     val currentUserImageUrl: String? = null,
-    val replyParentId: Long? = null
+    val replyParentId: Long? = null,
+    val showLoginRequiredError: Boolean = false
 )
 
 data class CommentScreenEvent(
@@ -54,5 +55,6 @@ data class CommentScreenEvent(
     val onStartReply: (Long) -> Unit,
     val onClearReplyTarget: () -> Unit,
     val onZoomImage: (String) -> Unit,
-    val onDismissZoom: () -> Unit
+    val onDismissZoom: () -> Unit,
+    val onConsumeLoginRequiredError: () -> Unit = {}
 )

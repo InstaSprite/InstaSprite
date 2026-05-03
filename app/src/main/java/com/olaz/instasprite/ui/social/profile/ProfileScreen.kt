@@ -81,6 +81,7 @@ fun ProfileScreen(
     onBackClick: () -> Unit = {},
     onPostClick: ((postId: Long) -> Unit)? = null,
     onMenuClick: (() -> Unit)? = null,
+    onLoginClick: () -> Unit = {},
     viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -107,32 +108,55 @@ fun ProfileScreen(
         }
     }
 
+    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+
+    LaunchedEffect(contentState.showLoginRequiredError) {
+        if (contentState.showLoginRequiredError) {
+            val result = snackbarHostState.showSnackbar(
+                message = context.getString(R.string.login_required),
+                actionLabel = context.getString(R.string.login)
+            )
+            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                onLoginClick()
+            }
+            viewModel.consumeLoginRequiredError()
+        }
+    }
+
     UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
     UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
 
-    ProfileContent(
-        state = contentState,
-        event = ProfileScreenEvent(
-            onBackClick = onBackClick,
-            onEditProfileClick = { viewModel.toggleEditProfileDialog() },
-            onEditAvatarClick = { viewModel.toggleEditAvatarDialog() },
-            onFollowClick = { viewModel.toggleFollow() },
-            onFollowersClick = { viewModel.showFollowersDialog() },
-            onFollowingClick = { viewModel.showFollowingDialog() },
-            onTabSelected = { index -> viewModel.selectTab(index) },
-            onUpdateProfile = { displayName, bio -> viewModel.updateUserProfile(displayName, bio) },
-            onFollowUser = { id -> viewModel.followUser(id) },
-            onUnfollowUser = { id -> viewModel.unfollowUser(id) },
-            onUploadAvatar = { uri -> viewModel.uploadProfileImage(uri) },
-            onPostClick = { postId -> onPostClick?.invoke(postId) },
-            onMenuClick = { onMenuClick?.invoke() },
-            onClearError = { viewModel.clearError() },
-            onDismissEditProfile = { viewModel.toggleEditProfileDialog() },
-            onDismissAvatarDialog = { viewModel.toggleEditAvatarDialog() },
-            onDismissFollowers = { viewModel.hideFollowersDialog() },
-            onDismissFollowing = { viewModel.hideFollowingDialog() }
+    Box(modifier = Modifier.fillMaxSize()) {
+        ProfileContent(
+            state = contentState,
+            event = ProfileScreenEvent(
+                onBackClick = onBackClick,
+                onEditProfileClick = { viewModel.toggleEditProfileDialog() },
+                onEditAvatarClick = { viewModel.toggleEditAvatarDialog() },
+                onFollowClick = { viewModel.toggleFollow() },
+                onFollowersClick = { viewModel.showFollowersDialog() },
+                onFollowingClick = { viewModel.showFollowingDialog() },
+                onTabSelected = { index -> viewModel.selectTab(index) },
+                onUpdateProfile = { displayName, bio -> viewModel.updateUserProfile(displayName, bio) },
+                onFollowUser = { id -> viewModel.followUser(id) },
+                onUnfollowUser = { id -> viewModel.unfollowUser(id) },
+                onUploadAvatar = { uri -> viewModel.uploadProfileImage(uri) },
+                onPostClick = { postId -> onPostClick?.invoke(postId) },
+                onMenuClick = { onMenuClick?.invoke() },
+                onClearError = { viewModel.clearError() },
+                onDismissEditProfile = { viewModel.toggleEditProfileDialog() },
+                onDismissAvatarDialog = { viewModel.toggleEditAvatarDialog() },
+                onDismissFollowers = { viewModel.hideFollowersDialog() },
+                onDismissFollowing = { viewModel.hideFollowingDialog() },
+                onConsumeLoginRequiredError = { viewModel.consumeLoginRequiredError() }
+            )
         )
-    )
+
+        androidx.compose.material3.SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }
 
 @Composable

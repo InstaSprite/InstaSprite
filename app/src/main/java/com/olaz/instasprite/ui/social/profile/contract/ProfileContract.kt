@@ -19,6 +19,7 @@ data class ProfileContentState(
     val following: List<FollowerUser> = emptyList(),
     val followersLoading: Boolean = false,
     val followingLoading: Boolean = false,
+    val showLoginRequiredError: Boolean = false,
 )
 
 data class UserProfileState(
@@ -77,4 +78,5 @@ data class ProfileScreenEvent(
     val onDismissAvatarDialog: () -> Unit = {},
     val onDismissFollowers: () -> Unit = {},
     val onDismissFollowing: () -> Unit = {},
+    val onConsumeLoginRequiredError: () -> Unit = {}
 )

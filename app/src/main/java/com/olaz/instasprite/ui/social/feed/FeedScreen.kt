@@ -17,6 +17,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.compose.ui.platform.LocalContext
+import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.MaintenanceScreen
 import com.olaz.instasprite.ui.social.feed.component.PostList
 import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
@@ -41,6 +43,7 @@ fun FeedScreen(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val isLoggedIn = sessionState is SocialSessionState.LoggedIn
     val isOnline by viewModel.isOnline.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(viewModel, lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -66,7 +69,8 @@ fun FeedScreen(
             onUpdateTopPostId = viewModel::updateTopPostId,
             onOpenHashtag = {},
             onClearError = viewModel::clearError,
-            onRetryConnection = viewModel::retryConnection
+            onRetryConnection = viewModel::retryConnection,
+            onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError
         )
     }
 
@@ -98,6 +102,19 @@ fun FeedContent(
         }
     }
 
+    LaunchedEffect(state.showLoginRequiredError) {
+        if (state.showLoginRequiredError) {
+            val result = snackbarHostState.showSnackbar(
+                message = context.getString(R.string.login_required),
+                actionLabel = context.getString(R.string.login)
+            )
+            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                event.onLoginClick()
+            }
+            event.onConsumeLoginRequiredError()
+        }
+    }
+
     if (state.verifyEmailState.showVerifyDialog) {
         VerifyEmailDialog(
             verifyEmailState = state.verifyEmailState,
@@ -121,9 +138,7 @@ fun FeedContent(
             state.isServerMaintenance -> MaintenanceScreen(
                 onReload = event.onRetryConnection
             )
-
-            isLoggedIn -> PostList(state = state, event = event, lazyListState = listState)
-            else -> LoginRequiredScreen(onLoginClick = event.onLoginClick)
+            else -> PostList(state = state, event = event, lazyListState = listState, isOnline = isOnline)
         }
 
         SnackbarHost(
@@ -158,7 +173,8 @@ private fun FeedContentLoggedOutPreview() {
                 onUpdateTopPostId = {},
                 onOpenHashtag = {},
                 onClearError = {},
-                onRetryConnection = {}
+                onRetryConnection = {},
+                onConsumeLoginRequiredError = {}
             )
         )
     }
@@ -189,7 +205,8 @@ private fun FeedContentLoggedInPreview() {
                 onUpdateTopPostId = {},
                 onOpenHashtag = {},
                 onClearError = {},
-                onRetryConnection = {}
+                onRetryConnection = {},
+                onConsumeLoginRequiredError = {}
             )
         )
     }
@@ -221,7 +238,8 @@ private fun FeedContentMaintenancePreview() {
                 onUpdateTopPostId = {},
                 onOpenHashtag = {},
                 onClearError = {},
-                onRetryConnection = {}
+                onRetryConnection = {},
+                onConsumeLoginRequiredError = {}
             )
         )
     }

@@ -139,6 +139,7 @@ class FeedViewModel @Inject constructor(
                     getCurrentProfile()
                     loadProfileImage()
                 } else {
+                    _contentState.update { it.copy(uiState = it.uiState.copy(postFilter = PostFilter.Recent)) }
                     clearFeed()
                 }
             }
@@ -204,8 +205,10 @@ class FeedViewModel @Inject constructor(
     suspend fun startPolling() {
         while (viewModelScope.isActive) {
             delay(30_000)
-            if (!isLoggedIn) continue
             if (currentTopPostId == 0L) continue
+
+            val filter = _contentState.value.uiState.postFilter
+            if (!isLoggedIn && filter == PostFilter.Follow) continue
 
             if (!_contentState.value.hasNewPosts && currentTopPostId > 0) {
                 try {
@@ -381,6 +384,10 @@ class FeedViewModel @Inject constructor(
     }
 
     fun toggleLikePost(postId: Long, currentStatus: Boolean) {
+        if (!isLoggedIn) {
+            _contentState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val newStatus = !currentStatus
         viewModelScope.launch(Dispatchers.IO) {
             PostInteractionEvent.emitLikeEvent(postId, newStatus)
@@ -391,6 +398,10 @@ class FeedViewModel @Inject constructor(
     }
 
     fun toggleBookmarkPost(postId: Long, currentStatus: Boolean) {
+        if (!isLoggedIn) {
+            _contentState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val newStatus = !currentStatus
         viewModelScope.launch(Dispatchers.IO) {
             PostInteractionEvent.emitBookmarkEvent(postId, newStatus)
@@ -404,6 +415,10 @@ class FeedViewModel @Inject constructor(
     }
 
     fun toggleFollow(username: String, currentStatus: Boolean) {
+        if (!isLoggedIn) {
+            _contentState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         if (_contentState.value.profileState.memberUsername.equals(
                 username,
                 ignoreCase = true
@@ -472,6 +487,10 @@ class FeedViewModel @Inject constructor(
     }
 
     fun deletePost(postId: Long) {
+        if (!isLoggedIn) {
+            _contentState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         viewModelScope.launch {
             _contentState.update { it.copy(deletedPostIds = it.deletedPostIds + postId) }
             val result = postRepository.deletePost(postId)
@@ -497,6 +516,10 @@ class FeedViewModel @Inject constructor(
                 deletedPostIds = emptySet()
             )
         }
+    }
+
+    fun consumeLoginRequiredError() {
+        _contentState.update { it.copy(showLoginRequiredError = false) }
     }
 
     fun updateTopPostId(newId: Long) {

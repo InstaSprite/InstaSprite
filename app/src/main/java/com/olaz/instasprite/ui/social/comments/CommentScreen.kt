@@ -68,9 +68,11 @@ fun CommentScreen(
     postId: Long? = null,
     onBackClick: () -> Unit = {},
     onProfileClick: (String) -> Unit = {},
+    onLoginClick: () -> Unit = {},
     viewModel: CommentViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var zoomedImageUrl by remember { mutableStateOf<String?>(null) }
     var newCommentText by remember { mutableStateOf("") }
 
@@ -109,17 +111,40 @@ fun CommentScreen(
             },
             onClearReplyTarget = viewModel::clearReplyTarget,
             onZoomImage = { zoomedImageUrl = it },
-            onDismissZoom = { zoomedImageUrl = null }
+            onDismissZoom = { zoomedImageUrl = null },
+            onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError
         )
     }
 
-    CommentScreenContent(
-        uiState = uiState,
-        newCommentText = newCommentText,
-        onNewCommentTextChange = { newCommentText = it },
-        commentFocusRequester = commentFocusRequester,
-        event = event
-    )
+    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+
+    LaunchedEffect(uiState.showLoginRequiredError) {
+        if (uiState.showLoginRequiredError) {
+            val result = snackbarHostState.showSnackbar(
+                message = context.getString(R.string.login_required),
+                actionLabel = context.getString(R.string.login)
+            )
+            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                onLoginClick()
+            }
+            viewModel.consumeLoginRequiredError()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        CommentScreenContent(
+            uiState = uiState,
+            newCommentText = newCommentText,
+            onNewCommentTextChange = { newCommentText = it },
+            commentFocusRequester = commentFocusRequester,
+            event = event
+        )
+        
+        androidx.compose.material3.SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 
     // TODO: Implement image zoom overlay if needed
 }
@@ -388,7 +413,8 @@ private fun CommentScreenPreview() {
                 onStartReply = {},
                 onClearReplyTarget = {},
                 onZoomImage = {},
-                onDismissZoom = {}
+                onDismissZoom = {},
+                onConsumeLoginRequiredError = {}
             )
         )
     }

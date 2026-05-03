@@ -24,7 +24,8 @@ data class FeedContentState(
     val refreshPending: Boolean = false,
     val hasNewPosts: Boolean = false,
     val deletedPostIds: Set<Long> = emptySet(),
-    val isServerMaintenance: Boolean = false
+    val isServerMaintenance: Boolean = false,
+    val showLoginRequiredError: Boolean = false
 )
 
 data class FeedScreenEvent(
@@ -44,5 +45,6 @@ data class FeedScreenEvent(
     val onUpdateTopPostId: (Long) -> Unit,
     val onOpenHashtag: (hashtag: String) -> Unit,
     val onClearError: () -> Unit,
-    val onRetryConnection: () -> Unit
+    val onRetryConnection: () -> Unit,
+    val onConsumeLoginRequiredError: () -> Unit
 )

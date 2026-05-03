@@ -37,7 +37,8 @@ object SocialModule {
             CommentScreen(
                 postId = args.postId,
                 onBackClick = { navigator.goBack() },
-                onProfileClick = { userId -> navigator.goTo(Screen.Profile(userId)) }
+                onProfileClick = { userId -> navigator.goTo(Screen.Profile(userId)) },
+                onLoginClick = { navigator.goTo(Screen.Auth) }
             )
         }
     }
@@ -80,7 +81,8 @@ object SocialModule {
                 userId = args.userId,
                 onBackClick = { navigator.goBack() },
                 onPostClick = { postId -> navigator.goTo(Screen.Comments(postId)) },
-                onMenuClick = {}
+                onMenuClick = {},
+                onLoginClick = { navigator.goTo(Screen.Auth) }
             )
         }
     }

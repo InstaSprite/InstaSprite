@@ -25,15 +25,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.olaz.instasprite.ui.social.session.SocialSessionManager
+import com.olaz.instasprite.ui.social.session.SocialSessionState
+
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val followRepository: FollowRepository,
+    private val sessionManager: SocialSessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _contentState = MutableStateFlow(ProfileContentState())
     val contentState: StateFlow<ProfileContentState> = _contentState.asStateFlow()
+
+    private val isLoggedIn: Boolean
+        get() = sessionManager.sessionState.value is SocialSessionState.LoggedIn
 
     init {
         observeEvents()
@@ -228,6 +235,10 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun toggleFollow() {
+        if (!isLoggedIn) {
+            _contentState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
         val currentProfile = _contentState.value.userProfile
         if (currentProfile.isOwnProfile) return
 
@@ -251,6 +262,10 @@ class ProfileScreenViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun consumeLoginRequiredError() {
+        _contentState.update { it.copy(showLoginRequiredError = false) }
     }
 
     fun clearError() {

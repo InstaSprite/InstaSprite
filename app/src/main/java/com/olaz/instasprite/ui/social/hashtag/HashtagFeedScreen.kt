@@ -73,7 +73,8 @@ fun HashtagFeedScreenContent(
         onUpdateTopPostId = {},
         onOpenHashtag = onOpenHashtag,
         onClearError = {},
-        onRetryConnection = {}
+        onRetryConnection = {},
+        onConsumeLoginRequiredError = {}
     )
 
     Scaffold(
@@ -111,7 +112,8 @@ fun HashtagFeedScreenContent(
             PostList(
                 state = state,
                 event = event,
-                lazyListState = listState
+                lazyListState = listState,
+                isOnline = true
             )
         }
     }

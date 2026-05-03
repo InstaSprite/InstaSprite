@@ -188,7 +188,8 @@ fun HomeScreen(
             onUpdateTopPostId = feedViewModel::updateTopPostId,
             onOpenHashtag = {},
             onClearError = feedViewModel::clearError,
-            onRetryConnection = feedViewModel::retryConnection
+            onRetryConnection = feedViewModel::retryConnection,
+            onConsumeLoginRequiredError = feedViewModel::consumeLoginRequiredError
         )
     }
 
