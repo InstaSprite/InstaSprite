@@ -1,19 +1,29 @@
 package com.olaz.instasprite.utils
 
+import android.graphics.BitmapShader
 import android.graphics.Matrix
+import android.graphics.Shader
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.model.SelectionState
 import com.olaz.instasprite.ui.theme.CatppuccinUI
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
 
 
 fun DrawScope.drawSelectionOverlay(
@@ -119,10 +129,10 @@ fun Modifier.drawCheckerboard(
     canvasHeight: Int,
     checkerColor1: Color = CatppuccinUI.CanvasChecker1Color,
     checkerColor2: Color = CatppuccinUI.CanvasChecker2Color
-): Modifier = this.drawBehind {
-    if (canvasWidth == 0 || canvasHeight == 0) return@drawBehind
-
-    drawRect(color = checkerColor2)
+): Modifier = this.drawWithCache {
+    if (canvasWidth == 0 || canvasHeight == 0) {
+        return@drawWithCache onDrawBehind {}
+    }
 
     val cellWidth = size.width / canvasWidth
     val cellHeight = size.height / canvasHeight
@@ -130,22 +140,37 @@ fun Modifier.drawCheckerboard(
     val useLargeCheckers = canvasWidth >= 32 || canvasHeight >= 32
     val blockSize = if (useLargeCheckers) 16 else 1
 
-    val numCols = canvasWidth / blockSize
-    val numRows = canvasHeight / blockSize
-
     val blockWidth = cellWidth * blockSize
     val blockHeight = cellHeight * blockSize
 
-    for (row in 0 until numRows) {
-        val y = row * blockHeight
-        for (col in 0 until numCols) {
-            if ((row + col) % 2 == 0) {
-                drawRect(
-                    color = checkerColor1,
-                    topLeft = Offset(col * blockWidth, y),
-                    size = Size(blockWidth, blockHeight)
-                )
-            }
+    val bitmap = createBitmap(2, 2)
+    val c1 = checkerColor1.toArgb()
+    val c2 = checkerColor2.toArgb()
+    bitmap[0, 0] = c1
+    bitmap[1, 1] = c1
+    bitmap[1, 0] = c2
+    bitmap[0, 1] = c2
+
+    val shader = BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+    val matrix = Matrix()
+    matrix.setScale(blockWidth, blockHeight)
+    shader.setLocalMatrix(matrix)
+
+    val composePaint = Paint().apply {
+        this.shader = shader
+        this.filterQuality = FilterQuality.None
+        this.isAntiAlias = false
+    }
+
+    onDrawBehind {
+        drawIntoCanvas { canvas ->
+            canvas.drawRect(
+                left = 0f,
+                top = 0f,
+                right = size.width,
+                bottom = size.height,
+                paint = composePaint
+            )
         }
     }
 }
