@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.graphics.set
 import androidx.core.graphics.get
+import com.olaz.instasprite.domain.tool.selection.SelectionTool
 
 
 data class DrawingScreenState(
@@ -55,7 +56,8 @@ data class DrawingScreenState(
     val isSaving: Boolean = false,
     val selectedTool: Tool,
     val toolSize: Int,
-    val showLayerDrawer: Boolean = false
+    val showLayerDrawer: Boolean = false,
+    val isAppendSelectionMode: Boolean = false
 )
 
 @HiltViewModel(assistedFactory = DrawingViewModel.Factory::class)
@@ -101,6 +103,11 @@ class DrawingViewModel @AssistedInject constructor(
     private var _overlayBitmap: Bitmap? = null
     val overlayBitmap: Bitmap? get() = _overlayBitmap
     private var _overlayVersion: Long = 0
+
+    // selection bitmap
+    private var _selectionBitmap: Bitmap? = null
+    val selectionBitmap: Bitmap? get() = _selectionBitmap
+    private var _selectionVersion: Long = 0
 
     // Reused stroke buffers to avoid per-move allocations.
     private var strokeTouchMarks: IntArray = IntArray(0)
@@ -176,6 +183,8 @@ class DrawingViewModel @AssistedInject constructor(
         _bitmap = null
         _overlayBitmap?.recycle()
         _overlayBitmap = null
+        _selectionBitmap?.recycle()
+        _selectionBitmap = null
     }
 
     private fun ensureBitmap(width: Int, height: Int) {
@@ -196,6 +205,43 @@ class DrawingViewModel @AssistedInject constructor(
 
     private fun clearOverlayBitmap() {
         _overlayBitmap?.eraseColor(android.graphics.Color.TRANSPARENT)
+    }
+
+    private fun ensureSelectionBitmap() {
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        if (_selectionBitmap == null || _selectionBitmap!!.width != w || _selectionBitmap!!.height != h) {
+            _selectionBitmap?.recycle()
+            _selectionBitmap = if (w > 0 && h > 0) createBitmap(w, h) else null
+        }
+    }
+    
+    private fun clearSelectionBitmap() {
+        _selectionBitmap?.eraseColor(android.graphics.Color.TRANSPARENT)
+    }
+
+    private fun refreshSelectionBitmap() {
+        ensureSelectionBitmap()
+        val sel = _canvasState.value.selectionState
+        if (sel != null) {
+            val bmp = _selectionBitmap ?: return
+            val mask = sel.mask
+            val w = bmp.width
+            val h = bmp.height
+            val dimTint = 0x60000000 // dim background
+            val pixels = IntArray(w * h)
+            
+            for (i in 0 until w * h) {
+                if (!mask[i]) {
+                    pixels[i] = dimTint
+                }
+            }
+            
+            bmp.setPixels(pixels, 0, w, 0, 0, w, h)
+        } else {
+            clearSelectionBitmap()
+        }
+        _selectionVersion++
     }
 
     private fun ensureStrokeTrackingCapacity(width: Int, height: Int) {
@@ -354,12 +400,39 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun onCanvasEvent(event: PixelCanvasEvent) {
         when (event) {
-            is PixelCanvasEvent.OnStrokeStart -> onStrokeStart(event.y, event.x)
-            is PixelCanvasEvent.OnStrokeMove -> onStrokeMove(event.y, event.x)
+            is PixelCanvasEvent.OnStrokeStart -> onStrokeStart(event.y, event.x, event.zoomScale)
+            is PixelCanvasEvent.OnStrokeMove -> onStrokeMove(event.y, event.x, event.zoomScale)
             is PixelCanvasEvent.OnStrokeEnd -> onStrokeEnd()
             is PixelCanvasEvent.OnStrokeCancel -> onStrokeCancel()
             is PixelCanvasEvent.OnTapAt -> onTapAt(event.y, event.x)
+            is PixelCanvasEvent.ClearSelection -> clearSelection()
+            is PixelCanvasEvent.InvertSelection -> invertSelection()
         }
+    }
+
+    private fun clearSelection() {
+        pixelCanvasUseCase.setSelectionMask(null)
+        _canvasState.value = _canvasState.value.copy(selectionState = null)
+        refreshSelectionBitmap()
+    }
+    
+    private fun invertSelection() {
+        val sel = _canvasState.value.selectionState ?: return
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        val newMask = BooleanArray(w * h)
+        for (i in newMask.indices) {
+            newMask[i] = !sel.mask[i]
+        }
+        val newSel = com.olaz.instasprite.domain.model.SelectionState(
+            mask = newMask,
+            bounds = android.graphics.Rect(0, 0, w, h),
+            canvasWidth = w,
+            canvasHeight = h
+        )
+        pixelCanvasUseCase.setSelectionMask(newMask)
+        _canvasState.value = _canvasState.value.copy(selectionState = newSel)
+        refreshSelectionBitmap()
     }
 
     fun onToolSelectorEvent(event: ToolSelectorEvent) {
@@ -370,6 +443,11 @@ class DrawingViewModel @AssistedInject constructor(
             is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
             is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
             is ToolSelectorEvent.SelectTool -> selectTool(tool = event.tool)
+            is ToolSelectorEvent.ToggleAppendSelectionMode -> {
+                _uiState.value = _uiState.value.copy(
+                    isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
+                )
+            }
         }
     }
 
@@ -396,17 +474,25 @@ class DrawingViewModel @AssistedInject constructor(
 
     // --- Stroke lifecycle ---
 
-    private fun onStrokeStart(row: Int, col: Int) {
+    private fun onStrokeStart(row: Int, col: Int, zoomScale: Float = 1f) {
         val tool = _uiState.value.selectedTool
         if (tool !is StrokeTool) return
 
-        saveState()
+        if (tool !is SelectionTool) {
+            saveState()
+        }
 
         val color = activeColor.value
         val scale = _uiState.value.toolSize
         ensureOverlayBitmap()
         if (!tool.commitsImmediately) {
             beginOverlayStrokeTracking()
+        }
+
+        if (tool is SelectionTool) {
+            if (tool is com.olaz.instasprite.domain.tool.selection.RectangleSelectionTool) {
+                tool.setZoomScale(zoomScale)
+            }
         }
 
         tool.beginStroke(
@@ -428,7 +514,7 @@ class DrawingViewModel @AssistedInject constructor(
         }
     }
 
-    private fun onStrokeMove(row: Int, col: Int) {
+    private fun onStrokeMove(row: Int, col: Int, zoomScale: Float = 1f) {
         val tool = _uiState.value.selectedTool
         if (tool !is StrokeTool) return
 
@@ -445,7 +531,7 @@ class DrawingViewModel @AssistedInject constructor(
             return
         }
 
-        if (tool is ShapeTool) {
+        if (tool is ShapeTool || tool is SelectionTool) {
             beginOverlayStrokeTracking()
         }
 
@@ -466,6 +552,39 @@ class DrawingViewModel @AssistedInject constructor(
         if (tool !is StrokeTool) return
 
         tool.endStroke()
+
+        if (tool is SelectionTool) {
+            val sel = tool.currentSelection
+            if (sel != null) {
+                val oldSel = _canvasState.value.selectionState
+                val finalSel = if (_uiState.value.isAppendSelectionMode && oldSel != null) {
+                    val w = pixelCanvasUseCase.getCanvasWidth()
+                    val h = pixelCanvasUseCase.getCanvasHeight()
+                    val newMask = BooleanArray(w * h)
+                    for (i in newMask.indices) {
+                        newMask[i] = oldSel.mask[i] || sel.mask[i]
+                    }
+                    val newBounds = android.graphics.Rect(
+                        minOf(oldSel.bounds.left, sel.bounds.left),
+                        minOf(oldSel.bounds.top, sel.bounds.top),
+                        maxOf(oldSel.bounds.right, sel.bounds.right),
+                        maxOf(oldSel.bounds.bottom, sel.bounds.bottom)
+                    )
+                    com.olaz.instasprite.domain.model.SelectionState(newMask, newBounds, w, h)
+                } else {
+                    sel
+                }
+                
+                pixelCanvasUseCase.setSelectionMask(finalSel.mask)
+                _canvasState.value = _canvasState.value.copy(selectionState = finalSel)
+                refreshSelectionBitmap()
+            }
+            clearOverlayBitmap()
+            _overlayVersion++
+            _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+            strokeTouchedCount = 0
+            return
+        }
 
         if (!tool.commitsImmediately && strokeTouchedCount > 0) {
             commitOverlayStrokeToLayer()
@@ -489,15 +608,29 @@ class DrawingViewModel @AssistedInject constructor(
         if (tool !is StrokeTool) return
 
         tool.cancelStroke()
-        restorePendingHistoryCapture()
         clearOverlayBitmap()
         _overlayVersion++
+
+        if (tool !is SelectionTool) {
+            restorePendingHistoryCapture()
+        }
     }
 
     private fun onTapAt(row: Int, col: Int) {
         val tool = _uiState.value.selectedTool
         val color = activeColor.value
         val size = _uiState.value.toolSize
+
+        if (tool is SelectionTool) {
+            tool.apply(pixelCanvasUseCase, row, col, color)
+            val sel = tool.currentSelection
+            if (sel != null) {
+                pixelCanvasUseCase.setSelectionMask(sel.mask)
+                _canvasState.value = _canvasState.value.copy(selectionState = sel)
+                refreshSelectionBitmap()
+            }
+            return
+        }
 
         if (tool is FillTool) {
             if (_fillRunning) return

@@ -1,14 +1,92 @@
 package com.olaz.instasprite.utils
 
+import android.graphics.Matrix
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import com.olaz.instasprite.domain.model.SelectionState
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
+
+fun DrawScope.drawSelectionOverlay(
+    selectionState: SelectionState,
+    showGrabHandle: Boolean,
+    canvasWidth: Int,
+    canvasHeight: Int,
+    dstSize: IntSize,
+    scale: Float
+) {
+    val pxW = dstSize.width.toFloat() / canvasWidth
+    val pxH = dstSize.height.toFloat() / canvasHeight
+
+    val matrix = Matrix()
+    matrix.setScale(pxW, pxH)
+    val scaledPath = Path().apply {
+        addPath(selectionState.outlinePath)
+        asAndroidPath().transform(matrix)
+    }
+
+    val outlineWidth = 2.dp.toPx() / scale
+    val bgOutlineWidth = 3.dp.toPx() / scale
+
+    drawPath(
+        path = scaledPath,
+        color = Color.Black,
+        style = Stroke(width = bgOutlineWidth),
+
+    )
+    drawPath(
+        path = scaledPath,
+        color = Color.White,
+        style = Stroke(width = outlineWidth)
+    )
+
+    if (showGrabHandle) {
+        val b = selectionState.bounds
+        val handleSize = 16.dp.toPx() / scale
+        val strokeWidth = 1.dp.toPx() / scale
+
+        val left = b.left * pxW
+        val right = b.right * pxW
+        val top = b.top * pxH
+        val bottom = b.bottom * pxH
+        val midX = (left + right) / 2f
+        val midY = (top + bottom) / 2f
+
+        val points = listOf(
+            Offset(left, top),
+            Offset(right, top),
+            Offset(left, bottom),
+            Offset(right, bottom),
+            Offset(midX, top),
+            Offset(midX, bottom),
+            Offset(left, midY),
+            Offset(right, midY)
+        )
+
+        for (pt in points) {
+            drawRect(
+                color = Color.White,
+                topLeft = Offset(pt.x - handleSize / 2, pt.y - handleSize / 2),
+                size = Size(handleSize, handleSize)
+            )
+            drawRect(
+                color = Color.Black,
+                topLeft = Offset(pt.x - handleSize / 2, pt.y - handleSize / 2),
+                size = Size(handleSize, handleSize),
+                style = Stroke(width = strokeWidth)
+            )
+        }
+    }
+}
 
 private fun DrawScope.drawGridOverlay(
     canvasWidth: Int,

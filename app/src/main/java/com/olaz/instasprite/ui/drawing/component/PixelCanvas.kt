@@ -27,11 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
+import com.olaz.instasprite.domain.tool.selection.RectangleSelectionTool
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.drawCheckerboard
+import com.olaz.instasprite.utils.drawSelectionOverlay
 import com.olaz.instasprite.utils.drawingPointerInput
 
 @Composable
@@ -40,7 +42,9 @@ fun PixelCanvas(
     pixelCanvasState: PixelCanvasState,
     bitmap: Bitmap?,
     overlayBitmap: Bitmap?,
+    selectionBitmap: Bitmap?,
     selectedTool: Tool?,
+    isSelectionAppendMode: Boolean,
     scale: Float,
     offset: Offset,
     onTransform: (Offset, Offset, Float, IntSize) -> Unit,
@@ -60,6 +64,11 @@ fun PixelCanvas(
 
     val overlayImageBitmap = remember(overlayBitmap, overlayVersion) {
         overlayBitmap?.asImageBitmap()
+    }
+
+    val selectionState = pixelCanvasState.selectionState
+    val selectionImageBitmap = remember(selectionBitmap, selectionState) {
+        selectionBitmap?.asImageBitmap()
     }
 
     val aspectRatio = canvasWidth.toFloat() / canvasHeight.toFloat()
@@ -100,6 +109,7 @@ fun PixelCanvas(
                             canvasWidth = canvasWidth,
                             canvasHeight = canvasHeight,
                             selectedTool = selectedTool,
+                            scale = scale,
                             onEvent = onEvent,
                             onTransform = { centroid, pan, zoom ->
                                 onTransform(centroid, pan, zoom, canvasLayoutSize)
@@ -115,12 +125,32 @@ fun PixelCanvas(
                         filterQuality = FilterQuality.None
                     )
 
+                    selectionImageBitmap?.let {
+                        drawImage(
+                            image = it,
+                            dstOffset = IntOffset.Zero,
+                            dstSize = dstSize,
+                            filterQuality = FilterQuality.None
+                        )
+                    }
+
                     overlayImageBitmap?.let {
                         drawImage(
                             image = it,
                             dstOffset = IntOffset.Zero,
                             dstSize = dstSize,
                             filterQuality = FilterQuality.None
+                        )
+                    }
+
+                    if (selectionState != null) {
+                        drawSelectionOverlay(
+                            selectionState = selectionState,
+                            showGrabHandle = (selectedTool is RectangleSelectionTool && !isSelectionAppendMode),
+                            canvasWidth = canvasWidth,
+                            canvasHeight = canvasHeight,
+                            dstSize = dstSize,
+                            scale = scale
                         )
                     }
                 }
@@ -140,10 +170,12 @@ private fun Preview() {
             ),
             bitmap = createBitmap(16, 16),
             selectedTool = PencilTool,
+            isSelectionAppendMode = false,
             scale = 1f,
             offset = Offset.Zero,
             onTransform = { _, _, _, _ -> },
             overlayBitmap = null,
+            selectionBitmap = null,
             onEvent = {},
             modifier = Modifier.fillMaxSize()
         )

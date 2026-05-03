@@ -10,31 +10,27 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.domain.tool.shape.CircleTool
-import com.olaz.instasprite.domain.tool.shape.DiamondTool
-import com.olaz.instasprite.domain.tool.shape.LineTool
-import com.olaz.instasprite.domain.tool.shape.OvalTool
-import com.olaz.instasprite.domain.tool.shape.RectangleTool
 import com.olaz.instasprite.domain.tool.Tool
+import com.olaz.instasprite.domain.tool.selection.LassoSelectionTool
+import com.olaz.instasprite.domain.tool.selection.MagicWandTool
+import com.olaz.instasprite.domain.tool.selection.RectangleSelectionTool
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
 @Composable
-fun ShapeSelector(
+fun SelectionModeSelector(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
     selectedTool: Tool,
-    onShapeSelected: (Tool) -> Unit
+    onSelectionToolSelected: (Tool) -> Unit
 ) {
-    val shapeTools = listOf(
-        LineTool,
-        RectangleTool,
-        CircleTool,
-        OvalTool,
-        DiamondTool
+    val selectionTools = listOf(
+        RectangleSelectionTool,
+        LassoSelectionTool,
+        MagicWandTool
     )
 
     AnimatedVisibility(
@@ -46,17 +42,18 @@ fun ShapeSelector(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(CatppuccinUI.BackgroundColor)
-                .padding(horizontal = 5.dp, vertical = 5.dp),
+                .background(CatppuccinUI.BackgroundColor),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            shapeTools.forEach { tool ->
-                ToolItem(
-                    iconResourceId = tool.icon,
-                    contentDescription = tool.description,
-                    selected = selectedTool == tool,
-                    onClick = { onShapeSelected(tool) }
-                )
+            selectionTools.forEach { tool ->
+                TextButton(
+                    onClick = { onSelectionToolSelected(tool) },
+                ) {
+                    Text(
+                        text = tool.name,
+                        color = if (selectedTool == tool) CatppuccinUI.AccentButtonColor else CatppuccinUI.TextColorLight
+                    )
+                }
             }
         }
     }

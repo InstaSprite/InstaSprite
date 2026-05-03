@@ -51,6 +51,7 @@ fun Modifier.drawingPointerInput(
     canvasWidth: Int,
     canvasHeight: Int,
     selectedTool: Tool?,
+    scale: Float,
     onEvent: (PixelCanvasEvent) -> Unit,
     onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit
 ): Modifier {
@@ -65,6 +66,7 @@ fun Modifier.drawingPointerInput(
                 canvasWidth = canvasWidth,
                 canvasHeight = canvasHeight,
                 selectedTool = selectedTool,
+                scale = scale,
                 touchSlop = touchSlop,
                 size = size,
                 onEvent = onEvent,
@@ -87,6 +89,7 @@ private class DrawingGestureHandler(
     private val canvasWidth: Int,
     private val canvasHeight: Int,
     private val selectedTool: Tool?,
+    private val scale: Float,
     private val touchSlop: Float,
     private val size: IntSize,
     private val onEvent: (PixelCanvasEvent) -> Unit,
@@ -151,13 +154,13 @@ private class DrawingGestureHandler(
                 state = DrawingGestureState.Drawing
                 passedSlop = true
                 val startCell = startPosition.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
-                onEvent(PixelCanvasEvent.OnStrokeStart(startCell.x, startCell.y))
+                onEvent(PixelCanvasEvent.OnStrokeStart(startCell.x, startCell.y, scale))
                 lastCell = startCell
             }
 
             val dragCell = pointerChange.position.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
             if (dragCell != lastCell) {
-                onEvent(PixelCanvasEvent.OnStrokeMove(dragCell.x, dragCell.y))
+                onEvent(PixelCanvasEvent.OnStrokeMove(dragCell.x, dragCell.y, scale))
                 lastCell = dragCell
             }
         } else {

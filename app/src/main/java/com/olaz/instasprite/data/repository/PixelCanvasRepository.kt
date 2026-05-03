@@ -34,6 +34,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     var activeLayerId: String = ""
         private set
 
+    var selectionMask: BooleanArray? = null
+
     init {
         if (_layers.isEmpty()) {
             addLayer("Layer 1")
@@ -309,6 +311,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
     fun setPixel(row: Int, col: Int, color: Color) {
         if (row in 0 until height && col in 0 until width) {
+            if (selectionMask?.get(row * width + col) == false) return
+            
             val index = getActiveLayerIndex()
             if (index !in _layers.indices) return
             val layer = _layers[index]
@@ -438,7 +442,21 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         if (idx !in _layers.indices) return
         val layer = _layers[idx]
         if (!layer.isLocked && pixels.size == width * height) {
-            _layers[idx] = layer.copy(tiles = pixelsToTiles(pixels, width, height))
+            if (selectionMask != null) {
+                val currentPixels = tilesToPixels(layer.tiles, width, height)
+                var changed = false
+                for (i in pixels.indices) {
+                    if (selectionMask!![i] && currentPixels[i] != pixels[i]) {
+                        currentPixels[i] = pixels[i]
+                        changed = true
+                    }
+                }
+                if (changed) {
+                    _layers[idx] = layer.copy(tiles = pixelsToTiles(currentPixels, width, height))
+                }
+            } else {
+                _layers[idx] = layer.copy(tiles = pixelsToTiles(pixels, width, height))
+            }
         }
     }
 
@@ -458,6 +476,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         for (i in 0 until writeCount) {
             val pixelIndex = indices[i]
             if (pixelIndex !in 0 until (width * height)) continue
+            if (selectionMask?.get(pixelIndex) == false) continue
 
             val row = pixelIndex / width
             val col = pixelIndex % width
