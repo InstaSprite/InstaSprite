@@ -413,6 +413,10 @@ class DrawingViewModel @AssistedInject constructor(
     private fun clearSelection() {
         pixelCanvasUseCase.setSelectionMask(null)
         _canvasState.value = _canvasState.value.copy(selectionState = null)
+        val tool = _uiState.value.selectedTool
+        if (tool is SelectionTool) {
+            tool.clearSelection()
+        }
         refreshSelectionBitmap()
     }
     
@@ -490,6 +494,9 @@ class DrawingViewModel @AssistedInject constructor(
         }
 
         if (tool is SelectionTool) {
+            if (_canvasState.value.selectionState == null) {
+                tool.clearSelection()
+            }
             if (tool is com.olaz.instasprite.domain.tool.selection.RectangleSelectionTool) {
                 tool.setZoomScale(zoomScale)
             }

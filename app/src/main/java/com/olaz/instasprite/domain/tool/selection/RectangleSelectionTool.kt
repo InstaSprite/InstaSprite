@@ -71,16 +71,19 @@ object RectangleSelectionTool : StrokeTool, SelectionTool {
             
             // Handle size is visually 16dp.
             // On a zoomed canvas, 1 canvas pixel = 1 * zoomScale screen pixels.
-            // A visual handle width of 16.dp corresponds to roughly (24 / zoomScale) canvas pixels.
             // We use half of that for tolerance from the center point.
-            val tol = maxOf(2, (12f / zoomScale).toInt())
+            var tol = maxOf(2, (12f / zoomScale).toInt())
+            val maxTolX = maxOf(1, (right - left) / 3)
+            val maxTolY = maxOf(1, (bottom - top) / 3)
+            val tolX = minOf(tol, maxTolX)
+            val tolY = minOf(tol, maxTolY)
             
-            val nearLeft = Math.abs(col - left) <= tol
-            val nearRight = Math.abs(col - right) <= tol
-            val nearTop = Math.abs(row - top) <= tol
-            val nearBottom = Math.abs(row - bottom) <= tol
-            val nearMidX = Math.abs(col - midX) <= tol
-            val nearMidY = Math.abs(row - midY) <= tol
+            val nearLeft = Math.abs(col - left) <= tolX
+            val nearRight = Math.abs(col - right) <= tolX
+            val nearTop = Math.abs(row - top) <= tolY
+            val nearBottom = Math.abs(row - bottom) <= tolY
+            val nearMidX = Math.abs(col - midX) <= tolX
+            val nearMidY = Math.abs(row - midY) <= tolY
 
             if (nearTop && nearLeft) resizeMode = ResizeMode.TOP_LEFT
             else if (nearTop && nearRight) resizeMode = ResizeMode.TOP_RIGHT
