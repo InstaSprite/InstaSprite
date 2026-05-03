@@ -106,6 +106,7 @@ fun HomeScreen(
     val sessionState by sessionViewModel.sessionState.collectAsState()
     val feedListState = rememberLazyListState()
     val isLoggedIn = sessionState is SocialSessionState.LoggedIn
+    val isOnline by feedViewModel.isOnline.collectAsState()
     val currentUsername = (sessionState as? SocialSessionState.LoggedIn)?.username
         ?.takeIf { it.isNotBlank() }
         ?: feedState.profileState.memberUsername.takeIf { it.isNotBlank() }
@@ -185,7 +186,9 @@ fun HomeScreen(
             onRefreshed = feedViewModel::onRefreshed,
             onConsumeRefreshPending = feedViewModel::consumeRefreshPending,
             onUpdateTopPostId = feedViewModel::updateTopPostId,
-            onOpenHashtag = {}
+            onOpenHashtag = {},
+            onClearError = feedViewModel::clearError,
+            onRetryConnection = feedViewModel::retryConnection
         )
     }
 
@@ -308,6 +311,7 @@ fun HomeScreen(
 
                         1 -> FeedContent(
                             isLoggedIn = isLoggedIn,
+                            isOnline = isOnline,
                             state = feedState,
                             listState = feedListState,
                             event = feedEvent,

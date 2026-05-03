@@ -71,7 +71,9 @@ fun HashtagFeedScreenContent(
         onRefreshed = {},
         onConsumeRefreshPending = {},
         onUpdateTopPostId = {},
-        onOpenHashtag = onOpenHashtag
+        onOpenHashtag = onOpenHashtag,
+        onClearError = {},
+        onRetryConnection = {}
     )
 
     Scaffold(

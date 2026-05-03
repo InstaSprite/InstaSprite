@@ -1,12 +1,15 @@
 package com.olaz.instasprite.ui.social.search
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.network.model.toDomain
 import com.olaz.instasprite.data.repository.SearchRepository
 import com.olaz.instasprite.domain.model.MemberData
 import com.olaz.instasprite.domain.model.PostData
+import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +32,8 @@ data class SearchUiState(
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -61,7 +65,7 @@ class SearchViewModel @Inject constructor(
                     }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isSearching = false, error = e.message) }
+                    _uiState.update { it.copy(isSearching = false, error = e.toUserMessage(context)) }
                 }
             )
         }
@@ -93,7 +97,7 @@ class SearchViewModel @Inject constructor(
                     }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isLoadingTrending = false, error = e.message) }
+                    _uiState.update { it.copy(isLoadingTrending = false, error = e.toUserMessage(context)) }
                 }
             )
         }

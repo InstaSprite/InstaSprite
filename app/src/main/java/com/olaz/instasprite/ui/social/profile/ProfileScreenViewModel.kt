@@ -2,14 +2,10 @@ package com.olaz.instasprite.ui.social.profile
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.olaz.instasprite.R
 import com.olaz.instasprite.data.network.model.EditProfileRequestDto
 import com.olaz.instasprite.data.network.model.FollowerDto
-    // Removed FollowingDto
-import com.olaz.instasprite.data.network.model.UserProfileDto
 import com.olaz.instasprite.data.repository.FollowRepository
 import com.olaz.instasprite.data.repository.ProfileRepository
 import com.olaz.instasprite.ui.social.PostInteractionEvent
@@ -17,6 +13,7 @@ import com.olaz.instasprite.ui.social.profile.contract.FollowerUser
 import com.olaz.instasprite.ui.social.profile.contract.ProfileContentState
 import com.olaz.instasprite.ui.social.profile.contract.UserProfileState
 import com.olaz.instasprite.utils.Constants
+import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -109,53 +106,29 @@ class ProfileScreenViewModel @Inject constructor(
     fun loadCurrentUserProfile() {
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            try {
-                val response = profileRepository.getCurrentUserProfile()
-                if (response.status == 200 && response.data != null) {
-                    val userProfile = mapUserProfileResponseToUserProfile(response.data)
+            profileRepository.getCurrentUserProfile().fold(
+                onSuccess = { data ->
+                    val userProfile = mapUserProfileResponseToUserProfile(data)
                     _contentState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = null,
-                            userProfile = userProfile
-                        )
+                        it.copy(isLoading = false, errorMessage = null, userProfile = userProfile)
                     }
                     refreshPosts(userProfile.username)
-                    Log.d(
-                        "ProfileScreenViewModel",
-                        "Profile loaded successfully: ${userProfile.username}"
-                    )
-                } else {
+                },
+                onFailure = { error ->
                     _contentState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = response.message
-                                ?: context.getString(R.string.failed_to_load_profile)
-                        )
+                        it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
                     }
-                    Log.e("ProfileScreenViewModel", "Failed to load profile: ${response.message}")
                 }
-            } catch (e: Exception) {
-                _contentState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message
-                            ?: context.getString(R.string.unknown_error_occurred)
-                    )
-                }
-                Log.e("ProfileScreenViewModel", "Error loading profile", e)
-            }
+            )
         }
     }
 
     fun loadUserProfile(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update { it.copy(isLoading = true, errorMessage = null) }
-            try {
-                val response = profileRepository.getUserProfile(userId)
-                if (response.status == 200 && response.data != null) {
-                    val userProfile = mapUserProfileResponseToUserProfile(response.data)
+            profileRepository.getUserProfile(userId).fold(
+                onSuccess = { data ->
+                    val userProfile = mapUserProfileResponseToUserProfile(data)
                     _contentState.update {
                         it.copy(
                             isLoading = false,
@@ -167,40 +140,19 @@ class ProfileScreenViewModel @Inject constructor(
                         )
                     }
                     refreshPosts(userProfile.username)
-                } else {
+                },
+                onFailure = { error ->
                     _contentState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = response.message
-                                ?: context.getString(R.string.failed_to_load_profile)
-                        )
+                        it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
                     }
                 }
-            } catch (e: Exception) {
-                _contentState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message
-                            ?: context.getString(R.string.unknown_error_occurred)
-                    )
-                }
-            }
+            )
         }
     }
 
     private suspend fun refreshPosts(username: String) {
-        try {
-            profileRepository.getRecentPostsByUsername(username).fold(
-                onSuccess = { posts ->
-                    Log.d("ProfileScreenViewModel", "Loaded ${posts.size} posts for $username")
-                    _contentState.update { it.copy(userPosts = posts) }
-                },
-                onFailure = { error ->
-                    Log.e("ProfileScreenViewModel", "Failed to load posts for $username", error)
-                }
-            )
-        } catch (e: Exception) {
-            Log.e("ProfileScreenViewModel", "Exception loading posts", e)
+        profileRepository.getRecentPostsByUsername(username).onSuccess { posts ->
+            _contentState.update { it.copy(userPosts = posts) }
         }
     }
 
@@ -215,24 +167,19 @@ class ProfileScreenViewModel @Inject constructor(
     fun selectTab(tabIndex: Int) {
         _contentState.update { it.copy(selectedTabIndex = tabIndex) }
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (tabIndex == 1) {
-                    if (_contentState.value.userProfile.isOwnProfile) {
-                        profileRepository.getRecentSavedPosts().fold(
-                            onSuccess = { posts ->
-                                Log.d("ProfileScreenViewModel", "Loaded ${posts.size} saved posts")
-                                _contentState.update { it.copy(sharedPosts = posts) }
-                            },
-                            onFailure = { error ->
-                                Log.e("ProfileScreenViewModel", "Failed to load saved posts", error)
-                                _contentState.update { it.copy(sharedPosts = emptyList()) }
-                            }
-                        )
-                    } else {
-                        _contentState.update { it.copy(sharedPosts = emptyList()) }
-                    }
+            if (tabIndex == 1) {
+                if (_contentState.value.userProfile.isOwnProfile) {
+                    profileRepository.getRecentSavedPosts().fold(
+                        onSuccess = { posts ->
+                            _contentState.update { it.copy(sharedPosts = posts) }
+                        },
+                        onFailure = {
+                            _contentState.update { it.copy(sharedPosts = emptyList()) }
+                        }
+                    )
+                } else {
+                    _contentState.update { it.copy(sharedPosts = emptyList()) }
                 }
-            } catch (_: Exception) {
             }
         }
     }
@@ -241,59 +188,42 @@ class ProfileScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                val editProfileResponse = profileRepository.getEditProfile()
-                if (editProfileResponse.status != 200 || editProfileResponse.data == null) {
-                    _contentState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = context.getString(R.string.failed_to_get_current_user_data)
-                        )
-                    }
-                    return@launch
-                }
-
-                val currentProfile = _contentState.value.userProfile
-                val request = EditProfileRequestDto(
-                    memberUsername = currentProfile.username,
-                    memberName = displayName,
-                    memberIntroduce = bio,
-                    memberEmail = editProfileResponse.data.memberEmail
-                )
-
-                val response = profileRepository.editProfile(request)
-                if (response.status == 200) {
-                    _contentState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = null,
-                            userProfile = it.userProfile.copy(
-                                displayName = displayName,
-                                bio = bio
-                            )
-                        )
-                    }
-                    Log.d("ProfileScreenViewModel", "Profile updated successfully")
-                } else {
-                    _contentState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = response.message
-                                ?: context.getString(R.string.failed_to_update_profile)
-                        )
-                    }
-                    Log.e("ProfileScreenViewModel", "Failed to update profile: ${response.message}")
-                }
-            } catch (e: Exception) {
-                _contentState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message
-                            ?: context.getString(R.string.unknown_error_occurred)
+            profileRepository.getEditProfile().fold(
+                onSuccess = { editData ->
+                    val currentProfile = _contentState.value.userProfile
+                    val request = EditProfileRequestDto(
+                        memberUsername = currentProfile.username,
+                        memberName = displayName,
+                        memberIntroduce = bio,
+                        memberEmail = editData.memberEmail
                     )
+
+                    profileRepository.editProfile(request).fold(
+                        onSuccess = {
+                            _contentState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    errorMessage = null,
+                                    userProfile = it.userProfile.copy(
+                                        displayName = displayName,
+                                        bio = bio
+                                    )
+                                )
+                            }
+                        },
+                        onFailure = { error ->
+                            _contentState.update {
+                                it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
+                            }
+                        }
+                    )
+                },
+                onFailure = { error ->
+                    _contentState.update {
+                        it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
+                    }
                 }
-                Log.e("ProfileScreenViewModel", "Error updating profile", e)
-            }
+            )
         }
     }
 
@@ -314,13 +244,10 @@ class ProfileScreenViewModel @Inject constructor(
                 followRepository.unfollow(targetUsername)
             }
 
-            result.onFailure { exception ->
+            result.onFailure { error ->
                 PostInteractionEvent.emitFollowEvent(targetUsername, currentIsFollowing)
                 _contentState.update {
-                    it.copy(
-                        errorMessage = exception.message
-                            ?: context.getString(R.string.failed_to_update_follow_status)
-                    )
+                    it.copy(errorMessage = error.toUserMessage(context))
                 }
             }
         }
@@ -351,52 +278,40 @@ class ProfileScreenViewModel @Inject constructor(
     private fun loadFollowers() {
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update { it.copy(followersLoading = true) }
-            try {
-                val username = _contentState.value.userProfile.username
-                followRepository.getFollowers(username).fold(
-                    onSuccess = { followers ->
-                        _contentState.update {
-                            it.copy(
-                                followers = followers.content.map(::mapFollowerDto),
-                                followersLoading = false
-                            )
-                        }
-                    },
-                    onFailure = { error ->
-                        Log.e("ProfileScreenViewModel", "Failed to load followers", error)
-                        _contentState.update { it.copy(followersLoading = false) }
+            val username = _contentState.value.userProfile.username
+            followRepository.getFollowers(username).fold(
+                onSuccess = { followers ->
+                    _contentState.update {
+                        it.copy(
+                            followers = followers.content.map(::mapFollowerDto),
+                            followersLoading = false
+                        )
                     }
-                )
-            } catch (e: Exception) {
-                Log.e("ProfileScreenViewModel", "Error in loadFollowers", e)
-                _contentState.update { it.copy(followersLoading = false) }
-            }
+                },
+                onFailure = {
+                    _contentState.update { it.copy(followersLoading = false) }
+                }
+            )
         }
     }
 
     private fun loadFollowing() {
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update { it.copy(followingLoading = true) }
-            try {
-                val username = _contentState.value.userProfile.username
-                followRepository.getFollowings(username).fold(
-                    onSuccess = { following ->
-                        _contentState.update {
-                            it.copy(
-                                following = following.content.map(::mapFollowerDto),
-                                followingLoading = false
-                            )
-                        }
-                    },
-                    onFailure = { error ->
-                        Log.e("ProfileScreenViewModel", "Failed to load following", error)
-                        _contentState.update { it.copy(followingLoading = false) }
+            val username = _contentState.value.userProfile.username
+            followRepository.getFollowings(username).fold(
+                onSuccess = { following ->
+                    _contentState.update {
+                        it.copy(
+                            following = following.content.map(::mapFollowerDto),
+                            followingLoading = false
+                        )
                     }
-                )
-            } catch (e: Exception) {
-                Log.e("ProfileScreenViewModel", "Error in loadFollowing", e)
-                _contentState.update { it.copy(followingLoading = false) }
-            }
+                },
+                onFailure = {
+                    _contentState.update { it.copy(followingLoading = false) }
+                }
+            )
         }
     }
 
@@ -430,20 +345,19 @@ class ProfileScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update {
                 it.copy(
-                    profileImageUiState = it.profileImageUiState.copy(
-                        isLoading = true,
-                        error = null
-                    )
+                    profileImageUiState = it.profileImageUiState.copy(isLoading = true, error = null)
                 )
             }
-            try {
-                val response = if (userId.isNullOrBlank()) {
-                    profileRepository.getCurrentUserProfile()
-                } else {
-                    profileRepository.getUserProfile(userId)
-                }
-                if (response.status == 200 && response.data != null) {
-                    val imageUrl = response.data.memberImage?.imageUrl
+
+            val result = if (userId.isNullOrBlank()) {
+                profileRepository.getCurrentUserProfile()
+            } else {
+                profileRepository.getUserProfile(userId)
+            }
+
+            result.fold(
+                onSuccess = { data ->
+                    val imageUrl = data.memberImage?.imageUrl
                     val finalUrl = if (!imageUrl.isNullOrEmpty()) {
                         "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
                     } else {
@@ -452,34 +366,21 @@ class ProfileScreenViewModel @Inject constructor(
                     _contentState.update {
                         it.copy(
                             profileImageUiState = it.profileImageUiState.copy(
-                                isLoading = false,
-                                imageUrl = finalUrl,
-                                error = null
+                                isLoading = false, imageUrl = finalUrl, error = null
                             )
                         )
                     }
-                } else {
+                },
+                onFailure = { error ->
                     _contentState.update {
                         it.copy(
                             profileImageUiState = it.profileImageUiState.copy(
-                                isLoading = false,
-                                imageUrl = null,
-                                error = context.getString(R.string.failed_to_load_profile)
+                                isLoading = false, imageUrl = null, error = error.toUserMessage(context)
                             )
                         )
                     }
                 }
-            } catch (e: Exception) {
-                _contentState.update {
-                    it.copy(
-                        profileImageUiState = it.profileImageUiState.copy(
-                            isLoading = false,
-                            imageUrl = null,
-                            error = e.message ?: context.getString(R.string.unknown_error)
-                        )
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -487,40 +388,27 @@ class ProfileScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update {
                 it.copy(
-                    profileImageUiState = it.profileImageUiState.copy(
-                        isLoading = true,
-                        error = null
-                    )
+                    profileImageUiState = it.profileImageUiState.copy(isLoading = true, error = null)
                 )
             }
-            try {
-                val response = profileRepository.uploadProfileImage(imageUri, context)
-                if (response.status == 200) {
+
+            profileRepository.uploadProfileImage(imageUri, context).fold(
+                onSuccess = {
                     if (_contentState.value.userProfile.isOwnProfile) {
                         loadProfileImage()
                     }
                     _contentState.update { it.copy(showEditAvatarDialog = false) }
-                } else {
+                },
+                onFailure = { error ->
                     _contentState.update {
                         it.copy(
                             profileImageUiState = it.profileImageUiState.copy(
-                                isLoading = false,
-                                error = response.message
-                                    ?: context.getString(R.string.failed_to_upload_image)
+                                isLoading = false, error = error.toUserMessage(context)
                             )
                         )
                     }
                 }
-            } catch (e: Exception) {
-                _contentState.update {
-                    it.copy(
-                        profileImageUiState = it.profileImageUiState.copy(
-                            isLoading = false,
-                            error = e.message ?: "Failed to upload image"
-                        )
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -536,7 +424,7 @@ class ProfileScreenViewModel @Inject constructor(
         )
     }
 
-    private fun mapUserProfileResponseToUserProfile(response: UserProfileDto): UserProfileState {
+    private fun mapUserProfileResponseToUserProfile(response: com.olaz.instasprite.data.network.model.UserProfileDto): UserProfileState {
         return UserProfileState(
             id = response.memberId.toString(),
             username = response.memberUsername,

@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import javax.inject.Inject
+import com.olaz.instasprite.utils.toUserMessage
 
 @HiltViewModel
 class CommentViewModel @Inject constructor(
@@ -81,7 +82,7 @@ class CommentViewModel @Inject constructor(
                     loadFullComments(postId)
                 },
                 onFailure = { e ->
-                    val errorMsg = e.message ?: context.getString(R.string.failed_to_load_post)
+                    val errorMsg = e.toUserMessage(context)
                     _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
                 }
             )
@@ -181,7 +182,8 @@ class CommentViewModel @Inject constructor(
                 }.onFailure {
                     _uiState.update { it.copy(comments = uiComments) }
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.toUserMessage(context)) }
             }
         }
     }
@@ -241,7 +243,8 @@ class CommentViewModel @Inject constructor(
                     val imageUrl = toFullImageUrl(response.body()?.data?.memberImage?.imageUrl)
                     _uiState.update { it.copy(currentUserImageUrl = imageUrl) }
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.toUserMessage(context)) }
             }
         }
     }

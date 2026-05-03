@@ -6,12 +6,15 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import coil3.decode.DecodeUtils.calculateInSampleSize
 import coil3.size.Scale
-import com.olaz.instasprite.di.RetrofitModule
 import com.olaz.instasprite.data.network.api.PostApi
-import com.olaz.instasprite.data.network.getBodyOrError
 import com.olaz.instasprite.data.network.model.PostDto
 import com.olaz.instasprite.data.network.model.PageDto
+import com.olaz.instasprite.data.network.model.SpringPageDto
 import com.olaz.instasprite.data.network.model.toDomain
+import com.olaz.instasprite.data.network.safeApiCall
+import com.olaz.instasprite.data.network.toResult
+import com.olaz.instasprite.data.network.toResultMessage
+import com.olaz.instasprite.data.network.toResultUnit
 import com.olaz.instasprite.domain.model.PageData
 import com.olaz.instasprite.domain.model.PostData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,26 +30,11 @@ import javax.inject.Inject
 
 class PostRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val postApi : PostApi
+    private val postApi: PostApi
 ) {
 
-    suspend fun getPost(postId: Long): Result<PostData> {
-        return try {
-            val response = postApi.getPost(postId)
-            val body = response.getBodyOrError(RetrofitModule.gson)
-
-            if (body != null && body.status == 200 && body.data != null) {
-                val post = body.data.toDomain()
-                Result.success(post)
-            } else {
-                val errorMessage = body?.message ?: "Failed to get post detail"
-                val errorCode = body?.code ?: response.code().toString()
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
+    suspend fun getPost(postId: Long): Result<PostData> = safeApiCall {
+        postApi.getPost(postId).toResult().map { it.toDomain() }
     }
 
     suspend fun uploadPostWithUris(
@@ -54,75 +42,92 @@ class PostRepository @Inject constructor(
         images: List<Uri>,
         altTexts: List<String>,
         commentFlag: Boolean,
-    ): Result<String> {
-        return try {
-            val imageParts = images.mapIndexed { index, uri ->
-                val fileName = "post_image_$index"
-                val file = compressImageIfNeeded(
-                    context = context,
-                    uri = uri,
-                    outputFileName = fileName
-                )
-
-                val requestFile = file
-                    .asRequestBody("image/jpeg".toMediaType())
-
-                MultipartBody.Part.createFormData(
-                    name = "postImages",
-                    filename = file.name,
-                    body = requestFile
-                )
-            }
-
-            val contentBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
-            val altTextParts = altTexts.mapIndexed { index, altText ->
-                MultipartBody.Part.createFormData("altTexts", altText)
-            }
-            val commentFlagBody = commentFlag.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-
-            val response = postApi.uploadPost(
-                content = contentBody,
-                postImages = imageParts,
-                altTexts = altTextParts,
-                commentFlag = commentFlagBody
+    ): Result<String> = safeApiCall {
+        val imageParts = images.mapIndexed { index, uri ->
+            val file = compressImageIfNeeded(
+                context = context,
+                uri = uri,
+                outputFileName = "post_image_$index"
             )
-            val body = response.getBodyOrError<Any>(RetrofitModule.gson)
+            val requestFile = file.asRequestBody("image/jpeg".toMediaType())
+            MultipartBody.Part.createFormData(
+                name = "postImages",
+                filename = file.name,
+                body = requestFile
+            )
+        }
 
-            if (body != null && body.status == 200) {
-                val postId = if (body.data is Map<*, *>) {
-                    val dataMap = body.data as Map<*, *>
-                    val postIdValue = dataMap["postId"]
-                    if (postIdValue is Number) {
-                        postIdValue.toLong()
-                    } else {
-                        null
-                    }
-                } else {
-                    null
-                }
-                Result.success("Post uploaded successfully with ID: $postId")
-            } else {
-                val errorMessage = body?.message ?: "Failed to upload post"
-                val errorCode = body?.code ?: response.code().toString()
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
+        val contentBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
+        val altTextParts = altTexts.map { altText ->
+            MultipartBody.Part.createFormData("altTexts", altText)
+        }
+        val commentFlagBody = commentFlag.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val response = postApi.uploadPost(
+            content = contentBody,
+            postImages = imageParts,
+            altTexts = altTextParts,
+            commentFlag = commentFlagBody
+        )
+        response.toResultMessage("Post uploaded successfully")
+    }
+
+    suspend fun getPostPage(lastPostId: Long?): Result<PageData> = safeApiCall {
+        postApi.getPostPage(lastPostId).toResult().map { it.toDomain() }
+    }
+
+    suspend fun getRecent10Posts(): Result<List<PostData>> = safeApiCall {
+        postApi.getRecent10Posts().toResult().map { list -> list.map { it.toDomain() } }
+    }
+
+    suspend fun getRecentPostsPage(lastPostId: Long?): Result<PageData> = safeApiCall {
+        postApi.getRecentPostsPage(lastPostId).toResult().map { it.toDomain() }
+    }
+
+    suspend fun likePost(postId: Long): Result<String> = safeApiCall {
+        postApi.likePost(postId).toResultMessage("Post liked")
+    }
+
+    suspend fun unlikePost(postId: Long): Result<String> = safeApiCall {
+        postApi.unlikePost(postId).toResultMessage("Post unliked")
+    }
+
+    suspend fun bookmarkPost(postId: Long): Result<String> = safeApiCall {
+        postApi.bookmarkPost(postId).toResultMessage("Post bookmarked")
+    }
+
+    suspend fun unBookmarkPost(postId: Long): Result<String> = safeApiCall {
+        postApi.unBookmarkPost(postId).toResultMessage("Post unbookmarked")
+    }
+
+    suspend fun deletePost(postId: Long): Result<Boolean> = safeApiCall {
+        postApi.deletePost(postId).toResultUnit().map { true }
+    }
+
+    suspend fun getMostLikedPost(): Result<PostData> = safeApiCall {
+        postApi.getMostLikedPost().toResult().map { it.toDomain() }
+    }
+
+    suspend fun getHashtagPosts(hashtag: String, page: Int = 1, size: Int = 10): Result<PageData> = safeApiCall {
+        postApi.getHashtagPosts(page = page, size = size, hashtag = hashtag).toResult().map { springPage ->
+            val posts = springPage.content.map { it.toDomain() }
+            PageData(
+                content = posts,
+                nextCursor = posts.lastOrNull()?.postId,
+                hasNext = !springPage.last
+            )
         }
     }
 
     private fun uriToFile(uri: Uri, baseFileName: String): File {
         val file = File(context.cacheDir, "$baseFileName.${getFileExtension(uri)}")
         file.createNewFile()
-
         val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
         inputStream?.use { input ->
             FileOutputStream(file).use { output ->
                 input.copyTo(output)
             }
         }
-
         return file
     }
 
@@ -130,16 +135,14 @@ class PostRepository @Inject constructor(
         context: Context,
         uri: Uri,
         outputFileName: String,
-        maxSizeBytes: Long = 1_500_000, // 1.5 MB
+        maxSizeBytes: Long = 1_500_000,
         maxDimension: Int = 1280,
         quality: Int = 80
     ): File {
-        // Check original size
         val inputStream = context.contentResolver.openInputStream(uri)!!
         val originalBytes = inputStream.available()
         inputStream.close()
 
-        // If already small, just copy with desired name
         if (originalBytes <= maxSizeBytes) {
             return uriToFile(uri, outputFileName)
         }
@@ -166,11 +169,7 @@ class PostRepository @Inject constructor(
 
         val scaledBitmap = scaleBitmap(bitmap, maxDimension)
 
-        val outputFile = File(
-            context.cacheDir,
-            "$outputFileName.jpg"
-        )
-
+        val outputFile = File(context.cacheDir, "$outputFileName.jpg")
         FileOutputStream(outputFile).use {
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, it)
         }
@@ -184,7 +183,6 @@ class PostRepository @Inject constructor(
     private fun scaleBitmap(bitmap: Bitmap, maxDimension: Int): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
-
         if (width <= maxDimension && height <= maxDimension) return bitmap
 
         val ratio = width.toFloat() / height.toFloat()
@@ -206,207 +204,4 @@ class PostRepository @Inject constructor(
         val path = uri.path ?: return "png"
         return path.substringAfterLast('.', "png").lowercase()
     }
-
-    private fun getMediaTypeFromUri(uri: Uri): String {
-        val extension = getFileExtension(uri)
-        return when (extension) {
-            "jpg", "jpeg" -> "image/jpeg"
-            "png" -> "image/png"
-            "gif" -> "image/gif"
-            "bmp" -> "image/bmp"
-            "webp" -> "image/webp"
-            else -> "image/png"
-        }
-    }
-
-    suspend fun getPostPage(lastPostId: Long?): Result<PageData> {
-        return try {
-            val response = postApi.getPostPage(lastPostId)
-            val body = response.getBodyOrError<PageDto>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200 && body.data != null) {
-                val posts = body.data.toDomain()
-                Result.success(posts)
-            } else {
-                val errorMessage = body?.message ?: "Failed to get posts"
-                val errorCode = body?.code ?: response.code().toString()
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getRecent10Posts(): Result<List<PostData>> {
-        return try {
-            val response = postApi.getRecent10Posts()
-            val body = response.getBodyOrError<List<com.olaz.instasprite.data.network.model.PostDto>>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200 && body.data != null) {
-                val posts = body.data.map { it.toDomain() }
-                Result.success(posts)
-            } else {
-                val errorMessage = body?.message ?: "Failed to get recent posts"
-                val errorCode = body?.code ?: response.code().toString()
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getRecentPostsPage(lastPostId: Long?): Result<PageData> {
-        return try {
-            val response = postApi.getRecentPostsPage(lastPostId)
-            val body = response.getBodyOrError<PageDto>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200 && body.data != null) {
-                val posts = body.data.toDomain()
-                Result.success(posts)
-            } else {
-                val errorMessage = body?.message ?: "Failed to get recent posts page"
-                val errorCode = body?.code ?: response.code().toString()
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun likePost(postId: Long): Result<String> {
-        return try {
-            val response = postApi.likePost(postId)
-            val body = response.getBodyOrError<String>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200) {
-                Result.success(body.data ?: "Post liked successfully")
-            } else {
-                val errorCode = body?.code ?: response.code().toString()
-                val errorMessage = body?.message ?: "Unknown error"
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun unlikePost(postId: Long): Result<String> {
-        return try {
-            val response = postApi.unlikePost(postId)
-            val body = response.getBodyOrError<String>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200) {
-                Result.success(body.data ?: "Post unliked successfully")
-            } else {
-                val errorCode = body?.code ?: response.code().toString()
-                val errorMessage = body?.message ?: "Unknown error"
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun bookmarkPost(postId: Long): Result<String> {
-        return try {
-            val response = postApi.bookmarkPost(postId)
-            val body = response.getBodyOrError<String>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200) {
-                Result.success(body.data ?: "Post bookmarked successfully")
-            } else {
-                val errorCode = body?.code ?: response.code().toString()
-                val errorMessage = body?.message ?: "Unknown error"
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun unBookmarkPost(postId: Long): Result<String> {
-        return try {
-            val response = postApi.unBookmarkPost(postId)
-            val body = response.getBodyOrError<String>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200) {
-                Result.success(body.data ?: "Post unbookmarked successfully")
-            } else {
-                val errorCode = body?.code ?: response.code().toString()
-                val errorMessage = body?.message ?: "Unknown error"
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun deletePost(postId: Long): Result<Boolean> {
-        return try {
-            val response = postApi.deletePost(postId)
-            val body = response.getBodyOrError<String>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200) {
-                Result.success(true)
-            } else {
-                val errorCode = body?.code ?: response.code().toString()
-                val errorMessage = body?.message ?: "Unknown error"
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getMostLikedPost(): Result<PostData> {
-        return try {
-            val response = postApi.getMostLikedPost()
-            val body = response.getBodyOrError<PostDto>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200 && body.data != null) {
-                val post = body.data.toDomain()
-                Result.success(post)
-            } else {
-                val errorMessage = body?.message ?: "Failed to get most liked post"
-                val errorCode = body?.code ?: response.code().toString()
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getHashtagPosts(hashtag: String, page: Int = 1, size: Int = 10): Result<PageData> {
-        return try {
-            val response = postApi.getHashtagPosts(page = page, size = size, hashtag = hashtag)
-            val body = response.getBodyOrError<com.olaz.instasprite.data.network.model.SpringPageDto<PostDto>>(RetrofitModule.gson)
-
-            if (body != null && body.status == 200 && body.data != null) {
-                val posts = body.data.content.map { it.toDomain() }
-                val pageData = PageData(
-                    content = posts,
-                    nextCursor = posts.lastOrNull()?.postId,
-                    hasNext = !body.data.last
-                )
-                Result.success(pageData)
-            } else {
-                val errorMessage = body?.message ?: "Failed to get hashtag posts"
-                val errorCode = body?.code ?: response.code().toString()
-                Result.failure(Exception("$errorCode: $errorMessage"))
-            }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Result.failure(e)
-        }
-    }
 }
-

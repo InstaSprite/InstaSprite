@@ -23,7 +23,8 @@ data class FeedContentState(
     val localFollowState: Map<String, Boolean> = emptyMap(),
     val refreshPending: Boolean = false,
     val hasNewPosts: Boolean = false,
-    val deletedPostIds: Set<Long> = emptySet()
+    val deletedPostIds: Set<Long> = emptySet(),
+    val isServerMaintenance: Boolean = false
 )
 
 data class FeedScreenEvent(
@@ -41,5 +42,7 @@ data class FeedScreenEvent(
     val onRefreshed: () -> Unit,
     val onConsumeRefreshPending: () -> Unit,
     val onUpdateTopPostId: (Long) -> Unit,
-    val onOpenHashtag: (hashtag: String) -> Unit
+    val onOpenHashtag: (hashtag: String) -> Unit,
+    val onClearError: () -> Unit,
+    val onRetryConnection: () -> Unit
 )

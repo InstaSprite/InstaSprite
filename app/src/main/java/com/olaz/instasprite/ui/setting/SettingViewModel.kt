@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.repository.AuthRepository
 import com.olaz.instasprite.utils.AppSettings
+import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
@@ -128,7 +129,7 @@ class SettingViewModel @Inject constructor(
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
                         isLoadingOtp = false,
-                        otpError = error.message ?: "Failed to enroll OTP",
+                        otpError = error.toUserMessage(context),
                         is2FAEnabled = false
                     )
                 }
@@ -173,7 +174,7 @@ class SettingViewModel @Inject constructor(
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
                         isEnabling2FA = false,
-                        enable2FAError = error.message ?: "Failed to enable 2FA"
+                        enable2FAError = error.toUserMessage(context)
                     )
                 }
             )
@@ -212,7 +213,7 @@ class SettingViewModel @Inject constructor(
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
                         isDisabling2FA = false,
-                        disable2FAError = error.message ?: "Failed to disable 2FA"
+                        disable2FAError = error.toUserMessage(context)
                     )
                 }
             )

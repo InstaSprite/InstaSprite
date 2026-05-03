@@ -171,6 +171,15 @@
     <string name="error_file_upload">Failed to upload file. Please try again.</string>
     <string name="error_permission">Permission denied. Please grant the required permission.</string>
     <string name="auth_cancelled_by_user">Sign in was cancelled</string>
+    <string name="error_no_connection">No internet connection. Please check your network.</string>
+    <string name="error_session_expired">Session expired. Please log in again.</string>
+    <string name="error_no_permission">You don\'t have permission to do this.</string>
+    <string name="error_content_not_found">Content not found.</string>
+    <string name="error_server_problem">Something went wrong on our end. Please try again.</string>
+    <string name="error_something_went_wrong">Something went wrong. Please try again.</string>
+    <string name="error_action_failed">Action failed. Please try again.</string>
+    <string name="error_maintenance_title">Under Maintenance</string>
+    <string name="error_maintenance_desc">We\'re working on improvements. Please try again later.</string>
     
     <!-- Success Messages -->
     <string name="success_post_created">Post created successfully!</string>

@@ -35,6 +35,7 @@ import com.olaz.instasprite.ui.components.composable.JumpToTopButton
 import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
 import com.olaz.instasprite.ui.social.feed.contract.FeedScreenEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.utils.toUserMessage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 
@@ -45,7 +46,7 @@ fun PostList(
     lazyListState: LazyListState,
 ) {
     val pagedItems = state.pagedPosts.collectAsLazyPagingItems()
-    LocalContext.current
+    val context = LocalContext.current
     val firstItemVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 } }
 
     val firstVisiblePostId = pagedItems.itemSnapshotList.items
@@ -101,7 +102,7 @@ fun PostList(
             val error = (pagedItems.loadState.refresh as LoadState.Error).error
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "${stringResource(R.string.error)}: ${error.message}",
+                    text = "${stringResource(R.string.error)}: ${error.toUserMessage(context)}",
                     color = CatppuccinUI.TextColorLight,
                     textAlign = TextAlign.Center
                 )

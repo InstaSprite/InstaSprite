@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.network.model.EditProfileRequestDto
 import com.olaz.instasprite.data.repository.ProfileRepository
 import com.olaz.instasprite.ui.social.completionprofile.contract.ProfileCompletionState
+import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileCompletionViewModel @Inject constructor(
-    private val repository: ProfileRepository
+    private val repository: ProfileRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileCompletionState())
@@ -26,31 +29,16 @@ class ProfileCompletionViewModel @Inject constructor(
     fun loadProfileData() {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            try {
-                val response = repository.getEditProfile()
-                if (response.status == 200 && response.data != null) {
+            repository.getEditProfile().fold(
+                onSuccess = { data ->
+                    _uiState.update { it.copy(isLoading = false, profileData = data) }
+                },
+                onFailure = { error ->
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            profileData = response.data
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = response.message ?: "Failed to load profile data"
-                        )
+                        it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
                     }
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Unknown error occurred"
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -62,37 +50,22 @@ class ProfileCompletionViewModel @Inject constructor(
     ) {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            try {
-                val request = EditProfileRequestDto(
-                    memberUsername = username,
-                    memberName = name,
-                    memberIntroduce = introduce,
-                    memberEmail = email
-                )
-                val response = repository.editProfile(request)
-                if (response.status == 200) {
+            val request = EditProfileRequestDto(
+                memberUsername = username,
+                memberName = name,
+                memberIntroduce = introduce,
+                memberEmail = email
+            )
+            repository.editProfile(request).fold(
+                onSuccess = {
+                    _uiState.update { it.copy(isLoading = false, isProfileUpdated = true) }
+                },
+                onFailure = { error ->
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            isProfileUpdated = true
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = response.message ?: "Failed to update profile"
-                        )
+                        it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
                     }
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Unknown error occurred"
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -102,55 +75,30 @@ class ProfileCompletionViewModel @Inject constructor(
 
     fun selectImage(imageUri: Uri?) {
         _uiState.update {
-            it.copy(
-                selectedImageUri = imageUri,
-                imageUploadError = null
-            )
+            it.copy(selectedImageUri = imageUri, imageUploadError = null)
         }
     }
 
     fun uploadImage(context: Context) {
-        val currentState = _uiState.value
-        val imageUri = currentState.selectedImageUri
-
+        val imageUri = _uiState.value.selectedImageUri
         if (imageUri == null) {
             _uiState.update { it.copy(imageUploadError = "No image selected") }
             return
         }
 
-        _uiState.update {
-            it.copy(
-                isUploadingImage = true,
-                imageUploadError = null
-            )
-        }
+        _uiState.update { it.copy(isUploadingImage = true, imageUploadError = null) }
 
         viewModelScope.launch {
-            try {
-                val response = repository.uploadProfileImage(imageUri, context)
-                if (response.status == 200) {
+            repository.uploadProfileImage(imageUri, context).fold(
+                onSuccess = {
+                    _uiState.update { it.copy(isUploadingImage = false, imageUploadError = null) }
+                },
+                onFailure = { error ->
                     _uiState.update {
-                        it.copy(
-                            isUploadingImage = false,
-                            imageUploadError = null
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isUploadingImage = false,
-                            imageUploadError = response.message
-                        )
+                        it.copy(isUploadingImage = false, imageUploadError = error.toUserMessage(context))
                     }
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isUploadingImage = false,
-                        imageUploadError = e.message ?: "Unknown error occurred"
-                    )
-                }
-            }
+            )
         }
     }
 

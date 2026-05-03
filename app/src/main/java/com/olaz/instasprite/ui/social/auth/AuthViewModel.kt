@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.social.auth
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,7 +19,9 @@ import com.olaz.instasprite.ui.social.auth.contract.AuthMode
 import com.olaz.instasprite.ui.social.auth.contract.ForgotPasswordUiState
 import com.olaz.instasprite.ui.social.auth.contract.GoogleAuthUiState
 import com.olaz.instasprite.ui.social.session.SocialSessionManager
+import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +38,8 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
     private val notificationRepository: NotificationRepository,
-    private val sessionManager: SocialSessionManager
+    private val sessionManager: SocialSessionManager,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GoogleAuthUiState())
@@ -90,7 +94,7 @@ class AuthViewModel @Inject constructor(
                     )
                 },
                 onFailure = { exception: Throwable ->
-                    val errorMessage = exception.message ?: "Unknown error"
+                    val errorMessage = exception.message ?: ""
                     // Check if error code is M013 (OTP required)
                     if (errorMessage.startsWith("M013:")) {
                         _uiState.update {
@@ -103,19 +107,20 @@ class AuthViewModel @Inject constructor(
                             )
                         }
                     } else {
+                        val userMsg = exception.toUserMessage(context)
                         // If OTP dialog is showing, show error in dialog
                         if (_uiState.value.showOtpDialog) {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    otpError = errorMessage
+                                    otpError = userMsg
                                 )
                             }
                         } else {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    errorMessage = errorMessage,
+                                    errorMessage = userMsg,
                                     showOtpDialog = false,
                                     pendingLoginRequest = null
                                 )
@@ -173,7 +178,7 @@ class AuthViewModel @Inject constructor(
                     )
                 },
                 onFailure = { exception: Throwable ->
-                    val errorMessage = exception.message ?: "Unknown error"
+                    val errorMessage = exception.message ?: ""
                     // Check if error code is M013 (OTP required)
                     if (errorMessage.startsWith("M013:")) {
                         _uiState.update {
@@ -186,19 +191,20 @@ class AuthViewModel @Inject constructor(
                             )
                         }
                     } else {
+                        val userMsg = exception.toUserMessage(context)
                         // If OTP dialog is showing, show error in dialog
                         if (_uiState.value.showOtpDialog) {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    otpError = errorMessage
+                                    otpError = userMsg
                                 )
                             }
                         } else {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    errorMessage = errorMessage,
+                                    errorMessage = userMsg,
                                     showOtpDialog = false,
                                     pendingLoginRequest = null,
                                     pendingGoogleLoginRequest = null
@@ -231,7 +237,7 @@ class AuthViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.message ?: "Unknown error"
+                            errorMessage = exception.toUserMessage(context)
                         )
                     }
                 }
@@ -285,11 +291,10 @@ class AuthViewModel @Inject constructor(
                     }
                 },
                 onFailure = { exception ->
-                    val errorMessage = exception.message ?: "Unknown error"
                     _forgotPasswordState.update {
                         it.copy(
                             isSendingEmail = false,
-                            errorMessage = errorMessage
+                            errorMessage = exception.toUserMessage(context)
                         )
                     }
                 }
@@ -319,11 +324,10 @@ class AuthViewModel @Inject constructor(
                     _forgotPasswordState.value = ForgotPasswordUiState()
                 },
                 onFailure = { exception ->
-                    val errorMessage = exception.message ?: "Unknown error"
                     _forgotPasswordState.update {
                         it.copy(
                             isResettingPassword = false,
-                            errorMessage = errorMessage
+                            errorMessage = exception.toUserMessage(context)
                         )
                     }
                 }

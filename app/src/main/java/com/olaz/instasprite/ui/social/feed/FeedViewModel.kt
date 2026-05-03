@@ -13,6 +13,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.olaz.instasprite.R
+import com.olaz.instasprite.data.network.ApiError
 import com.olaz.instasprite.data.paging.FeedPagingSource
 import com.olaz.instasprite.data.repository.AccountRepository
 import com.olaz.instasprite.data.repository.AuthRepository
@@ -25,7 +26,10 @@ import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
 import com.olaz.instasprite.ui.social.session.SocialSessionManager
 import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.utils.Constants
+import com.olaz.instasprite.utils.ConnectivityObserver
+import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -37,6 +41,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -79,11 +85,16 @@ class FeedViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val followRepository: FollowRepository,
     private val accountRepository: AccountRepository,
-    private val sessionManager: SocialSessionManager
+    private val sessionManager: SocialSessionManager,
+    private val connectivityObserver: ConnectivityObserver,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _contentState = MutableStateFlow(FeedContentState())
     val contentState: StateFlow<FeedContentState> = _contentState.asStateFlow()
+
+    val isOnline: StateFlow<Boolean> = connectivityObserver.isOnline
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     private var currentTopPostId: Long = 0L
     private var isLoggedIn: Boolean = false
@@ -206,7 +217,12 @@ class FeedViewModel @Inject constructor(
                     result.onSuccess { page ->
                         val serverNewestId = page.content.firstOrNull()?.postId ?: 0L
                         if (serverNewestId > currentTopPostId) {
-                            _contentState.update { it.copy(hasNewPosts = true) }
+                            _contentState.update { it.copy(hasNewPosts = true, isServerMaintenance = false) }
+                        }
+                    }.onFailure { error ->
+                        val isDeviceOnline = isOnline.value
+                        if (isDeviceOnline && (error is ApiError.Network || error is ApiError.Server || error is ApiError.Unknown)) {
+                            _contentState.update { it.copy(isServerMaintenance = true) }
                         }
                     }
                 } catch (e: Exception) {
@@ -232,6 +248,22 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    fun clearError() {
+        _contentState.update {
+            it.copy(
+                profileState = it.profileState.copy(error = null),
+                profileImageState = it.profileImageState.copy(error = null),
+                verifyEmailState = it.verifyEmailState.copy(message = "")
+            )
+        }
+    }
+
+    fun retryConnection() {
+        _contentState.update { it.copy(isServerMaintenance = false) }
+        getCurrentProfile()
+        loadProfileImage()
+    }
+
     fun getCurrentProfile() {
         if (!isLoggedIn) return
         if (_contentState.value.profileState.isLoading) return
@@ -240,59 +272,53 @@ class FeedViewModel @Inject constructor(
             _contentState.update {
                 it.copy(profileState = it.profileState.copy(isLoading = true, error = null))
             }
-            try {
-                val response = profileRepository.getCurrentUserProfile()
-                if (response.status == 200 && response.data != null) {
+            profileRepository.getCurrentUserProfile().fold(
+                onSuccess = { data ->
                     _contentState.update {
                         it.copy(
                             profileState = it.profileState.copy(
                                 isLoading = false,
-                                memberName = response.data.memberName,
-                                memberUsername = response.data.memberUsername,
+                                memberName = data.memberName,
+                                memberUsername = data.memberUsername,
                                 error = null
                             )
                         )
                     }
 
-                    val avatarUrl = response.data.memberImage?.imageUrl?.let {
+                    val avatarUrl = data.memberImage?.imageUrl?.let {
                         "${Constants.BASE_URL}/images/$it"
                     }.orEmpty()
 
-                    accountRepository.updateAccount(username = response.data.memberUsername) { currentAccount ->
+                    accountRepository.updateAccount(username = data.memberUsername) { currentAccount ->
                         currentAccount.copy(
-                            name = response.data.memberName,
+                            name = data.memberName,
                             avatarUrl = avatarUrl,
-                            isVerified = response.data.verifiedEmail
+                            isVerified = data.verifiedEmail
                         )
                     }
 
-                    if (!response.data.verifiedEmail) {
+                    if (!data.verifiedEmail) {
                         _contentState.update {
                             it.copy(
                                 verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = true)
                             )
                         }
                     }
-                } else {
+                },
+                onFailure = { error ->
+                    val isDeviceOnline = isOnline.value
+                    val isServerDown = isDeviceOnline && (error is ApiError.Network || error is ApiError.Server || error is ApiError.Unknown)
                     _contentState.update {
                         it.copy(
+                            isServerMaintenance = isServerDown,
                             profileState = it.profileState.copy(
                                 isLoading = false,
-                                error = response.message
+                                error = if (isServerDown) null else error.toUserMessage(context)
                             )
                         )
                     }
                 }
-            } catch (e: Exception) {
-                _contentState.update {
-                    it.copy(
-                        profileState = it.profileState.copy(
-                            isLoading = false,
-                            error = e.message
-                        )
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -309,10 +335,9 @@ class FeedViewModel @Inject constructor(
                     )
                 )
             }
-            try {
-                val response = profileRepository.getCurrentUserProfile()
-                if (response.status == 200 && response.data != null) {
-                    val imageUrl = response.data.memberImage?.imageUrl
+            profileRepository.getCurrentUserProfile().fold(
+                onSuccess = { data ->
+                    val imageUrl = data.memberImage?.imageUrl
                     val finalUrl = if (!imageUrl.isNullOrEmpty()) {
                         "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
                     } else {
@@ -327,26 +352,21 @@ class FeedViewModel @Inject constructor(
                             )
                         )
                     }
-                } else {
+                },
+                onFailure = { error ->
+                    val isDeviceOnline = isOnline.value
+                    val isServerDown = isDeviceOnline && (error is ApiError.Network || error is ApiError.Server || error is ApiError.Unknown)
                     _contentState.update {
                         it.copy(
+                            isServerMaintenance = isServerDown,
                             profileImageState = it.profileImageState.copy(
                                 isLoading = false,
-                                error = response.message
+                                error = if (isServerDown) null else error.toUserMessage(context)
                             )
                         )
                     }
                 }
-            } catch (e: Exception) {
-                _contentState.update {
-                    it.copy(
-                        profileImageState = it.profileImageState.copy(
-                            isLoading = false,
-                            error = e.message
-                        )
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -442,7 +462,7 @@ class FeedViewModel @Inject constructor(
                             verifyEmailState = it.verifyEmailState.copy(
                                 isSending = false,
                                 success = false,
-                                message = error.message.orEmpty()
+                                message = error.toUserMessage(context)
                             )
                         )
                     }
