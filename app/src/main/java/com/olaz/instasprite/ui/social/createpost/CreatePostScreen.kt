@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,9 +24,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import java.io.File
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.social.createpost.composable.CaptionSection
 import com.olaz.instasprite.ui.social.createpost.composable.ImageSection
 import com.olaz.instasprite.ui.social.createpost.composable.OptionSection
@@ -41,11 +56,6 @@ fun CreatePostScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri: Uri? -> uri?.let { viewModel.onImageChange(it) } }
-    )
-
     LaunchedEffect(uiState.isPostCreated) {
         if (uiState.isPostCreated) onBackClick()
     }
@@ -54,9 +64,11 @@ fun CreatePostScreen(
         CreatePostScreenEvent(
             onBackClick = onBackClick,
             onCaptionChange = viewModel::onCaptionChange,
-            onImageClick = { imagePickerLauncher.launch(arrayOf("image/*")) },
+            onImageClick = viewModel::toggleSpriteSelector,
             onCommentEnabledChange = viewModel::onCommentEnabledChange,
-            onCreatePost = viewModel::createPost
+            onCreatePost = viewModel::createPost,
+            onToggleSpriteSelector = viewModel::toggleSpriteSelector,
+            onSpriteSelected = viewModel::selectSpriteForPost
         )
     }
 
@@ -66,6 +78,7 @@ fun CreatePostScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreatePostScreenContent(
     uiState: CreatePostState,
@@ -129,6 +142,51 @@ private fun CreatePostScreenContent(
                 }
             }
         }
+        
+        if (uiState.showSpriteSelector) {
+            ModalBottomSheet(
+                onDismissRequest = event.onToggleSpriteSelector,
+                containerColor = CatppuccinUI.BackgroundColorDarker
+            ) {
+                val context = LocalContext.current
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    items(uiState.userSprites) { spriteWithMeta ->
+                        val file = File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .clickable {
+                                    event.onSpriteSelected(spriteWithMeta.sprite.id)
+                                }
+                        ) {
+                            coil3.compose.AsyncImage(
+                                model = file,
+                                contentDescription = spriteWithMeta.meta?.spriteName,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(CatppuccinUI.BackgroundColor)
+                                    .padding(4.dp),
+                                contentScale = ContentScale.FillBounds,
+                                filterQuality = FilterQuality.None
+                            )
+                            Text(
+                                text = spriteWithMeta.meta?.spriteName ?: "Untitled",
+                                color = CatppuccinUI.TextColorLight,
+                                modifier = Modifier.padding(top = 4.dp),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -146,7 +204,9 @@ private fun CreatePostScreenPreview() {
                 onCaptionChange = {},
                 onImageClick = {},
                 onCommentEnabledChange = {},
-                onCreatePost = {}
+                onCreatePost = {},
+                onToggleSpriteSelector = {},
+                onSpriteSelected = {}
             )
         )
     }

@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.R
 import com.olaz.instasprite.data.repository.PostRepository
+import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.ui.social.PostInteractionEvent
 import com.olaz.instasprite.ui.social.createpost.contract.CreatePostState
+import java.io.File
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -23,10 +25,19 @@ import javax.inject.Inject
 class CreatePostViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val postRepository: PostRepository,
+    private val spriteDatabaseRepository: SpriteDatabaseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreatePostState())
     val uiState: StateFlow<CreatePostState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            spriteDatabaseRepository.getAllSpritesWithMeta().collect { sprites ->
+                _uiState.update { it.copy(userSprites = sprites) }
+            }
+        }
+    }
 
     fun onCaptionChange(v: String) {
         _uiState.update { it.copy(caption = v) }
@@ -38,6 +49,20 @@ class CreatePostViewModel @Inject constructor(
 
     fun onCommentEnabledChange(v: Boolean) {
         _uiState.update { it.copy(commentEnabled = v) }
+    }
+
+    fun toggleSpriteSelector() {
+        _uiState.update { it.copy(showSpriteSelector = !it.showSpriteSelector) }
+    }
+
+    fun selectSpriteForPost(spriteId: String) {
+        val file = File(context.filesDir, "thumbnail_$spriteId.png")
+        _uiState.update { 
+            it.copy(
+                selectedImage = Uri.fromFile(file),
+                showSpriteSelector = false
+            )
+        }
     }
 
     fun createPost() {
