@@ -137,7 +137,7 @@ fun FeedPostItem(
                                 "FeedPostItem",
                                 "Follow button clicked for user: ${post.member.memberUsername}, current state: ${post.isFollowing}, new state: ${!post.isFollowing}"
                             )
-                            onFollowClick(post.member.memberUsername, !post.isFollowing)
+                            onFollowClick(post.member.memberUsername, post.isFollowing)
                         },
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = CatppuccinUI.TextColorLight
