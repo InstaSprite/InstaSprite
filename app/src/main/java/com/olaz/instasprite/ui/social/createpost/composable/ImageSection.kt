@@ -60,7 +60,7 @@ fun ImageSection(
                     modifier = Modifier.size(62.dp)
                 )
                 Text(
-                    text = stringResource(R.string.select_images),
+                    text = stringResource(R.string.select_sprites),
                     color = CatppuccinUI.TextColorLight
                 )
             }

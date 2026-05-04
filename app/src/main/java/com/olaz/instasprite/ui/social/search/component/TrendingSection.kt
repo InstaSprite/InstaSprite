@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -105,7 +106,6 @@ fun TrendingPostThumbnail(
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(4.dp))
             .background(CatppuccinUI.Foreground0Color)
             .clickable(onClick = onClick)
     ) {
@@ -117,6 +117,7 @@ fun TrendingPostThumbnail(
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                filterQuality = FilterQuality.None,
                 modifier = Modifier.fillMaxSize()
             )
         } else {
@@ -138,13 +139,14 @@ fun TrendingPostThumbnail(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
+                .background(CatppuccinUI.BackgroundColorDarker)
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = null,
-                tint = CatppuccinUI.TextColorLight.copy(alpha = 0.9f),
+                tint = CatppuccinUI.DismissButtonColor,
                 modifier = Modifier.size(12.dp)
             )
             Spacer(modifier = Modifier.width(2.dp))

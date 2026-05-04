@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +72,7 @@ fun FeedPostItem(
     modifier: Modifier = Modifier,
     showFollowButton: Boolean = true,
     showDeleteButton: Boolean = false,
+    showBookmarkButton: Boolean = !showDeleteButton,
 ) {
 
     LocalContext.current
@@ -203,7 +207,6 @@ fun FeedPostItem(
                             }
                         }
                         .clip(RoundedCornerShape(8.dp))
-                        .background(CatppuccinUI.Foreground1Color)
                         .clickable {
                             onPostClick()
                         }
@@ -283,19 +286,16 @@ fun FeedPostItem(
                     }
                 }
 
-//				// Bookmark Button (hidden for own posts)
-//				val currentUsername = TokenUtilsProvider.get(LocalContext.current).getUsername()
-//				val isOwnPost = currentUsername != null && currentUsername.equals(post.member.memberUsername, ignoreCase = true)
-//				if (!isOwnPost) {
-//					Icon(
-//						imageVector = if (post.postBookmarkFlag) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-//						contentDescription = "Bookmark",
-//						tint = CatppuccinUI.TextColorLight,
-//						modifier = Modifier
-//                            .size(20.dp)
-//                            .clickable { onBookmarkClick() }
-//					)
-//				}
+                if (showBookmarkButton) {
+                    Icon(
+                        imageVector = if (post.postBookmarkFlag) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                        contentDescription = "Bookmark",
+                        tint = CatppuccinUI.TextColorLight,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable { onBookmarkClick() }
+                    )
+                }
             }
         }
     }

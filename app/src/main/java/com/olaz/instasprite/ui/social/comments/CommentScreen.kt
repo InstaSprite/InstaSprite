@@ -23,6 +23,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -127,7 +129,8 @@ fun CommentScreen(
         if (uiState.showLoginRequiredError) {
             val result = snackbarHostState.showSnackbar(
                 message = context.getString(R.string.login_required),
-                actionLabel = context.getString(R.string.login)
+                actionLabel = context.getString(R.string.login),
+                true
             )
             if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
                 onLoginClick()
@@ -146,11 +149,21 @@ fun CommentScreen(
             isLoggedIn = isLoggedIn,
             onLoginClick = onLoginClick
         )
-        
-        androidx.compose.material3.SnackbarHost(
+
+        SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .clickable(enabled = true, onClick = {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                })
+        ) { data ->
+            Snackbar(
+                snackbarData = data,
+                containerColor = CatppuccinUI.BackgroundColorDarker,
+                dismissActionContentColor = CatppuccinUI.DismissButtonColor
+            )
+        }
     }
 
     // TODO: Implement image zoom overlay if needed

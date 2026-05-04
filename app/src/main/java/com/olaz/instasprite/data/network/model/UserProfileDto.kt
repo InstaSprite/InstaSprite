@@ -16,6 +16,9 @@ data class UserProfileDto(
     @SerializedName("memberImage")
     val memberImage: MemberImageDto? = null,
     
+    @SerializedName("memberImageUrl")
+    val memberImageUrl: String? = null,
+    
     @SerializedName("memberIntroduce")
     val memberIntroduce: String? = null,
     

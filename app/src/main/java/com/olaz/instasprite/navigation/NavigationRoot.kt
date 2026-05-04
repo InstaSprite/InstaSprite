@@ -55,7 +55,6 @@ sealed interface Screen : NavKey {
     @Serializable
     data class Profile(val userId: String? = null) : Screen
 
-    // Phase 2: Hashtag Route
     @Serializable
     data class Hashtag(val hashtag: String) : Screen
 

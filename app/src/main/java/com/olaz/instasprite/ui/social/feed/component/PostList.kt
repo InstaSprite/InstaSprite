@@ -15,6 +15,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -56,6 +60,7 @@ fun PostList(
         .firstOrNull { !state.deletedPostIds.contains(it.postId) }?.postId
 
     val itemsSnapshot = pagedItems.itemSnapshotList
+    val pullRefreshState = rememberPullToRefreshState()
 
     LaunchedEffect(state.refreshPending) {
         if (state.refreshPending) {
@@ -125,103 +130,119 @@ fun PostList(
                 )
             }
         } else {
-            LazyColumn(
-                state = lazyListState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 10.dp),
-                contentPadding = PaddingValues(bottom = 96.dp)
+            PullToRefreshBox(
+                isRefreshing = pagedItems.loadState.refresh is LoadState.Loading,
+                onRefresh = { pagedItems.refresh() },
+                state = pullRefreshState,
+                indicator = {
+                    Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        isRefreshing = pagedItems.loadState.refresh is LoadState.Loading,
+                        containerColor = CatppuccinUI.BackgroundColor,
+                        color = CatppuccinUI.TextColorLight,
+                        state = pullRefreshState
+                    )
+                },
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(
-                    count = pagedItems.itemCount,
-                    key = pagedItems.itemKey { it.postId }
-                ) { index ->
-                    val rawPost = pagedItems[index]
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 10.dp),
+                    contentPadding = PaddingValues(bottom = 96.dp)
+                ) {
+                    items(
+                        count = pagedItems.itemCount,
+                        key = pagedItems.itemKey { it.postId }
+                    ) { index ->
+                        val rawPost = pagedItems[index]
 
-                    if (rawPost != null && !state.deletedPostIds.contains(rawPost.postId)) {
-                        val isLiked = state.localLikeState[rawPost.postId] ?: rawPost.postLikeFlag
-                        val isBookmarked =
-                            state.localBookmarkState[rawPost.postId] ?: rawPost.postBookmarkFlag
-                        val targetUser = rawPost.member.memberUsername
-                        val isFollowing = state.localFollowState[targetUser] ?: rawPost.isFollowing
+                        if (rawPost != null && !state.deletedPostIds.contains(rawPost.postId)) {
+                            val isLiked = state.localLikeState[rawPost.postId] ?: rawPost.postLikeFlag
+                            val isBookmarked =
+                                state.localBookmarkState[rawPost.postId] ?: rawPost.postBookmarkFlag
+                            val targetUser = rawPost.member.memberUsername
+                            val isFollowing = state.localFollowState[targetUser] ?: rawPost.isFollowing
 
-                        val originalLikeCount = rawPost.postLikesCount
-                        val likeCountDisplay =
-                            if (state.localLikeState.containsKey(rawPost.postId)) {
-                                val likedNow = state.localLikeState[rawPost.postId]!!
-                                val likedOriginally = rawPost.postLikeFlag
-                                if (likedNow && !likedOriginally) originalLikeCount + 1
-                                else if (!likedNow && likedOriginally) {
-                                    (originalLikeCount - 1).coerceAtLeast(0)
+                            val originalLikeCount = rawPost.postLikesCount
+                            val likeCountDisplay =
+                                if (state.localLikeState.containsKey(rawPost.postId)) {
+                                    val likedNow = state.localLikeState[rawPost.postId]!!
+                                    val likedOriginally = rawPost.postLikeFlag
+                                    if (likedNow && !likedOriginally) originalLikeCount + 1
+                                    else if (!likedNow && likedOriginally) {
+                                        (originalLikeCount - 1).coerceAtLeast(0)
+                                    } else {
+                                        originalLikeCount
+                                    }
                                 } else {
                                     originalLikeCount
                                 }
-                            } else {
-                                originalLikeCount
-                            }
 
-                        val delta = state.localCommentState[rawPost.postId] ?: 0
-                        val finalCommentCount = (rawPost.postCommentsCount + delta).coerceAtLeast(0)
+                            val delta = state.localCommentState[rawPost.postId] ?: 0
+                            val finalCommentCount = (rawPost.postCommentsCount + delta).coerceAtLeast(0)
 
-                        val effectivePost = rawPost.copy(
-                            postLikeFlag = isLiked,
-                            postBookmarkFlag = isBookmarked,
-                            postLikesCount = likeCountDisplay,
-                            postCommentsCount = finalCommentCount,
-                            isFollowing = isFollowing
-                        )
+                            val effectivePost = rawPost.copy(
+                                postLikeFlag = isLiked,
+                                postBookmarkFlag = isBookmarked,
+                                postLikesCount = likeCountDisplay,
+                                postCommentsCount = finalCommentCount,
+                                isFollowing = isFollowing
+                            )
 
-                        val isOwnPost =
-                            state.profileState.memberUsername.equals(targetUser, ignoreCase = true)
+                            val isOwnPost =
+                                state.profileState.memberUsername.equals(targetUser, ignoreCase = true)
 
-                        FeedPostItem(
-                            post = effectivePost,
-                            onPostClick = { event.onOpenComments(rawPost.postId) },
-                            onProfileClick = event.onOpenProfile,
-                            onHashtagClick = event.onOpenHashtag,
-                            onMentionClick = { mention -> event.onOpenProfile(mention.removePrefix("@")) },
-                            onFollowClick = { username, following ->
-                                if (!isOwnPost) event.onToggleFollow(username, following)
-                            },
-                            onLikeClick = { event.onToggleLike(rawPost.postId, isLiked) },
-                            onBookmarkClick = {
-                                event.onToggleBookmark(rawPost.postId, isBookmarked)
-                            },
-                            onCommentClick = { event.onOpenComments(rawPost.postId) },
-                            onDeleteClick = event.onDeletePost,
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            showFollowButton = isLoggedIn && !isOwnPost,
-                            showDeleteButton = isOwnPost,
-                        )
-                    }
-                }
-
-                if (pagedItems.loadState.append is LoadState.Loading) {
-                    item {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+                            FeedPostItem(
+                                post = effectivePost,
+                                onPostClick = { event.onOpenComments(rawPost.postId) },
+                                onProfileClick = event.onOpenProfile,
+                                onHashtagClick = event.onOpenHashtag,
+                                onMentionClick = { mention -> event.onOpenProfile(mention.removePrefix("@")) },
+                                onFollowClick = { username, following ->
+                                    if (!isOwnPost) event.onToggleFollow(username, following)
+                                },
+                                onLikeClick = { event.onToggleLike(rawPost.postId, isLiked) },
+                                onBookmarkClick = {
+                                    event.onToggleBookmark(rawPost.postId, isBookmarked)
+                                },
+                                onCommentClick = { event.onOpenComments(rawPost.postId) },
+                                onDeleteClick = event.onDeletePost,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                showFollowButton = isLoggedIn && !isOwnPost,
+                                showDeleteButton = isOwnPost,
+                            )
                         }
                     }
-                }
 
-                if (pagedItems.loadState.append is LoadState.Error) {
-                    item {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Button(
-                                onClick = { pagedItems.retry() },
-                                colors = ButtonDefaults.buttonColors(containerColor = CatppuccinUI.SelectedColor)
+                    if (pagedItems.loadState.append is LoadState.Loading) {
+                        item {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text("Retry?", color = CatppuccinUI.TextColorDark)
+                                CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+                            }
+                        }
+                    }
+
+                    if (pagedItems.loadState.append is LoadState.Error) {
+                        item {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Button(
+                                    onClick = { pagedItems.retry() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = CatppuccinUI.SelectedColor)
+                                ) {
+                                    Text("Retry?", color = CatppuccinUI.TextColorDark)
+                                }
                             }
                         }
                     }

@@ -1,8 +1,10 @@
 package com.olaz.instasprite.ui.social.feed
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -12,12 +14,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.compose.ui.platform.LocalContext
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.MaintenanceScreen
 import com.olaz.instasprite.ui.social.feed.component.PostList
@@ -27,7 +30,10 @@ import com.olaz.instasprite.ui.social.feed.dialog.PostFilterDialog
 import com.olaz.instasprite.ui.social.feed.dialog.VerifyEmailDialog
 import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
+import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun FeedScreen(
@@ -97,17 +103,28 @@ fun FeedContent(
     LaunchedEffect(state.profileState.error, state.profileImageState.error) {
         val error = state.profileState.error ?: state.profileImageState.error
         if (error != null) {
+            val job = launch {
+                delay(5000)
+                snackbarHostState.currentSnackbarData?.dismiss()
+            }
             snackbarHostState.showSnackbar(error)
+            job.cancel()
             event.onClearError()
         }
     }
 
     LaunchedEffect(state.showLoginRequiredError) {
         if (state.showLoginRequiredError) {
+            val job = launch {
+                delay(5000)
+                snackbarHostState.currentSnackbarData?.dismiss()
+            }
             val result = snackbarHostState.showSnackbar(
                 message = context.getString(R.string.login_required),
-                actionLabel = context.getString(R.string.login)
+                actionLabel = context.getString(R.string.login),
+                true
             )
+            job.cancel()
             if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
                 event.onLoginClick()
             }
@@ -143,8 +160,19 @@ fun FeedContent(
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .clickable(enabled = true, onClick = {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                })
+        ) { data ->
+            Snackbar(
+                snackbarData = data,
+                containerColor = CatppuccinUI.BackgroundColorDarker,
+                dismissActionContentColor = CatppuccinUI.DismissButtonColor
+
+            )
+        }
     }
 }
 

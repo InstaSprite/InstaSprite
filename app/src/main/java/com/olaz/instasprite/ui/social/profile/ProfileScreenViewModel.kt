@@ -391,9 +391,13 @@ class ProfileScreenViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { data ->
-                    val imageUrl = data.memberImage?.imageUrl
+                    val imageUrl = data.memberImage?.imageUrl ?: data.memberImageUrl
                     val finalUrl = if (!imageUrl.isNullOrEmpty()) {
-                        "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
+                        if (imageUrl.startsWith("http")) {
+                            "$imageUrl?ts=${System.currentTimeMillis()}"
+                        } else {
+                            "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
+                        }
                     } else {
                         null
                     }
@@ -480,7 +484,7 @@ class ProfileScreenViewModel @Inject constructor(
             displayName = response.memberName,
             bio = response.memberIntroduce ?: "",
             email = "",
-            profileImageUrl = response.memberImage?.imageUrl,
+            profileImageUrl = response.memberImage?.imageUrl ?: response.memberImageUrl,
             postsCount = response.memberPostsCount,
             followersCount = response.memberFollowersCount,
             followingCount = response.memberFollowingsCount,

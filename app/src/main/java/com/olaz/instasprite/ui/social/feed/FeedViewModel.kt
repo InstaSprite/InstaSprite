@@ -340,9 +340,13 @@ class FeedViewModel @Inject constructor(
             }
             profileRepository.getCurrentUserProfile().fold(
                 onSuccess = { data ->
-                    val imageUrl = data.memberImage?.imageUrl
+                    val imageUrl = data.memberImage?.imageUrl ?: data.memberImageUrl
                     val finalUrl = if (!imageUrl.isNullOrEmpty()) {
-                        "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
+                        if (imageUrl.startsWith("http")) {
+                            "$imageUrl?ts=${System.currentTimeMillis()}"
+                        } else {
+                            "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
+                        }
                     } else {
                         null
                     }
