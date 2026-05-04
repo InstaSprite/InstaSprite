@@ -80,7 +80,7 @@ interface PostApi {
         @Query("hashtag") hashtag: String
     ): Response<ResultResponse<SpringPageDto<PostDto>>>
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts/most-liked")
     suspend fun getMostLikedPost(): Response<ResultResponse<PostDto>>
 }

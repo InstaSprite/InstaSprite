@@ -138,7 +138,7 @@ fun FeedContent(
             state.isServerMaintenance -> MaintenanceScreen(
                 onReload = event.onRetryConnection
             )
-            else -> PostList(state = state, event = event, lazyListState = listState, isOnline = isOnline)
+            else -> PostList(state = state, event = event, lazyListState = listState, isOnline = isOnline, isLoggedIn = isLoggedIn)
         }
 
         SnackbarHost(

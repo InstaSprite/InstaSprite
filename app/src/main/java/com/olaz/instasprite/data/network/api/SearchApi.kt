@@ -15,6 +15,7 @@ interface SearchApi {
         @Query("size") size: Int = 10
     ): Response<ResultResponse<SearchResponseDto>>
 
+    @Headers("Guest-Aware: true")
     @GET("/api/v1/search/trending")
     suspend fun getTrendingPosts(): Response<ResultResponse<List<PostDto>>>
 }

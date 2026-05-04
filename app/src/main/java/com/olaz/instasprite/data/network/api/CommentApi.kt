@@ -28,7 +28,7 @@ interface CommentApi {
         @Path("commentId") commentId: Long
     ): Response<ResultResponse<String>>
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts/{postId}")
     suspend fun getCommentsPage(
         @Path("postId") postId: Long,
@@ -36,14 +36,14 @@ interface CommentApi {
     ): Response<ResultResponse<List<CommentDto>>>
 
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/comments/{commentId}")
     suspend fun getRepliesPage(
         @Path("commentId") commentId: Long,
         @Query("page") page: Int
     ): Response<ResultResponse<List<CommentDto>>>
 
-    @Headers("Content-Type: application/json")
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/comments/{commentId}")
     suspend fun getReplies(
         @Path("commentId") commentId: Long

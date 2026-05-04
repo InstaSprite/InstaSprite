@@ -57,6 +57,8 @@ import com.olaz.instasprite.ui.social.comments.contract.CommentScreenEvent
 import com.olaz.instasprite.ui.social.comments.contract.CommentState
 import com.olaz.instasprite.ui.social.comments.contract.PostAuthor
 import com.olaz.instasprite.ui.social.createpost.composable.TopBar
+import com.olaz.instasprite.ui.social.session.SocialSessionState
+import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
@@ -69,9 +71,12 @@ fun CommentScreen(
     onBackClick: () -> Unit = {},
     onProfileClick: (String) -> Unit = {},
     onLoginClick: () -> Unit = {},
-    viewModel: CommentViewModel = hiltViewModel()
+    viewModel: CommentViewModel = hiltViewModel(),
+    sessionViewModel: SocialSessionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val sessionState by sessionViewModel.sessionState.collectAsState()
+    val isLoggedIn = sessionState is SocialSessionState.LoggedIn
     val context = LocalContext.current
     var zoomedImageUrl by remember { mutableStateOf<String?>(null) }
     var newCommentText by remember { mutableStateOf("") }
@@ -137,7 +142,9 @@ fun CommentScreen(
             newCommentText = newCommentText,
             onNewCommentTextChange = { newCommentText = it },
             commentFocusRequester = commentFocusRequester,
-            event = event
+            event = event,
+            isLoggedIn = isLoggedIn,
+            onLoginClick = onLoginClick
         )
         
         androidx.compose.material3.SnackbarHost(
@@ -156,7 +163,9 @@ private fun CommentScreenContent(
     newCommentText: String,
     onNewCommentTextChange: (String) -> Unit,
     commentFocusRequester: FocusRequester,
-    event: CommentScreenEvent
+    event: CommentScreenEvent,
+    isLoggedIn: Boolean,
+    onLoginClick: () -> Unit
 ) {
     LocalContext.current
 
@@ -197,13 +206,31 @@ private fun CommentScreenContent(
                 )
             },
             bottomBar = {
-                CommentInput(
-                    text = newCommentText,
-                    onTextChange = onNewCommentTextChange,
-                    onSendClick = { event.onAddComment(newCommentText) },
-                    modifier = Modifier.focusRequester(commentFocusRequester),
-                    profileImageUrl = uiState.currentUserImageUrl
-                )
+                if (isLoggedIn) {
+                    CommentInput(
+                        text = newCommentText,
+                        onTextChange = onNewCommentTextChange,
+                        onSendClick = { event.onAddComment(newCommentText) },
+                        modifier = Modifier.focusRequester(commentFocusRequester),
+                        profileImageUrl = uiState.currentUserImageUrl
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(CatppuccinUI.BackgroundColorDarker)
+                            .clickable { onLoginClick() }
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.login_required),
+                            color = CatppuccinUI.AccentButtonColor,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         ) { innerPadding ->
             LazyColumn(
@@ -219,7 +246,8 @@ private fun CommentScreenContent(
                             postAuthor = uiState.postAuthor,
                             isOwnPost = uiState.isOwnPost,
                             onProfileClick = event.onProfileClick,
-                            onToggleFollow = event.onToggleFollow
+                            onToggleFollow = event.onToggleFollow,
+                            isLoggedIn = isLoggedIn
                         )
                     }
 
@@ -302,7 +330,8 @@ private fun PostHeader(
     postAuthor: PostAuthor?,
     isOwnPost: Boolean,
     onProfileClick: (String) -> Unit,
-    onToggleFollow: () -> Unit
+    onToggleFollow: () -> Unit,
+    isLoggedIn: Boolean
 ) {
     LocalContext.current
     Row(
@@ -342,7 +371,7 @@ private fun PostHeader(
                 fontSize = 12.sp
             )
         }
-        if (!isOwnPost) {
+        if (isLoggedIn && !isOwnPost) {
             OutlinedButton(
                 onClick = onToggleFollow,
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -415,7 +444,9 @@ private fun CommentScreenPreview() {
                 onZoomImage = {},
                 onDismissZoom = {},
                 onConsumeLoginRequiredError = {}
-            )
+            ),
+            isLoggedIn = true,
+            onLoginClick = {}
         )
     }
 }

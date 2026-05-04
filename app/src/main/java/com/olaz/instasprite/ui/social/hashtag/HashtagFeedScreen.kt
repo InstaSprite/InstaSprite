@@ -40,7 +40,8 @@ fun HashtagFeedScreen(
         onBackClick = onBackClick,
         onOpenProfile = onOpenProfile,
         onOpenComments = onOpenComments,
-        onOpenHashtag = onOpenHashtag
+        onOpenHashtag = onOpenHashtag,
+        isLoggedIn = false
     )
 }
 
@@ -52,7 +53,8 @@ fun HashtagFeedScreenContent(
     onBackClick: () -> Unit,
     onOpenProfile: (String) -> Unit,
     onOpenComments: (Long) -> Unit,
-    onOpenHashtag: (String) -> Unit
+    onOpenHashtag: (String) -> Unit,
+    isLoggedIn: Boolean
 ) {
     val listState = rememberLazyListState()
 
@@ -113,7 +115,8 @@ fun HashtagFeedScreenContent(
                 state = state,
                 event = event,
                 lazyListState = listState,
-                isOnline = true
+                isOnline = true,
+                isLoggedIn = isLoggedIn
             )
         }
     }
@@ -128,7 +131,8 @@ fun HashtagFeedScreenContentPreview() {
         onBackClick = {},
         onOpenProfile = {},
         onOpenComments = {},
-        onOpenHashtag = {}
+        onOpenHashtag = {},
+        isLoggedIn = true
     )
 }
 
@@ -141,6 +145,7 @@ fun HashtagFeedScreenContentLongTagPreview() {
         onBackClick = {},
         onOpenProfile = {},
         onOpenComments = {},
-        onOpenHashtag = {}
+        onOpenHashtag = {},
+        isLoggedIn = true
     )
 }

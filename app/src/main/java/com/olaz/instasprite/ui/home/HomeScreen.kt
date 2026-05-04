@@ -353,7 +353,7 @@ fun HomeScreen(
                 }
 
                 AnimatedVisibility(
-                    visible = pagerState.currentPage == 1,
+                    visible = pagerState.currentPage == 1 && isLoggedIn,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
                 ) {

@@ -64,6 +64,8 @@ import com.olaz.instasprite.ui.social.profile.contract.ProfileContentState
 import com.olaz.instasprite.ui.social.profile.contract.ProfileScreenEvent
 import com.olaz.instasprite.ui.social.profile.contract.ProfileTab
 import com.olaz.instasprite.ui.social.profile.contract.UserProfileState
+import com.olaz.instasprite.ui.social.session.SocialSessionState
+import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
 import com.olaz.instasprite.ui.social.profile.dialog.EditProfileDialog
 import com.olaz.instasprite.ui.social.profile.dialog.FollowersDialog
 import com.olaz.instasprite.ui.social.profile.dialog.FollowingDialog
@@ -82,10 +84,13 @@ fun ProfileScreen(
     onPostClick: ((postId: Long) -> Unit)? = null,
     onMenuClick: (() -> Unit)? = null,
     onLoginClick: () -> Unit = {},
-    viewModel: ProfileScreenViewModel = hiltViewModel()
+    viewModel: ProfileScreenViewModel = hiltViewModel(),
+    sessionViewModel: SocialSessionViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val contentState by viewModel.contentState.collectAsState()
+    val sessionState by sessionViewModel.sessionState.collectAsState()
+    val isLoggedIn = sessionState is SocialSessionState.LoggedIn
 
     LaunchedEffect(userId) {
         if (userId == null) {
@@ -149,7 +154,8 @@ fun ProfileScreen(
                 onDismissFollowers = { viewModel.hideFollowersDialog() },
                 onDismissFollowing = { viewModel.hideFollowingDialog() },
                 onConsumeLoginRequiredError = { viewModel.consumeLoginRequiredError() }
-            )
+            ),
+            isLoggedIn = isLoggedIn
         )
 
         androidx.compose.material3.SnackbarHost(
@@ -162,7 +168,8 @@ fun ProfileScreen(
 @Composable
 fun ProfileContent(
     state: ProfileContentState,
-    event: ProfileScreenEvent
+    event: ProfileScreenEvent,
+    isLoggedIn: Boolean
 ) {
     LocalContext.current
 
@@ -206,7 +213,8 @@ fun ProfileContent(
                 onFollowClick = event.onFollowClick,
                 onEditAvatarClick = event.onEditAvatarClick,
                 onFollowersClick = event.onFollowersClick,
-                onFollowingClick = event.onFollowingClick
+                onFollowingClick = event.onFollowingClick,
+                isLoggedIn = isLoggedIn
             )
 
             ProfileTabRow(
@@ -514,7 +522,8 @@ fun ProfileContentPreview() {
                     followingCount = 150
                 )
             ),
-            event = ProfileScreenEvent()
+            event = ProfileScreenEvent(),
+            isLoggedIn = true
         )
     }
 }

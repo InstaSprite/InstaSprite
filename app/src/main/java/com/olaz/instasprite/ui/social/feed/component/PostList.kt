@@ -45,7 +45,8 @@ fun PostList(
     state: FeedContentState,
     event: FeedScreenEvent,
     lazyListState: LazyListState,
-    isOnline: Boolean
+    isOnline: Boolean,
+    isLoggedIn: Boolean
 ) {
     val pagedItems = state.pagedPosts.collectAsLazyPagingItems()
     val context = LocalContext.current
@@ -189,7 +190,7 @@ fun PostList(
                             onCommentClick = { event.onOpenComments(rawPost.postId) },
                             onDeleteClick = event.onDeletePost,
                             modifier = Modifier.padding(vertical = 8.dp),
-                            showFollowButton = !isOwnPost,
+                            showFollowButton = isLoggedIn && !isOwnPost,
                             showDeleteButton = isOwnPost,
                         )
                     }

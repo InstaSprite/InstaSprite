@@ -55,6 +55,7 @@ fun ProfileInfoSection(
     onEditAvatarClick: () -> Unit = {},
     onFollowersClick: () -> Unit = {},
     onFollowingClick: () -> Unit = {},
+    isLoggedIn: Boolean = false
 ) {
     LocalContext.current
     Column(
@@ -210,7 +211,7 @@ fun ProfileInfoSection(
                         fontWeight = FontWeight.Medium
                     )
                 }
-            } else {
+            } else if (isLoggedIn) {
                 Button(
                     onClick = onFollowClick,
                     modifier = Modifier.weight(1f),
