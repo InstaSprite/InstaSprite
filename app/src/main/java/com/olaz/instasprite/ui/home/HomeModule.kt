@@ -41,6 +41,7 @@ object HomeModule {
                 },
                 onNavigateToCreateCanvas = { navigator.goTo(Screen.CreateCanvas) },
                 onNavigateToLoadImage = { navigator.goTo(Screen.LoadImage) },
+                onNavigateToHashtag = { navigator.goTo(Screen.Hashtag(it)) },
                 onLoginClick = { navigator.goTo(Screen.Auth) },
                 onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
                 onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },

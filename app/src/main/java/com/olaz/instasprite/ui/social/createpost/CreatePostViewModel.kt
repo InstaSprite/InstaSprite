@@ -65,10 +65,33 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+    fun onHashtagInputChange(v: String) {
+        _uiState.update { it.copy(currentHashtagInput = v) }
+    }
+
+    fun addHashtag() {
+        val input = _uiState.value.currentHashtagInput.trim().removePrefix("#")
+        if (input.isNotBlank() && !_uiState.value.hashtags.contains(input)) {
+            _uiState.update { it.copy(
+                hashtags = it.hashtags + input,
+                currentHashtagInput = ""
+            ) }
+        } else {
+            _uiState.update { it.copy(currentHashtagInput = "") }
+        }
+    }
+
+    fun removeHashtag(tag: String) {
+        _uiState.update { it.copy(
+            hashtags = it.hashtags - tag
+        ) }
+    }
+
     fun createPost() {
         val caption = _uiState.value.caption
         val selectedImage = _uiState.value.selectedImage ?: return
         val commentEnabled = _uiState.value.commentEnabled
+        val hashtags = _uiState.value.hashtags
 
         _uiState.update { it.copy(isPostInProgress = true) }
         viewModelScope.launch(Dispatchers.IO) {
@@ -77,6 +100,7 @@ class CreatePostViewModel @Inject constructor(
                     content = caption,
                     images = listOf(selectedImage),
                     altTexts = listOf(""),
+                    hashtags = hashtags,
                     commentFlag = commentEnabled
                 )
 

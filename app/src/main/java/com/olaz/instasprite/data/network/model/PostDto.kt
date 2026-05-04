@@ -47,8 +47,8 @@ data class PostDto(
     @SerializedName("mentionsOfContent")
     val mentionsOfContent: List<String>? = null,
     
-    @SerializedName("hashtagsOfContent")
-    val hashtagsOfContent: List<String>? = null,
+    @SerializedName("hashtags")
+    val hashtags: List<String>? = null,
     
     // Handle both "postImages" (array) and "postImage" (single) formats
     @SerializedName("postImages")

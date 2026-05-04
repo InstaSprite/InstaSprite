@@ -6,7 +6,7 @@ data class PostData(
     val postId: Long,
     val postContent: String,
     val mentionsOfContent: List<String> = emptyList(),
-    val hashtagsOfContent: List<String> = emptyList(),
+    val hashtags: List<String> = emptyList(),
     val postImages: List<PostImageData> = emptyList(),
     val postUploadDate: LocalDateTime,
     val member: MemberData,

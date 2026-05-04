@@ -17,6 +17,7 @@ interface PostApi {
         @Part("content") content: RequestBody,
         @Part postImages: List<MultipartBody.Part>,
         @Part altTexts: List<MultipartBody.Part>,
+        @Part hashtags: List<MultipartBody.Part>,
         @Part("commentFlag") commentFlag: RequestBody
     ): Response<ResultResponse<Any>>
 

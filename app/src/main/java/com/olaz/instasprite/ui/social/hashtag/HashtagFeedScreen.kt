@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,14 +30,21 @@ import com.olaz.instasprite.ui.theme.CatppuccinUI
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HashtagFeedScreen(
+    hashtag: String,
     viewModel: HashtagFeedViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onOpenProfile: (String) -> Unit,
     onOpenComments: (Long) -> Unit,
     onOpenHashtag: (String) -> Unit
 ) {
+    androidx.compose.runtime.LaunchedEffect(hashtag) {
+        viewModel.setHashtag(hashtag)
+    }
+    
+    val currentTag by viewModel.hashtag.collectAsState()
+
     HashtagFeedScreenContent(
-        hashtag = viewModel.hashtag,
+        hashtag = currentTag,
         state = FeedContentState(pagedPosts = viewModel.pagedPosts),
         onBackClick = onBackClick,
         onOpenProfile = onOpenProfile,

@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,6 +59,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FeedPostItem(
     post: PostData,
@@ -187,6 +190,24 @@ fun FeedPostItem(
                     onTextClick = { onPostClick() },
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            if (post.hashtags.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    post.hashtags.forEach { tag ->
+                        Text(
+                            text = "#$tag",
+                            color = CatppuccinUI.SelectedColor,
+                            fontSize = 14.sp,
+                            modifier = Modifier.clickable { onHashtagClick(tag) }
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(12.dp))
             }
 

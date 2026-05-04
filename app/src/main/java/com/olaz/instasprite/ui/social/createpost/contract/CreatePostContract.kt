@@ -11,6 +11,8 @@ data class CreatePostState(
     val isPostCreated: Boolean = false,
     val showSpriteSelector: Boolean = false,
     val userSprites: List<SpriteWithMeta> = emptyList(),
+    val hashtags: List<String> = emptyList(),
+    val currentHashtagInput: String = ""
 )
 
 data class CreatePostScreenEvent(
@@ -20,5 +22,8 @@ data class CreatePostScreenEvent(
     val onCommentEnabledChange: (Boolean) -> Unit,
     val onCreatePost: () -> Unit,
     val onToggleSpriteSelector: () -> Unit,
-    val onSpriteSelected: (String) -> Unit
+    val onSpriteSelected: (String) -> Unit,
+    val onHashtagInputChange: (String) -> Unit,
+    val onAddHashtag: () -> Unit,
+    val onRemoveHashtag: (String) -> Unit
 )

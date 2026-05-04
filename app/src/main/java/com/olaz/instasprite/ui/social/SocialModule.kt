@@ -7,8 +7,10 @@ import com.olaz.instasprite.ui.social.auth.AuthScreen
 import com.olaz.instasprite.ui.social.comments.CommentScreen
 import com.olaz.instasprite.ui.social.completionprofile.ProfileCompletionScreen
 import com.olaz.instasprite.ui.social.createpost.CreatePostScreen
+import com.olaz.instasprite.ui.social.hashtag.HashtagFeedScreen
 import com.olaz.instasprite.ui.social.notification.NotificationScreen
 import com.olaz.instasprite.ui.social.profile.ProfileScreen
+import com.olaz.instasprite.ui.social.search.SearchScreen
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -91,7 +93,8 @@ object SocialModule {
     @IntoSet
     fun provideHashtagEntry(navigator: Navigator): EntryProviderInstaller = {
         entry<Screen.Hashtag> { args ->
-            com.olaz.instasprite.ui.social.hashtag.HashtagFeedScreen(
+            HashtagFeedScreen(
+                hashtag = args.hashtag,
                 onBackClick = { navigator.goBack() },
                 onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
                 onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
@@ -104,7 +107,7 @@ object SocialModule {
     @IntoSet
     fun provideSearchEntry(navigator: Navigator): EntryProviderInstaller = {
         entry<Screen.Search> {
-            com.olaz.instasprite.ui.social.search.SearchScreen(
+            SearchScreen(
                 onBackClick = { navigator.goBack() },
                 onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
                 onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },

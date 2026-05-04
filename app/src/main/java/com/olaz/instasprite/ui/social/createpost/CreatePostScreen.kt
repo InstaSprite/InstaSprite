@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.olaz.instasprite.ui.social.createpost.composable.CaptionSection
+import com.olaz.instasprite.ui.social.createpost.composable.HashtagSection
 import com.olaz.instasprite.ui.social.createpost.composable.ImageSection
 import com.olaz.instasprite.ui.social.createpost.composable.OptionSection
 import com.olaz.instasprite.ui.social.createpost.composable.TopBar
@@ -64,7 +68,10 @@ fun CreatePostScreen(
             onCommentEnabledChange = viewModel::onCommentEnabledChange,
             onCreatePost = viewModel::createPost,
             onToggleSpriteSelector = viewModel::toggleSpriteSelector,
-            onSpriteSelected = viewModel::selectSpriteForPost
+            onSpriteSelected = viewModel::selectSpriteForPost,
+            onHashtagInputChange = viewModel::onHashtagInputChange,
+            onAddHashtag = viewModel::addHashtag,
+            onRemoveHashtag = viewModel::removeHashtag
         )
     }
 
@@ -102,17 +109,11 @@ private fun CreatePostScreenContent(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding()
+                    .verticalScroll(rememberScrollState())
             ) {
-                CaptionSection(
-                    enabled = !uiState.isPostInProgress,
-                    value = uiState.caption,
-                    onValueChange = event.onCaptionChange,
-                    modifier = Modifier
-                        .padding(top = 10.dp)
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                )
                 ImageSection(
                     imageUri = uiState.selectedImage,
                     onClick = {
@@ -125,13 +126,33 @@ private fun CreatePostScreenContent(
                         .heightIn(max = 400.dp)
                         .padding(16.dp)
                 )
-                OptionSection(
-                    isCommentChecked = uiState.commentEnabled,
-                    onEnableCommentChange = event.onCommentEnabledChange,
+                CaptionSection(
+                    enabled = !uiState.isPostInProgress,
+                    value = uiState.caption,
+                    onValueChange = event.onCaptionChange,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .padding(top = 10.dp)
                         .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
                 )
+                HashtagSection(
+                    enabled = !uiState.isPostInProgress,
+                    inputValue = uiState.currentHashtagInput,
+                    hashtags = uiState.hashtags,
+                    onValueChange = event.onHashtagInputChange,
+                    onAddHashtag = event.onAddHashtag,
+                    onRemoveHashtag = event.onRemoveHashtag,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxWidth()
+                )
+//                OptionSection(
+//                    isCommentChecked = uiState.commentEnabled,
+//                    onEnableCommentChange = event.onCommentEnabledChange,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp)
+//                )
 
                 Button(
                     onClick = event.onCreatePost,
@@ -146,7 +167,7 @@ private fun CreatePostScreenContent(
                 }
             }
         }
-        
+
         if (uiState.showSpriteSelector) {
 
             ModalBottomSheet(
@@ -157,10 +178,13 @@ private fun CreatePostScreenContent(
                 val context = LocalContext.current
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
                 ) {
                     items(uiState.userSprites) { spriteWithMeta ->
-                        val file = File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
+                        val file =
+                            File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
@@ -211,7 +235,10 @@ private fun CreatePostScreenPreview() {
                 onCommentEnabledChange = {},
                 onCreatePost = {},
                 onToggleSpriteSelector = {},
-                onSpriteSelected = {}
+                onSpriteSelected = {},
+                onHashtagInputChange = {},
+                onAddHashtag = {},
+                onRemoveHashtag = {}
             )
         )
     }

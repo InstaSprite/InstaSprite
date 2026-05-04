@@ -77,6 +77,7 @@ fun HomeScreen(
     onNavigateToDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit,
     onNavigateToCreateCanvas: () -> Unit,
     onNavigateToLoadImage: () -> Unit,
+    onNavigateToHashtag: (hashtag : String) -> Unit,
     onLoginClick: () -> Unit,
     onOpenComments: (postId: Long) -> Unit,
     onOpenProfile: (userId: String) -> Unit,
@@ -186,7 +187,7 @@ fun HomeScreen(
             onRefreshed = feedViewModel::onRefreshed,
             onConsumeRefreshPending = feedViewModel::consumeRefreshPending,
             onUpdateTopPostId = feedViewModel::updateTopPostId,
-            onOpenHashtag = {},
+            onOpenHashtag = onNavigateToHashtag,
             onClearError = feedViewModel::clearError,
             onRetryConnection = feedViewModel::retryConnection,
             onConsumeLoginRequiredError = feedViewModel::consumeLoginRequiredError

@@ -19,7 +19,7 @@ fun PostDto.toDomain(): PostData {
         postId = postId,
         postContent = postContent ?: "",
         mentionsOfContent = mentionsOfContent ?: emptyList(),
-        hashtagsOfContent = hashtagsOfContent ?: emptyList(),
+        hashtags = hashtags ?: emptyList(),
         postImages = getPostImages().map { it.toDomain() },
         postUploadDate = parseDateTime(postUploadDate),
         member = member?.toDomain() ?: MemberData(

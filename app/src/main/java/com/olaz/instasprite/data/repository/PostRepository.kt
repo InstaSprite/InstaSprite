@@ -41,6 +41,7 @@ class PostRepository @Inject constructor(
         content: String,
         images: List<Uri>,
         altTexts: List<String>,
+        hashtags: List<String>,
         commentFlag: Boolean,
     ): Result<String> = safeApiCall {
         val imageParts = images.mapIndexed { index, uri ->
@@ -61,12 +62,16 @@ class PostRepository @Inject constructor(
         val altTextParts = altTexts.map { altText ->
             MultipartBody.Part.createFormData("altTexts", altText)
         }
+        val hashtagParts = hashtags.map { tag ->
+            MultipartBody.Part.createFormData("hashtags", tag)
+        }
         val commentFlagBody = commentFlag.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
         val response = postApi.uploadPost(
             content = contentBody,
             postImages = imageParts,
             altTexts = altTextParts,
+            hashtags = hashtagParts,
             commentFlag = commentFlagBody
         )
         response.toResultMessage("Post uploaded successfully")
