@@ -38,7 +38,17 @@ class ColorPaletteRepository(
     val recentColors: StateFlow<ArrayDeque<Color>> = _recentColors.asStateFlow()
 
     val savedPalettes: Flow<List<ColorPalette>> = colorPaletteDao.getAllPaletteFlow()
-        .map { list -> list.map { it.toDomain() } }
+        .map { list ->
+            val sageColors = loadDefaultColorPalette(context)
+            val defaultPalette = ColorPalette(
+                id = -1,
+                name = "SAGE57",
+                author = "strawbrysage",
+                colors = sageColors
+            )
+            val mappedList = list.map { it.toDomain() }
+            listOf(defaultPalette) + mappedList
+        }
 
     fun addColorToPalette(color: Color) {
         if (color !in _colors.value) {
@@ -76,6 +86,10 @@ class ColorPaletteRepository(
         colorPaletteDao.deletePaletteById(id)
     }
 
+
+    suspend fun getPaletteById(id: Int): ColorPalette? {
+        return colorPaletteDao.getPaletteById(id)?.toDomain()
+    }
 
     suspend fun getLospecColorPalette(input: String): ColorPalette? {
         val paletteName = if (input.contains("lospec.com")) {

@@ -23,6 +23,9 @@ interface ColorPaletteDao {
     @Query("SELECT * FROM palette_data WHERE name = :name")
     suspend fun getPaletteByName(name: String): ColorPaletteData?
 
+    @Query("SELECT * FROM palette_data WHERE id = :id")
+    suspend fun getPaletteById(id: Int): ColorPaletteData?
+
     @Query("DELETE FROM palette_data WHERE name = :name")
     suspend fun deletePaletteByName(name: String)
 

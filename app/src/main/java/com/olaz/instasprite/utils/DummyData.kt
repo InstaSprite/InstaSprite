@@ -62,6 +62,10 @@ object DummyData {
                 return null
             }
 
+            override suspend fun getPaletteById(id: Int): ColorPaletteData? {
+                return null
+            }
+
 
             override suspend fun deletePaletteByName(name: String) {
 
