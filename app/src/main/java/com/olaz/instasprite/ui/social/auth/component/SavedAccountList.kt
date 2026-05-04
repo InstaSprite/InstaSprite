@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -49,13 +47,11 @@ fun SavedAccountList(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f, fill = false)
-                .heightIn(max = 400.dp)
         ) {
-            items(accounts) { account ->
+            accounts.forEach { account ->
                 SavedAccountItem(
                     account = account,
                     onClick = {

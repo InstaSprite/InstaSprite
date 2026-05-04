@@ -6,7 +6,7 @@ import com.olaz.instasprite.data.network.ApiError
 
 fun ApiError.toUserMessage(context: Context): String = when (this) {
     is ApiError.Network -> context.getString(R.string.error_no_connection)
-    is ApiError.Unauthorized -> context.getString(R.string.error_session_expired)
+    is ApiError.Unauthorized -> if (this.msg.isNotBlank()) this.msg else context.getString(R.string.error_session_expired)
     is ApiError.Forbidden -> context.getString(R.string.error_no_permission)
     is ApiError.NotFound -> context.getString(R.string.error_content_not_found)
     is ApiError.Server -> context.getString(R.string.error_server_problem)

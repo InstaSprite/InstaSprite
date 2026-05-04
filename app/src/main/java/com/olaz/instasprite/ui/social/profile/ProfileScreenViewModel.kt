@@ -6,17 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.network.model.EditProfileRequestDto
 import com.olaz.instasprite.data.network.model.FollowerDto
+import com.olaz.instasprite.data.repository.AccountRepository
 import com.olaz.instasprite.data.repository.FollowRepository
 import com.olaz.instasprite.data.repository.ProfileRepository
 import com.olaz.instasprite.ui.social.PostInteractionEvent
 import com.olaz.instasprite.ui.social.profile.contract.FollowerUser
 import com.olaz.instasprite.ui.social.profile.contract.ProfileContentState
 import com.olaz.instasprite.ui.social.profile.contract.UserProfileState
+import com.olaz.instasprite.ui.social.session.SocialSessionManager
+import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.utils.Constants
 import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import coil3.imageLoader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,13 +29,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-import com.olaz.instasprite.ui.social.session.SocialSessionManager
-import com.olaz.instasprite.ui.social.session.SocialSessionState
-
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val followRepository: FollowRepository,
+    private val accountRepository: AccountRepository,
     private val sessionManager: SocialSessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -113,7 +115,14 @@ class ProfileScreenViewModel @Inject constructor(
     fun loadCurrentUserProfile() {
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update { it.copy(isLoading = true, errorMessage = null) }
-            profileRepository.getCurrentUserProfile().fold(
+            val currentUsername = sessionManager.currentUsername()
+            val result = if (currentUsername != null) {
+                profileRepository.getUserProfile(currentUsername)
+            } else {
+                profileRepository.getCurrentUserProfile()
+            }
+            
+            result.fold(
                 onSuccess = { data ->
                     val userProfile = mapUserProfileResponseToUserProfile(data)
                     _contentState.update {
@@ -207,6 +216,13 @@ class ProfileScreenViewModel @Inject constructor(
 
                     profileRepository.editProfile(request).fold(
                         onSuccess = {
+                            sessionManager.currentUsername()?.let { currentUsername ->
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    accountRepository.updateAccount(currentUsername) { acc ->
+                                        acc.copy(name = displayName)
+                                    }
+                                }
+                            }
                             _contentState.update {
                                 it.copy(
                                     isLoading = false,
@@ -364,10 +380,13 @@ class ProfileScreenViewModel @Inject constructor(
                 )
             }
 
-            val result = if (userId.isNullOrBlank()) {
-                profileRepository.getCurrentUserProfile()
-            } else {
+            val currentUsername = sessionManager.currentUsername()
+            val result = if (userId.isNullOrBlank() && currentUsername != null) {
+                profileRepository.getUserProfile(currentUsername)
+            } else if (!userId.isNullOrBlank()) {
                 profileRepository.getUserProfile(userId)
+            } else {
+                profileRepository.getCurrentUserProfile()
             }
 
             result.fold(
@@ -378,6 +397,17 @@ class ProfileScreenViewModel @Inject constructor(
                     } else {
                         null
                     }
+                    
+                    if (userId.isNullOrBlank() || userId == sessionManager.currentUsername()) {
+                        sessionManager.currentUsername()?.let { currentUsername ->
+                            viewModelScope.launch(Dispatchers.IO) {
+                                accountRepository.updateAccount(currentUsername) { acc ->
+                                    acc.copy(avatarUrl = finalUrl)
+                                }
+                            }
+                        }
+                    }
+
                     _contentState.update {
                         it.copy(
                             profileImageUiState = it.profileImageUiState.copy(
@@ -409,8 +439,12 @@ class ProfileScreenViewModel @Inject constructor(
 
             profileRepository.uploadProfileImage(imageUri, context).fold(
                 onSuccess = {
+                    context.imageLoader.diskCache?.clear()
+                    context.imageLoader.memoryCache?.clear()
+
                     if (_contentState.value.userProfile.isOwnProfile) {
                         loadProfileImage()
+                        loadCurrentUserProfile()
                     }
                     _contentState.update { it.copy(showEditAvatarDialog = false) }
                 },

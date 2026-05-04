@@ -45,7 +45,9 @@ import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.domain.model.PostData
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
+import com.olaz.instasprite.ui.components.composable.ParsedPostText
 import com.olaz.instasprite.ui.social.feed.dialog.DeletePostConfirmDialog
+import com.olaz.instasprite.ui.theme.CatppuccinTypography
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.utils.toSuffixString
 import java.time.Duration
@@ -172,13 +174,10 @@ fun FeedPostItem(
             Spacer(modifier = Modifier.height(12.dp))
 
             if (post.postContent.isNotEmpty()) {
-                com.olaz.instasprite.ui.components.composable.ParsedPostText(
+                ParsedPostText(
                     text = post.postContent,
                     textColor = CatppuccinUI.TextColorLight,
-                    style = androidx.compose.ui.text.TextStyle(
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp
-                    ),
+                    style = CatppuccinTypography.bodyMedium,
                     onHashtagClick = { hashtag -> onHashtagClick(hashtag) },
                     onMentionClick = { mention -> onMentionClick(mention) },
                     onTextClick = { onPostClick() },
