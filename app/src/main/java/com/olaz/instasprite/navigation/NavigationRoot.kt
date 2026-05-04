@@ -8,6 +8,9 @@ import kotlinx.serialization.Serializable
 sealed interface Screen : NavKey {
 
     @Serializable
+    data object Home : Screen
+
+    @Serializable
     data object Gallery : Screen
 
     @Serializable
@@ -27,4 +30,35 @@ sealed interface Screen : NavKey {
         val spriteName: String?,
         val colorPalette: ColorPalette? = null
     ) : Screen
+    
+    @Serializable
+    data object Auth : Screen
+
+    @Serializable
+    data object Feed : Screen
+
+    @Serializable
+    data class Comments(val postId: Long) : Screen
+
+    @Serializable
+    data object CompletionProfile : Screen
+
+    @Serializable
+    data object CreatePost : Screen
+
+    @Serializable
+    data object Notification : Screen
+
+    @Serializable
+    data object Setting : Screen
+
+    @Serializable
+    data class Profile(val userId: String? = null) : Screen
+
+    // Phase 2: Hashtag Route
+    @Serializable
+    data class Hashtag(val hashtag: String) : Screen
+
+    @Serializable
+    data object Search : Screen
 }

@@ -14,11 +14,13 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.InstaSprite"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="InstaSprite"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.InstaSprite">
         </activity>
         <activity

@@ -1,3 +1,270 @@
 <resources>
     <string name="app_name">InstaSprite</string>
+    <!-- Common UI Strings -->
+    <string name="login">Login</string>
+    <string name="login_required">Login required to perform this action</string>
+    <string name="logout">Logout</string>
+    <string name="register">Register</string>
+    <string name="password">Password</string>
+    <string name="password_validation_error">At least 6 chars, include at least 1 number &amp; special character</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm_password_validation_error">Passwords do not match</string>
+    <string name="already_has_account">Already have an account?</string>
+    <string name="dont_have_account">Do not have an account?</string>
+    <string name="register_succeed">Create account successfully</string>
+    <string name="login_with_existed">Choose existed account</string>
+    <string name="enable2fa">Enable Two-factor authentication</string>
+    <string name="select_account">Select an account</string>
+    <string name="or">Or</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="full_name">Full Name</string>
+    <string name="bio">Bio</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="share">Share</string>
+    <string name="like">Like</string>
+    <string name="comment">Comment</string>b
+    <string name="following">Following</string>
+    <string name="followers">Followers</string>
+    <string name="posts">Posts</string>
+    <string name="search">Search</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="settings">Settings</string>
+    <string name="setting">Setting</string>
+    <string name="notifications">Notifications</string>
+    <string name="gallery">Gallery</string>
+    <string name="about">About</string>
+    <string name="create_your_first_sprite">Create your first sprite!</string>
+    <string name="no_posts_to_show">No posts to show</string>
+    <string name="posts_you_save_will_appear_here">Posts you save will appear here</string>
+    <string name="no_saved_posts">No saved posts</string>
+    <string name="no_posts_yet">No posts yet</string>
+    <string name="post_created_successfully">Post created successfully</string>
+    <string name="post_created_fail">Failed to create post</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="add_caption">Add Caption</string>
+    <string name="add_hashtags">Add Hashtags</string>
+    <string name="loading">Loading...</string>
+    <string name="loading_image">Loading image...</string>
+    <string name="pixel_size">%dpx</string>
+    <string name="create_pixel_art_with_ease">Create pixel art with ease</string>
+    <string name="profile_updated_successfully">Profile updated successfully!</string>
+    <string name="complete_profile">Complete Profile</string>
+    <string name="cancel">Cancel</string>
+    <string name="uploading">Uploading...</string>
+    <string name="complete_your_profile">Complete Your Profile</string>
+    <string name="username">Username</string>
+    <string name="name">Name</string>
+    <string name="introduce">Introduce</string>
+    <string name="email">Email</string>
+    <string name="email_validation_error">Please enter a valid email address</string>
+    <string name="verify_email">Account email not verified!</string>
+    <string name="verify_email_desc">Please verify your email address to use all the features of InstaSprite.</string>
+    <string name="email_sent">Verification email sent! Please check your inbox</string>
+    <string name="email_verified_notification_title">Email Verified</string>
+    <string name="email_verified_notification_body">Your email has been successfully verified!</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="sending_email">Sending email…</string>
+    <string name="update_profile">Update Profile</string>
+    <string name="introduction_optional">Introduction (Optional)</string>
+    <string name="please_enter_username">Please enter a username</string>
+    <string name="username_length_error">Username must be between 4 and 12 characters</string>
+    <string name="please_enter_full_name">Please enter your full name</string>
+    <string name="name_length_error">Name must be between 2 and 12 characters</string>
+    <string name="please_enter_email">Please enter your email</string>
+    <string name="please_enter_valid_email">Please enter a valid email</string>
+    <string name="uploading_image">Uploading Image...</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="reset_password_email">Email with temporary password sent, please check your inbox</string>
+    <string name="reset_password">Reset password</string>
+    <string name="create_post">Create Post</string>
+    <string name="select_images">Select Images</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="confirm">Confirm</string>
+    <string name="change_profile_photo">Change profile photo</string>
+    <string name="no_posts_available">No posts available</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="retry">Retry</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="done">Done</string>
+    <string name="close">Close</string>
+    <string name="open">Open</string>
+    <string name="send">Send</string>
+    <string name="receive">Receive</string>
+    <string name="upload">Upload</string>
+    <string name="download">Download</string>
+    <string name="refresh">Refresh</string>
+    <string name="more">More</string>
+    <string name="less">Less</string>
+    <string name="show_more">Show More</string>
+    <string name="show_less">Show Less</string>
+    <string name="lets_set_up_your_profile">Let\'s set up your profile</string>
+
+    <!-- Drawing Activity -->
+    <string name="drawing_tools">Drawing Tools</string>
+    <string name="pencil">Pencil</string>
+    <string name="eraser">Eraser</string>
+    <string name="fill">Fill</string>
+    <string name="eyedropper">Eyedropper</string>
+    <string name="move">Move</string>
+    <string name="resize">Resize</string>
+    <string name="undo">Undo</string>
+    <string name="redo">Redo</string>
+    <string name="flip_horizontal">Flip Horizontal</string>
+    <string name="flip_vertical">Flip Vertical</string>
+    <string name="color_picker">Color Picker</string>
+    <string name="brush_size">Brush Size</string>
+    <string name="opacity">Opacity</string>
+    <string name="layers">Layers</string>
+    <string name="new_layer">New Layer</string>
+    <string name="delete_layer">Delete Layer</string>
+    <string name="duplicate_layer">Duplicate Layer</string>
+    <string name="merge_layers">Merge Layers</string>
+    
+    <!-- Profile Screen -->
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="change_cover">Change Cover</string>
+    <string name="privacy_settings">Privacy Settings</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="language_settings">Language Settings</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="help">Help</string>
+    <string name="support">Support</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    
+    <!-- Comments -->
+    <string name="write_comment">Write a comment...</string>
+    <string name="report_comment">Report Comment</string>
+    
+    <!-- Notifications -->
+    <string name="new_follower">started following you</string>
+    <string name="liked_your_post">liked your post</string>
+    <string name="commented_on_your_post">commented on your post</string>
+    <string name="mentioned_you">mentioned you</string>
+    <string name="shared_your_post">shared your post</string>
+    
+    <!-- Settings -->
+    <string name="change_language">Change Language</string>
+    <string name="english">English</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="light_mode">Light Mode</string>
+    <string name="auto_mode">Auto Mode</string>
+    <string name="font_size">Font Size</string>
+    <string name="small">Small</string>
+    <string name="medium">Medium</string>
+    <string name="large">Large</string>
+    
+    <!-- Error Messages -->
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_server">Server error. Please try again later.</string>
+    <string name="error_authentication">Authentication failed. Please login again.</string>
+    <string name="error_validation">Please check your input and try again.</string>
+    <string name="error_file_upload">Failed to upload file. Please try again.</string>
+    <string name="error_permission">Permission denied. Please grant the required permission.</string>
+    <string name="auth_cancelled_by_user">Sign in was cancelled</string>
+    <string name="error_no_connection">No internet connection. Please check your network.</string>
+    <string name="error_session_expired">Session expired. Please log in again.</string>
+    <string name="error_no_permission">You don\'t have permission to do this.</string>
+    <string name="error_content_not_found">Content not found.</string>
+    <string name="error_server_problem">Something went wrong on our end. Please try again.</string>
+    <string name="error_something_went_wrong">Something went wrong. Please try again.</string>
+    <string name="error_action_failed">Action failed. Please try again.</string>
+    <string name="error_maintenance_title">Under Maintenance</string>
+    <string name="error_maintenance_desc">We\'re working on improvements. Please try again later.</string>
+    
+    <!-- Success Messages -->
+    <string name="success_post_created">Post created successfully!</string>
+    <string name="success_profile_updated">Profile updated successfully!</string>
+    <string name="success_settings_saved">Settings saved successfully!</string>
+    <string name="success_followed">You are now following this user!</string>
+    <string name="success_unfollowed">You have unfollowed this user!</string>
+    
+    <!-- Widget -->
+    <string name="widget_title">InstaSprite Widget</string>
+    <string name="widget_description">Quick access to your InstaSprite posts</string>
+    
+    <!-- Post Filter Dialog -->
+    <string name="filter_posts">Filter Posts</string>
+    <string name="filter_follow">Follow</string>
+    <string name="filter_recent">Recent</string>
+    
+    <!-- Comment Screen -->
+    <string name="post">Post</string>
+    <string name="back">Back</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="unfollow">Following</string>
+    <string name="follow">Follow</string>
+    <string name="image_unavailable">Image unavailable</string>
+    <string name="replying_tap_to_cancel">Replying… tap to cancel</string>
+    <string name="zoomed_image">Zoomed image</string>
+    <string name="your_profile">Your Profile</string>
+    <string name="add_a_comment">Add a comment...</string>
+    <string name="like_comment">Like comment</string>
+    <string name="reply">Reply</string>
+    <string name="delete_comment">Delete comment</string>
+    <string name="comments">Comments</string>
+    <string name="failed_to_load_post">Failed to load post</string>
+    <string name="you">you</string>
+    <string name="you_capitalized">You</string>
+    
+    <!-- Profile Screen -->
+    <string name="post_image">Post image</string>
+    <string name="profile_image">Profile image</string>
+    <string name="avatar_preview">Avatar preview</string>
+    <string name="pick_image">Pick image</string>
+    <string name="now">now</string>
+    <string name="minutes_short">m</string>
+    <string name="hours_short">h</string>
+    <string name="days_short">d</string>
+    <string name="failed_to_load_profile">Failed to load profile</string>
+    <string name="unknown_error_occurred">Unknown error occurred</string>
+    <string name="failed_to_get_current_user_data">Failed to get current user data</string>
+    <string name="failed_to_update_profile">Failed to update profile</string>
+    <string name="failed_to_update_follow_status">Failed to update follow status</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="failed_to_upload_image">Failed to upload image</string>
+    <string name="menu">Menu</string>
+    <string name="edit_avatar">Edit Avatar</string>
+    <string name="no_bio_available">No bio available</string>
+
+    <string name="share_profile">Share Profile</string>
+    <string name="display_name">Display Name</string>
+    
+    <!-- Followers/Following Dialog -->
+    <string name="no_followers">No followers yet</string>
+    <string name="no_following">Not following anyone</string>
+    <string name="loading_followers">Loading followers...</string>
+    <string name="loading_following">Loading following...</string>
+    <string name="follow_user">Follow</string>
+    <string name="unfollow_user">Unfollow</string>
+    <string name="view_profile">View Profile</string>
+    
+    <!-- OTP / 2FA Strings -->
+    <string name="enter_otp">Enter OTP</string>
+    <string name="enter_verification_code">Enter Verification Code</string>
+    <string name="verify">Verify</string>
+    <string name="verifying">Verifying…</string>
+    <string name="enable_two_factor_authentication">Enable Two-Factor Authentication</string>
+    <string name="scan_qr_code_instruction">Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</string>
+    <string name="failed_to_load_qr_code">Failed to load QR code</string>
+    <string name="or_enter_secret_manually">Or enter this secret key manually:</string>
+    <string name="account_issuer_info">Account: %1$s\nIssuer: %2$s</string>
+    <string name="after_scanning_instruction">After scanning, enter the 6-digit code from your authenticator app to complete setup.</string>
+    <string name="got_it">Got it</string>
+    <string name="enter_6_digit_code">Enter the 6-digit code from your authenticator app</string>
+    <string name="disable_two_factor_authentication">Disable Two-Factor Authentication</string>
+    <string name="enter_6_digit_code_to_disable">Enter the 6-digit code from your authenticator app to disable 2FA</string>
+    <string name="disabling">Disabling…</string>
+    <string name="disable">Disable</string>
+    <string name="qr_code_for_otp">QR Code for OTP</string>
 </resources>

@@ -1,0 +1,260 @@
+<resources>
+    <string name="app_name">InstaSprite</string>
+
+    
+    <!-- Common UI Strings -->
+    <string name="login">Đăng nhập</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="register">Đăng ký</string>
+    <string name="password">Mật khẩu</string>
+    <string name="password_validation_error">"Ít nhất 6 ký tự, gồm chữ ít nhất 1 chữ số và 1 ký tự đặc biệt "</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="confirm_password_validation_error">Mật khẩu không trùng khớp</string>
+    <string name="dont_have_account">Chưa có tài khoản?</string>
+    <string name="register_succeed">Tạo tài khoản thành công</string>
+    <string name="login_with_existed">Chọn tài khoản</string>
+    <string name="enable2fa">Bật xác thực 2 lớp</string>
+    <string name="select_account">Chọn tài khoản</string>
+    <string name="or">Hoặc</string>
+    <string name="welcome_back">Chào mừng quay trở lại</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="bio">Giới thiệu</string>
+    <string name="save">Lưu</string>
+    <string name="delete">Xóa</string>
+    <string name="edit">Chỉnh sửa</string>
+    <string name="share">Chia sẻ</string>
+    <string name="like">Thích</string>
+    <string name="comment">Bình luận</string>
+    <string name="posts">Bài viết</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="home">Trang chủ</string>
+    <string name="profile">Hồ sơ</string>
+    <string name="settings">Cài đặt</string>
+    <string name="setting">Cài đặt</string>
+    <string name="notifications">Thông báo</string>
+    <string name="gallery">Thư viện</string>
+    <string name="about">Giới thiệu</string>
+    <string name="create_your_first_sprite">Tạo sprite đầu tiên của bạn!</string>
+    <string name="no_posts_to_show">Không có bài viết nào để hiển thị</string>
+    <string name="posts_you_save_will_appear_here">Các bài viết bạn lưu sẽ xuất hiện ở đây</string>
+    <string name="no_saved_posts">Không có bài viết đã lưu</string>
+    <string name="no_posts_yet">Chưa có bài viết nào</string>
+    <string name="add_photo">Thêm ảnh</string>
+    <string name="add_caption">Thêm chú thích</string>
+    <string name="add_hashtags">Thêm hashtag</string>
+    <string name="loading">Đang tải...</string>
+    <string name="loading_image">Đang tải ảnh...</string>
+    <string name="pixel_size">%dpx</string>
+    <string name="create_pixel_art_with_ease">Tạo pixel art một cách dễ dàng</string>
+    <string name="profile_updated_successfully">Cập nhật hồ sơ thành công!</string>
+    <string name="complete_profile">Hoàn thiện hồ sơ</string>
+    <string name="cancel">Hủy</string>
+    <string name="uploading">Đang tải lên...</string>
+    <string name="complete_your_profile">Hoàn thiện hồ sơ của bạn</string>
+    <string name="lets_set_up_your_profile">Hãy thiết lập thông tin hồ sơ của bạn</string>
+    <string name="username">Tên người dùng</string>
+    <string name="name">Tên</string>
+    <string name="introduce">Giới thiệu</string>
+    <string name="email">Email</string>
+    <string name="email_validation_error">Vui lòng điền email hợp lệ</string>
+    <string name="verify_email">Email chưa xác thực!</string>
+    <string name="verify_email_desc">Vui lòng xác thực email đễ sử dụng các tính năng của InstaSprite</string>
+    <string name="dismiss">Huỷ</string>
+    <string name="sending_email">Đang gửi…</string>
+    <string name="update_profile">Cập nhật hồ sơ</string>
+    <string name="introduction_optional">Giới thiệu (Tùy chọn)</string>
+    <string name="please_enter_username">Vui lòng nhập tên người dùng</string>
+    <string name="username_length_error">Tên người dùng phải có từ 4 đến 12 ký tự</string>
+    <string name="please_enter_full_name">Vui lòng nhập tên đầy đủ</string>
+    <string name="name_length_error">Tên phải có từ 2 đến 12 ký tự</string>
+    <string name="please_enter_email">Vui lòng nhập email</string>
+    <string name="please_enter_valid_email">Vui lòng nhập email hợp lệ</string>
+    <string name="uploading_image">Đang tải ảnh lên...</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="reset_password_email">Email chứa mật khẩu tạm thời đã được gửi, vui lòng kiểm tra</string>
+    <string name="reset_password">Đặt lại mật khẩu</string>
+    <string name="create_post">Tạo bài viết</string>
+    <string name="select_images">Chọn ảnh</string>
+    <string name="choose_image">Chọn ảnh</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="change_profile_photo">Thay đổi ảnh đại diện</string>
+    <string name="no_posts_available">Không có bài viết nào</string>
+    <string name="error">Lỗi</string>
+    <string name="success">Thành công</string>
+    <string name="retry">Thử lại</string>
+    <string name="ok">OK</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+    <string name="next">Tiếp theo</string>
+    <string name="previous">Trước</string>
+    <string name="done">Hoàn thành</string>
+    <string name="close">Đóng</string>
+    <string name="open">Mở</string>
+    <string name="send">Gửi</string>
+    <string name="receive">Nhận</string>
+    <string name="upload">Tải lên</string>
+    <string name="download">Tải xuống</string>
+    <string name="refresh">Làm mới</string>
+    <string name="more">Thêm</string>
+    <string name="less">Ít hơn</string>
+    <string name="show_more">Hiển thị thêm</string>
+    <string name="show_less">Ẩn bớt</string>
+    
+    <!-- Drawing Activity -->
+    <string name="drawing_tools">Công cụ vẽ</string>
+    <string name="pencil">Bút chì</string>
+    <string name="eraser">Tẩy</string>
+    <string name="fill">Tô màu</string>
+    <string name="eyedropper">Ống nhỏ mắt</string>
+    <string name="move">Di chuyển</string>
+    <string name="resize">Thay đổi kích thước</string>
+    <string name="undo">Hoàn tác</string>
+    <string name="redo">Làm lại</string>
+    <string name="flip_horizontal">Lật ngang</string>
+    <string name="flip_vertical">Lật dọc</string>
+    <string name="color_picker">Chọn màu</string>
+    <string name="brush_size">Kích thước cọ</string>
+    <string name="opacity">Độ trong suốt</string>
+    <string name="layers">Lớp</string>
+    <string name="new_layer">Lớp mới</string>
+    <string name="delete_layer">Xóa lớp</string>
+    <string name="duplicate_layer">Sao chép lớp</string>
+    <string name="merge_layers">Gộp lớp</string>
+    
+    <!-- Profile Screen -->
+    <string name="edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="change_photo">Thay đổi ảnh</string>
+    <string name="change_cover">Thay đổi ảnh bìa</string>
+    <string name="privacy_settings">Cài đặt riêng tư</string>
+    <string name="account_settings">Cài đặt tài khoản</string>
+    <string name="language_settings">Cài đặt ngôn ngữ</string>
+    <string name="notification_settings">Cài đặt thông báo</string>
+    <string name="help">Trợ giúp</string>
+    <string name="support">Hỗ trợ</string>
+    <string name="terms_of_service">Điều khoản dịch vụ</string>
+    <string name="privacy_policy">Chính sách bảo mật</string>
+    
+    <!-- Comments -->
+    <string name="write_comment">Viết bình luận...</string>
+
+    <string name="report_comment">Báo cáo bình luận</string>
+    
+    <!-- Notifications -->
+    <string name="new_follower">đã theo dõi bạn</string>
+    <string name="liked_your_post">đã thích bài viết của bạn</string>
+    <string name="commented_on_your_post">đã bình luận bài viết của bạn</string>
+    <string name="mentioned_you">đã nhắc đến bạn</string>
+    <string name="shared_your_post">đã chia sẻ bài viết của bạn</string>
+    
+    <!-- Settings -->
+    <string name="change_language">Thay đổi ngôn ngữ</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="dark_mode">Chế độ tối</string>
+    <string name="light_mode">Chế độ sáng</string>
+    <string name="auto_mode">Chế độ tự động</string>
+    <string name="font_size">Kích thước chữ</string>
+    <string name="small">Nhỏ</string>
+    <string name="medium">Trung bình</string>
+    <string name="large">Lớn</string>
+    
+    <!-- Error Messages -->
+    <string name="error_network">Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.</string>
+    <string name="error_server">Lỗi máy chủ. Vui lòng thử lại sau.</string>
+    <string name="error_authentication">Xác thực thất bại. Vui lòng đăng nhập lại.</string>
+    <string name="error_validation">Vui lòng kiểm tra thông tin nhập vào và thử lại.</string>
+    <string name="error_file_upload">Tải lên tệp thất bại. Vui lòng thử lại.</string>
+    <string name="error_permission">Quyền bị từ chối. Vui lòng cấp quyền cần thiết.</string>
+    <string name="auth_cancelled_by_user">Đăng nhập đã bị hủy</string>
+    
+    <!-- Success Messages -->
+    <string name="success_post_created">Tạo bài viết thành công!</string>
+    <string name="success_profile_updated">Cập nhật hồ sơ thành công!</string>
+    <string name="success_settings_saved">Lưu cài đặt thành công!</string>
+    <string name="success_followed">Bạn đã theo dõi người dùng này!</string>
+    <string name="success_unfollowed">Bạn đã bỏ theo dõi người dùng này!</string>
+    
+    <!-- Widget -->
+    <string name="widget_title">Widget InstaSprite</string>
+    <string name="widget_description">Truy cập nhanh đến bài viết InstaSprite của bạn</string>
+    
+    <!-- Post Filter Dialog -->
+    <string name="filter_posts">Lọc bài viết</string>
+    <string name="filter_follow">Theo dõi</string>
+    <string name="filter_recent">Gần đây</string>
+    
+    <!-- Comment Screen -->
+    <string name="post">Bài viết</string>
+    <string name="back">Quay lại</string>
+    <string name="profile_picture">Ảnh đại diện</string>
+    <string name="unfollow">Đang theo dõi</string>
+    <string name="follow">Theo dõi</string>
+    <string name="image_unavailable">Không thể tải ảnh</string>
+    <string name="replying_tap_to_cancel">Đang trả lời… chạm để hủy</string>
+    <string name="zoomed_image">Ảnh phóng to</string>
+    <string name="your_profile">Hồ sơ của bạn</string>
+    <string name="add_a_comment">Thêm bình luận...</string>
+    <string name="like_comment">Thích bình luận</string>
+    <string name="reply">Trả lời</string>
+    <string name="delete_comment">Xóa bình luận</string>
+    <string name="comments">Bình luận</string>
+    <string name="failed_to_load_post">Không thể tải bài viết</string>
+    <string name="you">bạn</string>
+    <string name="you_capitalized">Bạn</string>
+    
+    <!-- Profile Screen -->
+    <string name="post_image">Ảnh bài viết</string>
+    <string name="profile_image">Ảnh đại diện</string>
+    <string name="avatar_preview">Xem trước ảnh đại diện</string>
+    <string name="pick_image">Chọn ảnh</string>
+    <string name="now">bây giờ</string>
+    <string name="minutes_short">p</string>
+    <string name="hours_short">g</string>
+    <string name="days_short">n</string>
+    <string name="failed_to_load_profile">Không thể tải hồ sơ</string>
+    <string name="unknown_error_occurred">Đã xảy ra lỗi không xác định</string>
+    <string name="failed_to_get_current_user_data">Không thể lấy dữ liệu người dùng hiện tại</string>
+    <string name="failed_to_update_profile">Không thể cập nhật hồ sơ</string>
+    <string name="failed_to_update_follow_status">Không thể cập nhật trạng thái theo dõi</string>
+    <string name="unknown_error">Lỗi không xác định</string>
+    <string name="failed_to_upload_image">Không thể tải lên ảnh</string>
+    <string name="menu">Menu</string>
+    <string name="edit_avatar">Chỉnh sửa ảnh đại diện</string>
+    <string name="no_bio_available">Chưa có giới thiệu</string>
+    <string name="share_profile">Chia sẻ hồ sơ</string>
+    <string name="display_name">Tên hiển thị</string>
+    
+    <!-- Followers/Following Dialog -->
+    <string name="followers">Người theo dõi</string>
+    <string name="following">Đang theo dõi</string>
+    <string name="no_followers">Chưa có người theo dõi</string>
+    <string name="no_following">Chưa theo dõi ai</string>
+    <string name="loading_followers">Đang tải người theo dõi...</string>
+    <string name="loading_following">Đang tải danh sách theo dõi...</string>
+    <string name="follow_user">Theo dõi</string>
+    <string name="unfollow_user">Bỏ theo dõi</string>
+    <string name="view_profile">Xem hồ sơ</string>
+    <string name="already_has_account">Đã có tài khoản?</string>
+    <string name="email_sent">Đã gửi email xác nhận! vui lòng kiểm tra hòm thư</string>
+    <string name="email_verified_notification_title">Email đã được xác thực</string>
+    <string name="email_verified_notification_body">Email của bạn đã được xác thực thành công!</string>
+    <string name="verify">Xác thực</string>
+    
+    <!-- OTP / 2FA Strings -->
+    <string name="enter_otp">Nhập mã OTP</string>
+    <string name="enter_verification_code">Nhập mã xác thực</string>
+    <string name="verifying">Đang xác thực…</string>
+    <string name="enable_two_factor_authentication">Bật xác thực hai yếu tố</string>
+    <string name="scan_qr_code_instruction">Quét mã QR này bằng ứng dụng xác thực của bạn (Google Authenticator, Authy, v.v.)</string>
+    <string name="failed_to_load_qr_code">Không thể tải mã QR</string>
+    <string name="or_enter_secret_manually">Hoặc nhập khóa bí mật này thủ công:</string>
+    <string name="account_issuer_info">Tài khoản: %1$s\nNhà phát hành: %2$s</string>
+    <string name="after_scanning_instruction">Sau khi quét, nhập mã 6 chữ số từ ứng dụng xác thực của bạn để hoàn tất thiết lập.</string>
+    <string name="got_it">Đã hiểu</string>
+    <string name="enter_6_digit_code">Nhập mã 6 chữ số từ ứng dụng xác thực của bạn</string>
+    <string name="disable_two_factor_authentication">Tắt xác thực hai yếu tố</string>
+    <string name="enter_6_digit_code_to_disable">Nhập mã 6 chữ số từ ứng dụng xác thực của bạn để tắt 2FA</string>
+    <string name="disabling">Đang tắt…</string>
+    <string name="disable">Tắt</string>
+    <string name="qr_code_for_otp">Mã QR cho OTP</string>
+</resources>

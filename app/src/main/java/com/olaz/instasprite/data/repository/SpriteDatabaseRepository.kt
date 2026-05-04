@@ -5,11 +5,11 @@ import com.olaz.instasprite.data.database.SpriteDataDao
 import com.olaz.instasprite.data.database.SpriteMetaDataDao
 import com.olaz.instasprite.data.mapper.toDomain
 import com.olaz.instasprite.data.mapper.toEntity
-import com.olaz.instasprite.data.mapper.toSpritePixels
+import com.olaz.instasprite.data.mapper.toSprite
+import com.olaz.instasprite.data.mapper.toISprite
 import com.olaz.instasprite.data.model.SpriteMetaData
-import com.olaz.instasprite.data.source.SpritePixelDataSource
+import com.olaz.instasprite.data.source.ISpriteDatSource
 import com.olaz.instasprite.domain.export.ImageExporter
-import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteMeta
 import com.olaz.instasprite.domain.model.SpriteWithMeta
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class SpriteDatabaseRepository @Inject constructor(
     private val dao: SpriteDataDao,
     private val metaDao: SpriteMetaDataDao,
-    private val pixelDataSource: SpritePixelDataSource,
+    private val pixelDataSource: ISpriteDatSource,
     @ApplicationContext private val context: android.content.Context
 ) {
     suspend fun saveSprite(sprite: Sprite) {
@@ -38,7 +38,7 @@ class SpriteDatabaseRepository @Inject constructor(
             lastModifiedAt = now
         )
 
-        val proto = sprite.toSpritePixels()
+        val proto = sprite.toISprite()
         pixelDataSource.getDataStore(sprite.id).updateData { proto }
 
         ImageExporter.saveThumbnail(sprite, context)
@@ -52,18 +52,10 @@ class SpriteDatabaseRepository @Inject constructor(
         val proto = pixelDataSource.getDataStore(id).data.firstOrNull()
 
         if (proto != null) {
-            val layers = proto.layersList.map { layerData ->
-                Layer(
-                    id = layerData.id,
-                    name = layerData.name,
-                    isVisible = layerData.isVisible,
-                    isLocked = layerData.isLocked,
-                    pixels = layerData.pixelsList.toIntArray()
-                )
-            }
+            val sprite = proto.toSprite()
 
             return entity.toDomain(
-                layers = layers,
+                layers = sprite.layers,
                 colorPalette = proto.colorPaletteList,
             )
         }

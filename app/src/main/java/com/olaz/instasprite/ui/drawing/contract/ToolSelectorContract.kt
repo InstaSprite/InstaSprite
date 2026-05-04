@@ -10,5 +10,5 @@ sealed interface ToolSelectorEvent {
     data object OpenSaveImageDialog : ToolSelectorEvent
     data object OpenSaveISpriteDialog : ToolSelectorEvent
     data object OpenLoadISpriteDialog : ToolSelectorEvent
-
+    data object ToggleAppendSelectionMode : ToolSelectorEvent
 }

@@ -36,7 +36,8 @@ fun SaveFileDialog(
     onFolderSelected: (Uri) -> Unit,
     onSave: () -> Unit,
     onDismiss: () -> Unit,
-    onValuesChanged: ((values: List<String>, folderUri: Uri?) -> Unit)? = null
+    onValuesChanged: ((values: List<String>, folderUri: Uri?) -> Unit)? = null,
+    isSaving: Boolean = false
 ) {
     val context = LocalContext.current
     var folderUri by remember(lastSavedUri) { mutableStateOf<Uri?>(lastSavedUri) }
@@ -67,6 +68,7 @@ fun SaveFileDialog(
         title = title,
         fields = fields,
         confirmButtonText = "Save",
+        isLoading = isSaving,
         onDismiss = onDismiss,
         onConfirm = { values ->
             if (folderUri == null) {
@@ -74,7 +76,7 @@ fun SaveFileDialog(
             } else {
                 onValuesChanged?.invoke(values, folderUri)
                 onSave()
-                onDismiss()
+//                onDismiss()
             }
         },
         extraTopContent = {

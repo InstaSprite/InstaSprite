@@ -1,6 +1,7 @@
 package com.olaz.instasprite.ui.drawing.component
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -39,7 +40,7 @@ fun ShapeSelector(
     AnimatedVisibility(
         visible = isVisible,
         enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-        exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
+        exit = ExitTransition.None,
         modifier = modifier
     ) {
         Row(

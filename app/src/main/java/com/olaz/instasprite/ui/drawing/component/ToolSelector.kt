@@ -31,7 +31,7 @@ import com.olaz.instasprite.domain.tool.MoveTool
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.ShapeToolPlaceholder
 import com.olaz.instasprite.domain.tool.Tool
-import com.olaz.instasprite.domain.tool.shape.LineTool
+import com.olaz.instasprite.domain.tool.selection.SelectionToolPlaceholder
 import com.olaz.instasprite.ui.drawing.contract.ToolSelectorEvent
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 
@@ -47,6 +47,7 @@ fun ToolSelector(
     val tools = listOf(
         PencilTool,
         ShapeToolPlaceholder,
+        SelectionToolPlaceholder,
         EraserTool,
         FillTool,
         EyedropperTool,
@@ -85,7 +86,9 @@ fun ToolSelector(
                         text = { Text(tool.name) },
                         onClick = {
                             if (tool == ShapeToolPlaceholder) {
-                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(LineTool))
+                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(com.olaz.instasprite.domain.tool.shape.LineTool))
+                            } else if (tool == SelectionToolPlaceholder) {
+                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(com.olaz.instasprite.domain.tool.selection.RectangleSelectionTool))
                             } else {
                                 onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
                             }
@@ -148,6 +151,7 @@ fun ToolSelector(
                     text = { Text(text = "Export image") },
                     onClick = {
                         onToolSelectorEvent(ToolSelectorEvent.OpenSaveImageDialog)
+                        menuListVisible = false
                     }
                 )
 

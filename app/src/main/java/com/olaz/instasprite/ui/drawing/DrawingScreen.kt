@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -41,11 +40,14 @@ import com.olaz.instasprite.data.repository.ColorPaletteRepository
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.ShapeTool
 import com.olaz.instasprite.domain.tool.StrokeTool
+import com.olaz.instasprite.domain.tool.selection.SelectionTool
 import com.olaz.instasprite.ui.components.composable.DrawerLayout
 import com.olaz.instasprite.ui.components.composable.DrawerSide
 import com.olaz.instasprite.ui.drawing.component.ColorPalette
 import com.olaz.instasprite.ui.drawing.component.LayerDrawer
 import com.olaz.instasprite.ui.drawing.component.PixelCanvas
+import com.olaz.instasprite.ui.drawing.component.SelectionModeSelector
+import com.olaz.instasprite.ui.drawing.component.SelectionToolOption
 import com.olaz.instasprite.ui.drawing.component.ShapeSelector
 import com.olaz.instasprite.ui.drawing.component.ToolSelector
 import com.olaz.instasprite.ui.drawing.component.ToolSizeSlider
@@ -135,7 +137,8 @@ fun DrawingScreen(
                 colorPaletteState = colorPaletteState,
                 event = event,
                 bitmap = viewModel.bitmap,
-                overlayBitmap = viewModel.overlayBitmap
+                overlayBitmap = viewModel.overlayBitmap,
+                selectionBitmap = viewModel.selectionBitmap
             )
         }
     )
@@ -148,7 +151,8 @@ private fun DrawingScreenContent(
     colorPaletteState: ColorPaletteState,
     event: DrawingScreenEvent,
     bitmap: Bitmap?,
-    overlayBitmap: Bitmap?
+    overlayBitmap: Bitmap?,
+    selectionBitmap: Bitmap?
 ) {
     val maxScale by remember(canvasState.width, canvasState.height) {
         derivedStateOf {
@@ -180,6 +184,14 @@ private fun DrawingScreenContent(
         },
         bottomBar = {
             Column {
+                SelectionToolOption(
+                    isVisible = (canvasState.selectionState != null),
+                    isAppendMode = uiState.isAppendSelectionMode,
+                    onAppendModeToggle = { event.onToolSelectorEvent(ToolSelectorEvent.ToggleAppendSelectionMode) },
+                    onClearSelect = { event.onCanvasEvent(PixelCanvasEvent.ClearSelection) },
+                    onInvertSelect = { event.onCanvasEvent(PixelCanvasEvent.InvertSelection) }
+                )
+
                 ShapeSelector(
                     isVisible = (uiState.selectedTool is ShapeTool),
                     selectedTool = uiState.selectedTool,
@@ -193,18 +205,26 @@ private fun DrawingScreenContent(
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(65.dp)
                         .background(CatppuccinUI.BackgroundColor)
                         .padding(12.dp)
                 ) {
 
                     Box(modifier = Modifier.weight(9f)) {
-                        if (uiState.selectedTool is StrokeTool) {
+                        if (uiState.selectedTool is StrokeTool && uiState.selectedTool !is SelectionTool) {
                             ToolSizeSlider(
                                 toolSizeValue = toolSizeValue,
                                 onValueChange = {
                                     toolSizeValue = it
                                     event.onToolSizeChange(it)
+                                }
+                            )
+                        } else {
+                            SelectionModeSelector(
+                                isVisible = (uiState.selectedTool is SelectionTool),
+                                selectedTool = uiState.selectedTool,
+                                onSelectionToolSelected = { tool ->
+                                    event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
                                 }
                             )
                         }
@@ -228,7 +248,7 @@ private fun DrawingScreenContent(
                         .background(CatppuccinUI.BackgroundColor)
                         .padding(horizontal = 5.dp, vertical = 5.dp),
                     selectedTool = uiState.selectedTool,
-                    onToolSelectorEvent = event.onToolSelectorEvent,
+                    onToolSelectorEvent = event.onToolSelectorEvent
                 )
             }
         }
@@ -247,7 +267,10 @@ private fun DrawingScreenContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = 65.dp + 66.dp // only tool selector and bottom layer row
+                    )
                     .background(CatppuccinUI.BackgroundColorDarker)
 
             ) {
@@ -260,7 +283,9 @@ private fun DrawingScreenContent(
                     pixelCanvasState = canvasState,
                     bitmap = bitmap,
                     overlayBitmap = overlayBitmap,
+                    selectionBitmap = selectionBitmap,
                     selectedTool = uiState.selectedTool,
+                    isSelectionAppendMode = uiState.isAppendSelectionMode,
                     scale = scale,
                     offset = offset,
                     onTransform = { centroid, panChange, zoomChange, canvasSize ->
@@ -323,7 +348,8 @@ private fun DrawingScreenPreviewLoading() {
                 onToggleLayerDrawer = {}
             ),
             bitmap = createBitmap(16, 16),
-            overlayBitmap = null
+            overlayBitmap = null,
+            selectionBitmap = null
         )
     }
 }
@@ -366,7 +392,8 @@ private fun DrawingScreenPreview() {
                 onToggleLayerDrawer = {}
             ),
             bitmap = createBitmap(16, 16),
-            overlayBitmap = null
+            overlayBitmap = null,
+            selectionBitmap = null
         )
     }
 }

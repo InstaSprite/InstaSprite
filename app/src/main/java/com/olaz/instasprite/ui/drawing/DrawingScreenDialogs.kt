@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import com.olaz.instasprite.domain.dialog.Dialog
 import com.olaz.instasprite.ui.drawing.dialog.ColorWheelDialog
 import com.olaz.instasprite.ui.drawing.dialog.LoadISpriteDialog
@@ -26,8 +25,8 @@ fun DrawingScreenDialogs(
     dialogState: List<DrawingDialog>,
     viewModel: DrawingViewModel
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val uiState = viewModel.uiState.collectAsState().value
 
     var lastSavedUri = viewModel.lastSavedLocation.collectAsState().value
 
@@ -41,6 +40,7 @@ fun DrawingScreenDialogs(
                 SaveISpriteDialog(
                     onDismiss = viewModel::closeTopDialog,
                     folderUri = lastSavedUri,
+                    isSaving = uiState.isSaving,
                     onFolderSelected = viewModel::setLastSavedLocation,
                     onSave = { uri, name -> viewModel.saveISprite(uri, name) }
                 )
