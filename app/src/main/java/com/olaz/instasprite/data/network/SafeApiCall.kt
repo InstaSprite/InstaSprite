@@ -57,9 +57,12 @@ fun <T> Response<ResultResponse<T>>.toResultMessage(default: String = ""): Resul
 
 private fun mapHttpError(httpCode: Int, errorCode: String?, errorMessage: String?): ApiError {
     return when (httpCode) {
-        401 -> ApiError.Unauthorized(errorMessage ?: "")
-        403 -> ApiError.Forbidden(errorMessage ?: "")
-        404 -> ApiError.NotFound(errorMessage ?: "")
+        400 -> ApiError.BadRequest(errorMessage ?: "", errorCode ?: "")
+        401 -> ApiError.Unauthorized(errorMessage ?: "", errorCode ?: "")
+        403 -> ApiError.Forbidden(errorMessage ?: "", errorCode ?: "")
+        404 -> ApiError.NotFound(errorMessage ?: "", errorCode ?: "")
+        409 -> ApiError.Conflict(errorMessage ?: "", errorCode ?: "")
+        429 -> ApiError.TooManyRequests(errorMessage ?: "", errorCode ?: "")
         in 500..599 -> ApiError.Server(errorCode ?: httpCode.toString(), errorMessage ?: "")
         else -> ApiError.Server(errorCode ?: httpCode.toString(), errorMessage ?: "")
     }

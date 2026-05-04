@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <string name="app_name">InstaSprite</string>
     <!-- Common UI Strings -->
     <string name="login">Login</string>
@@ -66,7 +66,7 @@
     <string name="email_verified_notification_title">Email Verified</string>
     <string name="email_verified_notification_body">Your email has been successfully verified!</string>
     <string name="dismiss">Dismiss</string>
-    <string name="sending_email">Sending email…</string>
+    <string name="sending_email">Sending emailâ€¦</string>
     <string name="update_profile">Update Profile</string>
     <string name="introduction_optional">Introduction (Optional)</string>
     <string name="please_enter_username">Please enter a username</string>
@@ -155,7 +155,7 @@
     <!-- Settings -->
     <string name="change_language">Change Language</string>
     <string name="english">English</string>
-    <string name="vietnamese">Tiếng Việt</string>
+    <string name="vietnamese">Tiáº¿ng Viá»‡t</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="light_mode">Light Mode</string>
     <string name="auto_mode">Auto Mode</string>
@@ -205,7 +205,7 @@
     <string name="unfollow">Following</string>
     <string name="follow">Follow</string>
     <string name="image_unavailable">Image unavailable</string>
-    <string name="replying_tap_to_cancel">Replying… tap to cancel</string>
+    <string name="replying_tap_to_cancel">Replyingâ€¦ tap to cancel</string>
     <string name="zoomed_image">Zoomed image</string>
     <string name="your_profile">Your Profile</string>
     <string name="add_a_comment">Add a comment...</string>
@@ -253,7 +253,7 @@
     <string name="enter_otp">Enter OTP</string>
     <string name="enter_verification_code">Enter Verification Code</string>
     <string name="verify">Verify</string>
-    <string name="verifying">Verifying…</string>
+    <string name="verifying">Verifyingâ€¦</string>
     <string name="enable_two_factor_authentication">Enable Two-Factor Authentication</string>
     <string name="scan_qr_code_instruction">Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</string>
     <string name="failed_to_load_qr_code">Failed to load QR code</string>
@@ -264,7 +264,7 @@
     <string name="enter_6_digit_code">Enter the 6-digit code from your authenticator app</string>
     <string name="disable_two_factor_authentication">Disable Two-Factor Authentication</string>
     <string name="enter_6_digit_code_to_disable">Enter the 6-digit code from your authenticator app to disable 2FA</string>
-    <string name="disabling">Disabling…</string>
+    <string name="disabling">Disablingâ€¦</string>
     <string name="disable">Disable</string>
     <string name="qr_code_for_otp">QR Code for OTP</string>
-</resources>
+    <string name="error_too_many_requests">Too many requests. Please try again later.</string>`n</resources>
