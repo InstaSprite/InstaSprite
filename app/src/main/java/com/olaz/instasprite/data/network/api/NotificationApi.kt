@@ -7,6 +7,8 @@ import retrofit2.http.Body
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.HTTP
+import retrofit2.http.GET
+import retrofit2.http.PUT
 
 interface NotificationApi {
 
@@ -20,6 +22,17 @@ interface NotificationApi {
     @HTTP(method = "DELETE", path = "/api/v1/notifications/fcm-token", hasBody = true)
     suspend fun deleteFcmToken(
         @Body request: FcmTokenRequestDto
+    ): Response<ResultResponse<Any?>>
+
+    @GET("/api/v1/notifications")
+    suspend fun getNotifications(
+        @retrofit2.http.Query("page") page: Int,
+        @retrofit2.http.Query("size") size: Int = 20
+    ): Response<ResultResponse<com.olaz.instasprite.data.network.model.SpringPageDto<com.olaz.instasprite.data.network.model.NotificationDto>>>
+
+    @PUT("/api/v1/notifications/{notificationId}/read")
+    suspend fun markAsRead(
+        @retrofit2.http.Path("notificationId") notificationId: String
     ): Response<ResultResponse<Any?>>
 }
 

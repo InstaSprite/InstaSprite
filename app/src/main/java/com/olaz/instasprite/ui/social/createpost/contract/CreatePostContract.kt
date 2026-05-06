@@ -12,7 +12,8 @@ data class CreatePostState(
     val showSpriteSelector: Boolean = false,
     val userSprites: List<SpriteWithMeta> = emptyList(),
     val hashtags: List<String> = emptyList(),
-    val currentHashtagInput: String = ""
+    val currentHashtagInput: String = "",
+    val showEmailNotVerified: Boolean = false
 )
 
 data class CreatePostScreenEvent(

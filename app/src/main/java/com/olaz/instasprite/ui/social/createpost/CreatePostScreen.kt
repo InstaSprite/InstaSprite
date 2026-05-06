@@ -45,6 +45,8 @@ import com.olaz.instasprite.ui.social.createpost.composable.OptionSection
 import com.olaz.instasprite.ui.social.createpost.composable.TopBar
 import com.olaz.instasprite.ui.social.createpost.contract.CreatePostScreenEvent
 import com.olaz.instasprite.ui.social.createpost.contract.CreatePostState
+import com.olaz.instasprite.ui.social.feed.VerifyEmailState
+import com.olaz.instasprite.ui.social.feed.dialog.VerifyEmailDialog
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import java.io.File
@@ -79,6 +81,14 @@ fun CreatePostScreen(
         uiState = uiState,
         event = event
     )
+
+    if (uiState.showEmailNotVerified) {
+        VerifyEmailDialog(
+            verifyEmailState = VerifyEmailState(),
+            onDismiss = viewModel::dismissEmailNotVerified,
+            onConfirm = viewModel::dismissEmailNotVerified
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

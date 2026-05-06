@@ -22,6 +22,8 @@ import com.olaz.instasprite.ui.social.session.SocialSessionManager
 import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -340,7 +342,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun sendFcmTokenToBackend() {
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val token = FirebaseMessaging.getInstance().token.await()
                 notificationRepository.registerFcmToken(token).fold(

@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.R
+import com.olaz.instasprite.data.network.ApiError
 import com.olaz.instasprite.data.repository.PostRepository
 import com.olaz.instasprite.data.repository.SpriteDatabaseRepository
 import com.olaz.instasprite.ui.social.PostInteractionEvent
@@ -70,7 +71,7 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun addHashtag() {
-        val input = _uiState.value.currentHashtagInput.trim().removePrefix("#")
+        val input = _uiState.value.currentHashtagInput.trim().removePrefix("#").lowercase()
         if (input.isNotBlank() && !_uiState.value.hashtags.contains(input)) {
             _uiState.update { it.copy(
                 hashtags = it.hashtags + input,
@@ -116,14 +117,18 @@ class CreatePostViewModel @Inject constructor(
                             ).show()
                         }
                     },
-                    onFailure = {
+                    onFailure = { error ->
                         _uiState.update { it.copy(isPostInProgress = false) }
-                        viewModelScope.launch(Dispatchers.Main) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.post_created_fail),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        if (error is ApiError.Unauthorized && error.code == "M018") {
+                            _uiState.update { it.copy(showEmailNotVerified = true) }
+                        } else {
+                            viewModelScope.launch(Dispatchers.Main) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.post_created_fail),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 )
@@ -131,5 +136,9 @@ class CreatePostViewModel @Inject constructor(
                 _uiState.update { it.copy(isPostInProgress = false) }
             }
         }
+    }
+
+    fun dismissEmailNotVerified() {
+        _uiState.update { it.copy(showEmailNotVerified = false) }
     }
 }

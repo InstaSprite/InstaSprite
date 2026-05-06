@@ -59,6 +59,8 @@ import com.olaz.instasprite.ui.social.comments.contract.CommentScreenEvent
 import com.olaz.instasprite.ui.social.comments.contract.CommentState
 import com.olaz.instasprite.ui.social.comments.contract.PostAuthor
 import com.olaz.instasprite.ui.social.createpost.composable.TopBar
+import com.olaz.instasprite.ui.social.feed.VerifyEmailState
+import com.olaz.instasprite.ui.social.feed.dialog.VerifyEmailDialog
 import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
 import com.olaz.instasprite.ui.theme.CatppuccinUI
@@ -167,6 +169,14 @@ fun CommentScreen(
     }
 
     // TODO: Implement image zoom overlay if needed
+
+    if (uiState.showEmailNotVerified) {
+        VerifyEmailDialog(
+            verifyEmailState = VerifyEmailState(),
+            onDismiss = viewModel::dismissEmailNotVerified,
+            onConfirm = viewModel::dismissEmailNotVerified
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

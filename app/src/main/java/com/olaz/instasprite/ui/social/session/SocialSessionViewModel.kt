@@ -1,17 +1,23 @@
 package com.olaz.instasprite.ui.social.session
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
+import com.olaz.instasprite.data.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class SocialSessionViewModel @Inject constructor(
-    private val sessionManager: SocialSessionManager
+    private val sessionManager: SocialSessionManager,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
     val sessionState: StateFlow<SocialSessionState> = sessionManager.sessionState
@@ -25,6 +31,15 @@ class SocialSessionViewModel @Inject constructor(
         )
 
     fun logout() {
-        sessionManager.onLogout()
+        viewModelScope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                notificationRepository.deleteFcmToken(token)
+            } catch (e: Exception) {
+                Log.w("SocialSessionViewModel", "Failed to delete FCM token", e)
+            } finally {
+                sessionManager.onLogout()
+            }
+        }
     }
 }

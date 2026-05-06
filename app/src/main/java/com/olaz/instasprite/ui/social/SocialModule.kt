@@ -70,7 +70,9 @@ object SocialModule {
     fun provideNotificationEntry(navigator: Navigator): EntryProviderInstaller = {
         entry<Screen.Notification> {
             NotificationScreen(
-                onBackClick = { navigator.goBack() }
+                onBackClick = { navigator.goBack() },
+                onNavigateToProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
+                onNavigateToPost = { postId -> navigator.goTo(Screen.Comments(postId)) }
             )
         }
     }

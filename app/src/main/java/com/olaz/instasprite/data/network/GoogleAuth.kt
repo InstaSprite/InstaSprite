@@ -65,7 +65,7 @@ class GoogleAuth {
                         }
                     }
                 } catch (e: NoCredentialException) {
-                    launcher?.launch(getIntent())
+                    onError("No Google account found on this device. Please add one in Settings.")
                 } catch (e: GetCredentialCancellationException) {
                     onError(context.getString(R.string.auth_cancelled_by_user))
                 } catch (e: GetCredentialException) {

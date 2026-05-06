@@ -40,7 +40,8 @@ data class CommentState(
     val comments: List<Comment> = emptyList(),
     val currentUserImageUrl: String? = null,
     val replyParentId: Long? = null,
-    val showLoginRequiredError: Boolean = false
+    val showLoginRequiredError: Boolean = false,
+    val showEmailNotVerified: Boolean = false
 )
 
 data class CommentScreenEvent(

@@ -288,9 +288,16 @@ class FeedViewModel @Inject constructor(
                         )
                     }
 
-                    val avatarUrl = data.memberImage?.imageUrl?.let {
-                        "${Constants.BASE_URL}/images/$it"
-                    }.orEmpty()
+                    val imageUrl = data.memberImage?.imageUrl ?: data.memberImageUrl
+                    val avatarUrl = if (!imageUrl.isNullOrEmpty()) {
+                        if (imageUrl.startsWith("http")) {
+                            imageUrl
+                        } else {
+                            "${Constants.BASE_URL}/images/$imageUrl"
+                        }
+                    } else {
+                        null
+                    }
 
                     accountRepository.updateAccount(username = data.memberUsername) { currentAccount ->
                         currentAccount.copy(

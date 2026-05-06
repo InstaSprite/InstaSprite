@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.R
+import com.olaz.instasprite.data.network.ApiError
 import com.olaz.instasprite.data.network.api.FollowApi
 import com.olaz.instasprite.data.network.api.ProfileApi
 import com.olaz.instasprite.data.repository.CommentRepository
@@ -337,7 +338,7 @@ class CommentViewModel @Inject constructor(
         }
         val postId = _uiState.value.backendPost?.postId ?: return
         val prev = _uiState.value.comments
-        _uiState.update { it.copy(comments = prev.filter { it.id != commentId }) }
+        _uiState.update { it.copy(comments = prev.filter { it.id != commentId && it.parentId != commentId }) }
 
         viewModelScope.launch {
             val idLong = commentId.toLongOrNull() ?: return@launch
@@ -419,8 +420,11 @@ class CommentViewModel @Inject constructor(
                         )
                     }
                 },
-                onFailure = {
+                onFailure = { error ->
                     _uiState.update { it.copy(comments = before, replyParentId = null) }
+                    if (error is ApiError.Unauthorized && error.code == "M018") {
+                        _uiState.update { it.copy(showEmailNotVerified = true) }
+                    }
                 }
             )
         }
@@ -428,6 +432,10 @@ class CommentViewModel @Inject constructor(
 
     fun consumeLoginRequiredError() {
         _uiState.update { it.copy(showLoginRequiredError = false) }
+    }
+
+    fun dismissEmailNotVerified() {
+        _uiState.update { it.copy(showEmailNotVerified = false) }
     }
 }
 
