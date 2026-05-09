@@ -5,6 +5,8 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -16,6 +18,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.olaz.instasprite.domain.tool.StrokeTool
 import com.olaz.instasprite.domain.tool.Tool
+import com.olaz.instasprite.ui.drawing.contract.CursorState
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import kotlin.math.abs
 
@@ -273,3 +276,168 @@ fun calculateNewScaleAndOffset(
         )
     )
 }
+
+@Composable
+fun Modifier.cursorPointerInput(
+    canvasWidth: Int,
+    canvasHeight: Int,
+    cursorState: CursorState,
+    scale: Float,
+    onCursorMove: (cursorX: Float, cursorY: Float) -> Unit,
+    onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit
+): Modifier {
+    if (canvasWidth == 0 || canvasHeight == 0) return this
+
+    val touchSlop = LocalViewConfiguration.current.touchSlop
+    val latestCursorX by rememberUpdatedState(cursorState.cursorX)
+    val latestCursorY by rememberUpdatedState(cursorState.cursorY)
+
+    return this.pointerInput(canvasWidth, canvasHeight) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val handler = CursorGestureHandler(
+                canvasWidth = canvasWidth,
+                canvasHeight = canvasHeight,
+                cursorX = latestCursorX,
+                cursorY = latestCursorY,
+                touchSlop = touchSlop,
+                layoutSize = size,
+                onCursorMove = onCursorMove,
+                onTransform = onTransform,
+                startEvent = down
+            )
+
+            do {
+                val event = awaitPointerEvent()
+                val canceled = handler.processEvent(event)
+                if (canceled) break
+            } while (event.changes.any { it.pressed })
+
+            handler.onGestureEnded()
+        }
+    }
+}
+
+private class CursorGestureHandler(
+    private val canvasWidth: Int,
+    private val canvasHeight: Int,
+    private var cursorX: Float,
+    private var cursorY: Float,
+    private val touchSlop: Float,
+    private val layoutSize: IntSize,
+    private val onCursorMove: (cursorX: Float, cursorY: Float) -> Unit,
+    private val onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
+    startEvent: PointerInputChange
+) {
+    private var state = CursorGestureState.Dragging
+    private var pointerId = startEvent.id
+    private var lastPosition = startEvent.position
+
+    private var transformLocked = false
+    private var isPanningOnly = false
+    private var panAccumulated = Offset.Zero
+    private var zoomAccumulated = 1f
+
+    private val cellWidth = layoutSize.width.toFloat() / canvasWidth
+    private val cellHeight = layoutSize.height.toFloat() / canvasHeight
+
+    fun processEvent(event: PointerEvent): Boolean {
+        val isCanceled = event.changes.any { it.isConsumed }
+        if (isCanceled) {
+            state = CursorGestureState.Canceled
+            return true
+        }
+
+        val pressedChanges = event.changes.filter { it.pressed }
+        val pointerCount = pressedChanges.size
+
+        if (pointerCount > 1 && state != CursorGestureState.Transforming) {
+            state = CursorGestureState.Transforming
+        } else if (pointerCount == 1 && state == CursorGestureState.Transforming) {
+            state = CursorGestureState.Dragging
+            pointerId = pressedChanges.first().id
+            lastPosition = pressedChanges.first().position
+        }
+
+        when (state) {
+            CursorGestureState.Dragging -> handleDragging(event, pressedChanges)
+            CursorGestureState.Transforming -> handleTransforming(event, pressedChanges, pointerCount)
+            CursorGestureState.Canceled -> {}
+        }
+        return false
+    }
+
+    private fun handleDragging(event: PointerEvent, pressedChanges: List<PointerInputChange>) {
+        val pointerChange = event.changes.firstOrNull { it.id == pointerId }
+            ?: pressedChanges.firstOrNull() ?: return
+
+        pointerId = pointerChange.id
+        val delta = pointerChange.position - lastPosition
+        lastPosition = pointerChange.position
+
+        val deltaGridX = delta.x / cellWidth
+        val deltaGridY = delta.y / cellHeight
+
+        val rawX = cursorX + deltaGridX
+        val rawY = cursorY + deltaGridY
+        val maxX = canvasWidth.toFloat() - 0.01f
+        val maxY = canvasHeight.toFloat() - 0.01f
+        val clampedX = rawX.coerceIn(0f, maxX)
+        val clampedY = rawY.coerceIn(0f, maxY)
+
+        cursorX = clampedX
+        cursorY = clampedY
+        onCursorMove(clampedX, clampedY)
+
+        if (pointerChange.positionChange() != Offset.Zero) {
+            pointerChange.consume()
+        }
+    }
+
+    private fun handleTransforming(event: PointerEvent, pressedChanges: List<PointerInputChange>, pointerCount: Int) {
+        if (pointerCount <= 1) return
+
+        val zoomChange = event.calculateZoom()
+        val panChange = event.calculatePan()
+        val centroid = pressedChanges
+            .map { it.position }
+            .reduce { a, b -> a + b } / pointerCount.toFloat()
+
+        if (!transformLocked) {
+            zoomAccumulated *= zoomChange
+            panAccumulated += panChange
+
+            val panDistance = panAccumulated.getDistance()
+            val zoomDistance = abs(zoomAccumulated - 1f)
+
+            if (panDistance > touchSlop) {
+                transformLocked = true
+                isPanningOnly = true
+            } else if (zoomDistance > 0.05f) {
+                transformLocked = true
+                isPanningOnly = false
+            }
+        }
+
+        val effectiveZoom = if (transformLocked && isPanningOnly) {
+            1f
+        } else {
+            if (abs(zoomChange - 1f) < 0.01f) 1f else zoomChange
+        }
+
+        if (effectiveZoom != 1f || panChange != Offset.Zero) {
+            onTransform(centroid, panChange, effectiveZoom)
+        }
+
+        event.changes.forEach { if (it.pressed) it.consume() }
+    }
+
+    fun onGestureEnded() {}
+}
+
+private enum class CursorGestureState {
+    Dragging,
+    Transforming,
+    Canceled
+}
+

@@ -49,6 +49,8 @@ import kotlinx.coroutines.withContext
 import androidx.core.graphics.set
 import androidx.core.graphics.get
 import com.olaz.instasprite.domain.tool.selection.SelectionTool
+import com.olaz.instasprite.ui.drawing.contract.CursorDrawEvent
+import com.olaz.instasprite.ui.drawing.contract.CursorState
 
 
 data class DrawingScreenState(
@@ -57,7 +59,9 @@ data class DrawingScreenState(
     val selectedTool: Tool,
     val toolSize: Int,
     val showLayerDrawer: Boolean = false,
-    val isAppendSelectionMode: Boolean = false
+    val isAppendSelectionMode: Boolean = false,
+    val isCursorMode: Boolean = false,
+    val cursorState: CursorState = CursorState()
 )
 
 @HiltViewModel(assistedFactory = DrawingViewModel.Factory::class)
@@ -474,6 +478,84 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun toggleLayerDrawer() {
         _uiState.value = _uiState.value.copy(showLayerDrawer = !_uiState.value.showLayerDrawer)
+    }
+
+    fun onCursorDrawEvent(event: CursorDrawEvent) {
+        when (event) {
+            is CursorDrawEvent.ToggleCursorMode -> toggleCursorMode(event.cursorX, event.cursorY)
+            is CursorDrawEvent.MoveCursor -> moveCursor(event.cursorX, event.cursorY)
+            is CursorDrawEvent.DrawButtonPressed -> onCursorDrawPressed()
+            is CursorDrawEvent.DrawButtonReleased -> onCursorDrawReleased()
+        }
+    }
+
+    private fun toggleCursorMode(cx: Float, cy: Float) {
+        val current = _uiState.value
+        val newCursorMode = !current.isCursorMode
+        val cursorState = if (newCursorMode) {
+            val startX = if (cx >= 0f) cx else (canvasWidth / 2f)
+            val startY = if (cy >= 0f) cy else (canvasHeight / 2f)
+            CursorState(
+                cursorX = startX.coerceIn(0f, canvasWidth.toFloat() - 0.01f),
+                cursorY = startY.coerceIn(0f, canvasHeight.toFloat() - 0.01f),
+                isVisible = true
+            )
+        } else {
+            CursorState()
+        }
+        _uiState.value = current.copy(
+            isCursorMode = newCursorMode,
+            cursorState = cursorState
+        )
+    }
+
+    private fun moveCursor(cursorX: Float, cursorY: Float) {
+        val maxX = canvasWidth.toFloat() - 0.01f
+        val maxY = canvasHeight.toFloat() - 0.01f
+        val clampedX = cursorX.coerceIn(0f, maxX)
+        val clampedY = cursorY.coerceIn(0f, maxY)
+        val current = _uiState.value.cursorState
+
+        val prevGridX = current.gridX
+        val prevGridY = current.gridY
+
+        _uiState.value = _uiState.value.copy(
+            cursorState = current.copy(cursorX = clampedX, cursorY = clampedY, isVisible = true)
+        )
+
+        val newGridX = clampedX.toInt()
+        val newGridY = clampedY.toInt()
+
+        if (current.isDrawing && (newGridX != prevGridX || newGridY != prevGridY)) {
+            val tool = _uiState.value.selectedTool
+            if (tool is StrokeTool) {
+                onStrokeMove(newGridY, newGridX)
+            }
+        }
+    }
+
+    private fun onCursorDrawPressed() {
+        val cursor = _uiState.value.cursorState
+        _uiState.value = _uiState.value.copy(
+            cursorState = cursor.copy(isDrawing = true)
+        )
+        val tool = _uiState.value.selectedTool
+        if (tool is StrokeTool) {
+            onStrokeStart(cursor.gridY, cursor.gridX)
+        } else {
+            onTapAt(cursor.gridY, cursor.gridX)
+        }
+    }
+
+    private fun onCursorDrawReleased() {
+        val cursor = _uiState.value.cursorState
+        _uiState.value = _uiState.value.copy(
+            cursorState = cursor.copy(isDrawing = false)
+        )
+        val tool = _uiState.value.selectedTool
+        if (tool is StrokeTool) {
+            onStrokeEnd()
+        }
     }
 
     // --- Stroke lifecycle ---

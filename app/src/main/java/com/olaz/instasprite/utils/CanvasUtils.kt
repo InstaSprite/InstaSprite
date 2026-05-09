@@ -9,21 +9,161 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.model.SelectionState
 import com.olaz.instasprite.ui.theme.CatppuccinUI
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
+import com.olaz.instasprite.domain.tool.EraserTool
+import com.olaz.instasprite.domain.tool.EyedropperTool
+import com.olaz.instasprite.domain.tool.FillTool
+import com.olaz.instasprite.domain.tool.MoveTool
+import com.olaz.instasprite.domain.tool.PencilTool
+import com.olaz.instasprite.domain.tool.ShapeTool
+import com.olaz.instasprite.domain.tool.StrokeTool
+import com.olaz.instasprite.domain.tool.Tool
+import com.olaz.instasprite.domain.tool.selection.SelectionTool
+import com.olaz.instasprite.ui.drawing.contract.CursorState
+
+
+fun DrawScope.drawCursorOverlay(
+    cursorState: CursorState,
+    selectedTool: Tool?,
+    toolSize: Int,
+    canvasWidth: Int,
+    canvasHeight: Int,
+    dstSize: IntSize,
+    activeColor: Color,
+    scale: Float,
+    toolIconBitmap: ImageBitmap? = null
+) {
+    if (!cursorState.isVisible) return
+
+    val pxW = dstSize.width.toFloat() / canvasWidth
+    val pxH = dstSize.height.toFloat() / canvasHeight
+
+    val cursorScreenX = cursorState.cursorX * pxW
+    val cursorScreenY = cursorState.cursorY * pxH
+
+    val gridCellX = cursorState.gridX
+    val gridCellY = cursorState.gridY
+
+    val cursorSizeCells = when (selectedTool) {
+        is StrokeTool -> toolSize
+        else -> 1
+    }
+
+    val halfExpand = (cursorSizeCells - 1) / 2
+    val startCol = (gridCellX - halfExpand).coerceAtLeast(0)
+    val startRow = (gridCellY - halfExpand).coerceAtLeast(0)
+    val endCol = (gridCellX + (cursorSizeCells - halfExpand - 1)).coerceAtMost(canvasWidth - 1)
+    val endRow = (gridCellY + (cursorSizeCells - halfExpand - 1)).coerceAtMost(canvasHeight - 1)
+
+    val cellLeft = startCol * pxW
+    val cellTop = startRow * pxH
+    val cellRight = (endCol + 1) * pxW
+    val cellBottom = (endRow + 1) * pxH
+
+//    val fillColor = when (selectedTool) {
+//        is EraserTool -> Color.White.copy(alpha = 0.25f)
+//        is PencilTool -> activeColor.copy(alpha = 0.35f)
+//        else -> Color.White.copy(alpha = 0.15f)
+//    }
+//
+//    drawRect(
+//        color = fillColor,
+//        topLeft = Offset(cellLeft, cellTop),
+//        size = Size(cellRight - cellLeft, cellBottom - cellTop)
+//    )
+
+    val strokeWidth = 1.5f.dp.toPx() / scale
+
+    drawRect(
+        color = Color.White,
+        topLeft = Offset(cellLeft + strokeWidth, cellTop + strokeWidth),
+        size = Size(cellRight - cellLeft - strokeWidth * 2, cellBottom - cellTop - strokeWidth * 2),
+        style = Stroke(width = strokeWidth),
+    )
+
+    drawRect(
+        color = Color.Black,
+        topLeft = Offset(cellLeft, cellTop),
+        size = Size(cellRight - cellLeft, cellBottom - cellTop),
+        style = Stroke(width = strokeWidth),
+    )
+
+    val iconSizePx = 32.dp.toPx() / scale
+
+    if (toolIconBitmap != null) {
+        val iconX = cursorScreenX
+        val iconY = cursorScreenY - iconSizePx
+
+        val scaleX = iconSizePx / toolIconBitmap.width
+        val scaleY = iconSizePx / toolIconBitmap.height
+
+        translate(left = iconX, top = iconY) {
+            scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
+                drawImage(image = toolIconBitmap)
+            }
+        }
+    } else { // crosshair
+        val centerX = cursorScreenX
+        val centerY = cursorScreenY
+
+        val crosshairSize = iconSizePx * 0.4f
+
+        val strokeOuter = 5.dp.toPx() / scale
+        val strokeInner = 3.dp.toPx() / scale
+
+        drawLine(
+            color = Color.Black,
+            start = Offset(centerX - crosshairSize, centerY),
+            end = Offset(centerX + crosshairSize, centerY),
+            strokeWidth = strokeOuter,
+            cap = StrokeCap.Square
+        )
+
+        drawLine(
+            color = Color.Black,
+            start = Offset(centerX, centerY - crosshairSize),
+            end = Offset(centerX, centerY + crosshairSize),
+            strokeWidth = strokeOuter,
+            cap = StrokeCap.Square
+        )
+
+        drawLine(
+            color = Color.White,
+            start = Offset(centerX - crosshairSize, centerY),
+            end = Offset(centerX + crosshairSize, centerY),
+            strokeWidth = strokeInner,
+            cap = StrokeCap.Square
+        )
+
+        drawLine(
+            color = Color.White,
+            start = Offset(centerX, centerY - crosshairSize),
+            end = Offset(centerX, centerY + crosshairSize),
+            strokeWidth = strokeInner,
+            cap = StrokeCap.Square
+        )
+    }
+}
 
 
 fun DrawScope.drawSelectionOverlay(
@@ -52,7 +192,7 @@ fun DrawScope.drawSelectionOverlay(
         color = Color.Black,
         style = Stroke(width = bgOutlineWidth),
 
-    )
+        )
     drawPath(
         path = scaledPath,
         color = Color.White,

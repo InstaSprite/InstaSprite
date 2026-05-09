@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -44,6 +46,8 @@ import com.olaz.instasprite.domain.tool.selection.SelectionTool
 import com.olaz.instasprite.ui.components.composable.DrawerLayout
 import com.olaz.instasprite.ui.components.composable.DrawerSide
 import com.olaz.instasprite.ui.drawing.component.ColorPalette
+import com.olaz.instasprite.ui.drawing.component.CursorDrawButton
+import com.olaz.instasprite.ui.drawing.component.CursorModeToggle
 import com.olaz.instasprite.ui.drawing.component.LayerDrawer
 import com.olaz.instasprite.ui.drawing.component.PixelCanvas
 import com.olaz.instasprite.ui.drawing.component.SelectionModeSelector
@@ -54,6 +58,8 @@ import com.olaz.instasprite.ui.drawing.component.ToolSizeSlider
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteState
+import com.olaz.instasprite.ui.drawing.contract.CursorDrawEvent
+import com.olaz.instasprite.ui.drawing.contract.CursorState
 import com.olaz.instasprite.ui.drawing.contract.LayerEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
@@ -71,7 +77,8 @@ data class DrawingScreenEvent(
     val onCanvasEvent: (PixelCanvasEvent) -> Unit,
     val onToolSizeChange: (Int) -> Unit,
     val onToggleLayerDrawer: () -> Unit,
-    val onLayerEvent: (LayerEvent) -> Unit
+    val onLayerEvent: (LayerEvent) -> Unit,
+    val onCursorDrawEvent: (CursorDrawEvent) -> Unit
 )
 
 @Composable
@@ -112,7 +119,8 @@ fun DrawingScreen(
             onCanvasEvent = viewModel::onCanvasEvent,
             onToolSizeChange = viewModel::setToolSize,
             onToggleLayerDrawer = viewModel::toggleLayerDrawer,
-            onLayerEvent = viewModel::onLayerEvent
+            onLayerEvent = viewModel::onLayerEvent,
+            onCursorDrawEvent = viewModel::onCursorDrawEvent
         )
     }
 
@@ -163,6 +171,7 @@ private fun DrawingScreenContent(
 
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
+    var canvasLayoutSize by remember { mutableStateOf(IntSize.Zero) }
 
     val coroutineScope = rememberCoroutineScope()
     var toolSizeValue by remember { mutableIntStateOf(uiState.toolSize) }
@@ -183,7 +192,9 @@ private fun DrawingScreenContent(
             }
         },
         bottomBar = {
-            Column {
+            Column(
+                modifier = Modifier.background(CatppuccinUI.BackgroundColor)
+            ) {
                 SelectionToolOption(
                     isVisible = (canvasState.selectionState != null),
                     isAppendMode = uiState.isAppendSelectionMode,
@@ -206,11 +217,10 @@ private fun DrawingScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(65.dp)
-                        .background(CatppuccinUI.BackgroundColor)
                         .padding(12.dp)
                 ) {
 
-                    Box(modifier = Modifier.weight(9f)) {
+                    Box(modifier = Modifier.weight(8f)) {
                         if (uiState.selectedTool is StrokeTool && uiState.selectedTool !is SelectionTool) {
                             ToolSizeSlider(
                                 toolSizeValue = toolSizeValue,
@@ -230,6 +240,24 @@ private fun DrawingScreenContent(
                         }
                     }
 
+                    CursorModeToggle(
+                        isCursorMode = uiState.isCursorMode,
+                        onToggle = {
+                            var cx = -1f
+                            var cy = -1f
+                            if (canvasLayoutSize.width > 0 && canvasState.width > 0) {
+                                val cellWidth = canvasLayoutSize.width.toFloat() / canvasState.width
+                                val cellHeight =
+                                    canvasLayoutSize.height.toFloat() / canvasState.height
+                                val centerX = canvasLayoutSize.width / 2f - offset.x / scale
+                                val centerY = canvasLayoutSize.height / 2f - offset.y / scale
+                                cx = centerX / cellWidth
+                                cy = centerY / cellHeight
+                            }
+                            event.onCursorDrawEvent(CursorDrawEvent.ToggleCursorMode(cx, cy))
+                        }
+                    )
+
                     IconButton(
                         onClick = { event.onToggleLayerDrawer() },
                         modifier = Modifier.weight(1f)
@@ -245,11 +273,22 @@ private fun DrawingScreenContent(
                 ToolSelector(
                     modifier = Modifier
                         .height(66.dp)
-                        .background(CatppuccinUI.BackgroundColor)
                         .padding(horizontal = 5.dp, vertical = 5.dp),
                     selectedTool = uiState.selectedTool,
                     onToolSelectorEvent = event.onToolSelectorEvent
                 )
+
+                if (uiState.isCursorMode) {
+                    CursorDrawButton(
+                        selectedTool = uiState.selectedTool,
+                        onPressed = { event.onCursorDrawEvent(CursorDrawEvent.DrawButtonPressed) },
+                        onReleased = { event.onCursorDrawEvent(CursorDrawEvent.DrawButtonReleased) },
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(60.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -267,10 +306,11 @@ private fun DrawingScreenContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(
-                        top = innerPadding.calculateTopPadding(),
-                        bottom = 65.dp + 66.dp // only tool selector and bottom layer row
-                    )
+                    .padding(innerPadding)
+//                    .padding(
+//                        top = innerPadding.calculateTopPadding(),
+//                        bottom = 65.dp + 66.dp // only tool selector and bottom layer row
+//                    )
                     .background(CatppuccinUI.BackgroundColorDarker)
 
             ) {
@@ -288,14 +328,20 @@ private fun DrawingScreenContent(
                     isSelectionAppendMode = uiState.isAppendSelectionMode,
                     scale = scale,
                     offset = offset,
-                    onTransform = { centroid, panChange, zoomChange, canvasSize ->
+                    isCursorMode = uiState.isCursorMode,
+                    cursorState = uiState.cursorState,
+                    toolSize = uiState.toolSize,
+                    activeColor = colorPaletteState.activeColor,
+                    onCursorDrawEvent = event.onCursorDrawEvent,
+                    onTransform = { centroid, panChange, zoomChange, layoutSize ->
+                        canvasLayoutSize = layoutSize
                         val (newScale, newOffset) = calculateNewScaleAndOffset(
                             centroid = centroid,
                             panChange = panChange,
                             zoomChange = zoomChange,
                             currentScale = scale,
                             currentOffset = offset,
-                            layoutSize = canvasSize,
+                            layoutSize = layoutSize,
                             maxScale = maxScale
                         )
                         scale = newScale
@@ -345,7 +391,8 @@ private fun DrawingScreenPreviewLoading() {
                 onCanvasEvent = {},
                 onToolSizeChange = {},
                 onLayerEvent = {},
-                onToggleLayerDrawer = {}
+                onToggleLayerDrawer = {},
+                onCursorDrawEvent = {}
             ),
             bitmap = createBitmap(16, 16),
             overlayBitmap = null,
@@ -389,7 +436,8 @@ private fun DrawingScreenPreview() {
                 onCanvasEvent = {},
                 onToolSizeChange = {},
                 onLayerEvent = {},
-                onToggleLayerDrawer = {}
+                onToggleLayerDrawer = {},
+                onCursorDrawEvent = {}
             ),
             bitmap = createBitmap(16, 16),
             overlayBitmap = null,
