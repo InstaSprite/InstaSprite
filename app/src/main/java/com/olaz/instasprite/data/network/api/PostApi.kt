@@ -1,25 +1,27 @@
 package com.olaz.instasprite.data.network.api
 
+import com.olaz.instasprite.data.network.model.CommitPostRequestDto
+import com.olaz.instasprite.data.network.model.CommitPostResponseDto
 import com.olaz.instasprite.data.network.model.PageDto
 import com.olaz.instasprite.data.network.model.PostDto
 import com.olaz.instasprite.data.network.model.ResultResponse
 import com.olaz.instasprite.data.network.model.SpringPageDto
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import com.olaz.instasprite.data.network.model.UploadInitRequestDto
+import com.olaz.instasprite.data.network.model.UploadInitResponseDto
 import retrofit2.Response
 import retrofit2.http.*
 
 interface PostApi {
 
-    @Multipart
-    @POST("/api/v1/posts")
-    suspend fun uploadPost(
-        @Part("content") content: RequestBody,
-        @Part postImages: List<MultipartBody.Part>,
-        @Part altTexts: List<MultipartBody.Part>,
-        @Part hashtags: List<MultipartBody.Part>,
-        @Part("commentFlag") commentFlag: RequestBody
-    ): Response<ResultResponse<Any>>
+    @POST("/api/v1/posts/upload-init")
+    suspend fun uploadInit(
+        @Body request: UploadInitRequestDto
+    ): Response<ResultResponse<UploadInitResponseDto>>
+
+    @POST("/api/v1/posts/commit")
+    suspend fun commitPost(
+        @Body request: CommitPostRequestDto
+    ): Response<ResultResponse<CommitPostResponseDto>>
 
     @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts")

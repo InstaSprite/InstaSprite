@@ -6,10 +6,13 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import coil3.decode.DecodeUtils.calculateInSampleSize
 import coil3.size.Scale
+import com.olaz.instasprite.data.network.S3UploadClient
 import com.olaz.instasprite.data.network.api.PostApi
+import com.olaz.instasprite.data.network.model.CommitPostRequestDto
 import com.olaz.instasprite.data.network.model.PostDto
 import com.olaz.instasprite.data.network.model.PageDto
 import com.olaz.instasprite.data.network.model.SpringPageDto
+import com.olaz.instasprite.data.network.model.UploadInitRequestDto
 import com.olaz.instasprite.data.network.model.toDomain
 import com.olaz.instasprite.data.network.safeApiCall
 import com.olaz.instasprite.data.network.toResult
@@ -18,11 +21,6 @@ import com.olaz.instasprite.data.network.toResultUnit
 import com.olaz.instasprite.domain.model.PageData
 import com.olaz.instasprite.domain.model.PostData
 import dagger.hilt.android.qualifiers.ApplicationContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -30,51 +28,67 @@ import javax.inject.Inject
 
 class PostRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val postApi: PostApi
+    private val postApi: PostApi,
+    private val s3UploadClient: S3UploadClient
 ) {
 
     suspend fun getPost(postId: Long): Result<PostData> = safeApiCall {
         postApi.getPost(postId).toResult().map { it.toDomain() }
     }
 
-    suspend fun uploadPostWithUris(
+    suspend fun createPost(
         content: String,
         images: List<Uri>,
         altTexts: List<String>,
         hashtags: List<String>,
         commentFlag: Boolean,
-    ): Result<String> = safeApiCall {
-        val imageParts = images.mapIndexed { index, uri ->
+    ): Result<Long> = safeApiCall {
+        val fileInfos = images.map { uri ->
+            val mimeType = context.contentResolver.getType(uri)
+                ?: mimeTypeFromExtension(uri)
+            
+            val options = android.graphics.BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                android.graphics.BitmapFactory.decodeStream(stream, null, options)
+            }
+            val width = if (options.outWidth > 0) options.outWidth else 1080
+            val height = if (options.outHeight > 0) options.outHeight else 1080
+
+            UploadInitRequestDto.FileInfo(
+                contentType = mimeType,
+                width = width,
+                height = height
+            )
+        }
+
+        val initData = postApi.uploadInit(UploadInitRequestDto(files = fileInfos))
+            .toResult()
+            .getOrThrow()
+
+        for ((index, upload) in initData.uploads.withIndex()) {
             val file = compressImageIfNeeded(
                 context = context,
-                uri = uri,
+                uri = images[index],
                 outputFileName = "post_image_$index"
             )
-            val requestFile = file.asRequestBody("image/jpeg".toMediaType())
-            MultipartBody.Part.createFormData(
-                name = "postImages",
-                filename = file.name,
-                body = requestFile
-            )
+            val presignedUrl = if (upload.url.startsWith("http")) upload.url else "${com.olaz.instasprite.utils.Constants.BASE_URL}${upload.url}"
+            s3UploadClient.uploadFile(
+                presignedUrl = presignedUrl,
+                file = file,
+                contentType = fileInfos[index].contentType
+            ).getOrThrow()
         }
 
-        val contentBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
-        val altTextParts = altTexts.map { altText ->
-            MultipartBody.Part.createFormData("altTexts", altText)
-        }
-        val hashtagParts = hashtags.map { tag ->
-            MultipartBody.Part.createFormData("hashtags", tag)
-        }
-        val commentFlagBody = commentFlag.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-
-        val response = postApi.uploadPost(
-            content = contentBody,
-            postImages = imageParts,
-            altTexts = altTextParts,
-            hashtags = hashtagParts,
-            commentFlag = commentFlagBody
+        val commitRequest = CommitPostRequestDto(
+            postId = initData.postId,
+            content = content,
+            commentFlag = commentFlag,
+            altTexts = altTexts,
+            hashtags = hashtags
         )
-        response.toResultMessage("Post uploaded successfully")
+        postApi.commitPost(commitRequest).toResult().map { it.postId }
     }
 
     suspend fun getPostPage(lastPostId: Long?): Result<PageData> = safeApiCall {
@@ -174,9 +188,15 @@ class PostRepository @Inject constructor(
 
         val scaledBitmap = scaleBitmap(bitmap, maxDimension)
 
-        val outputFile = File(context.cacheDir, "$outputFileName.jpg")
+        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+        val (format, ext) = when {
+            mimeType.contains("png") -> Bitmap.CompressFormat.PNG to "png"
+            else -> Bitmap.CompressFormat.JPEG to "jpg"
+        }
+
+        val outputFile = File(context.cacheDir, "$outputFileName.$ext")
         FileOutputStream(outputFile).use {
-            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, it)
+            scaledBitmap.compress(format, quality, it)
         }
 
         bitmap.recycle()
@@ -208,5 +228,13 @@ class PostRepository @Inject constructor(
     private fun getFileExtension(uri: Uri): String {
         val path = uri.path ?: return "png"
         return path.substringAfterLast('.', "png").lowercase()
+    }
+
+    private fun mimeTypeFromExtension(uri: Uri): String {
+        return when (getFileExtension(uri)) {
+            "png" -> "image/png"
+            "webp" -> "image/webp"
+            else -> "image/jpeg"
+        }
     }
 }

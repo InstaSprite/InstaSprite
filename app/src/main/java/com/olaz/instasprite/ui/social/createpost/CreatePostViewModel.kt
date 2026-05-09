@@ -97,7 +97,7 @@ class CreatePostViewModel @Inject constructor(
         _uiState.update { it.copy(isPostInProgress = true) }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = postRepository.uploadPostWithUris(
+                val result = postRepository.createPost(
                     content = caption,
                     images = listOf(selectedImage),
                     altTexts = listOf(""),
