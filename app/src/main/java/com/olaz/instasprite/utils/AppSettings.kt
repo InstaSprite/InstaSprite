@@ -2,6 +2,7 @@ package com.olaz.instasprite.utils
 
 import android.content.Context
 import android.content.res.Configuration
+import com.olaz.instasprite.data.model.DrawSetting
 import com.olaz.instasprite.data.model.SettingPreferences
 import com.olaz.instasprite.di.settingsDataStore
 import kotlinx.coroutines.flow.first
@@ -26,6 +27,10 @@ object AppSettings {
         return getPersistedSettings(context).isDarkMode
     }
 
+    fun getDrawSetting(context: Context): DrawSetting {
+        return getPersistedSettings(context).drawSetting
+    }
+
     fun setLanguage(context: Context, language: String): Context {
         persist(context) { it.copy(language = language) }
         return updateResources(context, language)
@@ -34,6 +39,14 @@ object AppSettings {
     fun setDarkMode(context: Context, isDark: Boolean) {
         persist(context) { it.copy(isDarkMode = isDark) }
         applyTheme(isDark)
+    }
+
+    fun setDrawSetting(context: Context, setting: DrawSetting) {
+        persist(context) { it.copy(drawSetting = setting) }
+    }
+
+    fun setCursorMode(context: Context, isCursorMode: Boolean) {
+        persist(context) { it.copy(drawSetting = it.drawSetting.copy(isCursorMode = isCursorMode)) }
     }
 
     fun getSupportedLocales(): List<Pair<String, String>> {

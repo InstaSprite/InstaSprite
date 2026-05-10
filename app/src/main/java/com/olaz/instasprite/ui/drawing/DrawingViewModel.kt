@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.drawing
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
@@ -48,9 +49,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.graphics.set
 import androidx.core.graphics.get
+import com.olaz.instasprite.data.model.DrawSetting
 import com.olaz.instasprite.domain.tool.selection.SelectionTool
 import com.olaz.instasprite.ui.drawing.contract.CursorDrawEvent
 import com.olaz.instasprite.ui.drawing.contract.CursorState
+import com.olaz.instasprite.utils.AppSettings
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 
 data class DrawingScreenState(
@@ -75,7 +79,8 @@ class DrawingViewModel @AssistedInject constructor(
     private val spriteDataRepository: SpriteDatabaseRepository,
     private val colorPaletteRepository: ColorPaletteRepository,
     private val fileRepository: FileRepository,
-    private val dialogController: DialogController<DrawingDialog>
+    private val dialogController: DialogController<DrawingDialog>,
+    @ApplicationContext private val applicationContext: Context
 ) : ViewModel(),
     DialogController<DrawingDialog> by dialogController {
 
@@ -172,6 +177,8 @@ class DrawingViewModel @AssistedInject constructor(
     init {
         setCanvasSize(canvasWidth, canvasHeight)
 
+        applyDrawSetting(AppSettings.getDrawSetting(applicationContext))
+
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 loadFromDB()
@@ -189,6 +196,14 @@ class DrawingViewModel @AssistedInject constructor(
         _overlayBitmap = null
         _selectionBitmap?.recycle()
         _selectionBitmap = null
+    }
+
+    private fun applyDrawSetting(drawSetting: DrawSetting) {
+
+        if (drawSetting.isCursorMode) {
+            // Use toggle because cursor mode default to false
+            toggleCursorMode(-1f, -1f)
+        }
     }
 
     private fun ensureBitmap(width: Int, height: Int) {
@@ -507,6 +522,8 @@ class DrawingViewModel @AssistedInject constructor(
             isCursorMode = newCursorMode,
             cursorState = cursorState
         )
+
+        AppSettings.setCursorMode(applicationContext, newCursorMode)
     }
 
     private fun moveCursor(cursorX: Float, cursorY: Float) {
