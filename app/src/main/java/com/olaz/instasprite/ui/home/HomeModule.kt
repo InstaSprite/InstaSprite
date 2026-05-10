@@ -48,6 +48,7 @@ object HomeModule {
                 onOpenNotifications = { navigator.goTo(Screen.Notification) },
                 onOpenSearch = { navigator.goTo(Screen.Search) },
                 onOpenSetting = { navigator.goTo(Screen.Setting) },
+                onOpenAbout = { navigator.goTo(Screen.About) },
                 onNavigateToCreatePost = { navigator.goTo(Screen.CreatePost) },
             )
         }
@@ -57,6 +58,11 @@ object HomeModule {
                 onBackClick = { navigator.goBack() }
             )
         }
+
+        entry<Screen.About> {
+            AboutScreen(
+                onBackClick = { navigator.goBack() }
+            )
+        }
     }
 }
-

@@ -84,6 +84,7 @@ fun HomeScreen(
     onOpenNotifications: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenSetting: () -> Unit,
+    onOpenAbout: () -> Unit,
     onNavigateToCreatePost: () -> Unit,
     galleryViewModel: GalleryViewModel = hiltViewModel(),
     feedViewModel: FeedViewModel = hiltViewModel(),
@@ -223,7 +224,7 @@ fun HomeScreen(
                 onNotificationsClick = { launchDrawerAction(onOpenNotifications) },
                 onSearchClick = { launchDrawerAction(onOpenSearch) },
                 onSettingsClick = { launchDrawerAction(onOpenSetting) },
-                onAboutClick = { launchDrawerAction() },
+                onAboutClick = { launchDrawerAction(onOpenAbout) },
                 onLogoutClick = {
                     launchDrawerAction {
                         sessionViewModel.logout()
