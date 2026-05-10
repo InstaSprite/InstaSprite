@@ -30,7 +30,7 @@ import com.olaz.instasprite.ui.social.feed.dialog.PostFilterDialog
 import com.olaz.instasprite.ui.social.feed.dialog.VerifyEmailDialog
 import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -168,8 +168,8 @@ fun FeedContent(
         ) { data ->
             Snackbar(
                 snackbarData = data,
-                containerColor = CatppuccinUI.BackgroundColorDarker,
-                dismissActionContentColor = CatppuccinUI.DismissButtonColor
+                containerColor = AppTheme.colors.BackgroundColorDarker,
+                dismissActionContentColor = AppTheme.colors.DismissButtonColor
 
             )
         }

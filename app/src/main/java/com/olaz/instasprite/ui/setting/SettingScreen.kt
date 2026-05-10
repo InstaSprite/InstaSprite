@@ -2,21 +2,27 @@ package com.olaz.instasprite.ui.setting
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +54,10 @@ import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.dialog.OtpDialog
 import com.olaz.instasprite.ui.components.dialog.OtpEnrollmentDialog
 import com.olaz.instasprite.ui.setting.composable.SettingItem
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppColors
+import com.olaz.instasprite.ui.theme.AppTheme
+import com.olaz.instasprite.ui.theme.Catppuccin
+import com.olaz.instasprite.ui.theme.ThemeFlavour
 import com.olaz.instasprite.utils.UiUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,9 +69,10 @@ fun SettingScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val colors = AppTheme.colors
 
-    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(colors.BackgroundColorDarker)
+    UiUtils.SetNavigationBarColor(colors.BackgroundColorDarker)
 
     Scaffold(
         topBar = {
@@ -71,7 +82,7 @@ fun SettingScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = CatppuccinUI.TextColorLight
+                            tint = colors.TextColorLight
                         )
                     }
                 },
@@ -80,11 +91,11 @@ fun SettingScreen(
                         text = context?.getString(R.string.settings) ?: "Settings",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
-                        color = CatppuccinUI.TextColorLight
+                        color = colors.TextColorLight
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CatppuccinUI.TopBarColor,
+                    containerColor = colors.TopBarColor,
                 )
             )
         }
@@ -93,30 +104,41 @@ fun SettingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(CatppuccinUI.BackgroundColor)
+                .background(colors.BackgroundColor)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Dark Theme Setting
-            SettingItem(
-                icon = Icons.Default.Warning,
-                title = context?.getString(R.string.dark_mode) ?: context.getString(R.string.dark_mode),
-                subtitle = context?.getString(R.string.dark_mode) ?: context.getString(R.string.dark_mode),
-                trailing = {
-                    Switch(
-                        checked = uiState.isDarkThemeEnabled,
-                        onCheckedChange = { viewModel.toggleDarkTheme(it) },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = CatppuccinUI.AccentButtonColor,
-                            checkedTrackColor = CatppuccinUI.Foreground2Color,
-                            uncheckedThumbColor = CatppuccinUI.Subtext0Color,
-                            uncheckedTrackColor = CatppuccinUI.Foreground1Color
-                        )
-                    )
-                }
+            // Theme Flavour Section
+            Text(
+                text = "Theme",
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = colors.Subtext0Color,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
             )
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ThemeFlavour.entries.forEach { flavour ->
+                    val previewColors = Catppuccin.toAppColors(Catppuccin.fromFlavour(flavour))
+                    val isSelected = uiState.themeFlavour == flavour
+                    FlavourCard(
+                        label = flavour.label,
+                        previewColors = previewColors,
+                        isSelected = isSelected,
+                        onClick = { viewModel.setThemeFlavour(flavour) },
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             HorizontalDivider(
-                color = CatppuccinUI.Foreground1Color,
+                color = colors.Foreground1Color,
                 thickness = 1.dp
             )
 
@@ -130,14 +152,14 @@ fun SettingScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Select Language",
-                        tint = CatppuccinUI.Subtext0Color,
+                        tint = colors.Subtext0Color,
                         modifier = Modifier.graphicsLayer(rotationZ = 180f)
                     )
                 }
             )
 
             HorizontalDivider(
-                color = CatppuccinUI.Foreground1Color,
+                color = colors.Foreground1Color,
                 thickness = 1.dp
             )
 
@@ -156,17 +178,17 @@ fun SettingScreen(
                         onCheckedChange = { viewModel.toggle2FA(it) },
                         enabled = !uiState.isLoadingOtp && !uiState.isLoading2FAStatus,
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = CatppuccinUI.AccentButtonColor,
-                            checkedTrackColor = CatppuccinUI.Foreground2Color,
-                            uncheckedThumbColor = CatppuccinUI.Subtext0Color,
-                            uncheckedTrackColor = CatppuccinUI.Foreground1Color
+                            checkedThumbColor = colors.AccentButtonColor,
+                            checkedTrackColor = colors.Foreground2Color,
+                            uncheckedThumbColor = colors.Subtext0Color,
+                            uncheckedTrackColor = colors.Foreground1Color
                         )
                     )
                 }
             )
 
             HorizontalDivider(
-                color = CatppuccinUI.Foreground1Color,
+                color = colors.Foreground1Color,
                 thickness = 1.dp
             )
         }
@@ -179,7 +201,7 @@ fun SettingScreen(
                     Text(
                         text = context?.getString(R.string.change_language) ?: "Select Language",
                         fontWeight = FontWeight.Bold,
-                        color = CatppuccinUI.TextColorLight
+                        color = colors.TextColorLight
                     )
                 },
                 text = {
@@ -200,14 +222,14 @@ fun SettingScreen(
                                         viewModel.selectLanguage(index)
                                     },
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = CatppuccinUI.SelectedColor,
-                                        unselectedColor = CatppuccinUI.Subtext0Color
+                                        selectedColor = colors.SelectedColor,
+                                        unselectedColor = colors.Subtext0Color
                                     )
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = language,
-                                    color = CatppuccinUI.TextColorLight
+                                    color = colors.TextColorLight
                                 )
                             }
                         }
@@ -219,11 +241,11 @@ fun SettingScreen(
                     ) {
                         Text(
                             text = context?.getString(R.string.cancel) ?: "Cancel",
-                            color = CatppuccinUI.DismissButtonColor
+                            color = colors.DismissButtonColor
                         )
                     }
                 },
-                containerColor = CatppuccinUI.DialogColor
+                containerColor = colors.DialogColor
             )
         }
 
@@ -267,6 +289,58 @@ fun SettingScreen(
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun FlavourCard(
+    label: String,
+    previewColors: AppColors,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = AppTheme.colors
+    val borderColor = if (isSelected) colors.SelectedColor else colors.Foreground1Color
+    val borderWidth = if (isSelected) 2.dp else 1.dp
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .border(borderWidth, borderColor, RoundedCornerShape(12.dp))
+            .background(previewColors.BackgroundColor)
+            .clickable(onClick = onClick)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Swatch row — key semantic colors from the theme
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            listOf(
+                previewColors.SelectedColor,
+                previewColors.AccentButtonColor,
+                previewColors.DismissButtonColor,
+                previewColors.LinkColor,
+            ).forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = previewColors.TextColorLight,
+        )
     }
 }
 

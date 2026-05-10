@@ -14,14 +14,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun TitledBox(
     title: String,
     modifier: Modifier = Modifier,
     titleBackgroundColor: Color = Color.Unspecified,
-    titleColor: Color = CatppuccinUI.TextColorLight,
+    titleColor: Color = AppTheme.colors.TextColorLight,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -53,7 +53,7 @@ fun TitledBox(
 private fun Preview() {
     TitledBox(
         title = "Title",
-        titleBackgroundColor = CatppuccinUI.BackgroundColor,
+        titleBackgroundColor = AppTheme.colors.BackgroundColor,
         modifier = Modifier
     ) {
         Text(text = "Test")

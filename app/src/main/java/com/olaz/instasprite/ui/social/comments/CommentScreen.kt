@@ -63,7 +63,7 @@ import com.olaz.instasprite.ui.social.feed.VerifyEmailState
 import com.olaz.instasprite.ui.social.feed.dialog.VerifyEmailDialog
 import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
 import com.olaz.instasprite.utils.formatTimeAgo
@@ -93,8 +93,8 @@ fun CommentScreen(
         viewModel.loadCurrentUserProfile()
     }
 
-    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColorDarker)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColorDarker)
 
     val event = remember(viewModel) {
         CommentScreenEvent(
@@ -162,8 +162,8 @@ fun CommentScreen(
         ) { data ->
             Snackbar(
                 snackbarData = data,
-                containerColor = CatppuccinUI.BackgroundColorDarker,
-                dismissActionContentColor = CatppuccinUI.DismissButtonColor
+                containerColor = AppTheme.colors.BackgroundColorDarker,
+                dismissActionContentColor = AppTheme.colors.DismissButtonColor
             )
         }
     }
@@ -197,7 +197,7 @@ private fun CommentScreenContent(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = CatppuccinUI.BottomBarColor)
+            CircularProgressIndicator(color = AppTheme.colors.BottomBarColor)
         }
     } else {
         Scaffold(
@@ -206,7 +206,7 @@ private fun CommentScreenContent(
 //                    title = {
 //                        Text(
 //                            text = stringResource(R.string.post),
-//                            color = CatppuccinUI.TextColorLight,
+//                            color = AppTheme.colors.TextColorLight,
 //                            fontSize = 18.sp,
 //                            fontWeight = FontWeight.Bold
 //                        )
@@ -216,12 +216,12 @@ private fun CommentScreenContent(
 //                            Icon(
 //                                imageVector = Icons.Default.ArrowBack,
 //                                contentDescription = stringResource(R.string.back),
-//                                tint = CatppuccinUI.TextColorLight
+//                                tint = AppTheme.colors.TextColorLight
 //                            )
 //                        }
 //                    },
 //                    colors = TopAppBarDefaults.topAppBarColors(
-//                        containerColor = CatppuccinUI.BackgroundColorDarker
+//                        containerColor = AppTheme.colors.BackgroundColorDarker
 //                    )
 //                )
                 TopBar(
@@ -241,14 +241,14 @@ private fun CommentScreenContent(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(CatppuccinUI.BackgroundColorDarker)
+                            .background(AppTheme.colors.BackgroundColorDarker)
                             .clickable { onLoginClick() }
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = stringResource(R.string.login_required),
-                            color = CatppuccinUI.AccentButtonColor,
+                            color = AppTheme.colors.AccentButtonColor,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -260,7 +260,7 @@ private fun CommentScreenContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .background(CatppuccinUI.BackgroundColorDarker)
+                    .background(AppTheme.colors.BackgroundColorDarker)
             ) {
                 uiState.backendPost?.let { detail ->
                     item {
@@ -278,7 +278,7 @@ private fun CommentScreenContent(
                         item {
                             Text(
                                 text = detail.postContent,
-                                color = CatppuccinUI.TextColorLight,
+                                color = AppTheme.colors.TextColorLight,
                                 fontSize = 14.sp,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -374,7 +374,7 @@ private fun PostHeader(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = detail.member.memberUsername,
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
@@ -390,7 +390,7 @@ private fun PostHeader(
                         .toInstant()
                         .toEpochMilli()
                 ),
-                color = CatppuccinUI.TextColorLight.copy(alpha = 0.6f),
+                color = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
                 fontSize = 12.sp
             )
         }
@@ -398,18 +398,18 @@ private fun PostHeader(
             OutlinedButton(
                 onClick = onToggleFollow,
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = CatppuccinUI.TextColorLight
+                    contentColor = AppTheme.colors.TextColorLight
                 ),
                 border = BorderStroke(
                     width = 0.5.dp,
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.3f)
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f)
                 )
             ) {
                 Text(
                     text = if (postAuthor?.isFollowing == true) stringResource(R.string.unfollow) else stringResource(
                         R.string.follow
                     ),
-                    color = if (postAuthor?.isFollowing == true) CatppuccinUI.AccentButtonColor else CatppuccinUI.TextColorLight,
+                    color = if (postAuthor?.isFollowing == true) AppTheme.colors.AccentButtonColor else AppTheme.colors.TextColorLight,
                     fontSize = 12.sp
                 )
             }

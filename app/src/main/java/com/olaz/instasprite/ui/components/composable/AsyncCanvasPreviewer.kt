@@ -21,7 +21,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.olaz.instasprite.domain.model.Sprite
 import com.olaz.instasprite.domain.model.SpriteMeta
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.drawCheckerboard
 import java.io.File
 
@@ -40,7 +40,7 @@ fun AsyncCanvasPreviewer(
     var modifier = modifier
 
     if (showBorder) {
-        modifier = modifier.border(5.dp, CatppuccinUI.BackgroundColorDarker)
+        modifier = modifier.border(5.dp, AppTheme.colors.BackgroundColorDarker)
     }
 
 

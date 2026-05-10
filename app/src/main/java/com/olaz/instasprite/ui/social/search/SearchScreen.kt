@@ -37,7 +37,7 @@ import com.olaz.instasprite.domain.model.PostData
 import com.olaz.instasprite.ui.social.search.component.MemberSearchResults
 import com.olaz.instasprite.ui.social.search.component.PostSearchResults
 import com.olaz.instasprite.ui.social.search.component.TrendingSection
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import java.time.LocalDateTime
 
 @Composable
@@ -82,19 +82,19 @@ fun SearchScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CatppuccinUI.BackgroundColorDarker)
+            .background(AppTheme.colors.BackgroundColorDarker)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(CatppuccinUI.BackgroundColorDarker),
+                .background(AppTheme.colors.BackgroundColorDarker),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
-                    tint = CatppuccinUI.TextColorLight
+                    tint = AppTheme.colors.TextColorLight
                 )
             }
 
@@ -104,7 +104,7 @@ fun SearchScreenContent(
                 placeholder = {
                     Text(
                         text = "Search posts, @users, #hashtags...",
-                        color = CatppuccinUI.Subtext0Color
+                        color = AppTheme.colors.Subtext0Color
                     )
                 },
                 singleLine = true,
@@ -114,7 +114,7 @@ fun SearchScreenContent(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = null,
-                                tint = CatppuccinUI.DismissButtonColor,
+                                tint = AppTheme.colors.DismissButtonColor,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -126,16 +126,16 @@ fun SearchScreenContent(
                     .weight(1f)
                     .focusRequester(focusRequester),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = CatppuccinUI.BackgroundColorDarker,
-                    disabledContainerColor = CatppuccinUI.BackgroundColorDarker,
-                    unfocusedContainerColor = CatppuccinUI.BackgroundColorDarker,
-                    focusedTextColor = CatppuccinUI.TextColorLight,
-                    unfocusedTextColor = CatppuccinUI.TextColorLight,
-                    cursorColor = CatppuccinUI.TextColorLight,
-                    focusedBorderColor = CatppuccinUI.CurrentPalette.Peach,
-                    unfocusedBorderColor = CatppuccinUI.CurrentPalette.Peach,
-                    unfocusedPlaceholderColor = CatppuccinUI.CurrentPalette.Peach,
-                    focusedPlaceholderColor = CatppuccinUI.Subtext0Color
+                    focusedContainerColor = AppTheme.colors.BackgroundColorDarker,
+                    disabledContainerColor = AppTheme.colors.BackgroundColorDarker,
+                    unfocusedContainerColor = AppTheme.colors.BackgroundColorDarker,
+                    focusedTextColor = AppTheme.colors.TextColorLight,
+                    unfocusedTextColor = AppTheme.colors.TextColorLight,
+                    cursorColor = AppTheme.colors.TextColorLight,
+                    focusedBorderColor = AppTheme.colors.WarningColor,
+                    unfocusedBorderColor = AppTheme.colors.WarningColor,
+                    unfocusedPlaceholderColor = AppTheme.colors.WarningColor,
+                    focusedPlaceholderColor = AppTheme.colors.Subtext0Color
                 )
             )
         }
@@ -146,7 +146,7 @@ fun SearchScreenContent(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+                    CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
                 }
             }
 

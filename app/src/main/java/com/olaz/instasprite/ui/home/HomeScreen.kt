@@ -62,7 +62,7 @@ import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
 import com.olaz.instasprite.ui.social.feed.contract.FeedScreenEvent
 import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -89,8 +89,8 @@ fun HomeScreen(
     feedViewModel: FeedViewModel = hiltViewModel(),
     sessionViewModel: SocialSessionViewModel = hiltViewModel(),
 ) {
-    UiUtils.SetStatusBarColor(CatppuccinUI.TopBarColor)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BottomBarColor)
+    UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
 
     val tabs = HomeTab.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -237,11 +237,11 @@ fun HomeScreen(
                 topBar = {
                     PrimaryTabRow(
                         selectedTabIndex = pagerState.currentPage,
-                        containerColor = CatppuccinUI.TopBarColor,
-                        contentColor = CatppuccinUI.TextColorLight,
+                        containerColor = AppTheme.colors.TopBarColor,
+                        contentColor = AppTheme.colors.TextColorLight,
                         indicator = {
                             TabRowDefaults.SecondaryIndicator(
-                                color = CatppuccinUI.SelectedColor,
+                                color = AppTheme.colors.SelectedColor,
                                 modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
 
                             )
@@ -256,9 +256,9 @@ fun HomeScreen(
                                     Text(
                                         text = tab.title,
                                         color = if (pagerState.currentPage == index)
-                                            CatppuccinUI.TextColorLight
+                                            AppTheme.colors.TextColorLight
                                         else
-                                            CatppuccinUI.Subtext0Color
+                                            AppTheme.colors.Subtext0Color
                                     )
                                 }
                             )

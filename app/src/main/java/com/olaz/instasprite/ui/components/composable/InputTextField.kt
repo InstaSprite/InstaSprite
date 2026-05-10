@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -28,8 +29,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.data.model.InputField
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun InputTextField(
@@ -57,15 +57,15 @@ fun InputTextField(
         },
         label = {
             Text(
-                inputField.label, color = CatppuccinUI.SelectedColor,
-                style = CatppuccinTypography.bodySmall
+                inputField.label, color = AppTheme.colors.SelectedColor,
+                style = MaterialTheme.typography.bodySmall
             )
         },
         placeholder = {
             if (inputField.placeholder.isNotBlank())
                 Text(
-                    inputField.placeholder, color = CatppuccinUI.Subtext0Color,
-                    style = CatppuccinTypography.bodyMedium
+                    inputField.placeholder, color = AppTheme.colors.Subtext0Color,
+                    style = MaterialTheme.typography.bodyMedium
                 )
         },
         trailingIcon = {
@@ -76,8 +76,8 @@ fun InputTextField(
                 inputField.suffix?.let {
                     Text(
                         it,
-                        color = CatppuccinUI.CurrentPalette.Blue,
-                        style = CatppuccinTypography.bodySmall
+                        color = AppTheme.colors.LinkColor,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
 
@@ -106,15 +106,15 @@ fun InputTextField(
         supportingText = {
             if (hasTyped && !inputField.validator(value)) {
                 Text(
-                    inputField.errorMessage, color = CatppuccinUI.CurrentPalette.Red,
-                    style = CatppuccinTypography.bodySmall
+                    inputField.errorMessage, color = AppTheme.colors.DismissButtonColor,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         },
-        colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+        colors = AppTheme.colors.outlineTextFieldColors(),
         modifier = modifier,
         visualTransformation = visualTransformation,
-        textStyle = CatppuccinTypography.bodyMedium,
+        textStyle = MaterialTheme.typography.bodyMedium,
     )
 }
 

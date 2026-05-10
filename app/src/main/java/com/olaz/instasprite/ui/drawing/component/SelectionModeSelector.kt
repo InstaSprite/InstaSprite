@@ -18,7 +18,7 @@ import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.tool.selection.LassoSelectionTool
 import com.olaz.instasprite.domain.tool.selection.MagicWandTool
 import com.olaz.instasprite.domain.tool.selection.RectangleSelectionTool
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun SelectionModeSelector(
@@ -42,7 +42,7 @@ fun SelectionModeSelector(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(CatppuccinUI.BackgroundColor),
+                .background(AppTheme.colors.BackgroundColor),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             selectionTools.forEach { tool ->
@@ -51,7 +51,7 @@ fun SelectionModeSelector(
                 ) {
                     Text(
                         text = tool.name,
-                        color = if (selectedTool == tool) CatppuccinUI.AccentButtonColor else CatppuccinUI.TextColorLight
+                        color = if (selectedTool == tool) AppTheme.colors.AccentButtonColor else AppTheme.colors.TextColorLight
                     )
                 }
             }

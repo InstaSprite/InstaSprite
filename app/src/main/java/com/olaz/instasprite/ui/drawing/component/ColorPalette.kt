@@ -44,7 +44,7 @@ import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.drawing.contract.CanvasMenuEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteEvent
 import com.olaz.instasprite.ui.drawing.contract.ColorPaletteState
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.toHexString
 import kotlinx.coroutines.launch
 
@@ -199,7 +199,7 @@ private fun ActiveColor(
             .background(activeColor)
             .border(
                 width = 5.dp,
-                color = CatppuccinUI.BackgroundColorDarker
+                color = AppTheme.colors.BackgroundColorDarker
             )
             .clickable(
                 onClick = onClick
@@ -224,7 +224,7 @@ private fun CanvasMenuDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        modifier = modifier.background(CatppuccinUI.DropDownMenuColor)
+        modifier = modifier.background(AppTheme.colors.DropDownMenuColor)
     ) {
         DropdownMenuItem(
             text = {

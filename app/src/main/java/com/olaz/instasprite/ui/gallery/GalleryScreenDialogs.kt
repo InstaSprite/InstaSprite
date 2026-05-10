@@ -11,7 +11,7 @@ import com.olaz.instasprite.ui.gallery.dialog.RenameDialog
 import com.olaz.instasprite.ui.gallery.dialog.SaveImageDialog
 import com.olaz.instasprite.ui.gallery.dialog.SelectSortOptionDialog
 import com.olaz.instasprite.ui.drawing.dialog.LoadISpriteDialog
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 sealed interface GalleryDialog : Dialog {
@@ -43,7 +43,7 @@ fun GalleryScreenDialogs(
                     highlightText = dialog.spriteName,
                     confirmButtonText = "Delete",
                     dismissButtonText = "Cancel",
-                    highlightTextColor = CatppuccinUI.DismissButtonColor,
+                    highlightTextColor = AppTheme.colors.DismissButtonColor,
                     hasQuestionMark = true,
                     onConfirm = {
                         viewModel.deleteSpriteById(dialog.spriteId)

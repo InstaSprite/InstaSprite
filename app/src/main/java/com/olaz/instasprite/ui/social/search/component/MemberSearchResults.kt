@@ -32,7 +32,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.olaz.instasprite.domain.model.MemberData
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun MemberSearchResults(
@@ -46,7 +46,7 @@ fun MemberSearchResults(
         ) {
             Text(
                 text = "No users found",
-                color = CatppuccinUI.Subtext0Color,
+                color = AppTheme.colors.Subtext0Color,
                 fontSize = 14.sp
             )
         }
@@ -75,7 +75,7 @@ fun MemberSearchItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(CatppuccinUI.BackgroundColor)
+            .background(AppTheme.colors.BackgroundColor)
             .clickable(onClick = onClick)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -99,12 +99,12 @@ fun MemberSearchItem(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(CatppuccinUI.Foreground1Color),
+                    .background(AppTheme.colors.Foreground1Color),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = member.memberName.take(1).uppercase(),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
@@ -116,13 +116,13 @@ fun MemberSearchItem(
         Column {
             Text(
                 text = member.memberUsername,
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp
             )
             Text(
                 text = member.memberName,
-                color = CatppuccinUI.Subtext0Color,
+                color = AppTheme.colors.Subtext0Color,
                 fontSize = 12.sp
             )
         }

@@ -41,8 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun OtpDialog(
@@ -78,7 +77,7 @@ fun OtpDialog(
         onDismissRequest = {
             if (enabled) onDismiss()
         },
-        containerColor = CatppuccinUI.DialogColor,
+        containerColor = AppTheme.colors.DialogColor,
         shape = RoundedCornerShape(16.dp),
         title = {
             Box(
@@ -87,7 +86,7 @@ fun OtpDialog(
             ) {
                 Text(
                     text = defaultTitle,
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -100,7 +99,7 @@ fun OtpDialog(
                 description?.let {
                     Text(
                         text = it,
-                        color = CatppuccinUI.Subtext0Color,
+                        color = AppTheme.colors.Subtext0Color,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 24.dp)
@@ -174,17 +173,17 @@ fun OtpDialog(
                     onOtpComplete(currentOtp)
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = CatppuccinUI.AccentButtonColor,
-                    disabledContainerColor = CatppuccinUI.Foreground1Color
+                    containerColor = AppTheme.colors.AccentButtonColor,
+                    disabledContainerColor = AppTheme.colors.Foreground1Color
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = defaultConfirmText,
                     color = if (enabled && currentOtp.length == otpLength) {
-                        CatppuccinUI.TextColorDark
+                        AppTheme.colors.TextColorDark
                     } else {
-                        CatppuccinUI.TextColorLight
+                        AppTheme.colors.TextColorLight
                     }
                 )
             }
@@ -196,7 +195,7 @@ fun OtpDialog(
             ) {
                 Text(
                     text = defaultDismissText,
-                    color = CatppuccinUI.TextColorLight
+                    color = AppTheme.colors.TextColorLight
                 )
             }
         }
@@ -217,9 +216,9 @@ private fun OtpTextField(
             .border(
                 width = 2.dp,
                 color = if (isFocused || value.text.isNotEmpty()) {
-                    CatppuccinUI.AccentButtonColor
+                    AppTheme.colors.AccentButtonColor
                 } else {
-                    CatppuccinUI.Foreground2Color
+                    AppTheme.colors.Foreground2Color
                 },
                 shape = RoundedCornerShape(12.dp)
             ),
@@ -230,10 +229,10 @@ private fun OtpTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxSize(),
-            textStyle = CatppuccinTypography.headlineMedium.copy(
+            textStyle = MaterialTheme.typography.headlineMedium.copy(
                 fontSize = 32.sp,
                 textAlign = TextAlign.Center,
-                color = CatppuccinUI.TextColorLight
+                color = AppTheme.colors.TextColorLight
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             singleLine = true,

@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.tool.PencilTool
 import com.olaz.instasprite.domain.tool.Tool
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 @Composable
@@ -40,9 +40,9 @@ fun CursorDrawButton(
     var isPressed by remember { mutableStateOf(false) }
 
     val backgroundColor = if (isPressed) {
-        CatppuccinUI.Foreground1Color
+        AppTheme.colors.Foreground1Color
     } else {
-        CatppuccinUI.Foreground0Color
+        AppTheme.colors.Foreground0Color
     }
 
     Box(

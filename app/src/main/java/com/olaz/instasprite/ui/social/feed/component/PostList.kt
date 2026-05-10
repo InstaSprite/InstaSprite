@@ -39,7 +39,7 @@ import com.olaz.instasprite.ui.components.composable.JumpToTopButton
 import com.olaz.instasprite.ui.components.composable.MaintenanceScreen
 import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
 import com.olaz.instasprite.ui.social.feed.contract.FeedScreenEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.toUserMessage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -100,14 +100,14 @@ fun PostList(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(CatppuccinUI.BackgroundColorDarker)
+            .background(AppTheme.colors.BackgroundColorDarker)
     ) {
         val isRefreshError = pagedItems.loadState.refresh is LoadState.Error
         val error = if (isRefreshError) (pagedItems.loadState.refresh as LoadState.Error).error else null
 
         if (pagedItems.loadState.refresh is LoadState.Loading && pagedItems.itemCount == 0) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+                CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
             }
         } else if (isRefreshError && pagedItems.itemCount == 0) {
             if (isOnline) {
@@ -116,7 +116,7 @@ fun PostList(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = "${stringResource(R.string.error)}: ${error?.toUserMessage(context)}",
-                        color = CatppuccinUI.TextColorLight,
+                        color = AppTheme.colors.TextColorLight,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -125,7 +125,7 @@ fun PostList(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     text = stringResource(R.string.no_posts_available),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     textAlign = TextAlign.Center
                 )
             }
@@ -138,8 +138,8 @@ fun PostList(
                     Indicator(
                         modifier = Modifier.align(Alignment.TopCenter),
                         isRefreshing = pagedItems.loadState.refresh is LoadState.Loading,
-                        containerColor = CatppuccinUI.BackgroundColor,
-                        color = CatppuccinUI.TextColorLight,
+                        containerColor = AppTheme.colors.BackgroundColor,
+                        color = AppTheme.colors.TextColorLight,
                         state = pullRefreshState
                     )
                 },
@@ -224,7 +224,7 @@ fun PostList(
                                     .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+                                CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
                             }
                         }
                     }
@@ -239,9 +239,9 @@ fun PostList(
                             ) {
                                 Button(
                                     onClick = { pagedItems.retry() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = CatppuccinUI.SelectedColor)
+                                    colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.SelectedColor)
                                 ) {
-                                    Text("Retry?", color = CatppuccinUI.TextColorDark)
+                                    Text("Retry?", color = AppTheme.colors.TextColorDark)
                                 }
                             }
                         }

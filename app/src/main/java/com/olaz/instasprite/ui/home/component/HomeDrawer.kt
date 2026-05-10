@@ -38,7 +38,7 @@ import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.social.feed.ProfileImageState
 import com.olaz.instasprite.ui.social.feed.ProfileState
 import com.olaz.instasprite.ui.social.feed.component.ProfileImage
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun HomeDrawer(
@@ -58,11 +58,11 @@ fun HomeDrawer(
 ) {
     val drawerItemColors = NavigationDrawerItemDefaults.colors(
         unselectedContainerColor = Color.Transparent,
-        selectedContainerColor = CatppuccinUI.Foreground0Color.copy(alpha = 0.85f),
-        unselectedIconColor = CatppuccinUI.TextColorLight,
-        selectedIconColor = CatppuccinUI.TextColorLight,
-        unselectedTextColor = CatppuccinUI.TextColorLight,
-        selectedTextColor = CatppuccinUI.TextColorLight,
+        selectedContainerColor = AppTheme.colors.Foreground0Color.copy(alpha = 0.85f),
+        unselectedIconColor = AppTheme.colors.TextColorLight,
+        selectedIconColor = AppTheme.colors.TextColorLight,
+        unselectedTextColor = AppTheme.colors.TextColorLight,
+        selectedTextColor = AppTheme.colors.TextColorLight,
     )
 
     val memberName = profileState.memberName.ifBlank {
@@ -71,7 +71,7 @@ fun HomeDrawer(
     val memberUsername = profileState.memberUsername.ifBlank { username.orEmpty() }
 
     ModalDrawerSheet(
-        drawerContainerColor = CatppuccinUI.TopBarColor,
+        drawerContainerColor = AppTheme.colors.TopBarColor,
         drawerShape = RectangleShape,
         modifier = modifier.fillMaxWidth(0.9f)
     ) {
@@ -109,14 +109,14 @@ fun HomeDrawer(
                         text = stringResource(R.string.loading),
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f)
+                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                     )
                 } else {
                     Text(
                         text = memberName,
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = CatppuccinUI.TextColorLight
+                        color = AppTheme.colors.TextColorLight
                     )
 
                     if (memberUsername.isNotBlank()) {
@@ -124,7 +124,7 @@ fun HomeDrawer(
                             text = "@$memberUsername",
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             style = MaterialTheme.typography.bodySmall,
-                            color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f)
+                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                         )
                     }
                 }
@@ -175,7 +175,7 @@ fun HomeDrawer(
             Spacer(modifier = Modifier.weight(1f))
 
             HorizontalDivider(
-                color = CatppuccinUI.TextColorLight.copy(alpha = 0.3f),
+                color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -216,7 +216,7 @@ private fun HomeDrawerItem(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = CatppuccinUI.TextColorLight,
+                    tint = AppTheme.colors.TextColorLight,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.social.feed.ProfileImageState
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ProfileImage(
@@ -27,7 +27,7 @@ fun ProfileImage(
             Log.d("ProfileImage", "Showing loading indicator")
             CircularProgressIndicator(
                 modifier = modifier.size(size),
-                color = CatppuccinUI.TextColorLight
+                color = AppTheme.colors.TextColorLight
             )
         }
 
@@ -57,7 +57,7 @@ fun ProfileImage(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Default Profile",
                 modifier = modifier.size(size),
-                tint = CatppuccinUI.TextColorLight
+                tint = AppTheme.colors.TextColorLight
             )
         }
     }

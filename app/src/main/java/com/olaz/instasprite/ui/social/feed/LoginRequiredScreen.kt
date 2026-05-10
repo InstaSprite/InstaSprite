@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -21,8 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun LoginRequiredScreen(
@@ -31,7 +31,7 @@ fun LoginRequiredScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CatppuccinUI.BackgroundColorDarker),
+            .background(AppTheme.colors.BackgroundColorDarker),
 
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -40,15 +40,15 @@ fun LoginRequiredScreen(
             imageVector = Icons.AutoMirrored.Filled.Login,
             contentDescription = "Login Required",
             modifier = Modifier.size(80.dp),
-            tint = CatppuccinUI.TextColorLight.copy(alpha = 0.6f)
+            tint = AppTheme.colors.TextColorLight.copy(alpha = 0.6f)
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = "Login Required",
-            style = CatppuccinTypography.titleMedium,
-            color = CatppuccinUI.TextColorLight,
+            style = MaterialTheme.typography.titleMedium,
+            color = AppTheme.colors.TextColorLight,
             textAlign = TextAlign.Center
         )
 
@@ -56,7 +56,7 @@ fun LoginRequiredScreen(
 
         Button(
             onClick = onLoginClick,
-            colors = ButtonDefaults.buttonColors(containerColor = CatppuccinUI.SelectedColor),
+            colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.SelectedColor),
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
@@ -65,7 +65,7 @@ fun LoginRequiredScreen(
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Login", color = CatppuccinUI.TextColorDark)
+            Text("Login", color = AppTheme.colors.TextColorDark)
         }
     }
 }

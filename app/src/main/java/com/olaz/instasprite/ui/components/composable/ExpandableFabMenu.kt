@@ -54,7 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import kotlin.math.roundToInt
 
@@ -82,12 +82,12 @@ data class FabMenuColors(
     companion object {
         @Composable
         fun defaults(
-            fab: Color = CatppuccinUI.TextColorLight,
-            fabIcon: Color = CatppuccinUI.TextColorDark,
-            itemIcon: Color = CatppuccinUI.CurrentPalette.Blue,
-            itemBackground: Color = CatppuccinUI.BackgroundColor,
-            itemIconBackground: Color = CatppuccinUI.Foreground0Color,
-            label: Color = CatppuccinUI.TextColorLight,
+            fab: Color = AppTheme.colors.TextColorLight,
+            fabIcon: Color = AppTheme.colors.TextColorDark,
+            itemIcon: Color = AppTheme.colors.LinkColor,
+            itemBackground: Color = AppTheme.colors.BackgroundColor,
+            itemIconBackground: Color = AppTheme.colors.Foreground0Color,
+            label: Color = AppTheme.colors.TextColorLight,
             scrim: Color = Color.Black.copy(alpha = 0.8f),
         ) = FabMenuColors(fab, fabIcon, itemIcon, itemBackground, itemIconBackground, label, scrim)
     }
@@ -318,7 +318,7 @@ private fun Preview() {
         Box(
             modifier = Modifier
                 .size(250.dp, 350.dp)
-                .background(CatppuccinUI.BackgroundColorDarker),
+                .background(AppTheme.colors.BackgroundColorDarker),
             contentAlignment = Alignment.BottomCenter
         ) {
             ExpandableFabMenu(

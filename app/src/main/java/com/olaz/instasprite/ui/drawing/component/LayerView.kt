@@ -40,7 +40,7 @@ import androidx.core.graphics.createBitmap
 import com.olaz.instasprite.domain.model.Cel
 import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.ui.drawing.contract.LayerEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.drawCheckerboard
 import com.olaz.instasprite.utils.inflateCel
@@ -61,9 +61,9 @@ fun LayerView(
 ) {
 
     val backgroundColor = if (isActive)
-        CatppuccinUI.BackgroundColor
+        AppTheme.colors.BackgroundColor
     else
-        CatppuccinUI.BackgroundColorDarker
+        AppTheme.colors.BackgroundColorDarker
 
     val bitmapImage = remember(layer.cel, canvasWidth, canvasHeight) {
         if (canvasWidth > 0 && canvasHeight > 0) {
@@ -89,7 +89,7 @@ fun LayerView(
             modifier = Modifier
                 .height(100.dp)
                 .aspectRatio(1f)
-                .background(CatppuccinUI.BackgroundColorDarker),
+                .background(AppTheme.colors.BackgroundColorDarker),
             contentAlignment = Alignment.Center
         ) {
             if (bitmapImage != null) {
@@ -120,7 +120,7 @@ fun LayerView(
             ) {
                 Text(
                     text = layer.name,
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     fontSize = 14.sp
                 )
                 IconButton(
@@ -130,7 +130,7 @@ fun LayerView(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Layer",
-                        tint = CatppuccinUI.DismissButtonColor,
+                        tint = AppTheme.colors.DismissButtonColor,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -147,7 +147,7 @@ fun LayerView(
                     Icon(
                         imageVector = if (layer.isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = "Toggle Visibility",
-                        tint = CatppuccinUI.TextColorLight,
+                        tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -158,7 +158,7 @@ fun LayerView(
                     Icon(
                         imageVector = if (layer.isLocked) Icons.Default.Lock else Icons.Outlined.LockOpen,
                         contentDescription = "Toggle Lock",
-                        tint = CatppuccinUI.TextColorLight,
+                        tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -169,7 +169,7 @@ fun LayerView(
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowDown,
                         contentDescription = "Merge Down",
-                        tint = CatppuccinUI.TextColorLight,
+                        tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -193,7 +193,7 @@ private fun PreviewActive() {
                     width = 16,
                     height = 16,
                     pixels = IntArray(16 * 16) {
-                        CatppuccinUI.CurrentPalette.Flamingo.toArgb()
+                        AppTheme.colors.InfoColor.toArgb()
                     }
                 )
             ),
@@ -223,7 +223,7 @@ private fun PreviewInactive() {
                     width = 16,
                     height = 16,
                     pixels = IntArray(16 * 16) {
-                        CatppuccinUI.CurrentPalette.Maroon.toArgb()
+                        AppTheme.colors.ErrorDarkColor.toArgb()
                     }
                 )
             ),

@@ -44,7 +44,7 @@ import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.social.profile.contract.ProfileImageUiState
 import com.olaz.instasprite.ui.social.profile.contract.UserProfileState
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ProfileInfoSection(
@@ -86,14 +86,14 @@ fun ProfileInfoSection(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
-                            .background(CatppuccinUI.BackgroundColorDarker)
+                            .background(AppTheme.colors.BackgroundColorDarker)
                     ) {
                         if (profileImageState.isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier
                                     .size(40.dp)
                                     .align(Alignment.Center),
-                                color = CatppuccinUI.BottomBarColor,
+                                color = AppTheme.colors.BottomBarColor,
                                 strokeWidth = 2.dp
                             )
                         } else if (profileImageState.imageUrl != null) {
@@ -126,8 +126,8 @@ fun ProfileInfoSection(
                             .size(28.dp)
                             .align(Alignment.BottomEnd)
                             .offset(x = -6.dp, y = -12.dp), // Position it higher up on the circle
-                        containerColor = CatppuccinUI.BottomBarColor,
-                        contentColor = CatppuccinUI.TextColorLight,
+                        containerColor = AppTheme.colors.BottomBarColor,
+                        contentColor = AppTheme.colors.TextColorLight,
                         elevation = FloatingActionButtonDefaults.elevation(
                             defaultElevation = 6.dp,
                             pressedElevation = 10.dp
@@ -152,7 +152,7 @@ fun ProfileInfoSection(
                     text = userProfile.displayName,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -182,7 +182,7 @@ fun ProfileInfoSection(
         Text(
             text = if (userProfile.bio.isNotEmpty()) userProfile.bio else stringResource(R.string.no_bio_available),
             fontSize = 14.sp,
-            color = CatppuccinUI.TextColorLight,
+            color = AppTheme.colors.TextColorLight,
             lineHeight = 18.sp,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -198,11 +198,11 @@ fun ProfileInfoSection(
                     onClick = onEditProfileClick,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = CatppuccinUI.TextColorLight
+                        contentColor = AppTheme.colors.TextColorLight
                     ),
                     border = BorderStroke(
                         width = 0.5.dp,
-                        color = CatppuccinUI.TextColorLight.copy(alpha = 0.3f)
+                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f)
                     )
                 ) {
                     Text(
@@ -216,7 +216,7 @@ fun ProfileInfoSection(
                     onClick = onFollowClick,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (userProfile.isFollowing) CatppuccinUI.BackgroundColor else CatppuccinUI.SelectedColor,
+                        containerColor = if (userProfile.isFollowing) AppTheme.colors.BackgroundColor else AppTheme.colors.SelectedColor,
                     )
                 ) {
                     Text(
@@ -225,7 +225,7 @@ fun ProfileInfoSection(
                         ),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = if (userProfile.isFollowing) CatppuccinUI.AccentButtonColor else CatppuccinUI.TextColorDark
+                        color = if (userProfile.isFollowing) AppTheme.colors.AccentButtonColor else AppTheme.colors.TextColorDark
                     )
                 }
             }
@@ -249,13 +249,13 @@ private fun StatItem(
     ) {
         Text(
             text = formatCount(count),
-            color = CatppuccinUI.TextColorLight,
+            color = AppTheme.colors.TextColorLight,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
             text = label,
-            color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
             fontSize = 14.sp
         )
     }

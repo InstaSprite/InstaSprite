@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 
@@ -33,7 +33,7 @@ fun Bar(
     middleSlot: (@Composable () -> Unit)? = null,
     rightSlot: (@Composable () -> Unit)? = null,
     height: Dp = 56.dp,
-    backgroundColor: Color = CatppuccinUI.BackgroundColor,
+    backgroundColor: Color = AppTheme.colors.BackgroundColor,
     space: Dp = 16.dp
 ) {
     Box(
@@ -70,14 +70,14 @@ private fun Preview() {
             middleSlot = {
                 Text(
                     text = "Test test alo alo",
-                    color = CatppuccinUI.TextColorLight
+                    color = AppTheme.colors.TextColorLight
                 )
             },
             rightSlot = {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "More",
-                    tint = CatppuccinUI.TextColorLight,
+                    tint = AppTheme.colors.TextColorLight,
                     modifier = Modifier.size(32.dp)
                 )
             }

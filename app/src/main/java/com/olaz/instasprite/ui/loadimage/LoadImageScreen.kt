@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -40,8 +41,7 @@ import com.olaz.instasprite.ui.loadimage.component.ImageConfigView
 import com.olaz.instasprite.ui.loadimage.component.ProcessedImagePreview
 import com.olaz.instasprite.ui.loadimage.contract.ImageConfigEvent
 import com.olaz.instasprite.ui.loadimage.contract.LoadImageUiState
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import kotlinx.coroutines.launch
 
@@ -132,8 +132,8 @@ fun LoadImageScreenContent(
                 middleSlot = {
                     Text(
                         text = "Load Image",
-                        color = CatppuccinUI.TextColorLight,
-                        style = CatppuccinTypography.titleMedium
+                        color = AppTheme.colors.TextColorLight,
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 rightSlot = {
@@ -144,15 +144,15 @@ fun LoadImageScreenContent(
                     Button(
                         onClick = event.onConfirm,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = CatppuccinUI.AccentButtonColor,
-                            disabledContainerColor = CatppuccinUI.Foreground0Color
+                            containerColor = AppTheme.colors.AccentButtonColor,
+                            disabledContainerColor = AppTheme.colors.Foreground0Color
                         ),
                         enabled = isCreateButtonEnabled
                     ) {
                         val textColor = if (isCreateButtonEnabled) {
-                            CatppuccinUI.TextColorDark
+                            AppTheme.colors.TextColorDark
                         } else {
-                            CatppuccinUI.TextColorLight
+                            AppTheme.colors.TextColorLight
                         }
 
                         Text("Create", color = textColor)
@@ -160,7 +160,7 @@ fun LoadImageScreenContent(
                 }
             )
         },
-        containerColor = CatppuccinUI.BackgroundColorDarker
+        containerColor = AppTheme.colors.BackgroundColorDarker
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -181,7 +181,7 @@ fun LoadImageScreenContent(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxSize()
-                    .background(CatppuccinUI.BackgroundColor)
+                    .background(AppTheme.colors.BackgroundColor)
                     .padding(12.dp),
             ) {
                 ImageConfigView(
@@ -219,4 +219,3 @@ private fun LoadImageScreenPreview() {
         )
     }
 }
-

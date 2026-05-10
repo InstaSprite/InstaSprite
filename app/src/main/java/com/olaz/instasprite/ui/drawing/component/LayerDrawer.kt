@@ -41,7 +41,7 @@ import com.olaz.instasprite.domain.model.Layer
 import com.olaz.instasprite.ui.components.composable.BackButton
 import com.olaz.instasprite.ui.components.composable.Bar
 import com.olaz.instasprite.ui.drawing.contract.LayerEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -79,7 +79,7 @@ fun LayerDrawer(
     Column(
         modifier = modifier
             .fillMaxHeight()
-            .background(CatppuccinUI.BackgroundColorDarker)
+            .background(AppTheme.colors.BackgroundColorDarker)
             .padding(12.dp)
     ) {
         Row(
@@ -90,7 +90,7 @@ fun LayerDrawer(
         ) {
             Text(
                 text = "Layers",
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.weight(1f)
@@ -108,15 +108,15 @@ fun LayerDrawer(
             items(layersList, key = { it.id }) { layer ->
 
                 val dragIndicatorBgColor = if (layer.id == activeLayerId ){
-                    CatppuccinUI.CurrentPalette.Blue
+                    AppTheme.colors.LinkColor
                 } else {
-                    CatppuccinUI.BackgroundColor
+                    AppTheme.colors.BackgroundColor
                 }
 
                 val dragIndicatorColor = if (layer.id == activeLayerId ){
-                    CatppuccinUI.TextColorDark
+                    AppTheme.colors.TextColorDark
                 } else {
-                    CatppuccinUI.TextColorLight
+                    AppTheme.colors.TextColorLight
                 }
 
                 ReorderableItem(
@@ -168,30 +168,30 @@ fun LayerDrawer(
         }
 
         Spacer(modifier = Modifier.height(10.dp))
-        HorizontalDivider(color = CatppuccinUI.SelectedColor)
+        HorizontalDivider(color = AppTheme.colors.SelectedColor)
 
         Bar(
             leftSlot = {
                 BackButton(
                     onClick = onBack,
-                    color = CatppuccinUI.TextColorLight
+                    color = AppTheme.colors.TextColorLight
                 )
             },
             rightSlot = {
                 Button(
                     onClick = { onEvent(LayerEvent.AddLayer) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.AccentButtonColor
+                        containerColor = AppTheme.colors.AccentButtonColor
                     )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add Layer",
-                        tint = CatppuccinUI.TextColorDark
+                        tint = AppTheme.colors.TextColorDark
                     )
                 }
             },
-            backgroundColor = CatppuccinUI.BackgroundColorDarker
+            backgroundColor = AppTheme.colors.BackgroundColorDarker
         )
     }
 }
@@ -214,7 +214,7 @@ private fun Preview() {
                         width = 16,
                         height = 16,
                         pixels = IntArray(16 * 16) {
-                            CatppuccinUI.CurrentPalette.Maroon.toArgb()
+                            AppTheme.colors.ErrorDarkColor.toArgb()
                         }
                     )
                 ),
@@ -227,7 +227,7 @@ private fun Preview() {
                         width = 16,
                         height = 16,
                         pixels = IntArray(16 * 16) {
-                            CatppuccinUI.CurrentPalette.Mauve.toArgb()
+                            AppTheme.colors.SelectedColor.toArgb()
                         }
                     )
                 )

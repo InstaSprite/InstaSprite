@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.social.comments.contract.Comment
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.formatTimeAgo
 
 @Composable
@@ -83,7 +83,7 @@ fun CommentItem(
             ) {
                 Text(
                     text = comment.username,
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { onProfileClick(comment.username) }
@@ -91,7 +91,7 @@ fun CommentItem(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = formatTimeAgo(comment.createdAt),
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.5f),
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
                     fontSize = 11.sp
                 )
             }
@@ -100,7 +100,7 @@ fun CommentItem(
 
             Text(
                 text = comment.content,
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 fontSize = 14.sp,
                 lineHeight = 18.sp
             )
@@ -112,7 +112,7 @@ fun CommentItem(
                 Icon(
                     imageVector = if (comment.isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = stringResource(R.string.like_comment),
-                    tint = if (comment.isLiked) CatppuccinUI.DismissButtonColor else CatppuccinUI.TextColorLight,
+                    tint = if (comment.isLiked) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
                     modifier = Modifier
                         .size(16.dp)
                         .clickable { onLikeClick(comment.id) }
@@ -123,7 +123,7 @@ fun CommentItem(
                     if (comment.likesCount > 0) {
                         Text(
                             text = "${comment.likesCount}",
-                            color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                             fontSize = 12.sp
                         )
                     }
@@ -132,7 +132,7 @@ fun CommentItem(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.reply),
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                     fontSize = 12.sp,
                     modifier = Modifier.clickable { onReplyClick(comment.id) }
                 )
@@ -145,7 +145,7 @@ fun CommentItem(
                 Icon(
                     imageVector = Icons.Filled.Delete,
                     contentDescription = stringResource(R.string.delete_comment),
-                    tint = CatppuccinUI.TextColorLight.copy(alpha = 0.7f)
+                    tint = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                 )
             }
         }

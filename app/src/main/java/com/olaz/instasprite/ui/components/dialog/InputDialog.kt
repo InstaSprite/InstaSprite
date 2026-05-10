@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -22,8 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.model.InputField
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @Composable
@@ -73,7 +73,7 @@ fun InputDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     CircularProgressIndicator(
-                        color = CatppuccinUI.SelectedColor,
+                        color = AppTheme.colors.SelectedColor,
                     )
                 }
             } else {
@@ -85,19 +85,19 @@ fun InputDialog(
                         OutlinedTextField(
                             value = inputStates[index].value,
                             onValueChange = { inputStates[index].value = it },
-                            label = { Text(field.label, color = CatppuccinUI.SelectedColor) },
+                            label = { Text(field.label, color = AppTheme.colors.SelectedColor) },
                             placeholder = {
                                 if (field.placeholder.isNotBlank())
                                     Text(
-                                        field.placeholder, color = CatppuccinUI.Subtext0Color,
-                                        style = CatppuccinTypography.bodyMedium
+                                        field.placeholder, color = AppTheme.colors.Subtext0Color,
+                                        style = MaterialTheme.typography.bodyMedium
                                     )
                             },
                             trailingIcon = {
                                 field.suffix?.let {
                                     Text(
                                         it,
-                                        color = CatppuccinUI.CurrentPalette.Blue,
+                                        color = AppTheme.colors.LinkColor,
                                         modifier = Modifier.padding(horizontal = 14.dp)
                                     )
                                 }
@@ -107,12 +107,12 @@ fun InputDialog(
                             isError = !field.validator(inputStates[index].value),
                             supportingText = {
                                 if (!field.validator(inputStates[index].value)) {
-                                    Text(field.errorMessage, color = CatppuccinUI.CurrentPalette.Red)
+                                    Text(field.errorMessage, color = AppTheme.colors.DismissButtonColor)
                                 }
                             },
-                            colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+                            colors = AppTheme.colors.outlineTextFieldColors(),
                             modifier = Modifier.fillMaxWidth(),
-                            textStyle = CatppuccinTypography.bodyMedium
+                            textStyle = MaterialTheme.typography.bodyMedium
                         )
                     }
 

@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun GoogleSignInButton(
@@ -44,7 +44,7 @@ fun GoogleSignInButton(
             .height(56.dp)
             .border(
                 width = 1.dp,
-                color = CatppuccinUI.TextColorLight.copy(alpha = 0.2f),
+                color = AppTheme.colors.TextColorLight.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(12.dp)
             )
     ) {

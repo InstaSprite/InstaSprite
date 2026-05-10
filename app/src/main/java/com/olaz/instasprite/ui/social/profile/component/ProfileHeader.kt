@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +32,7 @@ fun ProfileHeader(
         title = {
             Text(
                 text = username,
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -42,7 +42,7 @@ fun ProfileHeader(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.back),
-                    tint = CatppuccinUI.TextColorLight
+                    tint = AppTheme.colors.TextColorLight
                 )
             }
         },
@@ -52,12 +52,12 @@ fun ProfileHeader(
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = stringResource(R.string.menu),
-                    tint = CatppuccinUI.TextColorLight
+                    tint = AppTheme.colors.TextColorLight
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = CatppuccinUI.BackgroundColorDarker
+            containerColor = AppTheme.colors.BackgroundColorDarker
         ),
         modifier = modifier
     )

@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.components.composable.CustomTextField
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun CaptionSection(
@@ -31,7 +31,7 @@ fun CaptionSection(
 
         Text(
             text = "${value.length}/2200",
-            color = CatppuccinUI.Subtext0Color,
+            color = AppTheme.colors.Subtext0Color,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier
                 .align(Alignment.End)

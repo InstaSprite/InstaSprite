@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.model.ColorPalette
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.DummyData
 
@@ -44,7 +44,7 @@ fun ColorPaletteList(
     LazyColumn(
         state = lazyListState,
         modifier = modifier
-            .background(CatppuccinUI.BackgroundColorDarker),
+            .background(AppTheme.colors.BackgroundColorDarker),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -71,7 +71,7 @@ private fun ListEntry(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(CatppuccinUI.BackgroundColor)
+            .background(AppTheme.colors.BackgroundColor)
             .clickable(onClick = onClick)
             .padding(12.dp)
     ) {
@@ -84,12 +84,12 @@ private fun ListEntry(
                     text = palette.name,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = CatppuccinUI.TextColorLight
+                    color = AppTheme.colors.TextColorLight
                 )
                 Text(
                     text = "by ${palette.author}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = CatppuccinUI.Subtext0Color
+                    color = AppTheme.colors.Subtext0Color
                 )
             }
 
@@ -131,10 +131,10 @@ private fun PreviewColorPaletteListWithOption() {
 
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.CurrentPalette.Peach
+                        containerColor = AppTheme.colors.WarningColor
                     ),
                 ) {
-                    Text(text = "Test", color = CatppuccinUI.TextColorDark)
+                    Text(text = "Test", color = AppTheme.colors.TextColorDark)
                 }
             }
         )

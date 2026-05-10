@@ -1,42 +1,38 @@
 package com.olaz.instasprite.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
+import androidx.compose.runtime.CompositionLocalProvider
 
 @Composable
 fun InstaSpriteTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
+    flavour: ThemeFlavour = ThemeFlavour.MOCHA,
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = DarkColorScheme,
-        typography = CatppuccinTypography,
-        content = content
+    val palette = Catppuccin.fromFlavour(flavour)
+    val appColors = Catppuccin.toAppColors(palette)
+    val typography = buildCatppuccinTypography(appColors)
+
+    val colorScheme = darkColorScheme(
+        primary = appColors.SelectedColor,
+        secondary = appColors.AccentButtonColor,
+        tertiary = appColors.SecondaryAccentColor,
+        background = appColors.BackgroundColor,
+        surface = appColors.Foreground0Color,
+        onPrimary = appColors.TextColorDark,
+        onSecondary = appColors.TextColorDark,
+        onBackground = appColors.TextColorLight,
+        onSurface = appColors.TextColorLight,
     )
+
+
+    CompositionLocalProvider(LocalAppColors provides appColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            content = content
+        )
+    }
 }

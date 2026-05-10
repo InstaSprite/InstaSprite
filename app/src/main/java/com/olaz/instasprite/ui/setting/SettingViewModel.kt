@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olaz.instasprite.data.repository.AuthRepository
+import com.olaz.instasprite.ui.theme.ThemeFlavour
 import com.olaz.instasprite.utils.AppSettings
 import com.olaz.instasprite.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,7 @@ import javax.inject.Inject
 import kotlin.text.get
 
 data class SettingUiState(
-    val isDarkThemeEnabled: Boolean = false,
+    val themeFlavour: ThemeFlavour = ThemeFlavour.MOCHA,
     val is2FAEnabled: Boolean = false,
     val isLoading2FAStatus: Boolean = true,
     val showLanguageDialog: Boolean = false,
@@ -65,7 +66,7 @@ class SettingViewModel @Inject constructor(
         val selectedLanguage = if (index >= 0) languages[index] else ""
         
         _uiState.value = _uiState.value.copy(
-            isDarkThemeEnabled = AppSettings.isDarkMode(context),
+            themeFlavour = AppSettings.getThemeFlavour(context),
             supportedLocales = supportedLocales,
             languages = languages,
             languageCodes = languageCodes,
@@ -93,9 +94,9 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun toggleDarkTheme(enabled: Boolean) {
-        _uiState.value = _uiState.value.copy(isDarkThemeEnabled = enabled)
-        AppSettings.setDarkMode(context, enabled)
+    fun setThemeFlavour(flavour: ThemeFlavour) {
+        _uiState.value = _uiState.value.copy(themeFlavour = flavour)
+        AppSettings.setThemeFlavour(context, flavour)
     }
 
     fun toggle2FA(enabled: Boolean) {

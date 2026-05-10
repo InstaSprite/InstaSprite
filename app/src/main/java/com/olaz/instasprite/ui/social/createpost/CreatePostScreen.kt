@@ -47,8 +47,9 @@ import com.olaz.instasprite.ui.social.createpost.contract.CreatePostScreenEvent
 import com.olaz.instasprite.ui.social.createpost.contract.CreatePostState
 import com.olaz.instasprite.ui.social.feed.VerifyEmailState
 import com.olaz.instasprite.ui.social.feed.dialog.VerifyEmailDialog
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
+import com.olaz.instasprite.ui.theme.ThemeFlavour
 import java.io.File
 
 @Composable
@@ -115,7 +116,7 @@ private fun CreatePostScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding())
-                .background(CatppuccinUI.BackgroundColorDarker)
+                .background(AppTheme.colors.BackgroundColorDarker)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -167,13 +168,13 @@ private fun CreatePostScreenContent(
                 Button(
                     onClick = event.onCreatePost,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.SelectedColor,
-                        contentColor = CatppuccinUI.TextColorLight
+                        containerColor = AppTheme.colors.SelectedColor,
+                        contentColor = AppTheme.colors.TextColorLight
                     ),
                     enabled = uiState.caption.isNotBlank() && uiState.selectedImage != null && !uiState.isPostInProgress,
                     modifier = Modifier.fillMaxWidth(0.5f)
                 ) {
-                    Text("Post", color = CatppuccinUI.TextColorDark)
+                    Text("Post", color = AppTheme.colors.TextColorDark)
                 }
             }
         }
@@ -183,7 +184,7 @@ private fun CreatePostScreenContent(
             ModalBottomSheet(
                 onDismissRequest = event.onToggleSpriteSelector,
                 properties = modalBottomSheetProperties,
-                containerColor = CatppuccinUI.BackgroundColorDarker
+                containerColor = AppTheme.colors.BackgroundColorDarker
             ) {
                 val context = LocalContext.current
                 LazyVerticalGrid(
@@ -209,14 +210,14 @@ private fun CreatePostScreenContent(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .aspectRatio(1f)
-                                    .background(CatppuccinUI.BackgroundColor)
+                                    .background(AppTheme.colors.BackgroundColor)
                                     .padding(4.dp),
                                 contentScale = ContentScale.FillHeight,
                                 filterQuality = FilterQuality.None
                             )
                             Text(
                                 text = spriteWithMeta.meta?.spriteName ?: "Untitled",
-                                color = CatppuccinUI.TextColorLight,
+                                color = AppTheme.colors.TextColorLight,
                                 modifier = Modifier.padding(top = 4.dp),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
@@ -232,7 +233,7 @@ private fun CreatePostScreenContent(
 @Preview
 @Composable
 private fun CreatePostScreenPreview() {
-    InstaSpriteTheme(darkTheme = false) {
+    InstaSpriteTheme(flavour = ThemeFlavour.MOCHA) {
         CreatePostScreenContent(
             uiState = CreatePostState(
                 caption = "Sample Caption",

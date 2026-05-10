@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun TopBar(
@@ -27,7 +27,7 @@ fun TopBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .background(CatppuccinUI.BackgroundColor)
+            .background(AppTheme.colors.BackgroundColor)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -43,7 +43,7 @@ fun TopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
                     contentDescription = "Dismiss",
-                    tint = CatppuccinUI.DismissButtonColor,
+                    tint = AppTheme.colors.DismissButtonColor,
                     modifier = Modifier.size(32.dp)
                 )
             }

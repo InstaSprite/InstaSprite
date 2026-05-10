@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun OtpEnrollmentDialog(
@@ -57,12 +57,12 @@ fun OtpEnrollmentDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = CatppuccinUI.DialogColor,
+        containerColor = AppTheme.colors.DialogColor,
         shape = RoundedCornerShape(16.dp),
         title = {
             Text(
                 text = context.getString(R.string.enable_two_factor_authentication),
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -77,7 +77,7 @@ fun OtpEnrollmentDialog(
             ) {
                 Text(
                     text = context.getString(R.string.scan_qr_code_instruction),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
@@ -91,14 +91,14 @@ fun OtpEnrollmentDialog(
                 } else {
                     Text(
                         text = context.getString(R.string.failed_to_load_qr_code),
-                        color = CatppuccinUI.DismissButtonColor,
+                        color = AppTheme.colors.DismissButtonColor,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
 
                 Text(
                     text = context.getString(R.string.or_enter_secret_manually),
-                    color = CatppuccinUI.Subtext0Color,
+                    color = AppTheme.colors.Subtext0Color,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center
                 )
@@ -112,7 +112,7 @@ fun OtpEnrollmentDialog(
                     ) {
                         Text(
                             text = secret,
-                            color = CatppuccinUI.AccentButtonColor,
+                            color = AppTheme.colors.AccentButtonColor,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium,
                             fontFamily = FontFamily.Monospace
@@ -124,7 +124,7 @@ fun OtpEnrollmentDialog(
 
                 Text(
                     text = context.getString(R.string.account_issuer_info, accountName, issuer),
-                    color = CatppuccinUI.Subtext0Color,
+                    color = AppTheme.colors.Subtext0Color,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center
                 )
@@ -133,7 +133,7 @@ fun OtpEnrollmentDialog(
 
                 Text(
                     text = context.getString(R.string.after_scanning_instruction),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     fontSize = 12.sp
@@ -144,13 +144,13 @@ fun OtpEnrollmentDialog(
             Button(
                 onClick = onGotIt,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = CatppuccinUI.AccentButtonColor
+                    containerColor = AppTheme.colors.AccentButtonColor
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = context.getString(R.string.got_it),
-                    color = CatppuccinUI.TextColorDark
+                    color = AppTheme.colors.TextColorDark
                 )
             }
         },
@@ -160,7 +160,7 @@ fun OtpEnrollmentDialog(
             ) {
                 Text(
                     text = context.getString(R.string.cancel),
-                    color = CatppuccinUI.DismissButtonColor
+                    color = AppTheme.colors.DismissButtonColor
                 )
             }
         }

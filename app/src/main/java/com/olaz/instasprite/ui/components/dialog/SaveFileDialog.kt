@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.olaz.instasprite.domain.model.InputField
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.getFullPathFromTreeUri
 
@@ -88,7 +88,7 @@ fun SaveFileDialog(
                 OutlinedTextField(
                     value = displayPath,
                     onValueChange = {},
-                    label = { Text("Save Location", color = CatppuccinUI.SelectedColor) },
+                    label = { Text("Save Location", color = AppTheme.colors.SelectedColor) },
                     supportingText = {},
                     readOnly = true,
                     enabled = false,
@@ -98,7 +98,7 @@ fun SaveFileDialog(
                             contentDescription = "Choose Folder",
                         )
                     },
-                    colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+                    colors = AppTheme.colors.outlineTextFieldColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }

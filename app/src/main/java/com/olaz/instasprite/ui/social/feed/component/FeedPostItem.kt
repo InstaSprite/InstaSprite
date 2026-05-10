@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,8 +54,7 @@ import com.olaz.instasprite.domain.model.PostData
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.components.composable.ParsedPostText
 import com.olaz.instasprite.ui.social.feed.dialog.DeletePostConfirmDialog
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.toSuffixString
 import java.time.Duration
 import java.time.LocalDateTime
@@ -94,7 +94,7 @@ fun FeedPostItem(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = CatppuccinUI.BackgroundColor
+            containerColor = AppTheme.colors.BackgroundColor
         )
     ) {
         Column(
@@ -118,7 +118,7 @@ fun FeedPostItem(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(CatppuccinUI.Foreground2Color),
+                            .background(AppTheme.colors.Foreground2Color),
                     )
 
                     Spacer(modifier = Modifier.width(12.dp))
@@ -126,13 +126,13 @@ fun FeedPostItem(
                     Column {
                         Text(
                             text = post.member.memberName,
-                            color = CatppuccinUI.TextColorLight,
+                            color = AppTheme.colors.TextColorLight,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
                         Text(
                             text = formatTimeAgo(post.postUploadDate),
-                            color = CatppuccinUI.Subtext0Color,
+                            color = AppTheme.colors.Subtext0Color,
                             fontSize = 12.sp
                         )
                     }
@@ -148,18 +148,18 @@ fun FeedPostItem(
                             onFollowClick(post.member.memberUsername, post.isFollowing)
                         },
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = CatppuccinUI.TextColorLight
+                            contentColor = AppTheme.colors.TextColorLight
                         ),
                         border = BorderStroke(
                             width = 0.5.dp,
-                            color = CatppuccinUI.TextColorLight.copy(alpha = 0.3f)
+                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f)
                         )
                     ) {
                         Text(
                             text = if (post.isFollowing) stringResource(R.string.unfollow) else stringResource(
                                 R.string.follow
                             ),
-                            color = if (post.isFollowing) CatppuccinUI.AccentButtonColor else CatppuccinUI.TextColorLight,
+                            color = if (post.isFollowing) AppTheme.colors.AccentButtonColor else AppTheme.colors.TextColorLight,
                             fontSize = 12.sp
                         )
                     }
@@ -173,7 +173,7 @@ fun FeedPostItem(
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Delete",
-                            tint = CatppuccinUI.DismissButtonColor
+                            tint = AppTheme.colors.DismissButtonColor
                         )
                     }
                 }
@@ -184,8 +184,8 @@ fun FeedPostItem(
             if (post.postContent.isNotEmpty()) {
                 ParsedPostText(
                     text = post.postContent,
-                    textColor = CatppuccinUI.TextColorLight,
-                    style = CatppuccinTypography.bodyMedium,
+                    textColor = AppTheme.colors.TextColorLight,
+                    style = MaterialTheme.typography.bodyMedium,
                     onHashtagClick = { hashtag -> onHashtagClick(hashtag) },
                     onMentionClick = { mention -> onMentionClick(mention) },
                     onTextClick = { onPostClick() },
@@ -203,7 +203,7 @@ fun FeedPostItem(
                     post.hashtags.forEach { tag ->
                         Text(
                             text = "#$tag",
-                            color = CatppuccinUI.SelectedColor,
+                            color = AppTheme.colors.SelectedColor,
                             fontSize = 14.sp,
                             modifier = Modifier.clickable { onHashtagClick(tag) }
                         )
@@ -260,7 +260,7 @@ fun FeedPostItem(
                         Icon(
                             imageVector = if (post.postLikeFlag) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Like",
-                            tint = if (post.postLikeFlag) CatppuccinUI.CurrentPalette.Red else CatppuccinUI.TextColorLight,
+                            tint = if (post.postLikeFlag) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
                                 .size(20.dp)
@@ -273,7 +273,7 @@ fun FeedPostItem(
                             if (post.postLikesCount > 0) {
                                 Text(
                                     text = post.postLikesCount.toSuffixString(),
-                                    color = CatppuccinUI.TextColorLight,
+                                    color = AppTheme.colors.TextColorLight,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp
                                 )
@@ -287,7 +287,7 @@ fun FeedPostItem(
                         Icon(
                             imageVector = Icons.Default.ChatBubbleOutline,
                             contentDescription = "Comment",
-                            tint = CatppuccinUI.TextColorLight,
+                            tint = AppTheme.colors.TextColorLight,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
                                 .size(20.dp)
@@ -301,7 +301,7 @@ fun FeedPostItem(
                             if (post.postCommentsCount > 0) {
                                 Text(
                                     text = "${post.postCommentsCount}",
-                                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.9f),
+                                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.9f),
                                     fontSize = 14.sp
                                 )
                             }
@@ -313,7 +313,7 @@ fun FeedPostItem(
                     Icon(
                         imageVector = if (post.postBookmarkFlag) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                         contentDescription = "Bookmark",
-                        tint = CatppuccinUI.TextColorLight,
+                        tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier
                             .size(20.dp)
                             .clickable { onBookmarkClick() }
@@ -336,4 +336,3 @@ private fun formatTimeAgo(dateTime: LocalDateTime): String {
         else -> dateTime.format(DateTimeFormatter.ofPattern("MMM d"))
     }
 }
-

@@ -31,7 +31,7 @@ import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.ui.components.composable.BackButton
 import com.olaz.instasprite.ui.components.composable.ColorPaletteList
 import com.olaz.instasprite.ui.components.composable.Bar
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.DummyData
 import com.olaz.instasprite.utils.rememberBottomBarVisibleState
@@ -83,7 +83,7 @@ private fun ColorPaletteSelectionContent(
                 }
             )
         },
-        containerColor = CatppuccinUI.BackgroundColor
+        containerColor = AppTheme.colors.BackgroundColor
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -110,7 +110,7 @@ private fun ColorPaletteSelectionContent(
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Delete palette",
-                                tint = CatppuccinUI.DismissButtonColor
+                                tint = AppTheme.colors.DismissButtonColor
                             )
                         }
                     }
@@ -128,12 +128,12 @@ private fun ColorPaletteSelectionContent(
                 FloatingActionButton(
                     onClick = onFabButton,
                     shape = CircleShape,
-                    containerColor = CatppuccinUI.SelectedColor,
+                    containerColor = AppTheme.colors.SelectedColor,
                 ) {
                     Icon(
                         Icons.Filled.Add,
                         contentDescription = "Floating action button",
-                        tint = CatppuccinUI.TextColorDark,
+                        tint = AppTheme.colors.TextColorDark,
                         modifier = Modifier.size(30.dp)
                     )
                 }

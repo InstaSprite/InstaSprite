@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -22,8 +23,7 @@ import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -69,17 +69,17 @@ fun LospecImportDialog(
                     onValueChange = { newUrl ->
                         paletteUrl = newUrl
                     },
-                    label = { Text("Lospec URL", color = CatppuccinUI.SelectedColor) },
+                    label = { Text("Lospec URL", color = AppTheme.colors.SelectedColor) },
                     placeholder = {
                         Text(
                             "https://lospec.com/palette-list/example",
-                             color = CatppuccinUI.Subtext0Color,
-                            style = CatppuccinTypography.bodyMedium
+                             color = AppTheme.colors.Subtext0Color,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     },
-                    textStyle = CatppuccinTypography.bodyMedium,
+                    textStyle = MaterialTheme.typography.bodyMedium,
                     singleLine = true,
-                    colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+                    colors = AppTheme.colors.outlineTextFieldColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -130,11 +130,11 @@ fun LospecImportDialog(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.AccentButtonColor
+                        containerColor = AppTheme.colors.AccentButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Fetch Palette", color = CatppuccinUI.TextColorDark)
+                    Text(text = "Fetch Palette", color = AppTheme.colors.TextColorDark)
                 }
             }
         }

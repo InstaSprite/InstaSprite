@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.social.profile.contract.FollowerUser
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun FollowingDialog(
@@ -47,7 +47,7 @@ fun FollowingDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = CatppuccinUI.BackgroundColorDarker,
+        containerColor = AppTheme.colors.BackgroundColorDarker,
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -55,7 +55,7 @@ fun FollowingDialog(
             ) {
                 Text(
                     text = stringResource(R.string.following),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -72,12 +72,12 @@ fun FollowingDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator(
-                            color = CatppuccinUI.BottomBarColor
+                            color = AppTheme.colors.BottomBarColor
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = stringResource(R.string.loading_following),
-                            color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                             fontSize = 12.sp
                         )
                     }
@@ -91,7 +91,7 @@ fun FollowingDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.no_following),
-                        color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                         fontSize = 14.sp
                     )
                 }
@@ -115,12 +115,12 @@ fun FollowingDialog(
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = CatppuccinUI.BottomBarColor
+                    containerColor = AppTheme.colors.BottomBarColor
                 )
             ) {
                 Text(
                     text = stringResource(R.string.close),
-                    color = CatppuccinUI.TextColorLight
+                    color = AppTheme.colors.TextColorLight
                 )
             }
         },
@@ -166,14 +166,14 @@ private fun FollowingItem(
         ) {
             Text(
                 text = user.username,
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
             if (user.displayName.isNotEmpty()) {
                 Text(
                     text = user.displayName,
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                     fontSize = 12.sp
                 )
             }
@@ -186,12 +186,12 @@ private fun FollowingItem(
                 .size(32.dp)
                 .clip(CircleShape)
                 .clickable { onUnfollowClick(user.id) }
-                .background(CatppuccinUI.DismissButtonColor.copy(alpha = 0.1f)),
+                .background(AppTheme.colors.DismissButtonColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "×",
-                color = CatppuccinUI.DismissButtonColor,
+                color = AppTheme.colors.DismissButtonColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center

@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun CommentActions(
@@ -45,7 +45,7 @@ fun CommentActions(
             Icon(
                 imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                 contentDescription = "Like",
-                tint = if (isLiked) CatppuccinUI.CurrentPalette.Red else CatppuccinUI.TextColorLight,
+                tint = if (isLiked) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
                 modifier = Modifier
                     .align(Alignment.Bottom)
                     .size(20.dp)
@@ -59,7 +59,7 @@ fun CommentActions(
                 if (likesCount > 0) {
                     Text(
                         text = "$likesCount",
-                        color = CatppuccinUI.TextColorLight,
+                        color = AppTheme.colors.TextColorLight,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
@@ -72,7 +72,7 @@ fun CommentActions(
                 Icon(
                     imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                     contentDescription = "Bookmark",
-                    tint = CatppuccinUI.TextColorLight,
+                    tint = AppTheme.colors.TextColorLight,
                     modifier = Modifier.size(20.dp)
                 )
             }

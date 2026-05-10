@@ -49,7 +49,7 @@ import com.olaz.instasprite.ui.components.composable.AsyncImageZoomableOverlay
 import com.olaz.instasprite.ui.components.composable.BackButton
 import com.olaz.instasprite.ui.components.composable.Bar
 import com.olaz.instasprite.ui.gallery.contract.ImagePagerEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.drawCheckerboard
 import com.olaz.instasprite.utils.toDateString
 import java.io.File
@@ -120,7 +120,7 @@ fun ImagePagerOverlay(
                     spriteWithMetaData = currentSprite,
                     modifier = Modifier
                         .height(180.dp)
-                        .background(CatppuccinUI.BackgroundColor)
+                        .background(AppTheme.colors.BackgroundColor)
                 )
             }
         ) { innerPadding ->
@@ -130,7 +130,7 @@ fun ImagePagerOverlay(
                 key = { index -> spriteList[index].sprite.id },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CatppuccinUI.BackgroundColorDarker)
+                    .background(AppTheme.colors.BackgroundColorDarker)
             ) { page ->
                 val spriteWithMeta = spriteList[page]
 
@@ -210,7 +210,7 @@ private fun BottomBar(
                 Button(
                     onClick = onSaveImageTap,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.SelectedColor
+                        containerColor = AppTheme.colors.SelectedColor
                     )
                 ) {
                     Row(
@@ -219,13 +219,13 @@ private fun BottomBar(
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
                             contentDescription = "Save as image",
-                            tint = CatppuccinUI.TextColorDark,
+                            tint = AppTheme.colors.TextColorDark,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = "Save as Image",
-                            color = CatppuccinUI.TextColorDark
+                            color = AppTheme.colors.TextColorDark
                         )
                     }
                 }
@@ -233,7 +233,7 @@ private fun BottomBar(
                 Button(
                     onClick = onEditButtonTap,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.AccentButtonColor
+                        containerColor = AppTheme.colors.AccentButtonColor
                     ),
                 ) {
                     Row(
@@ -242,13 +242,13 @@ private fun BottomBar(
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit sprite",
-                            tint = CatppuccinUI.TextColorDark,
+                            tint = AppTheme.colors.TextColorDark,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = "Edit",
-                            color = CatppuccinUI.TextColorDark
+                            color = AppTheme.colors.TextColorDark
                         )
                     }
                 }
@@ -276,7 +276,7 @@ private fun TopBar(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More",
-                        tint = CatppuccinUI.TextColorLight,
+                        tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -302,7 +302,7 @@ private fun PagerDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        containerColor = CatppuccinUI.DropDownMenuColor
+        containerColor = AppTheme.colors.DropDownMenuColor
     ) {
         DropdownMenuItem(
             text = {
@@ -312,7 +312,7 @@ private fun PagerDropdownMenu(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete sprite",
-                    tint = CatppuccinUI.TextColorLight
+                    tint = AppTheme.colors.TextColorLight
                 )
             },
             onClick = {

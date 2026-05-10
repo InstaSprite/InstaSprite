@@ -23,7 +23,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.gallery.contract.SearchBarContract
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun SearchBar(
@@ -56,7 +56,7 @@ fun SearchBar(
                 )
             )
         },
-        placeholder = { Text(text = "Search sprites", color = CatppuccinUI.Subtext0Color) },
+        placeholder = { Text(text = "Search sprites", color = AppTheme.colors.Subtext0Color) },
         singleLine = true,
         trailingIcon = {
             IconButton(
@@ -70,7 +70,7 @@ fun SearchBar(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Dismiss",
-                    tint = CatppuccinUI.DismissButtonColor,
+                    tint = AppTheme.colors.DismissButtonColor,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -82,16 +82,16 @@ fun SearchBar(
                 isFocused = it.isFocused
             },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = CatppuccinUI.BackgroundColor,
-            disabledContainerColor = CatppuccinUI.BackgroundColor,
-            unfocusedContainerColor = CatppuccinUI.BackgroundColor,
-            focusedTextColor = CatppuccinUI.TextColorLight,
-            unfocusedTextColor = CatppuccinUI.TextColorLight,
-            cursorColor = CatppuccinUI.TextColorLight,
-            focusedBorderColor = CatppuccinUI.CurrentPalette.Peach,
-            unfocusedBorderColor = CatppuccinUI.CurrentPalette.Peach,
-            unfocusedPlaceholderColor = CatppuccinUI.CurrentPalette.Peach,
-            focusedPlaceholderColor = CatppuccinUI.Subtext0Color
+            focusedContainerColor = AppTheme.colors.BackgroundColor,
+            disabledContainerColor = AppTheme.colors.BackgroundColor,
+            unfocusedContainerColor = AppTheme.colors.BackgroundColor,
+            focusedTextColor = AppTheme.colors.TextColorLight,
+            unfocusedTextColor = AppTheme.colors.TextColorLight,
+            cursorColor = AppTheme.colors.TextColorLight,
+            focusedBorderColor = AppTheme.colors.WarningColor,
+            unfocusedBorderColor = AppTheme.colors.WarningColor,
+            unfocusedPlaceholderColor = AppTheme.colors.WarningColor,
+            focusedPlaceholderColor = AppTheme.colors.Subtext0Color
         ),
     )
 

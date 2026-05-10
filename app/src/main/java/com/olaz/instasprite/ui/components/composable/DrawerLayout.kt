@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 enum class DrawerSide {
     Start,
@@ -87,7 +87,7 @@ fun DrawerLayout(
                     Modifier
                         .fillMaxHeight()
                         .width(width)
-                        .background(CatppuccinUI.BackgroundColor)
+                        .background(AppTheme.colors.BackgroundColor)
                         .clickable(
                             // block click passing thru drawer content
                             indication = null,

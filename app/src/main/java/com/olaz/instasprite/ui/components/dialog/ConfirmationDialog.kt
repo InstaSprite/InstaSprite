@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ConfirmationDialog(
@@ -15,7 +15,7 @@ fun ConfirmationDialog(
     highlightText: String,
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
-    highlightTextColor: Color = CatppuccinUI.DismissButtonColor,
+    highlightTextColor: Color = AppTheme.colors.DismissButtonColor,
     hasQuestionMark: Boolean = true,
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit = {}

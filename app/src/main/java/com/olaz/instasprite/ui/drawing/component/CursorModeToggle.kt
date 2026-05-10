@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 @Composable
@@ -26,7 +26,7 @@ fun CursorModeToggle(
     modifier: Modifier = Modifier
 ) {
     val containerColor = if (isCursorMode) {
-        CatppuccinUI.CurrentPalette.Blue
+        AppTheme.colors.LinkColor
     } else {
         Color.Transparent
     }

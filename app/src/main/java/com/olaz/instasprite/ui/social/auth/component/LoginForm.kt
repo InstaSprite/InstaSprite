@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -38,8 +39,7 @@ import com.olaz.instasprite.R
 import com.olaz.instasprite.data.model.InputField
 import com.olaz.instasprite.domain.model.LoginRequest
 import com.olaz.instasprite.ui.components.composable.InputTextField
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
@@ -111,8 +111,8 @@ fun LoginForm(
                 IconToggleButton(
                     checked = isPasswordVisible,
                     colors = IconButtonDefaults.iconToggleButtonColors().copy(
-                        checkedContentColor = CatppuccinUI.CurrentPalette.Blue,
-                        contentColor = CatppuccinUI.CurrentPalette.Overlay0,
+                        checkedContentColor = AppTheme.colors.LinkColor,
+                        contentColor = AppTheme.colors.InactiveColor,
                     ),
                     onCheckedChange = { isPasswordVisible = it },
                 ) {
@@ -125,8 +125,8 @@ fun LoginForm(
 
         Text(
             text = stringResource(R.string.forgot_password),
-            color = CatppuccinUI.CurrentPalette.Flamingo,
-            style = CatppuccinTypography.labelLarge,
+            color = AppTheme.colors.InfoColor,
+            style = MaterialTheme.typography.labelLarge,
             modifier = Modifier
                 .clickable(true, onClick = onForgotPasswordClick)
                 .align(Alignment.Start)
@@ -147,9 +147,9 @@ fun LoginForm(
                 )
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = CatppuccinUI.SelectedColor,
-                contentColor = CatppuccinUI.TextColorLight,
-                disabledContainerColor = CatppuccinUI.Foreground1Color,
+                containerColor = AppTheme.colors.SelectedColor,
+                contentColor = AppTheme.colors.TextColorLight,
+                disabledContainerColor = AppTheme.colors.Foreground1Color,
             ),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
@@ -158,8 +158,8 @@ fun LoginForm(
         ) {
             Text(
                 text = stringResource(R.string.login),
-                color = if (enabled) CatppuccinUI.TextColorDark else CatppuccinUI.TextColorLight,
-                style = CatppuccinTypography.bodyMedium
+                color = if (enabled) AppTheme.colors.TextColorDark else AppTheme.colors.TextColorLight,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
 
@@ -170,13 +170,13 @@ fun LoginForm(
         ) {
             Text(
                 text = stringResource(R.string.dont_have_account) + ' ',
-                color = CatppuccinUI.TextColorLight,
-                style = CatppuccinTypography.labelLarge
+                color = AppTheme.colors.TextColorLight,
+                style = MaterialTheme.typography.labelLarge
             )
             Text(
                 text = stringResource(R.string.register),
-                color = CatppuccinUI.AccentButtonColor,
-                style = CatppuccinTypography.labelLarge
+                color = AppTheme.colors.AccentButtonColor,
+                style = MaterialTheme.typography.labelLarge
             )
         }
 

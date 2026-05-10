@@ -32,7 +32,7 @@ import com.olaz.instasprite.R
 import com.olaz.instasprite.data.model.AccountPreferences
 import com.olaz.instasprite.data.model.AccountType
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun SavedAccountItem(
@@ -45,7 +45,7 @@ fun SavedAccountItem(
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(CatppuccinUI.BackgroundColor)
+            .background(AppTheme.colors.BackgroundColor)
             .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -56,7 +56,7 @@ fun SavedAccountItem(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(CatppuccinUI.Foreground0Color)
+                    .background(AppTheme.colors.Foreground0Color)
             )
 
             if (account.accountType == AccountType.GOOGLE) {
@@ -88,7 +88,7 @@ fun SavedAccountItem(
             ) {
                 Text(
                     text = account.name ?: "Unknown",
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     maxLines = 1,
@@ -97,7 +97,7 @@ fun SavedAccountItem(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = '@' + account.username,
-                    color = CatppuccinUI.Subtext0Color,
+                    color = AppTheme.colors.Subtext0Color,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp,
                     maxLines = 1,
@@ -107,7 +107,7 @@ fun SavedAccountItem(
 
             Text(
                 text = account.email!!,
-                color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -118,7 +118,7 @@ fun SavedAccountItem(
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Remove account",
-                tint = CatppuccinUI.DismissButtonColor,
+                tint = AppTheme.colors.DismissButtonColor,
                 modifier = Modifier.size(20.dp)
             )
         }

@@ -33,7 +33,7 @@ import com.olaz.instasprite.domain.export.ImageExporter
 import com.olaz.instasprite.ui.components.composable.CanvasPreviewer
 import com.olaz.instasprite.ui.components.composable.ImageZoomableOverlay
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.getFileName
 
 @Composable
@@ -80,17 +80,17 @@ fun LoadISpriteDialog(
                 OutlinedTextField(
                     value = displayPath,
                     onValueChange = {},
-                    label = { Text("File", color = CatppuccinUI.SelectedColor) },
+                    label = { Text("File", color = AppTheme.colors.SelectedColor) },
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Menu,
                             contentDescription = "Choose File",
-                            tint = CatppuccinUI.TextColorLight
+                            tint = AppTheme.colors.TextColorLight
                         )
                     },
-                    colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+                    colors = AppTheme.colors.outlineTextFieldColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }

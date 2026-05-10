@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,8 +28,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.drawCheckerboard
 
@@ -52,7 +52,7 @@ fun ProcessedImagePreview(
                         it.drawCheckerboard(processedBitmap.width, processedBitmap.height)
                     } else it
                 }
-                .background(CatppuccinUI.BackgroundColorDarker)
+                .background(AppTheme.colors.BackgroundColorDarker)
                 .clickable(enabled = true, onClick = onLaunchImagePicker),
             contentAlignment = Alignment.Center
         ) {
@@ -72,14 +72,14 @@ fun ProcessedImagePreview(
                     Icon(
                         imageVector = Icons.Default.AddCircleOutline,
                         contentDescription = "Add image",
-                        tint = CatppuccinUI.CurrentPalette.Peach,
+                        tint = AppTheme.colors.WarningColor,
                         modifier = Modifier.size(50.dp)
                     )
 
                     Text(
                         "Tap to select image",
-                        color = CatppuccinUI.Subtext0Color,
-                        style = CatppuccinTypography.bodyMedium
+                        color = AppTheme.colors.Subtext0Color,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -88,10 +88,10 @@ fun ProcessedImagePreview(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(CatppuccinUI.BackgroundColorDarker.copy(alpha = 0.5f)),
+                        .background(AppTheme.colors.BackgroundColorDarker.copy(alpha = 0.5f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = CatppuccinUI.AccentButtonColor)
+                    CircularProgressIndicator(color = AppTheme.colors.AccentButtonColor)
                 }
             }
         }

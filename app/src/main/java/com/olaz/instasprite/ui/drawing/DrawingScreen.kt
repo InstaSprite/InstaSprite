@@ -64,7 +64,7 @@ import com.olaz.instasprite.ui.drawing.contract.LayerEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
 import com.olaz.instasprite.ui.drawing.contract.ToolSelectorEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.DummyData
 import com.olaz.instasprite.utils.UiUtils
@@ -100,11 +100,11 @@ fun DrawingScreen(
 
 
     if (uiState.showLayerDrawer) {
-        UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
-        UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+        UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColorDarker)
+        UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColorDarker)
     } else {
-        UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColor)
-        UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColor)
+        UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColor)
+        UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColor)
     }
 
     DrawingScreenDialogs(dialogState, viewModel)
@@ -181,7 +181,7 @@ private fun DrawingScreenContent(
             Column {
                 ColorPalette(
                     modifier = Modifier
-                        .background(CatppuccinUI.BackgroundColor)
+                        .background(AppTheme.colors.BackgroundColor)
                         .padding(horizontal = 8.dp, vertical = 2.dp),
                     colorPaletteState = colorPaletteState,
                     onColorPaletteEvent = event.onColorPaletteEvent,
@@ -193,7 +193,7 @@ private fun DrawingScreenContent(
         },
         bottomBar = {
             Column(
-                modifier = Modifier.background(CatppuccinUI.BackgroundColor)
+                modifier = Modifier.background(AppTheme.colors.BackgroundColor)
             ) {
                 SelectionToolOption(
                     isVisible = (canvasState.selectionState != null),
@@ -265,7 +265,7 @@ private fun DrawingScreenContent(
                         Icon(
                             imageVector = Icons.Default.Layers,
                             contentDescription = "Layers",
-                            tint = CatppuccinUI.TextColorLight
+                            tint = AppTheme.colors.TextColorLight
                         )
                     }
                 }
@@ -297,10 +297,10 @@ private fun DrawingScreenContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CatppuccinUI.BackgroundColorDarker),
+                    .background(AppTheme.colors.BackgroundColorDarker),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+                CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
             }
         } else {
             Box(
@@ -311,7 +311,7 @@ private fun DrawingScreenContent(
 //                        top = innerPadding.calculateTopPadding(),
 //                        bottom = 65.dp + 66.dp // only tool selector and bottom layer row
 //                    )
-                    .background(CatppuccinUI.BackgroundColorDarker)
+                    .background(AppTheme.colors.BackgroundColorDarker)
 
             ) {
                 PixelCanvas(

@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.dialog.InputDialog
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -107,20 +107,20 @@ fun FileImportDialog(
                 OutlinedTextField(
                     value = selectedFileName ?: "No file selected",
                     onValueChange = {},
-                    label = { Text("Import Location", color = CatppuccinUI.SelectedColor) },
+                    label = { Text("Import Location", color = AppTheme.colors.SelectedColor) },
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Home,
                             contentDescription = "Choose File",
-                            tint = CatppuccinUI.CurrentPalette.Blue,
+                            tint = AppTheme.colors.LinkColor,
                             modifier = Modifier.clickable {
                                 filePickerLauncher.launch(arrayOf("text/plain"))
                             }
                         )
                     },
-                    colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+                    colors = AppTheme.colors.outlineTextFieldColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }

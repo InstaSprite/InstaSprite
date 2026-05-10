@@ -23,11 +23,11 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Immutable
 data class ColorPaletteConfig(
-    val backgroundColor: Color = CatppuccinUI.BackgroundColorDarker,
+    val backgroundColor: Color = Color.Unspecified,
     val itemSpacing: Dp = 0.dp,
     val listHeight: Dp = 40.dp,
     val colorItemSize: Dp = 30.dp,
@@ -55,12 +55,13 @@ fun ColorPaletteView(
     itemColorModifier: Modifier? = null,
 ) {
     with(config) {
+        val resolvedBg = if (backgroundColor == Color.Unspecified) AppTheme.colors.BackgroundColorDarker else backgroundColor
         Box(
             contentAlignment = Alignment.CenterStart,
             modifier = modifier
                 .height(height = listHeight)
                 .fillMaxWidth()
-                .background(backgroundColor),
+                .background(resolvedBg),
         ) {
             LazyRow(
                 state = lazyListState,

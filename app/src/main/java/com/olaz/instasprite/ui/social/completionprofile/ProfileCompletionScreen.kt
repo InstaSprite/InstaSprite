@@ -47,7 +47,7 @@ import com.olaz.instasprite.ui.social.PostInteractionEvent
 import com.olaz.instasprite.ui.social.completionprofile.contract.ProfileCompletionScreenEvent
 import com.olaz.instasprite.ui.social.completionprofile.contract.ProfileCompletionState
 import com.olaz.instasprite.ui.social.feed.component.AvatarSelectionComponent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.delay
@@ -110,8 +110,8 @@ fun ProfileCompletionContent(
 ) {
     LocalContext.current
 
-    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColorDarker)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColorDarker)
 
     Scaffold(
         topBar = {
@@ -124,19 +124,19 @@ fun ProfileCompletionContent(
                         Text(
                             text = stringResource(R.string.complete_your_profile),
                             fontWeight = FontWeight.Bold,
-                            color = CatppuccinUI.TextColorLight,
+                            color = AppTheme.colors.TextColorLight,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleLarge,
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CatppuccinUI.BackgroundColorDarker,
-                    titleContentColor = CatppuccinUI.TextColorLight
+                    containerColor = AppTheme.colors.BackgroundColorDarker,
+                    titleContentColor = AppTheme.colors.TextColorLight
                 )
             )
         },
-        containerColor = CatppuccinUI.BackgroundColorDarker
+        containerColor = AppTheme.colors.BackgroundColorDarker
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -147,7 +147,7 @@ fun ProfileCompletionContent(
         ) {
             if (state.isLoading && state.profileData == null) {
                 CircularProgressIndicator(
-                    color = CatppuccinUI.BottomBarColor,
+                    color = AppTheme.colors.BottomBarColor,
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
@@ -193,7 +193,7 @@ private fun ProfileCompletionForm(
         Text(
             text = stringResource(R.string.lets_set_up_your_profile),
             fontSize = 16.sp,
-            color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
         )
 
@@ -316,8 +316,8 @@ private fun ProfileCompletionForm(
             enabled = !state.isLoading && !state.isUploadingImage,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = CatppuccinUI.BottomBarColor,
-                contentColor = CatppuccinUI.TextColorLight
+                containerColor = AppTheme.colors.BottomBarColor,
+                contentColor = AppTheme.colors.TextColorLight
             ),
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -326,7 +326,7 @@ private fun ProfileCompletionForm(
             if (state.isLoading || state.isUploadingImage) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     strokeWidth = 2.dp
                 )
             } else {

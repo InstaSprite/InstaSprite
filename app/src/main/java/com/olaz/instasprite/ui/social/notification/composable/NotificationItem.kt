@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.data.network.model.NotificationDto
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -53,7 +53,7 @@ fun NotificationItem(notification: NotificationDto, onClick: () -> Unit = {}) {
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(CatppuccinUI.Foreground0Color)
+                    .background(AppTheme.colors.Foreground0Color)
             )
         } else {
             Box(
@@ -83,7 +83,7 @@ fun NotificationItem(notification: NotificationDto, onClick: () -> Unit = {}) {
                     withStyle(
                         style = SpanStyle(
                             fontWeight = FontWeight.SemiBold,
-                            color = CatppuccinUI.TextColorLight
+                            color = AppTheme.colors.TextColorLight
                         )
                     ) {
                         append(notification.title)
@@ -92,7 +92,7 @@ fun NotificationItem(notification: NotificationDto, onClick: () -> Unit = {}) {
                     append(notification.body)
                 },
                 fontSize = 14.sp,
-                color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                 lineHeight = 20.sp
             )
 
@@ -101,7 +101,7 @@ fun NotificationItem(notification: NotificationDto, onClick: () -> Unit = {}) {
             Text(
                 text = formatTimestamp(notification.createdAt),
                 fontSize = 12.sp,
-                color = CatppuccinUI.TextColorLight.copy(alpha = 0.5f)
+                color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f)
             )
         }
 

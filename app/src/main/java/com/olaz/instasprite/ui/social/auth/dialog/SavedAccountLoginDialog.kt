@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,8 +47,7 @@ import com.olaz.instasprite.data.model.InputField
 import com.olaz.instasprite.domain.model.LoginRequest
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.components.composable.InputTextField
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
@@ -84,7 +84,7 @@ fun SavedAccountLoginDialog(
     ) {
         Card(
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = CatppuccinUI.BackgroundColor),
+            colors = CardDefaults.cardColors(containerColor = AppTheme.colors.BackgroundColor),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
@@ -96,22 +96,22 @@ fun SavedAccountLoginDialog(
                     modifier = Modifier
                         .size(72.dp)
                         .clip(CircleShape)
-                        .background(CatppuccinUI.Foreground0Color)
+                        .background(AppTheme.colors.Foreground0Color)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = stringResource(R.string.welcome_back) + ", ${account.name ?: account.username}",
-                    color = CatppuccinUI.TextColorLight,
-                    style = CatppuccinTypography.titleMedium,
+                    color = AppTheme.colors.TextColorLight,
+                    style = MaterialTheme.typography.titleMedium,
                 )
 
                 Text(
                     text = account.username,
                     fontSize = 14.sp,
-                    color = CatppuccinUI.Subtext0Color,
-                    style = CatppuccinTypography.labelMedium
+                    color = AppTheme.colors.Subtext0Color,
+                    style = MaterialTheme.typography.labelMedium
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -128,8 +128,8 @@ fun SavedAccountLoginDialog(
                         IconToggleButton(
                             checked = isPasswordVisible,
                             colors = IconButtonDefaults.iconToggleButtonColors().copy(
-                                checkedContentColor = CatppuccinUI.CurrentPalette.Blue,
-                                contentColor = CatppuccinUI.CurrentPalette.Overlay0,
+                                checkedContentColor = AppTheme.colors.LinkColor,
+                                contentColor = AppTheme.colors.InactiveColor,
                             ),
                             onCheckedChange = { isPasswordVisible = it },
                         ) {
@@ -154,9 +154,9 @@ fun SavedAccountLoginDialog(
                         )
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.SelectedColor,
-                        contentColor = CatppuccinUI.TextColorLight,
-                        disabledContainerColor = CatppuccinUI.Foreground1Color,
+                        containerColor = AppTheme.colors.SelectedColor,
+                        contentColor = AppTheme.colors.TextColorLight,
+                        disabledContainerColor = AppTheme.colors.Foreground1Color,
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
@@ -165,8 +165,8 @@ fun SavedAccountLoginDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.login),
-                        color = if (enabled) CatppuccinUI.TextColorDark else CatppuccinUI.TextColorLight,
-                        style = CatppuccinTypography.bodyMedium
+                        color = if (enabled) AppTheme.colors.TextColorDark else AppTheme.colors.TextColorLight,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }

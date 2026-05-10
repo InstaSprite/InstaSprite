@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.social.feed.VerifyEmailState
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun VerifyEmailDialog(
@@ -45,18 +45,18 @@ fun VerifyEmailDialog(
             if (verifyEmailState.isSending) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(64.dp),
-                    color = CatppuccinUI.CurrentPalette.Peach,
+                    color = AppTheme.colors.WarningColor,
                     strokeWidth = 4.dp
                 )
 
                 Text(
                     text = stringResource(R.string.sending_email),
-                    style = CatppuccinTypography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
             } else {
                 Text(
                     text = stringResource(R.string.verify_email_desc),
-                    style = CatppuccinTypography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -37,8 +38,7 @@ import com.olaz.instasprite.data.model.InputField
 import com.olaz.instasprite.ui.components.composable.InputTextField
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
 import com.olaz.instasprite.ui.social.auth.contract.ForgotPasswordUiState
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
@@ -151,13 +151,13 @@ fun ForgotPasswordDialog(
             if (isSendingEmail || isResettingPassword) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(64.dp),
-                    color = CatppuccinUI.CurrentPalette.Peach,
+                    color = AppTheme.colors.WarningColor,
                     strokeWidth = 4.dp
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = if (isSendingEmail) stringResource(R.string.sending_email) else "Resetting password…",
-                    style = CatppuccinTypography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
             } else if (showResetForm) {
                 InputTextField(
@@ -170,8 +170,8 @@ fun ForgotPasswordDialog(
                         IconToggleButton(
                             checked = isTemporaryPasswordVisible,
                             colors = IconButtonDefaults.iconToggleButtonColors().copy(
-                                checkedContentColor = CatppuccinUI.CurrentPalette.Blue,
-                                contentColor = CatppuccinUI.CurrentPalette.Overlay0,
+                                checkedContentColor = AppTheme.colors.LinkColor,
+                                contentColor = AppTheme.colors.InactiveColor,
                             ),
                             onCheckedChange = { isTemporaryPasswordVisible = it },
                         ) {
@@ -196,8 +196,8 @@ fun ForgotPasswordDialog(
                         IconToggleButton(
                             checked = isNewPasswordVisible,
                             colors = IconButtonDefaults.iconToggleButtonColors().copy(
-                                checkedContentColor = CatppuccinUI.CurrentPalette.Blue,
-                                contentColor = CatppuccinUI.CurrentPalette.Overlay0,
+                                checkedContentColor = AppTheme.colors.LinkColor,
+                                contentColor = AppTheme.colors.InactiveColor,
                             ),
                             onCheckedChange = { isNewPasswordVisible = it },
                         ) {
@@ -222,8 +222,8 @@ fun ForgotPasswordDialog(
                         IconToggleButton(
                             checked = isConfirmPasswordVisible,
                             colors = IconButtonDefaults.iconToggleButtonColors().copy(
-                                checkedContentColor = CatppuccinUI.CurrentPalette.Blue,
-                                contentColor = CatppuccinUI.CurrentPalette.Overlay0,
+                                checkedContentColor = AppTheme.colors.LinkColor,
+                                contentColor = AppTheme.colors.InactiveColor,
                             ),
                             onCheckedChange = { isConfirmPasswordVisible = it },
                         ) {
@@ -249,11 +249,10 @@ fun ForgotPasswordDialog(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = errorMessage,
-                    color = CatppuccinUI.CurrentPalette.Red,
-                    style = CatppuccinTypography.bodySmall
+                    color = AppTheme.colors.DismissButtonColor,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
     }
 }
-

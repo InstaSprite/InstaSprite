@@ -62,7 +62,7 @@ import com.olaz.instasprite.ui.social.auth.dialog.ForgotPasswordDialog
 import com.olaz.instasprite.ui.social.auth.dialog.SavedAccountLoginDialog
 import com.olaz.instasprite.ui.social.session.SocialSessionState
 import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
 
@@ -74,8 +74,8 @@ fun AuthScreen(
     sessionViewModel: SocialSessionViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit = {},
 ) {
-    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColorDarker)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColorDarker)
 
     val context = LocalContext.current
     val activity = context as? Activity
@@ -244,7 +244,7 @@ fun AuthContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(CatppuccinUI.BackgroundColorDarker)
+            .background(AppTheme.colors.BackgroundColorDarker)
     ) {
         Column(
             modifier = modifier
@@ -268,7 +268,7 @@ fun AuthContent(
                     text = stringResource(R.string.app_name),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     textAlign = TextAlign.Center,
                 )
 
@@ -277,7 +277,7 @@ fun AuthContent(
                 Text(
                     text = stringResource(R.string.create_pixel_art_with_ease),
                     fontSize = 16.sp,
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center,
                 )
 
@@ -309,7 +309,7 @@ fun AuthContent(
 
                                 Text(
                                     text = stringResource(R.string.login_with_existed),
-                                    color = CatppuccinUI.TextColorLight,
+                                    color = AppTheme.colors.TextColorLight,
                                     modifier = Modifier.clickable(onClick = event.onShowAccountList),
                                 )
                             }
@@ -332,7 +332,7 @@ fun AuthContent(
 
                 Text(
                     text = stringResource(R.string.or),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))

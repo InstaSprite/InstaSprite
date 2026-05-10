@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -37,8 +38,7 @@ import com.olaz.instasprite.ui.components.composable.BackButton
 import com.olaz.instasprite.ui.components.composable.ColorPaletteConfig
 import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.composable.Bar
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun CreateCanvasScreen(
@@ -115,23 +115,23 @@ fun CreateCanvasScreen(
                 middleSlot = {
                     Text(
                         text = "New canvas",
-                        color = CatppuccinUI.TextColorLight,
-                        style = CatppuccinTypography.titleMedium
+                        color = AppTheme.colors.TextColorLight,
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 rightSlot = {
                     Button(
                         onClick = ::tryConfirm,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = CatppuccinUI.AccentButtonColor
+                            containerColor = AppTheme.colors.AccentButtonColor
                         )
                     ) {
-                        Text("Create", color = CatppuccinUI.TextColorDark)
+                        Text("Create", color = AppTheme.colors.TextColorDark)
                     }
                 }
             )
         },
-        containerColor = CatppuccinUI.BackgroundColor
+        containerColor = AppTheme.colors.BackgroundColor
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -146,20 +146,20 @@ fun CreateCanvasScreen(
                 OutlinedTextField(
                     value = inputStates[index].value,
                     onValueChange = { inputStates[index].value = it },
-                    label = { Text(field.label, color = CatppuccinUI.SelectedColor) },
+                    label = { Text(field.label, color = AppTheme.colors.SelectedColor) },
                     placeholder = {
                         if (field.placeholder.isNotBlank())
                             Text(
                                 field.placeholder,
-                                color = CatppuccinUI.Subtext0Color,
-                                style = CatppuccinTypography.bodyMedium
+                                color = AppTheme.colors.Subtext0Color,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                     },
                     trailingIcon = {
                         field.suffix?.let {
                             Text(
                                 it,
-                                color = CatppuccinUI.CurrentPalette.Blue,
+                                color = AppTheme.colors.LinkColor,
                                 modifier = Modifier.padding(horizontal = 14.dp)
                             )
                         }
@@ -169,12 +169,12 @@ fun CreateCanvasScreen(
                     isError = !field.validator(inputStates[index].value),
                     supportingText = {
                         if (!field.validator(inputStates[index].value)) {
-                            Text(field.errorMessage, color = CatppuccinUI.CurrentPalette.Red)
+                            Text(field.errorMessage, color = AppTheme.colors.DismissButtonColor)
                         }
                     },
-                    colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+                    colors = AppTheme.colors.outlineTextFieldColors(),
                     modifier = Modifier.fillMaxWidth(),
-                    textStyle = CatppuccinTypography.bodyMedium
+                    textStyle = MaterialTheme.typography.bodyMedium
                 )
             }
 

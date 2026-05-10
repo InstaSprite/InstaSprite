@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.social.profile.contract.ProfileTab
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ProfileTabRow(
@@ -24,12 +24,12 @@ fun ProfileTabRow(
 ) {
     PrimaryTabRow(
         selectedTabIndex = selectedTabIndex,
-        containerColor = CatppuccinUI.BackgroundColorDarker,
-        contentColor = CatppuccinUI.TextColorLight,
+        containerColor = AppTheme.colors.BackgroundColorDarker,
+        contentColor = AppTheme.colors.TextColorLight,
         indicator = {
             TabRowDefaults.SecondaryIndicator(
                 modifier = Modifier.tabIndicatorOffset(selectedTabIndex),
-                color = CatppuccinUI.TextColorLight
+                color = AppTheme.colors.TextColorLight
             )
         },
         divider = { HorizontalDivider(color = Color.Transparent) },
@@ -44,9 +44,9 @@ fun ProfileTabRow(
                         text = tab.title,
                         fontSize = 16.sp,
                         color = if (selectedTabIndex == index)
-                            CatppuccinUI.TextColorLight
+                            AppTheme.colors.TextColorLight
                         else
-                            CatppuccinUI.TextColorLight.copy(alpha = 0.6f),
+                            AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
                         fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal
                     )
                 }

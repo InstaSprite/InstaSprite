@@ -71,7 +71,7 @@ import com.olaz.instasprite.ui.social.session.SocialSessionViewModel
 import com.olaz.instasprite.ui.social.profile.dialog.EditProfileDialog
 import com.olaz.instasprite.ui.social.profile.dialog.FollowersDialog
 import com.olaz.instasprite.ui.social.profile.dialog.FollowingDialog
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
 import java.time.Duration
@@ -131,8 +131,8 @@ fun ProfileScreen(
         }
     }
 
-    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColorDarker)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColorDarker)
 
     Box(modifier = Modifier.fillMaxSize()) {
         ProfileContent(
@@ -171,8 +171,8 @@ fun ProfileScreen(
         ) { data ->
             Snackbar(
                 snackbarData = data,
-                containerColor = CatppuccinUI.BackgroundColorDarker,
-                dismissActionContentColor = CatppuccinUI.DismissButtonColor
+                containerColor = AppTheme.colors.BackgroundColorDarker,
+                dismissActionContentColor = AppTheme.colors.DismissButtonColor
 
             )
         }
@@ -192,7 +192,7 @@ fun ProfileContent(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = CatppuccinUI.BottomBarColor)
+            CircularProgressIndicator(color = AppTheme.colors.BottomBarColor)
         }
         return
     }
@@ -213,7 +213,7 @@ fun ProfileContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(CatppuccinUI.BackgroundColorDarker)
+            .background(AppTheme.colors.BackgroundColorDarker)
     ) {
         Column(
             modifier = Modifier
@@ -285,7 +285,7 @@ fun ProfileContent(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(12.dp))
                                         .fillMaxSize()
-                                        .background(CatppuccinUI.Foreground2Color)
+                                        .background(AppTheme.colors.Foreground2Color)
                                         .clickable { event.onPostClick(post.postId) },
                                 )
                             }
@@ -302,7 +302,7 @@ fun ProfileContent(
                                 key = { it.postId }
                             ) { post ->
                                 Card(
-                                    colors = CardDefaults.cardColors(containerColor = CatppuccinUI.BackgroundColor),
+                                    colors = CardDefaults.cardColors(containerColor = AppTheme.colors.BackgroundColor),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 12.dp, vertical = 8.dp)
@@ -319,7 +319,7 @@ fun ProfileContent(
                                                     modifier = Modifier
                                                         .size(40.dp)
                                                         .clip(androidx.compose.foundation.shape.CircleShape)
-                                                        .background(CatppuccinUI.Foreground2Color)
+                                                        .background(AppTheme.colors.Foreground2Color)
                                                 ) {
                                                     AsyncImageView(
                                                         imageUrl = post.member.memberImage?.imageUrl
@@ -334,13 +334,13 @@ fun ProfileContent(
                                                 Column {
                                                     Text(
                                                         text = post.member.memberUsername,
-                                                        color = CatppuccinUI.TextColorLight,
+                                                        color = AppTheme.colors.TextColorLight,
                                                         fontWeight = FontWeight.Bold,
                                                         fontSize = 14.sp
                                                     )
                                                     Text(
                                                         text = formatTimeAgoLocal(post.postUploadDate),
-                                                        color = CatppuccinUI.Subtext0Color,
+                                                        color = AppTheme.colors.Subtext0Color,
                                                         fontSize = 12.sp
                                                     )
                                                 }
@@ -426,7 +426,7 @@ fun ProfileContent(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(16.dp),
                                     strokeWidth = 2.dp,
-                                    color = CatppuccinUI.TextColorLight
+                                    color = AppTheme.colors.TextColorLight
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(text = stringResource(R.string.uploading))
@@ -434,7 +434,7 @@ fun ProfileContent(
                         } else {
                             Text(
                                 text = stringResource(R.string.confirm),
-                                color = CatppuccinUI.TextColorDark
+                                color = AppTheme.colors.TextColorDark
                             )
                         }
                     }
@@ -452,7 +452,7 @@ fun ProfileContent(
                         modifier = Modifier
                             .size(140.dp)
                             .clip(androidx.compose.foundation.shape.CircleShape)
-                            .background(CatppuccinUI.Foreground2Color)
+                            .background(AppTheme.colors.Foreground2Color)
                     ) {
                         AsyncImageView(
                             imageUrl = previewSource.toString(),
@@ -474,7 +474,7 @@ fun ProfileContent(
                             Icon(
                                 imageVector = Icons.Filled.Add,
                                 contentDescription = stringResource(R.string.pick_image),
-                                tint = CatppuccinUI.TextColorLight,
+                                tint = AppTheme.colors.TextColorLight,
                                 modifier = Modifier.size(32.dp)
                             )
                         }

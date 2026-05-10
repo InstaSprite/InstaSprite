@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.components.composable.CustomTextField
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -67,11 +67,11 @@ fun HashtagSection(
                             )
                         },
                         colors = AssistChipDefaults.assistChipColors(
-                            containerColor = CatppuccinUI.Foreground0Color,
-                            labelColor = CatppuccinUI.TextColorLight,
-                            trailingIconContentColor = CatppuccinUI.Subtext0Color
+                            containerColor = AppTheme.colors.Foreground0Color,
+                            labelColor = AppTheme.colors.TextColorLight,
+                            trailingIconContentColor = AppTheme.colors.Subtext0Color
                         ),
-                        border = BorderStroke(1.dp, CatppuccinUI.Foreground1Color)
+                        border = BorderStroke(1.dp, AppTheme.colors.Foreground1Color)
                     )
                 }
             }

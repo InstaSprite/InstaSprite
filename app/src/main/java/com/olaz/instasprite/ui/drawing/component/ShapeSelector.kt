@@ -20,7 +20,7 @@ import com.olaz.instasprite.domain.tool.shape.LineTool
 import com.olaz.instasprite.domain.tool.shape.OvalTool
 import com.olaz.instasprite.domain.tool.shape.RectangleTool
 import com.olaz.instasprite.domain.tool.Tool
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ShapeSelector(
@@ -46,7 +46,7 @@ fun ShapeSelector(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(CatppuccinUI.BackgroundColor)
+                .background(AppTheme.colors.BackgroundColor)
                 .padding(horizontal = 5.dp, vertical = 5.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {

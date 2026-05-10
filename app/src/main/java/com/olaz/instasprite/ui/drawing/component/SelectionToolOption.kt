@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.components.composable.TitledBox
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun SelectionToolOption(
@@ -35,51 +35,51 @@ fun SelectionToolOption(
         ) {
         TitledBox(
             title = "Selection Option",
-            titleBackgroundColor = CatppuccinUI.BackgroundColorDarker
+            titleBackgroundColor = AppTheme.colors.BackgroundColorDarker
         ) {
             Row(
                 modifier = Modifier
                     .height(40.dp)
-                    .background(CatppuccinUI.BackgroundColor)
+                    .background(AppTheme.colors.BackgroundColor)
             )
             {
                 TextButton(
                     onClick = onClearSelect,
                     modifier = Modifier
-                        .background(CatppuccinUI.BackgroundColor)
+                        .background(AppTheme.colors.BackgroundColor)
                 ) {
                     Text(
                         text = "Clear",
-                        color = CatppuccinUI.DismissButtonColor
+                        color = AppTheme.colors.DismissButtonColor
                     )
                 }
 
                 TextButton(
                     onClick = onInvertSelect,
                     modifier = Modifier
-                        .background(CatppuccinUI.BackgroundColor)
+                        .background(AppTheme.colors.BackgroundColor)
                 ) {
                     Text(
                         text = "Invert",
-                        color = CatppuccinUI.TextColorLight
+                        color = AppTheme.colors.TextColorLight
                     )
                 }
 
                 TextButton(
                     onClick = { onAppendModeToggle(!isAppendMode) },
                     modifier = Modifier
-                        .background(CatppuccinUI.BackgroundColor)
+                        .background(AppTheme.colors.BackgroundColor)
                 ) {
                     Checkbox(
                         checked = isAppendMode,
                         onCheckedChange = onAppendModeToggle,
                         modifier = Modifier
-                            .background(CatppuccinUI.BackgroundColor)
+                            .background(AppTheme.colors.BackgroundColor)
                             .width(35.dp)
                     )
                     Text(
                         text = "Append",
-                        color = CatppuccinUI.TextColorLight
+                        color = AppTheme.colors.TextColorLight
                     )
                 }
             }

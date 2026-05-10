@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.social.profile.contract.FollowerUser
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun FollowersDialog(
@@ -50,7 +50,7 @@ fun FollowersDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = CatppuccinUI.BackgroundColorDarker,
+        containerColor = AppTheme.colors.BackgroundColorDarker,
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -58,7 +58,7 @@ fun FollowersDialog(
             ) {
                 Text(
                     text = stringResource(R.string.followers),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -75,12 +75,12 @@ fun FollowersDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator(
-                            color = CatppuccinUI.BottomBarColor
+                            color = AppTheme.colors.BottomBarColor
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = stringResource(R.string.loading_followers),
-                            color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                             fontSize = 12.sp
                         )
                     }
@@ -94,7 +94,7 @@ fun FollowersDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.no_followers),
-                        color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                         fontSize = 14.sp
                     )
                 }
@@ -118,12 +118,12 @@ fun FollowersDialog(
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = CatppuccinUI.BottomBarColor
+                    containerColor = AppTheme.colors.BottomBarColor
                 )
             ) {
                 Text(
                     text = stringResource(R.string.close),
-                    color = CatppuccinUI.TextColorLight
+                    color = AppTheme.colors.TextColorLight
                 )
             }
         },
@@ -181,14 +181,14 @@ private fun FollowerItem(
         ) {
             Text(
                 text = follower.username,
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
             if (follower.displayName.isNotEmpty()) {
                 Text(
                     text = follower.displayName,
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
                     fontSize = 12.sp
                 )
             }
@@ -200,11 +200,11 @@ private fun FollowerItem(
             OutlinedButton(
                 onClick = { onFollowClick(follower.id) },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = CatppuccinUI.TextColorLight
+                    contentColor = AppTheme.colors.TextColorLight
                 ),
                 border = androidx.compose.foundation.BorderStroke(
                     width = 0.5.dp,
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.3f)
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f)
                 )
             ) {
                 Text(

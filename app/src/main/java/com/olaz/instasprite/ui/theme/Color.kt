@@ -3,7 +3,19 @@ package com.olaz.instasprite.ui.theme
 
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class ThemeFlavour(val label: String) {
+//    LATTE("Latte"),
+    FRAPPE("Frappé"),
+    MACCHIATO("Macchiato"),
+    MOCHA("Mocha")
+//    val isLight: Boolean get() = this == LATTE
+}
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
@@ -13,7 +25,7 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-private interface CatppuccinColors {
+interface CatppuccinColors {
     val Rosewater: Color
     val Flamingo: Color
     val Pink: Color
@@ -159,107 +171,152 @@ object Catppuccin {
         override val Crust: Color = Color(0xff11111b)
     }
 
-    var CurrentPalette = Mocha
+    fun fromFlavour(flavour: ThemeFlavour): CatppuccinColors = when (flavour) {
+//        ThemeFlavour.LATTE -> Latte
+        ThemeFlavour.FRAPPE -> Frappe
+        ThemeFlavour.MACCHIATO -> Macchiato
+        ThemeFlavour.MOCHA -> Mocha
+    }
+
+    fun toAppColors(palette: CatppuccinColors): AppColors = AppColors(
+        BackgroundColor = palette.Base,
+        BackgroundColorDarker = palette.Crust,
+
+        Foreground0Color = palette.Surface0,
+        Foreground1Color = palette.Surface1,
+        Foreground2Color = palette.Surface2,
+
+        TextColorLight = palette.Text,
+        Subtext0Color = palette.Overlay1,
+        Subtext1Color = palette.Overlay2,
+        TextColorDark = palette.Mantle,
+
+        SelectedColor = palette.Mauve,
+        AccentButtonColor = palette.Green,
+        DismissButtonColor = palette.Red,
+        LinkColor = palette.Blue,
+        WarningColor = palette.Peach,
+        InfoColor = palette.Flamingo,
+        SecondaryAccentColor = palette.Lavender,
+        ErrorDarkColor = palette.Maroon,
+
+        BarColor = palette.Mantle,
+        DialogColor = palette.Mantle,
+
+        InactiveColor = palette.Overlay0,
+    )
 }
 
-object CatppuccinUI {
-    var CurrentPalette = Catppuccin.CurrentPalette
+data class AppColors(
+    val BackgroundColor: Color,
+    val BackgroundColorDarker: Color,
 
-    val BackgroundColor = CurrentPalette.Base
-    val BackgroundColorDarker = CurrentPalette.Crust
+    val Foreground0Color: Color,
+    val Foreground1Color: Color,
+    val Foreground2Color: Color,
 
-    val Foreground0Color = CurrentPalette.Surface0
-    val Foreground1Color = CurrentPalette.Surface1
-    val Foreground2Color = CurrentPalette.Surface2
+    val TextColorLight: Color,
+    val Subtext0Color: Color,
+    val Subtext1Color: Color,
+    val TextColorDark: Color,
 
-    val SelectedColor = CurrentPalette.Mauve
+    val SelectedColor: Color,
+    val AccentButtonColor: Color,
+    val DismissButtonColor: Color,
+    val LinkColor: Color,
+    val WarningColor: Color,
+    val InfoColor: Color,
+    val SecondaryAccentColor: Color,
+    val ErrorDarkColor: Color,
 
-    val TextColorLight = CurrentPalette.Text
-    val Subtext0Color = CurrentPalette.Overlay1
-    val Subtext1Color = CurrentPalette.Overlay2
-    val TextColorDark = CurrentPalette.Mantle
+    val BarColor: Color,
+    val DialogColor: Color,
 
-    val AccentButtonColor = CurrentPalette.Green
-    val DismissButtonColor = CurrentPalette.Red
+    val InactiveColor: Color,
 
-    val TopBarColor = CurrentPalette.Mantle
-    val BottomBarColor = CurrentPalette.Mantle
+    val CanvasChecker1Color: Color = Color(0xFF808080),
+    val CanvasChecker2Color: Color = Color(0xFFC0C0C0),
+) {
+    // Derived aliases for backward compatibility
+    val TopBarColor: Color get() = BarColor
+    val BottomBarColor: Color get() = BarColor
+    val DropDownMenuColor: Color get() = BarColor
 
-    val DropDownMenuColor = CurrentPalette.Mantle
-    val DialogColor = CurrentPalette.Mantle
+    @Composable
+    fun outlineTextFieldColors() =
+        OutlinedTextFieldDefaults.colors(
 
-    val CanvasChecker1Color = Color(0xFF808080)
-    val CanvasChecker2Color = Color(0xFFC0C0C0)
+            // Container
+            focusedContainerColor = BackgroundColor,
+            disabledContainerColor = BackgroundColor,
+            unfocusedContainerColor = BackgroundColor,
+            errorContainerColor = BackgroundColor,
 
-    object OutlineTextFieldColors {
-        @Composable
-        fun colors() =
-            OutlinedTextFieldDefaults.colors(
+            // Text Colors
+            focusedTextColor = TextColorLight,
+            unfocusedTextColor = TextColorLight,
+            disabledTextColor = TextColorLight,
+            errorTextColor = DismissButtonColor,
 
-                // Container
-                focusedContainerColor = BackgroundColor,
-                disabledContainerColor = BackgroundColor,
-                unfocusedContainerColor = BackgroundColor,
-                errorContainerColor = BackgroundColor,
+            // Cursor
+            cursorColor = TextColorLight,
+            errorCursorColor = DismissButtonColor,
 
+            // Indicator (border)
+            focusedBorderColor = Foreground2Color,
+            unfocusedBorderColor = Foreground2Color,
+            disabledBorderColor = Foreground2Color,
+            errorBorderColor = DismissButtonColor,
 
-                // Text Colors
-                focusedTextColor = TextColorLight,
-                unfocusedTextColor = TextColorLight,
-                disabledTextColor = TextColorLight,
-                errorTextColor = CurrentPalette.Red,
+            // Leading Icons
+            focusedLeadingIconColor = AccentButtonColor,
+            unfocusedLeadingIconColor = AccentButtonColor,
+            disabledLeadingIconColor = AccentButtonColor,
+            errorLeadingIconColor = DismissButtonColor,
 
-                // Cursor
-                cursorColor = TextColorLight,
-                errorCursorColor = CurrentPalette.Red,
+            // Trailing Icons
+            focusedTrailingIconColor = LinkColor,
+            unfocusedTrailingIconColor = LinkColor,
+            disabledTrailingIconColor = LinkColor,
+            errorTrailingIconColor = DismissButtonColor,
 
-                // Indicator (border)
-                focusedBorderColor = Foreground2Color,
-                unfocusedBorderColor = Foreground2Color,
-                disabledBorderColor = Foreground2Color,
-                errorBorderColor = CurrentPalette.Red,
+            // Labels
+            focusedLabelColor = SelectedColor,
+            unfocusedLabelColor = SelectedColor,
+            disabledLabelColor = SelectedColor,
+            errorLabelColor = DismissButtonColor,
 
-                // Leading Icons
-                focusedLeadingIconColor = CurrentPalette.Green,
-                unfocusedLeadingIconColor = CurrentPalette.Green,
-                disabledLeadingIconColor = CurrentPalette.Green,
-                errorLeadingIconColor = CurrentPalette.Red,
+            // Placeholders
+            focusedPlaceholderColor = Subtext1Color,
+            unfocusedPlaceholderColor = Subtext1Color,
+            disabledPlaceholderColor = Subtext1Color,
+            errorPlaceholderColor = DismissButtonColor,
 
-                // Trailing Icons
-                focusedTrailingIconColor = CurrentPalette.Blue,
-                unfocusedTrailingIconColor = CurrentPalette.Blue,
-                disabledTrailingIconColor = CurrentPalette.Blue,
-                errorTrailingIconColor = CurrentPalette.Red,
+            // Supporting Text
+            focusedSupportingTextColor = Subtext1Color,
+            unfocusedSupportingTextColor = Subtext1Color,
+            disabledSupportingTextColor = Subtext1Color,
+            errorSupportingTextColor = DismissButtonColor,
 
-                // Labels
-                focusedLabelColor = SelectedColor,
-                unfocusedLabelColor = SelectedColor,
-                disabledLabelColor = SelectedColor,
-                errorLabelColor = CurrentPalette.Red,
+            // Prefix
+            focusedPrefixColor = Subtext1Color,
+            unfocusedPrefixColor = Subtext1Color,
+            disabledPrefixColor = Subtext1Color,
+            errorPrefixColor = DismissButtonColor,
 
-                // Placeholders
-                focusedPlaceholderColor = Subtext1Color,
-                unfocusedPlaceholderColor = Subtext1Color,
-                disabledPlaceholderColor = Subtext1Color,
-                errorPlaceholderColor = CurrentPalette.Red,
-
-                // Supporting Text
-                focusedSupportingTextColor = Subtext1Color,
-                unfocusedSupportingTextColor = Subtext1Color,
-                disabledSupportingTextColor = Subtext1Color,
-                errorSupportingTextColor = CurrentPalette.Red,
-
-                // Prefix
-                focusedPrefixColor = Subtext1Color,
-                unfocusedPrefixColor = Subtext1Color,
-                disabledPrefixColor = Subtext1Color,
-                errorPrefixColor = CurrentPalette.Red,
-
-                // Suffix
-                focusedSuffixColor = Subtext1Color,
-                unfocusedSuffixColor = Subtext1Color,
-                disabledSuffixColor = Subtext1Color,
-                errorSuffixColor = CurrentPalette.Red,
+            // Suffix
+            focusedSuffixColor = Subtext1Color,
+            unfocusedSuffixColor = Subtext1Color,
+            disabledSuffixColor = Subtext1Color,
+            errorSuffixColor = DismissButtonColor,
         )
-    }
+}
+
+val LocalAppColors = staticCompositionLocalOf { Catppuccin.toAppColors(Catppuccin.Mocha) }
+
+object AppTheme {
+    val colors: AppColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppColors.current
 }

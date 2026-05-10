@@ -27,7 +27,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.social.feed.PostFilter
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +46,7 @@ fun PostFilterDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = CatppuccinUI.DialogColor,
+        containerColor = AppTheme.colors.DialogColor,
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -54,7 +54,7 @@ fun PostFilterDialog(
             ) {
                 Text(
                     text = stringResource(R.string.filter_posts),
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -85,8 +85,8 @@ fun PostFilterDialog(
                         RadioButton(
                             selected = filter == selectedOption.value,
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = CatppuccinUI.SelectedColor,
-                                unselectedColor = CatppuccinUI.Foreground2Color
+                                selectedColor = AppTheme.colors.SelectedColor,
+                                unselectedColor = AppTheme.colors.Foreground2Color
                             ),
                             onClick = null
                         )

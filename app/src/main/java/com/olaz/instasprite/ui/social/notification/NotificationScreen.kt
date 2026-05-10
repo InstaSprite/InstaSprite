@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.social.notification.composable.NotificationItem
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.utils.UiUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,8 +47,8 @@ fun NotificationScreen(
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 
-    UiUtils.SetStatusBarColor(CatppuccinUI.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColorDarker)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColorDarker)
 
     Scaffold(
         topBar = {
@@ -58,7 +58,7 @@ fun NotificationScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = CatppuccinUI.TextColorLight
+                            tint = AppTheme.colors.TextColorLight
                         )
                     }
                 },
@@ -67,11 +67,11 @@ fun NotificationScreen(
                         stringResource(R.string.notifications),
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = CatppuccinUI.TextColorLight
+                        color = AppTheme.colors.TextColorLight
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CatppuccinUI.TopBarColor,
+                    containerColor = AppTheme.colors.TopBarColor,
                 )
             )
         }
@@ -80,17 +80,17 @@ fun NotificationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(CatppuccinUI.BackgroundColor)
+                .background(AppTheme.colors.BackgroundColor)
         ) {
             if (uiState.notifications.isEmpty() && uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = CatppuccinUI.SelectedColor
+                    color = AppTheme.colors.SelectedColor
                 )
             } else if (uiState.notifications.isEmpty()) {
                 Text(
                     text = "No notifications yet.",
-                    color = CatppuccinUI.TextColorLight.copy(alpha = 0.5f),
+                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
@@ -132,7 +132,7 @@ fun NotificationScreen(
                                     .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+                                CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
                             }
                         }
                     }

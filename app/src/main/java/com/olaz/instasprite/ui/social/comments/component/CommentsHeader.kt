@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun CommentsHeader(
@@ -28,7 +28,7 @@ fun CommentsHeader(
     ) {
         Text(
             text = "${stringResource(R.string.comments)} ($commentsCount)",
-            color = CatppuccinUI.TextColorLight,
+            color = AppTheme.colors.TextColorLight,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold
         )

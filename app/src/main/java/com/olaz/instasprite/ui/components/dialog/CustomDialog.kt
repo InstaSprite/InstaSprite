@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun CustomDialog(
@@ -27,12 +27,12 @@ fun CustomDialog(
     onConfirm: () -> Unit,
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
-    confirmButtonColor: Color = CatppuccinUI.AccentButtonColor,
+    confirmButtonColor: Color = AppTheme.colors.AccentButtonColor,
     content: @Composable () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = CatppuccinUI.DialogColor,
+        containerColor = AppTheme.colors.DialogColor,
         shape = RoundedCornerShape(10.dp),
         title = {
             if (title != null)
@@ -43,7 +43,7 @@ fun CustomDialog(
                 ) {
                     Text(
                         text = title,
-                        color = CatppuccinUI.TextColorLight,
+                        color = AppTheme.colors.TextColorLight,
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -62,12 +62,12 @@ fun CustomDialog(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor,)
             ) {
-                Text(confirmButtonText, color = CatppuccinUI.TextColorDark)
+                Text(confirmButtonText, color = AppTheme.colors.TextColorDark)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(dismissButtonText, color = CatppuccinUI.TextColorLight)
+                Text(dismissButtonText, color = AppTheme.colors.TextColorLight)
             }
         }
     )

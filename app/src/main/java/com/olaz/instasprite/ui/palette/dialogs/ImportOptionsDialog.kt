@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ImportOptionsDialog(
@@ -34,7 +34,7 @@ fun ImportOptionsDialog(
             modifier = Modifier
                 .width(300.dp)
                 .background(
-                    color = CatppuccinUI.DialogColor,
+                    color = AppTheme.colors.DialogColor,
                     shape = RoundedCornerShape(10.dp)
                 )
                 .padding(20.dp)
@@ -51,31 +51,31 @@ fun ImportOptionsDialog(
                 Button(
                     onClick = onLospecSelected,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.AccentButtonColor
+                        containerColor = AppTheme.colors.AccentButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Import from Lospec", color = CatppuccinUI.TextColorDark)
+                    Text(text = "Import from Lospec", color = AppTheme.colors.TextColorDark)
                 }
 
                 Button(
                     onClick = onFileSelected,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.AccentButtonColor
+                        containerColor = AppTheme.colors.AccentButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Import from File", color = CatppuccinUI.TextColorDark)
+                    Text("Import from File", color = AppTheme.colors.TextColorDark)
                 }
 
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.DismissButtonColor
+                        containerColor = AppTheme.colors.DismissButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Cancel", color = CatppuccinUI.TextColorDark)
+                    Text("Cancel", color = AppTheme.colors.TextColorDark)
                 }
             }
         }

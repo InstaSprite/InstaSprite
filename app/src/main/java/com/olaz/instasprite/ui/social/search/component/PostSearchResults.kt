@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.domain.model.MemberData
 import com.olaz.instasprite.domain.model.PostData
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import java.time.LocalDateTime
 
 @Composable
@@ -31,7 +31,7 @@ fun PostSearchResults(
         ) {
             Text(
                 text = "No posts found",
-                color = CatppuccinUI.Subtext0Color,
+                color = AppTheme.colors.Subtext0Color,
                 fontSize = 14.sp
             )
         }

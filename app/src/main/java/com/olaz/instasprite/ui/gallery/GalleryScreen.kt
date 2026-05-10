@@ -48,7 +48,7 @@ import com.olaz.instasprite.ui.gallery.contract.SearchBarContract
 import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
 import com.olaz.instasprite.ui.home.component.HomeBottomBar
 import com.olaz.instasprite.ui.home.component.HomeFab
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.cancel
@@ -72,8 +72,8 @@ fun GalleryScreen(
     onNavigateToLoadImage: () -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
-    UiUtils.SetStatusBarColor(CatppuccinUI.TopBarColor)
-    UiUtils.SetNavigationBarColor(CatppuccinUI.BottomBarColor)
+    UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
 
     val uiState by viewModel.uiState.collectAsState()
     val dialogState by viewModel.dialogState.collectAsState()
@@ -168,7 +168,7 @@ fun GalleryPageContent(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(CatppuccinUI.BackgroundColorDarker)
+            .background(AppTheme.colors.BackgroundColorDarker)
             .animateContentSize()
     ) {
         SpriteList(
@@ -198,7 +198,7 @@ private fun GalleryScreenContent(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .background(CatppuccinUI.TopBarColor)
+                        .background(AppTheme.colors.TopBarColor)
                         .height(56.dp)
                 ) {
                     Text(
@@ -236,7 +236,7 @@ private fun GalleryScreenContent(
                     .padding(innerPadding)
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .background(CatppuccinUI.BackgroundColorDarker)
+                    .background(AppTheme.colors.BackgroundColorDarker)
                     .animateContentSize()
             ) {
                 SpriteList(
@@ -303,7 +303,7 @@ private fun GalleryScreenPreview() {
                                         width = 16,
                                         height = 16,
                                         pixels = IntArray(16 * 16) {
-                                            CatppuccinUI.CurrentPalette.Flamingo.toArgb()
+                                            AppTheme.colors.InfoColor.toArgb()
                                         }
                                     )
                                 )
@@ -329,7 +329,7 @@ private fun GalleryScreenPreview() {
                                         width = 16,
                                         height = 16,
                                         pixels = IntArray(16 * 16) {
-                                            CatppuccinUI.CurrentPalette.Lavender.toArgb()
+                                            AppTheme.colors.SecondaryAccentColor.toArgb()
                                         }
                                     )
                                 )

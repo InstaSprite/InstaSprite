@@ -25,7 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.olaz.instasprite.ui.social.feed.component.PostList
 import com.olaz.instasprite.ui.social.feed.contract.FeedContentState
 import com.olaz.instasprite.ui.social.feed.contract.FeedScreenEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +94,7 @@ fun HashtagFeedScreenContent(
                 title = {
                     Text(
                         text = "#$hashtag",
-                        color = CatppuccinUI.TextColorLight,
+                        color = AppTheme.colors.TextColorLight,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
@@ -104,12 +104,12 @@ fun HashtagFeedScreenContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = CatppuccinUI.TextColorLight
+                            tint = AppTheme.colors.TextColorLight
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CatppuccinUI.BackgroundColorDarker
+                    containerColor = AppTheme.colors.BackgroundColorDarker
                 )
             )
         }
@@ -117,7 +117,7 @@ fun HashtagFeedScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(CatppuccinUI.BackgroundColorDarker)
+                .background(AppTheme.colors.BackgroundColorDarker)
                 .padding(paddingValues)
         ) {
             PostList(

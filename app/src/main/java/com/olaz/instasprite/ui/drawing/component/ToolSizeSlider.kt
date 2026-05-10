@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 @Composable
@@ -28,7 +28,7 @@ fun ToolSizeSlider(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .background(
-                color = CatppuccinUI.BackgroundColor,
+                color = AppTheme.colors.BackgroundColor,
             )
             .height(height)
     ) {
@@ -38,7 +38,7 @@ fun ToolSizeSlider(
         ) {
             Text(
                 text = "${toolSizeValue}px",
-                color = CatppuccinUI.TextColorLight,
+                color = AppTheme.colors.TextColorLight,
             )
         }
 

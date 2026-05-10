@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.domain.model.SelectionState
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
 import com.olaz.instasprite.domain.tool.EraserTool
@@ -267,8 +267,8 @@ private fun DrawScope.drawGridOverlay(
 fun Modifier.drawCheckerboard(
     canvasWidth: Int,
     canvasHeight: Int,
-    checkerColor1: Color = CatppuccinUI.CanvasChecker1Color,
-    checkerColor2: Color = CatppuccinUI.CanvasChecker2Color
+    checkerColor1: Color = Color(0xFF808080),
+    checkerColor2: Color = Color(0xFFC0C0C0)
 ): Modifier = this.drawWithCache {
     if (canvasWidth == 0 || canvasHeight == 0) {
         return@drawWithCache onDrawBehind {}

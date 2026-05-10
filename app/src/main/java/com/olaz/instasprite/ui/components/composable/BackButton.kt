@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @Composable
 fun BackButton(
     onClick: () -> Unit,
-    color: Color = CatppuccinUI.DismissButtonColor
+    color: Color = AppTheme.colors.DismissButtonColor
 ) {
     IconButton(onClick = onClick) {
         Icon(

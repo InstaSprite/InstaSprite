@@ -1,6 +1,7 @@
 package com.olaz.instasprite.utils
 
 import android.content.Context
+import com.olaz.instasprite.ui.theme.ThemeFlavour
 import android.content.res.Configuration
 import com.olaz.instasprite.data.model.DrawSetting
 import com.olaz.instasprite.data.model.SettingPreferences
@@ -13,9 +14,6 @@ object AppSettings {
 
     fun onAttach(context: Context): Context {
         val settings = getPersistedSettings(context)
-
-        applyTheme(settings.isDarkMode)
-
         return updateResources(context, settings.language)
     }
 
@@ -23,8 +21,8 @@ object AppSettings {
         return getPersistedSettings(context).language
     }
 
-    fun isDarkMode(context: Context): Boolean {
-        return getPersistedSettings(context).isDarkMode
+    fun getThemeFlavour(context: Context): ThemeFlavour {
+        return getPersistedSettings(context).themeFlavour
     }
 
     fun getDrawSetting(context: Context): DrawSetting {
@@ -36,9 +34,8 @@ object AppSettings {
         return updateResources(context, language)
     }
 
-    fun setDarkMode(context: Context, isDark: Boolean) {
-        persist(context) { it.copy(isDarkMode = isDark) }
-        applyTheme(isDark)
+    fun setThemeFlavour(context: Context, flavour: ThemeFlavour) {
+        persist(context) { it.copy(themeFlavour = flavour) }
     }
 
     fun setDrawSetting(context: Context, setting: DrawSetting) {
@@ -62,10 +59,6 @@ object AppSettings {
 
     private fun persist(context: Context, transform: (SettingPreferences) -> SettingPreferences) = runBlocking {
         context.settingsDataStore.updateData(transform)
-    }
-
-    private fun applyTheme(isDark: Boolean) {
-
     }
 
     private fun updateResources(context: Context, language: String): Context {

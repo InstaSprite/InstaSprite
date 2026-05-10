@@ -1,6 +1,7 @@
 package com.olaz.instasprite.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -77,27 +78,27 @@ val Typography = Typography(
     )
 )
 
-val CatppuccinTypography: Typography = Typography().run {
+fun buildCatppuccinTypography(colors: AppColors): Typography = Typography().run {
     copy(
-        displayLarge = displayLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        displayMedium = displayMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        displaySmall = displaySmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        displayLarge = displayLarge.withFontAndColor(RetronFont, colors.TextColorLight),
+        displayMedium = displayMedium.withFontAndColor(RetronFont, colors.TextColorLight),
+        displaySmall = displaySmall.withFontAndColor(RetronFont, colors.TextColorLight),
 
-        headlineLarge = headlineLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        headlineMedium = headlineMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        headlineSmall = headlineSmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        headlineLarge = headlineLarge.withFontAndColor(RetronFont, colors.TextColorLight),
+        headlineMedium = headlineMedium.withFontAndColor(RetronFont, colors.TextColorLight),
+        headlineSmall = headlineSmall.withFontAndColor(RetronFont, colors.TextColorLight),
 
-        titleLarge = titleLarge.withFontAndColor(RetronFont, CatppuccinUI.Subtext1Color),
-        titleMedium = titleMedium.withFontAndColor(RetronFont, CatppuccinUI.Subtext1Color),
-        titleSmall = titleSmall.withFontAndColor(RetronFont, CatppuccinUI.Subtext1Color),
+        titleLarge = titleLarge.withFontAndColor(RetronFont, colors.Subtext1Color),
+        titleMedium = titleMedium.withFontAndColor(RetronFont, colors.Subtext1Color),
+        titleSmall = titleSmall.withFontAndColor(RetronFont, colors.Subtext1Color),
 
-        bodyLarge = bodyLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        bodyMedium = bodyMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        bodySmall = bodySmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        bodyLarge = bodyLarge.withFontAndColor(RetronFont, colors.TextColorLight),
+        bodyMedium = bodyMedium.withFontAndColor(RetronFont, colors.TextColorLight),
+        bodySmall = bodySmall.withFontAndColor(RetronFont, colors.TextColorLight),
 
-        labelLarge = labelLarge.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        labelMedium = labelMedium.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
-        labelSmall = labelSmall.withFontAndColor(RetronFont, CatppuccinUI.TextColorLight),
+        labelLarge = labelLarge.withFontAndColor(RetronFont, colors.TextColorLight),
+        labelMedium = labelMedium.withFontAndColor(RetronFont, colors.TextColorLight),
+        labelSmall = labelSmall.withFontAndColor(RetronFont, colors.TextColorLight),
     )
 }
 

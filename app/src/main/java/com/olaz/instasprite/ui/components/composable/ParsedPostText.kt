@@ -9,7 +9,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 val HASHTAG_REGEX = Regex("(#[\\w]+)")
 val MENTION_REGEX = Regex("(@[\\w]+)")
@@ -18,8 +18,8 @@ val MENTION_REGEX = Regex("(@[\\w]+)")
 fun ParsedPostText(
     text: String,
     modifier: Modifier = Modifier,
-    textColor: Color = CatppuccinUI.TextColorLight,
-    linkColor: Color = CatppuccinUI.CurrentPalette.Blue,
+    textColor: Color = AppTheme.colors.TextColorLight,
+    linkColor: Color = AppTheme.colors.LinkColor,
     style: TextStyle = TextStyle.Default,
     onHashtagClick: (String) -> Unit = {},
     onMentionClick: (String) -> Unit = {},

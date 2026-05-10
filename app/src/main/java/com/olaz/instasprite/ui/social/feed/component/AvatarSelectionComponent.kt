@@ -38,7 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun AvatarSelectionComponent(
@@ -63,7 +63,7 @@ fun AvatarSelectionComponent(
             text = "Profile Picture",
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
-            color = CatppuccinUI.TextColorLight,
+            color = AppTheme.colors.TextColorLight,
             textAlign = TextAlign.Center
         )
 
@@ -76,10 +76,10 @@ fun AvatarSelectionComponent(
                 .clip(CircleShape)
                 .border(
                     width = 3.dp,
-                    color = CatppuccinUI.BottomBarColor,
+                    color = AppTheme.colors.BottomBarColor,
                     shape = CircleShape
                 )
-                .background(CatppuccinUI.BackgroundColorDarker)
+                .background(AppTheme.colors.BackgroundColorDarker)
                 .clickable { showImagePicker = true },
             contentAlignment = Alignment.Center
         ) {
@@ -96,7 +96,7 @@ fun AvatarSelectionComponent(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add Avatar",
                     modifier = Modifier.size(48.dp),
-                    tint = CatppuccinUI.TextColorLight.copy(alpha = 0.7f)
+                    tint = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                 )
             }
         }
@@ -109,11 +109,11 @@ fun AvatarSelectionComponent(
             onClick = { imagePickerLauncher.launch("image/*") },
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = CatppuccinUI.TextColorLight
+                contentColor = AppTheme.colors.TextColorLight
             ),
             border = BorderStroke(
                 1.dp,
-                CatppuccinUI.BottomBarColor
+                AppTheme.colors.BottomBarColor
             )
         ) {
             Icon(
@@ -132,7 +132,7 @@ fun AvatarSelectionComponent(
             TextButton(
                 onClick = { onImageSelected(null) },
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = CatppuccinUI.TextColorLight.copy(alpha = 0.7f)
+                    contentColor = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                 )
             ) {
                 Text("Remove Image")

@@ -38,7 +38,7 @@ import com.olaz.instasprite.ui.drawing.contract.CursorDrawEvent
 import com.olaz.instasprite.ui.drawing.contract.CursorState
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasEvent
 import com.olaz.instasprite.ui.drawing.contract.PixelCanvasState
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.cursorPointerInput
 import com.olaz.instasprite.utils.drawCheckerboard
@@ -130,6 +130,8 @@ fun PixelCanvas(
         )
     }
 
+    val canvasBorderColor = AppTheme.colors.BackgroundColor
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -143,10 +145,10 @@ fun PixelCanvas(
                     translationX = offset.x,
                     translationY = offset.y
                 )
-//                .border(borderSize, CatppuccinUI.BackgroundColor)
+//                .border(borderSize, AppTheme.colors.BackgroundColor)
                 .drawBehind(onDraw = {
                     drawRect(
-                        color = CatppuccinUI.BackgroundColor
+                        color = canvasBorderColor
                     )
                 })
                 .padding(borderSize)

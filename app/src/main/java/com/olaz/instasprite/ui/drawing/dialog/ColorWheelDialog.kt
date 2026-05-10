@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -53,8 +54,7 @@ import androidx.core.graphics.toRect
 import com.olaz.instasprite.ui.components.composable.ColorItem
 import com.olaz.instasprite.ui.components.composable.ColorPaletteView
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import android.graphics.Color as AndroidColor
@@ -167,7 +167,7 @@ fun ColorWheelDialog(
                         modifier = Modifier
                             .padding(start = 8.dp)
                             .size(40.dp)
-                            .border(width = 5.dp, color = CatppuccinUI.BackgroundColorDarker)
+                            .border(width = 5.dp, color = AppTheme.colors.BackgroundColorDarker)
                     )
                 }
 
@@ -190,7 +190,7 @@ fun ColorWheelDialog(
                             updateColorFromHex()
                         },
                         label = "Hex",
-                        labelColor = CatppuccinUI.SelectedColor,
+                        labelColor = AppTheme.colors.SelectedColor,
                         placeholder = "FFFFFF",
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -210,7 +210,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "R",
-                            labelColor = CatppuccinUI.CurrentPalette.Red,
+                            labelColor = AppTheme.colors.DismissButtonColor,
                             placeholder = "0",
                             modifier = Modifier.weight(0.2f),
                             keyboardType = KeyboardType.Number
@@ -227,7 +227,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "G",
-                            labelColor = CatppuccinUI.CurrentPalette.Green,
+                            labelColor = AppTheme.colors.AccentButtonColor,
                             placeholder = "0",
                             modifier = Modifier.weight(0.2f),
                             keyboardType = KeyboardType.Number
@@ -244,7 +244,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "B",
-                            labelColor = CatppuccinUI.CurrentPalette.Blue,
+                            labelColor = AppTheme.colors.LinkColor,
                             placeholder = "0",
                             modifier = Modifier.weight(0.2f),
                             keyboardType = KeyboardType.Number
@@ -255,11 +255,11 @@ fun ColorWheelDialog(
                 Button(
                     onClick = onOpenPaletteScreen,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CatppuccinUI.AccentButtonColor
+                        containerColor = AppTheme.colors.AccentButtonColor
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Choose another palette", color = CatppuccinUI.TextColorDark)
+                    Text(text = "Choose another palette", color = AppTheme.colors.TextColorDark)
                 }
             }
         }
@@ -281,16 +281,16 @@ private fun ColorInputTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, color = labelColor) },
-        textStyle = CatppuccinTypography.bodyLarge,
+        textStyle = MaterialTheme.typography.bodyLarge,
         placeholder = {
             Text(
                 placeholder,
-                color = CatppuccinUI.Subtext0Color,
-                style = CatppuccinTypography.bodyLarge
+                color = AppTheme.colors.Subtext0Color,
+                style = MaterialTheme.typography.bodyLarge
             )
         },
         singleLine = true,
-        colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+        colors = AppTheme.colors.outlineTextFieldColors(),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         modifier = modifier
     )
@@ -314,7 +314,7 @@ private fun HueBar(
         modifier = modifier
             .border(
                 width = 5.dp,
-                color = CatppuccinUI.BackgroundColorDarker
+                color = AppTheme.colors.BackgroundColorDarker
             )
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
@@ -404,7 +404,7 @@ private fun SatValPanel(
             .height(200.dp)
             .border(
                 width = 5.dp,
-                color = CatppuccinUI.BackgroundColorDarker,
+                color = AppTheme.colors.BackgroundColorDarker,
                 shape = RectangleShape
             )
             .emitDragGesture(interactionSource)

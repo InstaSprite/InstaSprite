@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -29,8 +30,7 @@ import com.olaz.instasprite.ui.components.composable.NumberStepper
 import com.olaz.instasprite.ui.loadimage.LoadImageScreenEvent
 import com.olaz.instasprite.ui.loadimage.contract.ImageConfigEvent
 import com.olaz.instasprite.ui.loadimage.contract.LoadImageUiState
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 
@@ -50,8 +50,8 @@ fun ImageConfigView(
 
         PrimaryTabRow(
             selectedTabIndex = uiState.selectedTabIndex,
-            containerColor = CatppuccinUI.BackgroundColor,
-            contentColor = CatppuccinUI.TextColorLight
+            containerColor = AppTheme.colors.BackgroundColor,
+            contentColor = AppTheme.colors.TextColorLight
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
@@ -60,12 +60,12 @@ fun ImageConfigView(
                     text = {
                         Text(
                             title,
-                            color = CatppuccinUI.TextColorLight,
-                            style = CatppuccinTypography.bodyMedium
+                            color = AppTheme.colors.TextColorLight,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     },
-                    selectedContentColor = CatppuccinUI.AccentButtonColor,
-                    unselectedContentColor = CatppuccinUI.TextColorLight
+                    selectedContentColor = AppTheme.colors.AccentButtonColor,
+                    unselectedContentColor = AppTheme.colors.TextColorLight
                 )
             }
         }
@@ -123,15 +123,15 @@ private fun AdvancedSettingTab(
         ) {
             Text(
                 "Enable Dithering",
-                color = CatppuccinUI.TextColorLight,
-                style = CatppuccinTypography.bodyMedium
+                color = AppTheme.colors.TextColorLight,
+                style = MaterialTheme.typography.bodyMedium
             )
             Switch(
                 checked = uiState.config.enableDithering,
                 onCheckedChange = { event.onConfigEvent(ImageConfigEvent.DitheringChange(it)) },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = CatppuccinUI.TextColorDark,
-                    checkedTrackColor = CatppuccinUI.AccentButtonColor
+                    checkedThumbColor = AppTheme.colors.TextColorDark,
+                    checkedTrackColor = AppTheme.colors.AccentButtonColor
                 )
             )
         }
@@ -145,15 +145,15 @@ private fun AdvancedSettingTab(
         ) {
             Text(
                 "Apply Custom Palette",
-                color = CatppuccinUI.TextColorLight,
-                style = CatppuccinTypography.bodyMedium
+                color = AppTheme.colors.TextColorLight,
+                style = MaterialTheme.typography.bodyMedium
             )
             Switch(
                 checked = uiState.applyPalette,
                 onCheckedChange = { event.onConfigEvent(ImageConfigEvent.ApplyPaletteChange(it)) },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = CatppuccinUI.TextColorDark,
-                    checkedTrackColor = CatppuccinUI.AccentButtonColor
+                    checkedThumbColor = AppTheme.colors.TextColorDark,
+                    checkedTrackColor = AppTheme.colors.AccentButtonColor
                 )
             )
         }

@@ -10,15 +10,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.olaz.instasprite.data.model.SettingPreferences
+import com.olaz.instasprite.di.settingsDataStore
 import com.olaz.instasprite.navigation.EntryProviderInstaller
 import com.olaz.instasprite.navigation.Navigator
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 import com.olaz.instasprite.utils.AppSettings
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,11 +66,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            InstaSpriteTheme {
+            val settings by settingsDataStore.data.collectAsState(
+                initial = SettingPreferences()
+            )
+
+            InstaSpriteTheme(flavour = settings.themeFlavour) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(CatppuccinUI.BackgroundColor)
+                        .background(AppTheme.colors.BackgroundColor)
                         .windowInsetsPadding(WindowInsets.safeDrawing)
                 ) {
 

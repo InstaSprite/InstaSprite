@@ -33,7 +33,7 @@ import com.olaz.instasprite.domain.tool.ShapeToolPlaceholder
 import com.olaz.instasprite.domain.tool.Tool
 import com.olaz.instasprite.domain.tool.selection.SelectionToolPlaceholder
 import com.olaz.instasprite.ui.drawing.contract.ToolSelectorEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ToolSelector(
@@ -70,7 +70,7 @@ fun ToolSelector(
 
             DropdownMenu(
                 expanded = toolListVisible,
-                containerColor = CatppuccinUI.DropDownMenuColor,
+                containerColor = AppTheme.colors.DropDownMenuColor,
                 onDismissRequest = { toolListVisible = false }
             ) {
                 tools.reversed().forEach { tool ->
@@ -130,7 +130,7 @@ fun ToolSelector(
 
             DropdownMenu(
                 expanded = menuListVisible,
-                containerColor = CatppuccinUI.DropDownMenuColor,
+                containerColor = AppTheme.colors.DropDownMenuColor,
                 onDismissRequest = { menuListVisible = false }
             ) {
                 DropdownMenuItem(
@@ -177,7 +177,7 @@ fun ToolItem(
 ) {
     Button(
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) CatppuccinUI.Foreground0Color else Color.Transparent
+            containerColor = if (selected) AppTheme.colors.Foreground0Color else Color.Transparent
         ),
         shape = CircleShape,
         contentPadding = PaddingValues(0.dp),

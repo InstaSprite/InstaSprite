@@ -8,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @Composable
@@ -23,16 +23,16 @@ fun OptionSection(
     ) {
         Text(
             text = "Enable Comments",
-            color = CatppuccinUI.TextColorLight,
+            color = AppTheme.colors.TextColorLight,
             style = MaterialTheme.typography.bodyMedium
         )
         Checkbox(
             checked = isCommentChecked,
             onCheckedChange = onEnableCommentChange,
             colors = CheckboxDefaults.colors(
-                checkedColor = CatppuccinUI.SelectedColor,
-                uncheckedColor = CatppuccinUI.Foreground2Color,
-                checkmarkColor = CatppuccinUI.TextColorDark
+                checkedColor = AppTheme.colors.SelectedColor,
+                uncheckedColor = AppTheme.colors.Foreground2Color,
+                checkmarkColor = AppTheme.colors.TextColorDark
             )
         )
     }

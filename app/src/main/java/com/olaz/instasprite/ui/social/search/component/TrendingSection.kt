@@ -39,7 +39,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.olaz.instasprite.domain.model.MemberData
 import com.olaz.instasprite.domain.model.PostData
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import java.time.LocalDateTime
 
 @Composable
@@ -53,7 +53,7 @@ fun TrendingSection(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = CatppuccinUI.SelectedColor)
+            CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
         }
         return
     }
@@ -61,7 +61,7 @@ fun TrendingSection(
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
             text = "Trending",
-            color = CatppuccinUI.TextColorLight,
+            color = AppTheme.colors.TextColorLight,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -74,7 +74,7 @@ fun TrendingSection(
             ) {
                 Text(
                     text = "No trending posts yet",
-                    color = CatppuccinUI.Subtext0Color,
+                    color = AppTheme.colors.Subtext0Color,
                     fontSize = 14.sp
                 )
             }
@@ -106,7 +106,7 @@ fun TrendingPostThumbnail(
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .background(CatppuccinUI.Foreground0Color)
+            .background(AppTheme.colors.Foreground0Color)
             .clickable(onClick = onClick)
     ) {
         if (imageUrl != null) {
@@ -127,7 +127,7 @@ fun TrendingPostThumbnail(
             ) {
                 Text(
                     text = post.postContent.take(40),
-                    color = CatppuccinUI.Subtext0Color,
+                    color = AppTheme.colors.Subtext0Color,
                     fontSize = 10.sp,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
@@ -139,20 +139,20 @@ fun TrendingPostThumbnail(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .background(CatppuccinUI.BackgroundColorDarker)
+                .background(AppTheme.colors.BackgroundColorDarker)
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = null,
-                tint = CatppuccinUI.DismissButtonColor,
+                tint = AppTheme.colors.DismissButtonColor,
                 modifier = Modifier.size(12.dp)
             )
             Spacer(modifier = Modifier.width(2.dp))
             Text(
                 text = "${post.postLikesCount}",
-                color = CatppuccinUI.TextColorLight.copy(alpha = 0.9f),
+                color = AppTheme.colors.TextColorLight.copy(alpha = 0.9f),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium
             )

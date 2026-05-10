@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.ui.gallery.SpriteListOrder
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @Composable
@@ -45,7 +45,7 @@ fun SelectSortOptionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = CatppuccinUI.DialogColor,
+        containerColor = AppTheme.colors.DialogColor,
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -53,7 +53,7 @@ fun SelectSortOptionDialog(
             ) {
                 Text(
                     text = "Sort by",
-                    color = CatppuccinUI.TextColorLight,
+                    color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -84,8 +84,8 @@ fun SelectSortOptionDialog(
                         RadioButton(
                             selected = (sortOrder == selectedOption.value),
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = CatppuccinUI.SelectedColor,
-                                unselectedColor = CatppuccinUI.Foreground2Color
+                                selectedColor = AppTheme.colors.SelectedColor,
+                                unselectedColor = AppTheme.colors.Foreground2Color
                             ),
                             onClick = null
                         )

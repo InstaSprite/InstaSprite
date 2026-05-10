@@ -6,7 +6,7 @@ import com.olaz.instasprite.domain.model.ColorPalette
 import com.olaz.instasprite.ui.components.dialog.ConfirmationDialog
 import com.olaz.instasprite.ui.palette.dialogs.ImportOptionsDialog
 import com.olaz.instasprite.ui.palette.dialogs.LospecImportDialog
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 sealed interface ColorPaletteDialog : Dialog {
@@ -59,7 +59,7 @@ fun ColorPaletteScreenDialogs(
                     highlightText = dialog.palette.name,
                     confirmButtonText = "Delete",
                     dismissButtonText = "Cancel",
-                    highlightTextColor = CatppuccinUI.DismissButtonColor,
+                    highlightTextColor = AppTheme.colors.DismissButtonColor,
                     hasQuestionMark = true,
                     onConfirm = {
                         viewModel.deletePalette(dialog.palette)

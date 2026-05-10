@@ -32,7 +32,7 @@ import com.olaz.instasprite.ui.components.composable.ExpandableFabMenu
 import com.olaz.instasprite.ui.components.composable.FabMenuColors
 import com.olaz.instasprite.ui.components.composable.FabMenuItem
 import com.olaz.instasprite.ui.gallery.contract.BottomBarEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun HomeBottomBar(
@@ -41,7 +41,7 @@ fun HomeBottomBar(
     modifier: Modifier = Modifier
 ) {
     BottomAppBar(
-        containerColor = CatppuccinUI.BottomBarColor,
+        containerColor = AppTheme.colors.BottomBarColor,
         modifier = modifier
 //            .clip(
 //                BottomNavShape(
@@ -58,7 +58,7 @@ fun HomeBottomBar(
             BottomBarItem(
                 imageVector = Icons.Default.Menu,
                 onClick = onMenuClick,
-                iconTint = CatppuccinUI.TextColorLight,
+                iconTint = AppTheme.colors.TextColorLight,
             )
         }
 
@@ -76,14 +76,14 @@ fun HomeBottomBar(
                 onClick = {
                     onBottomBarEvent(BottomBarEvent.ToggleSearchBar)
                 },
-                iconTint = CatppuccinUI.TextColorLight
+                iconTint = AppTheme.colors.TextColorLight
             )
             BottomBarItem(
                 iconResourceId = R.drawable.ic_sort,
                 onClick = {
                     onBottomBarEvent(BottomBarEvent.OpenSelectSortOption)
                 },
-                iconTint = CatppuccinUI.TextColorLight
+                iconTint = AppTheme.colors.TextColorLight
             )
         }
     }
@@ -171,7 +171,7 @@ fun FeedFab(
     FloatingActionButton(
         onClick = onCreatePost,
         shape = CircleShape,
-        containerColor = CatppuccinUI.TextColorLight,
+        containerColor = AppTheme.colors.TextColorLight,
         modifier = Modifier
             .size(70.dp)
     ) {

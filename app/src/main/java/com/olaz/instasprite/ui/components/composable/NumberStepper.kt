@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -22,8 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinTypography
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import com.olaz.instasprite.ui.theme.InstaSpriteTheme
 
 
@@ -44,8 +44,8 @@ fun NumberStepper(
     ) {
         Text(
             label,
-            color = CatppuccinUI.TextColorLight,
-            style = CatppuccinTypography.bodyMedium
+            color = AppTheme.colors.TextColorLight,
+            style = MaterialTheme.typography.bodyMedium
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -59,7 +59,7 @@ fun NumberStepper(
                 Icon(
                     imageVector = Icons.Default.RemoveCircle,
                     contentDescription = "Decrease",
-                    tint = CatppuccinUI.CurrentPalette.Blue
+                    tint = AppTheme.colors.LinkColor
                 )
             }
 
@@ -72,9 +72,9 @@ fun NumberStepper(
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                colors = CatppuccinUI.OutlineTextFieldColors.colors(),
+                colors = AppTheme.colors.outlineTextFieldColors(),
                 modifier = Modifier.width(80.dp),
-                textStyle = CatppuccinTypography.bodyMedium,
+                textStyle = MaterialTheme.typography.bodyMedium,
                 singleLine = true
             )
 
@@ -88,7 +88,7 @@ fun NumberStepper(
                 Icon(
                     imageVector = Icons.Default.AddCircle,
                     contentDescription = "Increase",
-                    tint = CatppuccinUI.CurrentPalette.Blue
+                    tint = AppTheme.colors.LinkColor
                 )
             }
         }

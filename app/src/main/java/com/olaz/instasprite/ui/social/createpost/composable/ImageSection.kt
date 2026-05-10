@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun ImageSection(
@@ -38,7 +38,7 @@ fun ImageSection(
             altText = "Selected Image",
             modifier = modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(CatppuccinUI.BackgroundColor)
+                .background(AppTheme.colors.BackgroundColor)
                 .clickable(onClick = onClick)
         )
 
@@ -48,7 +48,7 @@ fun ImageSection(
             modifier = modifier
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(8.dp))
-                .background(CatppuccinUI.BackgroundColor)
+                .background(AppTheme.colors.BackgroundColor)
                 .clickable(onClick = onClick)
         ) {
             Column(
@@ -56,12 +56,12 @@ fun ImageSection(
             ) {
                 Icon(
                     Icons.Default.Add, contentDescription = "Add Image",
-                    tint = CatppuccinUI.AccentButtonColor,
+                    tint = AppTheme.colors.AccentButtonColor,
                     modifier = Modifier.size(62.dp)
                 )
                 Text(
                     text = stringResource(R.string.select_sprites),
-                    color = CatppuccinUI.TextColorLight
+                    color = AppTheme.colors.TextColorLight
                 )
             }
         }

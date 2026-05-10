@@ -47,7 +47,7 @@ import com.olaz.instasprite.domain.model.SpriteMeta
 import com.olaz.instasprite.domain.model.SpriteWithMeta
 import com.olaz.instasprite.ui.components.composable.AsyncCanvasPreviewer
 import com.olaz.instasprite.ui.gallery.contract.SpriteListEvent
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @Composable
@@ -116,7 +116,7 @@ private fun SpriteCard(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = CatppuccinUI.BackgroundColor,
+                containerColor = AppTheme.colors.BackgroundColor,
             ),
             modifier = Modifier
                 .padding(vertical = 8.dp)
@@ -199,7 +199,7 @@ private fun SpriteDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        containerColor = CatppuccinUI.DropDownMenuColor,
+        containerColor = AppTheme.colors.DropDownMenuColor,
         modifier = modifier
     ) {
         DropdownMenuItem(
@@ -208,7 +208,7 @@ private fun SpriteDropdownMenu(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = "Rename",
-                    tint = CatppuccinUI.TextColorLight
+                    tint = AppTheme.colors.TextColorLight
                 )
             },
             onClick = onRename,
@@ -219,7 +219,7 @@ private fun SpriteDropdownMenu(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit",
-                    tint = CatppuccinUI.TextColorLight
+                    tint = AppTheme.colors.TextColorLight
                 )
             },
             onClick = onEdit,
@@ -230,7 +230,7 @@ private fun SpriteDropdownMenu(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete",
-                    tint = CatppuccinUI.TextColorLight
+                    tint = AppTheme.colors.TextColorLight
                 )
             },
             onClick = onDelete,

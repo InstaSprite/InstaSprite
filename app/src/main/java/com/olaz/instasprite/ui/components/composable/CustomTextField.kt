@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun CustomTextField(
@@ -56,13 +56,13 @@ fun CustomTextField(
         singleLine = maxLines == 1,
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = CatppuccinUI.SelectedColor,
-            unfocusedBorderColor = CatppuccinUI.TextColorLight.copy(alpha = 0.3f),
-            focusedLabelColor = CatppuccinUI.BottomBarColor,
-            unfocusedLabelColor = CatppuccinUI.TextColorLight.copy(alpha = 0.7f),
-            focusedTextColor = CatppuccinUI.TextColorLight,
-            unfocusedTextColor = CatppuccinUI.TextColorLight,
-            cursorColor = CatppuccinUI.TextColorLight,
+            focusedBorderColor = AppTheme.colors.SelectedColor,
+            unfocusedBorderColor = AppTheme.colors.TextColorLight.copy(alpha = 0.3f),
+            focusedLabelColor = AppTheme.colors.BottomBarColor,
+            unfocusedLabelColor = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+            focusedTextColor = AppTheme.colors.TextColorLight,
+            unfocusedTextColor = AppTheme.colors.TextColorLight,
+            cursorColor = AppTheme.colors.TextColorLight,
         ),
         modifier = modifier
     )

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.AsyncImageView
 import com.olaz.instasprite.ui.components.composable.CustomTextField
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun CommentInput(
@@ -43,7 +43,7 @@ fun CommentInput(
             .fillMaxWidth()
             .then(modifier),
         colors = CardDefaults.cardColors(
-            containerColor = CatppuccinUI.BackgroundColor
+            containerColor = AppTheme.colors.BackgroundColor
         ),
         shape = RoundedCornerShape(0.dp)
     ) {
@@ -76,7 +76,7 @@ fun CommentInput(
                 Icon(
                     Icons.AutoMirrored.Filled.Send,
                     contentDescription = stringResource(R.string.send),
-                    tint = CatppuccinUI.AccentButtonColor
+                    tint = AppTheme.colors.AccentButtonColor
                 )
             }
         }

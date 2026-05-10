@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 @Composable
 fun SettingItem(
@@ -38,7 +38,7 @@ fun SettingItem(
         Icon(
             imageVector = icon,
             contentDescription = title,
-            tint = CatppuccinUI.TextColorLight,
+            tint = AppTheme.colors.TextColorLight,
             modifier = Modifier.size(24.dp)
         )
 
@@ -51,13 +51,13 @@ fun SettingItem(
                 text = title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = CatppuccinUI.TextColorLight
+                color = AppTheme.colors.TextColorLight
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = subtitle,
                 fontSize = 14.sp,
-                color = CatppuccinUI.Subtext0Color
+                color = AppTheme.colors.Subtext0Color
             )
         }
 

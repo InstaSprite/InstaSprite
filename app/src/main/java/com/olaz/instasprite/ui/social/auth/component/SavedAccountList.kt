@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.olaz.instasprite.R
 import com.olaz.instasprite.data.model.AccountPreferences
 import com.olaz.instasprite.data.model.AccountType
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 
 
 @Composable
@@ -43,7 +43,7 @@ fun SavedAccountList(
             text = stringResource(R.string.select_account),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = CatppuccinUI.TextColorLight
+            color = AppTheme.colors.TextColorLight
         )
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -75,12 +75,12 @@ fun SavedAccountList(
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
-                tint = CatppuccinUI.CurrentPalette.Flamingo
+                tint = AppTheme.colors.InfoColor
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Log into another account",
-                color = CatppuccinUI.SelectedColor,
+                color = AppTheme.colors.SelectedColor,
                 fontWeight = FontWeight.Bold
             )
         }

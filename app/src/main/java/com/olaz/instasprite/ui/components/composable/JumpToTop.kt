@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.olaz.instasprite.R
-import com.olaz.instasprite.ui.theme.CatppuccinUI
+import com.olaz.instasprite.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,7 +44,7 @@ fun JumpToTopButton(
         },
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = CatppuccinUI.BackgroundColor
+            containerColor = AppTheme.colors.BackgroundColor
         ),
         contentPadding = PaddingValues(0.dp),
         modifier = modifier.size(48.dp)
@@ -52,7 +52,7 @@ fun JumpToTopButton(
         Icon(
             painter = painterResource(R.drawable.ic_arrowup),
             contentDescription = "Jump to top",
-            tint = CatppuccinUI.TextColorLight,
+            tint = AppTheme.colors.TextColorLight,
             modifier = Modifier
                 .size(24.dp)
                 .rotate(rotation.value)
