@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.palette.dialogs
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +47,7 @@ fun ImportOptionsDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Import Color Palettes",
+                    text = stringResource(R.string.import_color_palettes),
                     fontSize = 18.sp,
                 )
 
@@ -55,7 +58,7 @@ fun ImportOptionsDialog(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Import from Lospec", color = AppTheme.colors.TextColorDark)
+                    Text(text = stringResource(R.string.import_from_lospec), color = AppTheme.colors.TextColorDark)
                 }
 
                 Button(
@@ -65,7 +68,7 @@ fun ImportOptionsDialog(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Import from File", color = AppTheme.colors.TextColorDark)
+                    Text(stringResource(R.string.import_from_file), color = AppTheme.colors.TextColorDark)
                 }
 
                 Button(
@@ -75,7 +78,7 @@ fun ImportOptionsDialog(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Cancel", color = AppTheme.colors.TextColorDark)
+                    Text(stringResource(R.string.cancel), color = AppTheme.colors.TextColorDark)
                 }
             }
         }

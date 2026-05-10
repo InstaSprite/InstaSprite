@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.feed.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -60,7 +63,7 @@ fun AvatarSelectionComponent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Profile Picture",
+            text = stringResource(R.string.profile_picture),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             color = AppTheme.colors.TextColorLight,
@@ -94,7 +97,7 @@ fun AvatarSelectionComponent(
             } else {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add Avatar",
+                    contentDescription = stringResource(R.string.add_avatar),
                     modifier = Modifier.size(48.dp),
                     tint = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                 )
@@ -118,11 +121,11 @@ fun AvatarSelectionComponent(
         ) {
             Icon(
                 imageVector = Icons.Default.UploadFile,
-                contentDescription = "Gallery",
+                contentDescription = stringResource(R.string.gallery),
                 modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Gallery")
+            Text(stringResource(R.string.gallery))
         }
 
 
@@ -135,7 +138,7 @@ fun AvatarSelectionComponent(
                     contentColor = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                 )
             ) {
-                Text("Remove Image")
+                Text(stringResource(R.string.remove_image))
             }
         }
     }

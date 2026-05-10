@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.gallery
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,7 +42,7 @@ fun GalleryScreenDialogs(
             is GalleryDialog.DeleteSpriteConfirm ->
                 ConfirmationDialog(
                     title = "Delete sprite",
-                    text = "Are you sure you want to delete",
+                    text = stringResource(R.string.are_you_sure_you_want_to_delete),
                     highlightText = dialog.spriteName,
                     confirmButtonText = "Delete",
                     dismissButtonText = "Cancel",

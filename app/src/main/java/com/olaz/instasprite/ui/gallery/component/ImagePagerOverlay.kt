@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.gallery.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -218,13 +221,13 @@ private fun BottomBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Save as image",
+                            contentDescription = stringResource(R.string.save_as_image_1),
                             tint = AppTheme.colors.TextColorDark,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Save as Image",
+                            text = stringResource(R.string.save_as_image),
                             color = AppTheme.colors.TextColorDark
                         )
                     }
@@ -241,13 +244,13 @@ private fun BottomBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit sprite",
+                            contentDescription = stringResource(R.string.edit_sprite),
                             tint = AppTheme.colors.TextColorDark,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Edit",
+                            text = stringResource(R.string.edit),
                             color = AppTheme.colors.TextColorDark
                         )
                     }
@@ -275,7 +278,7 @@ private fun TopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More",
+                        contentDescription = stringResource(R.string.more),
                         tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(32.dp)
                     )
@@ -306,12 +309,12 @@ private fun PagerDropdownMenu(
     ) {
         DropdownMenuItem(
             text = {
-                Text(text = "Delete")
+                Text(text = stringResource(R.string.delete))
             },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete sprite",
+                    contentDescription = stringResource(R.string.delete_sprite),
                     tint = AppTheme.colors.TextColorLight
                 )
             },

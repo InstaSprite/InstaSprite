@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -155,7 +158,7 @@ private fun Preview() {
                 placeholder = "Test",
             ),
             trailingIcon = {
-                Icon(Icons.Default.Preview, contentDescription = "Preview")
+                Icon(Icons.Default.Preview, contentDescription = stringResource(R.string.preview))
             }
         )
         InputTextField(
@@ -167,7 +170,7 @@ private fun Preview() {
                 suffix = "Suffix"
             ),
             trailingIcon = {
-                Icon(Icons.Default.Preview, contentDescription = "Preview")
+                Icon(Icons.Default.Preview, contentDescription = stringResource(R.string.preview))
             }
         )
     }

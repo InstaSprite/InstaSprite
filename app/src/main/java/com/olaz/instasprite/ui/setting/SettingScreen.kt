@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.setting
 
+import androidx.compose.ui.res.stringResource
+
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -81,7 +83,7 @@ fun SettingScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = colors.TextColorLight
                         )
                     }
@@ -109,7 +111,7 @@ fun SettingScreen(
         ) {
             // Theme Flavour Section
             Text(
-                text = "Theme",
+                text = stringResource(R.string.theme),
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 color = colors.Subtext0Color,
@@ -151,7 +153,7 @@ fun SettingScreen(
                 trailing = {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Select Language",
+                        contentDescription = stringResource(R.string.select_language),
                         tint = colors.Subtext0Color,
                         modifier = Modifier.graphicsLayer(rotationZ = 180f)
                     )

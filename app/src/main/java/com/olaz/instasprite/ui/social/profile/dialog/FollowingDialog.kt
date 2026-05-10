@@ -190,7 +190,7 @@ private fun FollowingItem(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "×",
+                text = stringResource(R.string.str_res),
                 color = AppTheme.colors.DismissButtonColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,

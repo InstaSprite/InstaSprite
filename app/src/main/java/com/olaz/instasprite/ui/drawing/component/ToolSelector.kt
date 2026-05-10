@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -102,7 +104,7 @@ fun ToolSelector(
 
         ToolItem(
             iconResourceId = R.drawable.ic_undo,
-            contentDescription = "Undo last change",
+            contentDescription = stringResource(R.string.undo_last_change),
             selected = false,
             onClick = {
                 onToolSelectorEvent(ToolSelectorEvent.Undo)
@@ -111,7 +113,7 @@ fun ToolSelector(
 
         ToolItem(
             iconResourceId = R.drawable.ic_redo,
-            contentDescription = "Redo last change",
+            contentDescription = stringResource(R.string.redo_last_change),
             selected = false,
             onClick = {
                 onToolSelectorEvent(ToolSelectorEvent.Redo)
@@ -121,7 +123,7 @@ fun ToolSelector(
         Box {
             ToolItem(
                 iconResourceId = R.drawable.ic_menu,
-                contentDescription = "Menu",
+                contentDescription = stringResource(R.string.menu),
                 selected = false,
                 onClick = {
                     menuListVisible = true
@@ -134,21 +136,21 @@ fun ToolSelector(
                 onDismissRequest = { menuListVisible = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text(text = "Save") },
+                    text = { Text(text = stringResource(R.string.save)) },
                     onClick = {
                         onToolSelectorEvent(ToolSelectorEvent.OpenSaveISpriteDialog)
                     }
                 )
 
                 DropdownMenuItem(
-                    text = { Text(text = "Load") },
+                    text = { Text(text = stringResource(R.string.load)) },
                     onClick = {
                         onToolSelectorEvent(ToolSelectorEvent.OpenLoadISpriteDialog)
                     }
                 )
 
                 DropdownMenuItem(
-                    text = { Text(text = "Export image") },
+                    text = { Text(text = stringResource(R.string.export_image)) },
                     onClick = {
                         onToolSelectorEvent(ToolSelectorEvent.OpenSaveImageDialog)
                         menuListVisible = false
@@ -156,7 +158,7 @@ fun ToolSelector(
                 )
 
                 DropdownMenuItem(
-                    text = { Text(text = "Settings") },
+                    text = { Text(text = stringResource(R.string.settings)) },
                     onClick = {
                         // TODO: Handle settings
                     }

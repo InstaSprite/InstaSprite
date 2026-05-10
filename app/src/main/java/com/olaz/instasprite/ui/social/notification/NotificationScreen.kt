@@ -57,7 +57,7 @@ fun NotificationScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = AppTheme.colors.TextColorLight
                         )
                     }
@@ -89,7 +89,7 @@ fun NotificationScreen(
                 )
             } else if (uiState.notifications.isEmpty()) {
                 Text(
-                    text = "No notifications yet.",
+                    text = stringResource(R.string.no_notifications_yet),
                     color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
                     modifier = Modifier.align(Alignment.Center)
                 )

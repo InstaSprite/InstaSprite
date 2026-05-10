@@ -234,7 +234,7 @@ fun RegisterForm(
                 .height(56.dp)
         ) {
             Text(
-                text = "Sign In",
+                text = stringResource(R.string.sign_in),
                 color = if (enabled) AppTheme.colors.TextColorDark else AppTheme.colors.TextColorLight,
                 style = MaterialTheme.typography.bodyMedium
             )

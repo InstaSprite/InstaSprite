@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.gallery.component
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -147,7 +149,7 @@ private fun SpriteCard(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_three_dots),
-                            contentDescription = "Options",
+                            contentDescription = stringResource(R.string.options),
                             tint = Color.Unspecified,
                             modifier = Modifier.size(24.dp)
                         )
@@ -203,33 +205,33 @@ private fun SpriteDropdownMenu(
         modifier = modifier
     ) {
         DropdownMenuItem(
-            text = { Text("Rename") },
+            text = { Text(stringResource(R.string.rename)) },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Info,
-                    contentDescription = "Rename",
+                    contentDescription = stringResource(R.string.rename),
                     tint = AppTheme.colors.TextColorLight
                 )
             },
             onClick = onRename,
         )
         DropdownMenuItem(
-            text = { Text("Edit") },
+            text = { Text(stringResource(R.string.edit)) },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit",
+                    contentDescription = stringResource(R.string.edit),
                     tint = AppTheme.colors.TextColorLight
                 )
             },
             onClick = onEdit,
         )
         DropdownMenuItem(
-            text = { Text("Delete") },
+            text = { Text(stringResource(R.string.delete)) },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete),
                     tint = AppTheme.colors.TextColorLight
                 )
             },

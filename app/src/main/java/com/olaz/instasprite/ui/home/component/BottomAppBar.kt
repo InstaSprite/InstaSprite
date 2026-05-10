@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.home.component
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -102,7 +104,7 @@ fun BottomBarItem(
     ) {
         Icon(
             imageVector = imageVector,
-            contentDescription = "Floating action button",
+            contentDescription = stringResource(R.string.floating_action_button),
             tint = iconTint,
             modifier = Modifier.size(size)
         )
@@ -122,7 +124,7 @@ fun BottomBarItem(
     ) {
         Icon(
             painter = painterResource(id = iconResourceId),
-            contentDescription = "Floating action button",
+            contentDescription = stringResource(R.string.floating_action_button),
             tint = iconTint,
             modifier = Modifier.size(size)
         )
@@ -177,7 +179,7 @@ fun FeedFab(
     ) {
         Icon(
             Icons.Filled.Add,
-            contentDescription = "Create Post",
+            contentDescription = stringResource(R.string.create_post),
             tint = colors.fabIcon,
             modifier = Modifier
                 .size(30.dp)

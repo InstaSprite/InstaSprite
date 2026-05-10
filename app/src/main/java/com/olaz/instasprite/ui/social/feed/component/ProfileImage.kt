@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.feed.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.util.Log
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -55,7 +58,7 @@ fun ProfileImage(
             )
             Icon(
                 imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Default Profile",
+                contentDescription = stringResource(R.string.default_profile),
                 modifier = modifier.size(size),
                 tint = AppTheme.colors.TextColorLight
             )

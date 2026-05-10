@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.gallery
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -114,7 +117,7 @@ fun CreateCanvasScreen(
                 },
                 middleSlot = {
                     Text(
-                        text = "New canvas",
+                        text = stringResource(R.string.new_canvas),
                         color = AppTheme.colors.TextColorLight,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -126,7 +129,7 @@ fun CreateCanvasScreen(
                             containerColor = AppTheme.colors.AccentButtonColor
                         )
                     ) {
-                        Text("Create", color = AppTheme.colors.TextColorDark)
+                        Text(stringResource(R.string.create), color = AppTheme.colors.TextColorDark)
                     }
                 }
             )

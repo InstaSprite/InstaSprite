@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -134,7 +137,7 @@ private fun PreviewColorPaletteListWithOption() {
                         containerColor = AppTheme.colors.WarningColor
                     ),
                 ) {
-                    Text(text = "Test", color = AppTheme.colors.TextColorDark)
+                    Text(text = stringResource(R.string.test), color = AppTheme.colors.TextColorDark)
                 }
             }
         )

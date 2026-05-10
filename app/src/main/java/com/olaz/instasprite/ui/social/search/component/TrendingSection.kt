@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.search.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -60,7 +63,7 @@ fun TrendingSection(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = "Trending",
+            text = stringResource(R.string.trending),
             color = AppTheme.colors.TextColorLight,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
@@ -73,7 +76,7 @@ fun TrendingSection(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No trending posts yet",
+                    text = stringResource(R.string.no_trending_posts_yet),
                     color = AppTheme.colors.Subtext0Color,
                     fontSize = 14.sp
                 )

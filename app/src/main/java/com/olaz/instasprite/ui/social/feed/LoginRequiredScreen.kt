@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.feed
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +41,7 @@ fun LoginRequiredScreen(
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Login,
-            contentDescription = "Login Required",
+            contentDescription = stringResource(R.string.login_required_1),
             modifier = Modifier.size(80.dp),
             tint = AppTheme.colors.TextColorLight.copy(alpha = 0.6f)
         )
@@ -46,7 +49,7 @@ fun LoginRequiredScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Login Required",
+            text = stringResource(R.string.login_required_1),
             style = MaterialTheme.typography.titleMedium,
             color = AppTheme.colors.TextColorLight,
             textAlign = TextAlign.Center
@@ -61,11 +64,11 @@ fun LoginRequiredScreen(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Login,
-                contentDescription = "Login",
+                contentDescription = stringResource(R.string.login),
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Login", color = AppTheme.colors.TextColorDark)
+            Text(stringResource(R.string.login), color = AppTheme.colors.TextColorDark)
         }
     }
 }

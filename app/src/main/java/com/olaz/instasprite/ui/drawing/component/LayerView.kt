@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -95,7 +98,7 @@ fun LayerView(
             if (bitmapImage != null) {
                 Image(
                     bitmap = bitmapImage,
-                    contentDescription = "Layer Preview",
+                    contentDescription = stringResource(R.string.layer_preview),
                     contentScale = ContentScale.FillWidth,
                     filterQuality = FilterQuality.None,
                     modifier = Modifier
@@ -129,7 +132,7 @@ fun LayerView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Layer",
+                        contentDescription = stringResource(R.string.delete_layer),
                         tint = AppTheme.colors.DismissButtonColor,
                         modifier = Modifier.size(20.dp)
                     )
@@ -146,7 +149,7 @@ fun LayerView(
                 ) {
                     Icon(
                         imageVector = if (layer.isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = "Toggle Visibility",
+                        contentDescription = stringResource(R.string.toggle_visibility),
                         tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(20.dp)
                     )
@@ -157,7 +160,7 @@ fun LayerView(
                 ) {
                     Icon(
                         imageVector = if (layer.isLocked) Icons.Default.Lock else Icons.Outlined.LockOpen,
-                        contentDescription = "Toggle Lock",
+                        contentDescription = stringResource(R.string.toggle_lock),
                         tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(20.dp)
                     )
@@ -168,7 +171,7 @@ fun LayerView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Merge Down",
+                        contentDescription = stringResource(R.string.merge_down),
                         tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier.size(20.dp)
                     )

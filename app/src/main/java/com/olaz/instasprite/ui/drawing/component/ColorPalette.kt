@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -140,7 +142,7 @@ fun ColorPalette(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Show color wheel",
+                    contentDescription = stringResource(R.string.show_color_wheel),
                     tint = Color.White,
                     modifier = Modifier.size(32.dp)
                 )
@@ -167,7 +169,7 @@ fun ColorPalette(
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Show opts",
+                        contentDescription = stringResource(R.string.show_opts),
                         tint = Color.White,
                         modifier = Modifier.size(32.dp)
                     )
@@ -228,12 +230,12 @@ private fun CanvasMenuDropdownMenu(
     ) {
         DropdownMenuItem(
             text = {
-                Text(text = "Rotate Canvas")
+                Text(text = stringResource(R.string.rotate_canvas))
             },
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.ic_redo),
-                    contentDescription = "Rotate Canvas",
+                    contentDescription = stringResource(R.string.rotate_canvas),
                     tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
@@ -243,12 +245,12 @@ private fun CanvasMenuDropdownMenu(
 
         DropdownMenuItem(
             text = {
-                Text(text = "Horizontal Flip")
+                Text(text = stringResource(R.string.horizontal_flip))
             },
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.ic_hflip),
-                    contentDescription = "Flip canvas horizontal",
+                    contentDescription = stringResource(R.string.flip_canvas_horizontal),
                     tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
@@ -258,12 +260,12 @@ private fun CanvasMenuDropdownMenu(
 
         DropdownMenuItem(
             text = {
-                Text(text = "Vertical Flip")
+                Text(text = stringResource(R.string.vertical_flip))
             },
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.ic_vflip),
-                    contentDescription = "Flip canvas vertical",
+                    contentDescription = stringResource(R.string.flip_canvas_vertical),
                     tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
@@ -273,12 +275,12 @@ private fun CanvasMenuDropdownMenu(
 
         DropdownMenuItem(
             text = {
-                Text(text = "Resize")
+                Text(text = stringResource(R.string.resize))
             },
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.ic_resize),
-                    contentDescription = "Resize canvas",
+                    contentDescription = stringResource(R.string.resize_canvas),
                     tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )

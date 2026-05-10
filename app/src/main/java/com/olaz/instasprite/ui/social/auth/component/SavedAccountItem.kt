@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.social.auth.component
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -70,7 +72,7 @@ fun SavedAccountItem(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_google),
-                        contentDescription = "Remove account",
+                        contentDescription = stringResource(R.string.remove_account),
                         tint = Color.Unspecified,
                         modifier = Modifier
                             .size(16.dp)
@@ -117,7 +119,7 @@ fun SavedAccountItem(
         IconButton(onClick = onRemove) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Remove account",
+                contentDescription = stringResource(R.string.remove_account),
                 tint = AppTheme.colors.DismissButtonColor,
                 modifier = Modifier.size(20.dp)
             )

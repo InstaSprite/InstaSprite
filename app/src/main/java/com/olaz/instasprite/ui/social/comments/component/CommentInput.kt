@@ -88,7 +88,7 @@ fun CommentInput(
 @Composable
 private fun Preview() {
     CommentInput(
-        text = "This is a comment",
+        text = stringResource(R.string.this_is_a_comment),
         onTextChange = {},
         onSendClick = {},
 

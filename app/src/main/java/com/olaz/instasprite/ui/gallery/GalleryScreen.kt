@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.gallery
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.scaleIn
@@ -202,7 +205,7 @@ private fun GalleryScreenContent(
                         .height(56.dp)
                 ) {
                     Text(
-                        text = "Home",
+                        text = stringResource(R.string.home),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .weight(1f)

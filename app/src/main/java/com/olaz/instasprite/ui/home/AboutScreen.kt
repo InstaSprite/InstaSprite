@@ -68,14 +68,14 @@ fun AboutScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = colors.TextColorLight
                         )
                     }
                 },
                 title = {
                     Text(
-                        text = "About",
+                        text = stringResource(R.string.about),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color = colors.TextColorLight
@@ -110,7 +110,7 @@ fun AboutScreen(
 
             // App Name
             Text(
-                text = "InstaSprite",
+                text = stringResource(R.string.app_name),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = colors.TextColorLight
@@ -127,7 +127,7 @@ fun AboutScreen(
 
             // Tagline
             Text(
-                text = "Pixel art creation & social sharing",
+                text = stringResource(R.string.pixel_art_creation_social_sharing),
                 fontSize = 14.sp,
                 color = colors.Subtext1Color,
                 textAlign = TextAlign.Center,
@@ -195,7 +195,7 @@ fun AboutScreen(
 
             // Footer
             Text(
-                text = "Made with <3 and lots of pixels",
+                text = stringResource(R.string.made_with_3_and_lots_of_pixels),
                 fontSize = 12.sp,
                 color = colors.Subtext0Color,
             )

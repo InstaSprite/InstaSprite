@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -34,7 +37,7 @@ fun ImageZoomableOverlay(
         ) {
             Image(
                 bitmap = bitmap,
-                contentDescription = "Zoomed Sprite",
+                contentDescription = stringResource(R.string.zoomed_sprite),
                 contentScale = ContentScale.Fit,
                 filterQuality = FilterQuality.None,
                 modifier = Modifier

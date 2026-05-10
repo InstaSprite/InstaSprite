@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.search.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +48,7 @@ fun MemberSearchResults(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No users found",
+                text = stringResource(R.string.no_users_found),
                 color = AppTheme.colors.Subtext0Color,
                 fontSize = 14.sp
             )

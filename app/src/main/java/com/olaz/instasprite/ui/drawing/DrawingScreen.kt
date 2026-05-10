@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.drawing
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -264,7 +267,7 @@ private fun DrawingScreenContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Layers,
-                            contentDescription = "Layers",
+                            contentDescription = stringResource(R.string.layers),
                             tint = AppTheme.colors.TextColorLight
                         )
                     }

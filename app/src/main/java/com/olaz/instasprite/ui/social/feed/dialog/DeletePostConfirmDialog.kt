@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.feed.dialog
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.olaz.instasprite.ui.components.dialog.CustomDialog
@@ -16,7 +19,7 @@ fun DeletePostConfirmDialog(
         confirmButtonText = "Delete",
         dismissButtonText = "Cancel",
         content = {
-            Text("Are you sure you want to delete this post?")
+            Text(stringResource(R.string.are_you_sure_you_want_to_delete_this_post))
         }
     )
 }

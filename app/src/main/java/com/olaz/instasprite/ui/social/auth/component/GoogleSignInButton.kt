@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.social.auth.component
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +63,7 @@ fun GoogleSignInButton(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_google),
-                    contentDescription = "Google Logo",
+                    contentDescription = stringResource(R.string.google_logo),
                     modifier = Modifier.size(20.dp)
                 )
 
@@ -69,7 +71,7 @@ fun GoogleSignInButton(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Text(
-                    text = "Continue with Google",
+                    text = stringResource(R.string.continue_with_google),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.Black

@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,7 +54,7 @@ fun CanvasPreviewer(
 
     Image(
         bitmap = bitmapImage!!,
-        contentDescription = "Sprite Preview",
+        contentDescription = stringResource(R.string.sprite_preview),
         contentScale = ContentScale.FillBounds,
         filterQuality = FilterQuality.None,
         modifier = modifier

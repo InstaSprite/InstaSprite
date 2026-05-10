@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.loadimage.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -122,7 +125,7 @@ private fun AdvancedSettingTab(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                "Enable Dithering",
+                stringResource(R.string.enable_dithering),
                 color = AppTheme.colors.TextColorLight,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -144,7 +147,7 @@ private fun AdvancedSettingTab(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                "Apply Custom Palette",
+                stringResource(R.string.apply_custom_palette),
                 color = AppTheme.colors.TextColorLight,
                 style = MaterialTheme.typography.bodyMedium
             )

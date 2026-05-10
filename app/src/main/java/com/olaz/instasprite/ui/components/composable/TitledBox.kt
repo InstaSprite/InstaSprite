@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -56,6 +59,6 @@ private fun Preview() {
         titleBackgroundColor = AppTheme.colors.BackgroundColor,
         modifier = Modifier
     ) {
-        Text(text = "Test")
+        Text(text = stringResource(R.string.test))
     }
 }

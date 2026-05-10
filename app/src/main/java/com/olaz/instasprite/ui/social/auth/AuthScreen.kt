@@ -257,7 +257,7 @@ fun AuthContent(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher),
-                contentDescription = "App Logo",
+                contentDescription = stringResource(R.string.app_logo),
                 modifier = Modifier.size(100.dp),
             )
 

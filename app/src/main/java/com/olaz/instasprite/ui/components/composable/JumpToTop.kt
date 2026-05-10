@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
@@ -51,7 +53,7 @@ fun JumpToTopButton(
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_arrowup),
-            contentDescription = "Jump to top",
+            contentDescription = stringResource(R.string.jump_to_top),
             tint = AppTheme.colors.TextColorLight,
             modifier = Modifier
                 .size(24.dp)

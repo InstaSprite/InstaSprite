@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.loadimage.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,7 +63,7 @@ fun ProcessedImagePreview(
             if (processedBitmap != null) {
                 Image(
                     bitmap = processedBitmap.asImageBitmap(),
-                    contentDescription = "Processed Image",
+                    contentDescription = stringResource(R.string.processed_image),
                     contentScale = ContentScale.Fit,
                     filterQuality = FilterQuality.None,
                     modifier = Modifier.fillMaxSize(),
@@ -71,13 +74,13 @@ fun ProcessedImagePreview(
                 ) {
                     Icon(
                         imageVector = Icons.Default.AddCircleOutline,
-                        contentDescription = "Add image",
+                        contentDescription = stringResource(R.string.add_image),
                         tint = AppTheme.colors.WarningColor,
                         modifier = Modifier.size(50.dp)
                     )
 
                     Text(
-                        "Tap to select image",
+                        stringResource(R.string.tap_to_select_image),
                         color = AppTheme.colors.Subtext0Color,
                         style = MaterialTheme.typography.bodyMedium
                     )

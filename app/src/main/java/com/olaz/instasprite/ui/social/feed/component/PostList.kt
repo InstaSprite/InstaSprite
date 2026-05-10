@@ -241,7 +241,7 @@ fun PostList(
                                     onClick = { pagedItems.retry() },
                                     colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.SelectedColor)
                                 ) {
-                                    Text("Retry?", color = AppTheme.colors.TextColorDark)
+                                    Text(stringResource(R.string.retry_1), color = AppTheme.colors.TextColorDark)
                                 }
                             }
                         }

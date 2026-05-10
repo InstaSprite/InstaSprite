@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,14 +72,14 @@ private fun Preview() {
             },
             middleSlot = {
                 Text(
-                    text = "Test test alo alo",
+                    text = stringResource(R.string.test_test_alo_alo),
                     color = AppTheme.colors.TextColorLight
                 )
             },
             rightSlot = {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = "More",
+                    contentDescription = stringResource(R.string.more),
                     tint = AppTheme.colors.TextColorLight,
                     modifier = Modifier.size(32.dp)
                 )

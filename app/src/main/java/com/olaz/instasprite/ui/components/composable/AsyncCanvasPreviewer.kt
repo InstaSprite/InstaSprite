@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -62,7 +65,7 @@ fun AsyncCanvasPreviewer(
             .memoryCacheKey("thumbnail_${sprite.id}_${meta?.lastModifiedAt}")
             .diskCacheKey("thumbnail_${sprite.id}_${meta?.lastModifiedAt}")
             .build(),
-        contentDescription = "Sprite Preview",
+        contentDescription = stringResource(R.string.sprite_preview),
         modifier = modifier
             .aspectRatio(spriteAspectRatio)
             .drawCheckerboard(sprite.width, sprite.height)
@@ -91,7 +94,7 @@ private fun PreviewImage(
     }
     Image(
         bitmap = bitmapImage,
-        contentDescription = "Sprite Preview",
+        contentDescription = stringResource(R.string.sprite_preview),
         modifier = modifier
             .aspectRatio(spriteAspectRatio)
             .drawCheckerboard(sprite.width, sprite.height)

@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.comments.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +47,7 @@ fun CommentActions(
         Row {
             Icon(
                 imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = "Like",
+                contentDescription = stringResource(R.string.like),
                 tint = if (isLiked) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
                 modifier = Modifier
                     .align(Alignment.Bottom)
@@ -71,7 +74,7 @@ fun CommentActions(
             IconButton(onClick = onBookmarkClick) {
                 Icon(
                     imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                    contentDescription = "Bookmark",
+                    contentDescription = stringResource(R.string.bookmark),
                     tint = AppTheme.colors.TextColorLight,
                     modifier = Modifier.size(20.dp)
                 )

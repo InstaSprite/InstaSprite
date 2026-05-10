@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.createpost
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -174,7 +177,7 @@ private fun CreatePostScreenContent(
                     enabled = uiState.caption.isNotBlank() && uiState.selectedImage != null && !uiState.isPostInProgress,
                     modifier = Modifier.fillMaxWidth(0.5f)
                 ) {
-                    Text("Post", color = AppTheme.colors.TextColorDark)
+                    Text(stringResource(R.string.post), color = AppTheme.colors.TextColorDark)
                 }
             }
         }

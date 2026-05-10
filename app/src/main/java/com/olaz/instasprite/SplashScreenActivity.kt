@@ -1,5 +1,8 @@
 package com.olaz.instasprite
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -60,7 +63,7 @@ fun SplashScreen() {
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .fillMaxHeight(0.7f),
-            contentDescription = "Splash Screen",
+            contentDescription = stringResource(R.string.splash_screen),
         )
     }
 }

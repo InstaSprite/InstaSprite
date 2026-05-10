@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.dialog
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -88,14 +91,14 @@ fun SaveFileDialog(
                 OutlinedTextField(
                     value = displayPath,
                     onValueChange = {},
-                    label = { Text("Save Location", color = AppTheme.colors.SelectedColor) },
+                    label = { Text(stringResource(R.string.save_location), color = AppTheme.colors.SelectedColor) },
                     supportingText = {},
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Home,
-                            contentDescription = "Choose Folder",
+                            contentDescription = stringResource(R.string.choose_folder),
                         )
                     },
                     colors = AppTheme.colors.outlineTextFieldColors(),

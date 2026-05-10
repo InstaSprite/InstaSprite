@@ -172,7 +172,7 @@ fun FeedPostItem(
                     ) {
                         Icon(
                             Icons.Default.Delete,
-                            contentDescription = "Delete",
+                            contentDescription = stringResource(R.string.delete),
                             tint = AppTheme.colors.DismissButtonColor
                         )
                     }
@@ -259,7 +259,7 @@ fun FeedPostItem(
                     ) {
                         Icon(
                             imageVector = if (post.postLikeFlag) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Like",
+                            contentDescription = stringResource(R.string.like),
                             tint = if (post.postLikeFlag) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
@@ -286,7 +286,7 @@ fun FeedPostItem(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ChatBubbleOutline,
-                            contentDescription = "Comment",
+                            contentDescription = stringResource(R.string.comment),
                             tint = AppTheme.colors.TextColorLight,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
@@ -312,7 +312,7 @@ fun FeedPostItem(
                 if (showBookmarkButton) {
                     Icon(
                         imageVector = if (post.postBookmarkFlag) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                        contentDescription = "Bookmark",
+                        contentDescription = stringResource(R.string.bookmark),
                         tint = AppTheme.colors.TextColorLight,
                         modifier = Modifier
                             .size(20.dp)

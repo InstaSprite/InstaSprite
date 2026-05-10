@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -89,7 +92,7 @@ fun LayerDrawer(
                 .padding(bottom = 8.dp)
         ) {
             Text(
-                text = "Layers",
+                text = stringResource(R.string.layers),
                 color = AppTheme.colors.TextColorLight,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -147,7 +150,7 @@ fun LayerDrawer(
                             Icon(
                                 Icons.Rounded.DragHandle,
                                 tint = dragIndicatorColor,
-                                contentDescription = "Reorder"
+                                contentDescription = stringResource(R.string.reorder)
                             )
                         }
 
@@ -186,7 +189,7 @@ fun LayerDrawer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add Layer",
+                        contentDescription = stringResource(R.string.add_layer),
                         tint = AppTheme.colors.TextColorDark
                     )
                 }

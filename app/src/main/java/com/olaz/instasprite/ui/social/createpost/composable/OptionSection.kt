@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.createpost.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -22,7 +25,7 @@ fun OptionSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Enable Comments",
+            text = stringResource(R.string.enable_comments),
             color = AppTheme.colors.TextColorLight,
             style = MaterialTheme.typography.bodyMedium
         )

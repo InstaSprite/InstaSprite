@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.gallery.dialog
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,7 +55,7 @@ fun SelectSortOptionDialog(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Sort by",
+                    text = stringResource(R.string.sort_by),
                     color = AppTheme.colors.TextColorLight,
                     style = MaterialTheme.typography.titleMedium
                 )

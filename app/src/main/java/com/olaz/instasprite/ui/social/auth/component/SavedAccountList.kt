@@ -79,7 +79,7 @@ fun SavedAccountList(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Log into another account",
+                text = stringResource(R.string.log_into_another_account),
                 color = AppTheme.colors.SelectedColor,
                 fontWeight = FontWeight.Bold
             )

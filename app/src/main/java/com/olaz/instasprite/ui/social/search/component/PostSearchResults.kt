@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.search.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,7 +33,7 @@ fun PostSearchResults(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No posts found",
+                text = stringResource(R.string.no_posts_found),
                 color = AppTheme.colors.Subtext0Color,
                 fontSize = 14.sp
             )

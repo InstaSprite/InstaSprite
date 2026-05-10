@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.gallery.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -56,7 +59,7 @@ fun SearchBar(
                 )
             )
         },
-        placeholder = { Text(text = "Search sprites", color = AppTheme.colors.Subtext0Color) },
+        placeholder = { Text(text = stringResource(R.string.search_sprites), color = AppTheme.colors.Subtext0Color) },
         singleLine = true,
         trailingIcon = {
             IconButton(
@@ -69,7 +72,7 @@ fun SearchBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.dismiss),
                     tint = AppTheme.colors.DismissButtonColor,
                     modifier = Modifier.size(28.dp)
                 )

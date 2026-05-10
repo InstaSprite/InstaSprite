@@ -1,5 +1,7 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -43,7 +45,7 @@ fun CursorModeToggle(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_pencil_tool),
-            contentDescription = "Cursor Mode",
+            contentDescription = stringResource(R.string.cursor_mode),
             tint = Color.Unspecified,
             modifier = Modifier.size(24.dp)
         )

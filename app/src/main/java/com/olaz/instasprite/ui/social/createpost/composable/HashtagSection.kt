@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.createpost.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -62,7 +65,7 @@ fun HashtagSection(
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Remove tag",
+                                contentDescription = stringResource(R.string.remove_tag),
                                 modifier = Modifier.size(16.dp)
                             )
                         },

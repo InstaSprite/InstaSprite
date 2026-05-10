@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.search
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -103,7 +106,7 @@ fun SearchScreenContent(
                 onValueChange = onQueryChanged,
                 placeholder = {
                     Text(
-                        text = "Search posts, @users, #hashtags...",
+                        text = stringResource(R.string.search_posts_users_hashtags),
                         color = AppTheme.colors.Subtext0Color
                     )
                 },

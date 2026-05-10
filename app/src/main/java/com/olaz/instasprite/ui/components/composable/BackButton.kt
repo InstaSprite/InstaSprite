@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,7 +23,7 @@ fun BackButton(
     IconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.AutoMirrored.Default.ArrowBack,
-            contentDescription = "Dismiss",
+            contentDescription = stringResource(R.string.dismiss),
             tint = color,
             modifier = Modifier.size(32.dp)
         )

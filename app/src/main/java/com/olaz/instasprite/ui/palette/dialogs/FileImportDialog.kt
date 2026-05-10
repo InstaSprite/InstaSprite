@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.palette.dialogs
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -107,13 +110,13 @@ fun FileImportDialog(
                 OutlinedTextField(
                     value = selectedFileName ?: "No file selected",
                     onValueChange = {},
-                    label = { Text("Import Location", color = AppTheme.colors.SelectedColor) },
+                    label = { Text(stringResource(R.string.import_location), color = AppTheme.colors.SelectedColor) },
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Home,
-                            contentDescription = "Choose File",
+                            contentDescription = stringResource(R.string.choose_file),
                             tint = AppTheme.colors.LinkColor,
                             modifier = Modifier.clickable {
                                 filePickerLauncher.launch(arrayOf("text/plain"))

@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.drawing.dialog
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -80,13 +83,13 @@ fun LoadISpriteDialog(
                 OutlinedTextField(
                     value = displayPath,
                     onValueChange = {},
-                    label = { Text("File", color = AppTheme.colors.SelectedColor) },
+                    label = { Text(stringResource(R.string.file), color = AppTheme.colors.SelectedColor) },
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "Choose File",
+                            contentDescription = stringResource(R.string.choose_file),
                             tint = AppTheme.colors.TextColorLight
                         )
                     },

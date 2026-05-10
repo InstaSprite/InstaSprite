@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
@@ -49,7 +52,7 @@ fun SelectionToolOption(
                         .background(AppTheme.colors.BackgroundColor)
                 ) {
                     Text(
-                        text = "Clear",
+                        text = stringResource(R.string.clear),
                         color = AppTheme.colors.DismissButtonColor
                     )
                 }
@@ -60,7 +63,7 @@ fun SelectionToolOption(
                         .background(AppTheme.colors.BackgroundColor)
                 ) {
                     Text(
-                        text = "Invert",
+                        text = stringResource(R.string.invert),
                         color = AppTheme.colors.TextColorLight
                     )
                 }
@@ -78,7 +81,7 @@ fun SelectionToolOption(
                             .width(35.dp)
                     )
                     Text(
-                        text = "Append",
+                        text = stringResource(R.string.append),
                         color = AppTheme.colors.TextColorLight
                     )
                 }

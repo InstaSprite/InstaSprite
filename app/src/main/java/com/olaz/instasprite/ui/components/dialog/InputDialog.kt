@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.dialog
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -147,10 +150,10 @@ private fun InputDialogPreview() {
         onConfirm = {},
         onDismiss = {},
         extraTopContent = {
-            Text("Extra content at the top", color = Color.White)
+            Text(stringResource(R.string.extra_content_at_the_top), color = Color.White)
         },
         extraBottomContent = {
-            Text("Extra content at the bottom", color = Color.Gray)
+            Text(stringResource(R.string.extra_content_at_the_bottom), color = Color.Gray)
         }
     )
 }
@@ -179,10 +182,10 @@ private fun LoadingPreview() {
         onConfirm = {},
         onDismiss = {},
         extraTopContent = {
-            Text("Extra content at the top", color = Color.White)
+            Text(stringResource(R.string.extra_content_at_the_top), color = Color.White)
         },
         extraBottomContent = {
-            Text("Extra content at the bottom", color = Color.Gray)
+            Text(stringResource(R.string.extra_content_at_the_bottom), color = Color.Gray)
         },
         isLoading = true
     )

@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.loadimage
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -131,7 +134,7 @@ fun LoadImageScreenContent(
                 },
                 middleSlot = {
                     Text(
-                        text = "Load Image",
+                        text = stringResource(R.string.load_image),
                         color = AppTheme.colors.TextColorLight,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -155,7 +158,7 @@ fun LoadImageScreenContent(
                             AppTheme.colors.TextColorLight
                         }
 
-                        Text("Create", color = textColor)
+                        Text(stringResource(R.string.create), color = textColor)
                     }
                 }
             )

@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.dialog
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -82,7 +85,7 @@ fun CustomDialogPreview() {
         onDismiss = {},
         onConfirm = {},
         content = {
-            Text("Content")
+            Text(stringResource(R.string.content))
         }
     )
 }

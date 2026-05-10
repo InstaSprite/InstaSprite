@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.social.createpost.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +45,7 @@ fun TopBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.dismiss),
                     tint = AppTheme.colors.DismissButtonColor,
                     modifier = Modifier.size(32.dp)
                 )

@@ -55,7 +55,7 @@ fun ImageSection(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
-                    Icons.Default.Add, contentDescription = "Add Image",
+                    Icons.Default.Add, contentDescription = stringResource(R.string.add_image_1),
                     tint = AppTheme.colors.AccentButtonColor,
                     modifier = Modifier.size(62.dp)
                 )

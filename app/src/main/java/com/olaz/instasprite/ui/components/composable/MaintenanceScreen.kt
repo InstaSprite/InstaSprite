@@ -75,7 +75,7 @@ fun MaintenanceScreen(
             )
         ) {
             Text(
-                text = "Reload",
+                text = stringResource(R.string.reload),
                 color = AppTheme.colors.TextColorDark,
                 fontWeight = FontWeight.Bold
             )

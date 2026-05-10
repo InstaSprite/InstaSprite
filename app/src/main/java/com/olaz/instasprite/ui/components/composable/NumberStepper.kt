@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.components.composable
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -58,7 +61,7 @@ fun NumberStepper(
             ) {
                 Icon(
                     imageVector = Icons.Default.RemoveCircle,
-                    contentDescription = "Decrease",
+                    contentDescription = stringResource(R.string.decrease),
                     tint = AppTheme.colors.LinkColor
                 )
             }
@@ -87,7 +90,7 @@ fun NumberStepper(
             ) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
-                    contentDescription = "Increase",
+                    contentDescription = stringResource(R.string.increase),
                     tint = AppTheme.colors.LinkColor
                 )
             }

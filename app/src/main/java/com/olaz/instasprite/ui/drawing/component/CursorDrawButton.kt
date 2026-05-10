@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.drawing.component
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -60,7 +63,7 @@ fun CursorDrawButton(
                 }
             }
     ) {
-        Text(text = "Use tool", modifier = Modifier.align(Alignment.Center))
+        Text(text = stringResource(R.string.use_tool), modifier = Modifier.align(Alignment.Center))
     }
 }
 

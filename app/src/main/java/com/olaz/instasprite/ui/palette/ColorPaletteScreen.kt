@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.palette
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
@@ -109,7 +112,7 @@ private fun ColorPaletteSelectionContent(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete palette",
+                                contentDescription = stringResource(R.string.delete_palette),
                                 tint = AppTheme.colors.DismissButtonColor
                             )
                         }
@@ -132,7 +135,7 @@ private fun ColorPaletteSelectionContent(
                 ) {
                     Icon(
                         Icons.Filled.Add,
-                        contentDescription = "Floating action button",
+                        contentDescription = stringResource(R.string.floating_action_button),
                         tint = AppTheme.colors.TextColorDark,
                         modifier = Modifier.size(30.dp)
                     )

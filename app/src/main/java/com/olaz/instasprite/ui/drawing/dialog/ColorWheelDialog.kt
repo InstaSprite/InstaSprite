@@ -1,5 +1,8 @@
 package com.olaz.instasprite.ui.drawing.dialog
 
+import androidx.compose.ui.res.stringResource
+import com.olaz.instasprite.R
+
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -259,7 +262,7 @@ fun ColorWheelDialog(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Choose another palette", color = AppTheme.colors.TextColorDark)
+                    Text(text = stringResource(R.string.choose_another_palette), color = AppTheme.colors.TextColorDark)
                 }
             }
         }
