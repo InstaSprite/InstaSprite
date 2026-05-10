@@ -3,6 +3,7 @@ package com.olaz.instasprite.ui.components.composable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
@@ -18,6 +19,7 @@ fun AsyncImageView(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.FillWidth,
     altText: String = "Image",
+    placeHolder : Painter? = null,
     onLoading: ((AsyncImagePainter.State.Loading) -> Unit)? = null,
     onSuccess: ((AsyncImagePainter.State.Success) -> Unit)? = null,
     onError: ((AsyncImagePainter.State.Error) -> Unit)? = null
@@ -34,6 +36,7 @@ fun AsyncImageView(
         contentDescription = altText,
         filterQuality = FilterQuality.None,
         contentScale = contentScale,
+        placeholder = placeHolder,
         onError = onError,
         onLoading = onLoading,
         onSuccess = onSuccess,

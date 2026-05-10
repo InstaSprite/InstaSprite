@@ -1,5 +1,6 @@
 package com.olaz.instasprite.data.network.model
 
+import androidx.core.graphics.toColorInt
 import com.olaz.instasprite.domain.model.CommentData
 import com.olaz.instasprite.domain.model.Jwt
 import com.olaz.instasprite.domain.model.MemberData
@@ -75,7 +76,8 @@ fun PostImageDto.toDomain(): PostImageData {
         altText = altText ?: "",
         postTags = postTags?.map { it.toDomain() } ?: emptyList(),
         imageWidth = imageWidth ?: 1080,
-        imageHeight = imageHeight ?: 1080
+        imageHeight = imageHeight ?: 1080,
+        dominantColor = dominantColor?.toColorInt() ?: 0
     )
 }
 

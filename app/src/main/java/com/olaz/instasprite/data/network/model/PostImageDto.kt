@@ -20,6 +20,9 @@ data class PostImageDto(
     val imageHeight: Int? = null,
     
     @SerializedName("postTags")
-    val postTags: List<PostTagDto>? = null
+    val postTags: List<PostTagDto>? = null,
+
+    @SerializedName("dominantColor")
+    val dominantColor: String? = null
 )
 

@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.palette.ktx)
 
 
 

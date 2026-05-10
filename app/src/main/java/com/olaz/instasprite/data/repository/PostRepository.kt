@@ -56,10 +56,30 @@ class PostRepository @Inject constructor(
             val width = if (options.outWidth > 0) options.outWidth else 1080
             val height = if (options.outHeight > 0) options.outHeight else 1080
 
+            // Extract dominant color using a downscaled thumbnail
+            var dominantColorHex: String? = null
+            try {
+                val scaleOptions = BitmapFactory.Options().apply {
+                    inSampleSize = 1.coerceAtLeast((width / 100).coerceAtMost(height / 100))
+                }
+                context.contentResolver.openInputStream(uri)?.use { stream ->
+                    val thumbnail = BitmapFactory.decodeStream(stream, null, scaleOptions)
+                    if (thumbnail != null) {
+                        val palette = androidx.palette.graphics.Palette.from(thumbnail).generate()
+                        palette.dominantSwatch?.let { swatch ->
+                            dominantColorHex = String.format("#%06X", (0xFFFFFF and swatch.rgb))
+                        }
+                        thumbnail.recycle()
+                    }
+                }
+            } catch (e: Exception) {
+            }
+
             UploadInitRequestDto.FileInfo(
                 contentType = mimeType,
                 width = width,
-                height = height
+                height = height,
+                dominantColor = dominantColorHex
             )
         }
 

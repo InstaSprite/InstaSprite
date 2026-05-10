@@ -23,6 +23,7 @@ composeBom = "2025.12.01"
 navigation3 = "1.0.1"
 navigation3ViewModel = "2.10.0"
 okhttp = "5.3.2"
+paletteKtx = "1.0.0"
 retrofit = "3.0.0"
 roomCompiler = "2.8.4"
 roomKtx = "2.8.4"
@@ -48,6 +49,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
+androidx-palette-ktx = { module = "androidx.palette:palette-ktx", version.ref = "paletteKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
