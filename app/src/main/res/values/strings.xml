@@ -38,6 +38,8 @@
     <string name="gallery">Gallery</string>
     <string name="about">About</string>
     <string name="create_your_first_sprite">Create your first sprite!</string>
+    <string name="no_sprite">No sprite</string>
+    <string name="click_plus_to_create">Click + to create new Sprite!</string>
     <string name="no_posts_to_show">No posts to show</string>
     <string name="posts_you_save_will_appear_here">Posts you save will appear here</string>
     <string name="no_saved_posts">No saved posts</string>

@@ -174,12 +174,20 @@ fun GalleryPageContent(
             .background(AppTheme.colors.BackgroundColorDarker)
             .animateContentSize()
     ) {
-        SpriteList(
-            onSpriteListEvent = event.onSpriteListEvent,
-            spriteList = spriteList,
-            lazyListState = lazyListState,
-            modifier = Modifier.padding(horizontal = 10.dp)
-        )
+        if (spriteList.size > 0) {
+            SpriteList(
+                onSpriteListEvent = event.onSpriteListEvent,
+                spriteList = spriteList,
+                lazyListState = lazyListState,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.click_plus_to_create),
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
     }
 }
 
