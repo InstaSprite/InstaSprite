@@ -109,7 +109,7 @@ fun NotificationScreen(
                                 if (entityId != null) {
                                     when (notification.type) {
                                         "FOLLOW" -> onNavigateToProfile(entityId)
-                                        "LIKE", "MENTION" -> {
+                                        "LIKE", "MENTION", "COMMENT" -> {
                                             val postId = entityId.toLongOrNull()
                                             if (postId != null) {
                                                 onNavigateToPost(postId)

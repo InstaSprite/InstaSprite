@@ -27,12 +27,16 @@ fun CommentsHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "${stringResource(R.string.comments)} ($commentsCount)",
+            text = "${stringResource(R.string.comments)} ",
             color = AppTheme.colors.TextColorLight,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold
         )
+        Text(
+            text = "($commentsCount)",
+            color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal
+        )
     }
 }
-
-

@@ -7,7 +7,7 @@ data class NotificationDto(
     val id: String,
     val title: String,
     val body: String,
-    val type: String, // LIKE, FOLLOW, MENTION
+    val type: String, // LIKE, FOLLOW, MENTION, COMMENT
     val relatedEntityId: String? = null,
     val isRead: Boolean,
     val createdAt: String,

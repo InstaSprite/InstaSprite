@@ -113,8 +113,6 @@ fun CommentScreen(
                 }
             },
             onStartReply = { id ->
-                val comment = uiState.comments.find { it.id == id.toString() }
-                newCommentText = if (comment != null) "@${comment.username} " else ""
                 viewModel.startReply(id)
                 commentFocusRequester.requestFocus()
             },
@@ -230,12 +228,15 @@ private fun CommentScreenContent(
             },
             bottomBar = {
                 if (isLoggedIn) {
+                    val replyingToComment = uiState.comments.find { it.id == uiState.replyParentId?.toString() }
                     CommentInput(
                         text = newCommentText,
                         onTextChange = onNewCommentTextChange,
                         onSendClick = { event.onAddComment(newCommentText) },
                         modifier = Modifier.focusRequester(commentFocusRequester),
-                        profileImageUrl = uiState.currentUserImageUrl
+                        profileImageUrl = uiState.currentUserImageUrl,
+                        replyingToUsername = replyingToComment?.username,
+                        onCancelReply = event.onClearReplyTarget
                     )
                 } else {
                     Box(
@@ -314,17 +315,14 @@ private fun CommentScreenContent(
 
                 item {
                     CommentsHeader(commentsCount = uiState.comments.size)
+                    androidx.compose.material3.Divider(
+                        color = AppTheme.colors.Foreground0Color.copy(alpha = 0.5f),
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
                 }
 
-                if (uiState.replyParentId != null) {
-                    item {
-                        AssistChip(
-                            onClick = event.onClearReplyTarget,
-                            label = { Text(text = stringResource(R.string.replying_tap_to_cancel)) },
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                    }
-                }
+                // AssistChip for reply target is no longer needed here as it is moved to CommentInput
 
                 items(
                     items = uiState.comments,
