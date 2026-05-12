@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.AsyncImageView
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.RetronFont
 
 @Composable
 fun CommentInput(
@@ -96,26 +97,26 @@ fun CommentInput(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
-                val avatarModifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
+//                val avatarModifier = Modifier
+//                    .size(36.dp)
+//                    .clip(CircleShape)
+//
+//                if (!profileImageUrl.isNullOrBlank()) {
+//                    AsyncImageView(
+//                        imageUrl = profileImageUrl,
+//                        altText = stringResource(R.string.your_profile),
+//                        modifier = avatarModifier,
+//                    )
+//                } else {
+//                    androidx.compose.foundation.Image(
+//                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_launcher),
+//                        contentDescription = stringResource(R.string.your_profile),
+//                        modifier = avatarModifier,
+//                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+//                    )
+//                }
 
-                if (!profileImageUrl.isNullOrBlank()) {
-                    AsyncImageView(
-                        imageUrl = profileImageUrl,
-                        altText = stringResource(R.string.your_profile),
-                        modifier = avatarModifier,
-                    )
-                } else {
-                    androidx.compose.foundation.Image(
-                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_launcher),
-                        contentDescription = stringResource(R.string.your_profile),
-                        modifier = avatarModifier,
-                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
+//                Spacer(modifier = Modifier.width(12.dp))
 
                 Box(
                     modifier = Modifier
@@ -138,6 +139,7 @@ fun CommentInput(
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(
                             color = AppTheme.colors.TextColorLight,
+                            fontFamily = RetronFont,
                             fontSize = 14.sp
                         ),
                         cursorBrush = SolidColor(AppTheme.colors.AccentButtonColor),

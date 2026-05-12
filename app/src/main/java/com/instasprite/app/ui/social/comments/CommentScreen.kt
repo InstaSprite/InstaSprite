@@ -370,7 +370,7 @@ private fun PostHeader(
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = detail.member.memberUsername,
+                text = detail.member.memberName,
                 color = AppTheme.colors.TextColorLight,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,

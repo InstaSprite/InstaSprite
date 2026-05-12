@@ -128,7 +128,7 @@ fun CommentItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = comment.username,
+                    text = comment.displayName,
                     color = AppTheme.colors.TextColorLight,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
@@ -183,28 +183,29 @@ fun CommentItem(
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
-                
                 // Reply Button
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable { onReplyClick(comment.id) }
-                        .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Reply,
-                        contentDescription = stringResource(R.string.reply),
-                        tint = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = stringResource(R.string.reply),
-                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                if (!isReply) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .clickable { onReplyClick(comment.id) }
+                            .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Reply,
+                            contentDescription = stringResource(R.string.reply),
+                            tint = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.reply),
+                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
 
             }
