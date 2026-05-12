@@ -1,5 +1,6 @@
 package com.olaz.instasprite.ui.home
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,9 +22,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -37,12 +36,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.olaz.instasprite.R
 import com.olaz.instasprite.ui.components.composable.JumpToTopButton
 import com.olaz.instasprite.ui.gallery.GalleryDialog
 import com.olaz.instasprite.ui.gallery.GalleryPageContent
@@ -67,9 +66,9 @@ import com.olaz.instasprite.utils.UiUtils
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-enum class HomeTab(val title: String) {
-    GALLERY("Gallery"),
-    FEED("Feed")
+enum class HomeTab(@StringRes val titleRes: Int) {
+    GALLERY(R.string.gallery),
+    FEED(R.string.feed)
 }
 
 @Composable
@@ -255,7 +254,7 @@ fun HomeScreen(
                                 onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                                 text = {
                                     Text(
-                                        text = tab.title,
+                                        text = androidx.compose.ui.res.stringResource(tab.titleRes),
                                         color = if (pagerState.currentPage == index)
                                             AppTheme.colors.TextColorLight
                                         else
