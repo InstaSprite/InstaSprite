@@ -27,7 +27,7 @@ android {
         applicationId = "com.instasprite.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = "0.7"
 
         buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL", "\"\""))
