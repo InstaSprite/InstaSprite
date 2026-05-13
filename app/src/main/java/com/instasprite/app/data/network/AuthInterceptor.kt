@@ -86,7 +86,11 @@ class AuthInterceptor @Inject constructor(
 
     private suspend fun refreshTokenDirectly(refreshToken: String): JwtDto? {
         return try {
-            val client = OkHttpClient()
+            val client = OkHttpClient.Builder()
+                .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .build()
             val requestBody = gson.toJson(RefreshTokenRequestDto(refreshToken))
                 .toRequestBody("application/json".toMediaType())
 
