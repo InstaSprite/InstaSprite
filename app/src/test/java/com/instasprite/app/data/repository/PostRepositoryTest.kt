@@ -12,17 +12,21 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 
+import com.instasprite.app.data.network.S3UploadClient
+
 class PostRepositoryTest {
 
     private lateinit var postApi: PostApi
+    private lateinit var s3UploadClient: S3UploadClient
     private lateinit var context: Context
     private lateinit var repo: PostRepository
 
     @Before
     fun setUp() {
         postApi = mockk()
+        s3UploadClient = mockk(relaxed = true)
         context = mockk(relaxed = true)
-        repo = PostRepository(context, postApi)
+        repo = PostRepository(context, postApi, s3UploadClient)
     }
 
     // ============================
@@ -37,7 +41,7 @@ class PostRepositoryTest {
 
         val result = repo.likePost(42L)
         assertTrue(result.isSuccess)
-        assertEquals("Post liked successfully", result.getOrNull())
+        assertEquals("Liked", result.getOrNull())
     }
 
     @Test

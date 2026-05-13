@@ -66,8 +66,8 @@ class ProfileRepositoryTest {
         )
 
         val result = repo.getUserProfile("testuser")
-        assertEquals(200, result.status)
-        assertEquals("testuser", result.data?.memberUsername)
+        assertTrue(result.isSuccess)
+        assertEquals("testuser", result.getOrNull()?.memberUsername)
     }
 
     @Test
@@ -77,8 +77,7 @@ class ProfileRepositoryTest {
         )
 
         val result = repo.getUserProfile("testuser")
-        assertNull(result.data)
-        assertEquals(500, result.status) // Note: The actual code currently returns 500 when it can't parse error body into ResultResponse
+        assertTrue(result.isFailure)
     }
 
     // ============================
@@ -102,8 +101,8 @@ class ProfileRepositoryTest {
         )
 
         val result = repo.getCurrentUserProfile()
-        assertEquals(200, result.status)
-        assertEquals("me", result.data?.memberUsername)
+        assertTrue(result.isSuccess)
+        assertEquals("me", result.getOrNull()?.memberUsername)
     }
 
     // ============================

@@ -8,11 +8,14 @@ import com.instasprite.app.data.repository.PostRepository
 import com.instasprite.app.data.repository.ProfileRepository
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.session.SocialSessionManager
+import com.instasprite.app.ui.social.session.SocialSessionState
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -36,6 +39,8 @@ class FeedViewModelTest {
     private lateinit var followRepository: FollowRepository
     private lateinit var accountRepository: AccountRepository
     private lateinit var sessionManager: SocialSessionManager
+    private lateinit var connectivityObserver: com.instasprite.app.utils.ConnectivityObserver
+    private lateinit var context: android.content.Context
 
     private lateinit var viewModel: FeedViewModel
 
@@ -49,6 +54,16 @@ class FeedViewModelTest {
         followRepository = mockk()
         accountRepository = mockk()
         sessionManager = mockk(relaxed = true)
+        connectivityObserver = mockk(relaxed = true)
+        context = mockk(relaxed = true)
+
+        val sessionFlow = MutableStateFlow<SocialSessionState>(SocialSessionState.LoggedIn("testuser"))
+        every { sessionManager.sessionState } returns sessionFlow
+        
+        val onlineFlow = MutableStateFlow(true)
+        every { connectivityObserver.isOnline } returns onlineFlow
+        
+        coEvery { profileRepository.getCurrentUserProfile() } returns Result.failure(Exception())
 
         mockkObject(PostInteractionEvent)
 
@@ -58,8 +73,12 @@ class FeedViewModelTest {
             profileRepository,
             followRepository,
             accountRepository,
-            sessionManager
+            sessionManager,
+            connectivityObserver,
+            context
         )
+        
+        testDispatcher.scheduler.advanceUntilIdle()
     }
 
     @After
