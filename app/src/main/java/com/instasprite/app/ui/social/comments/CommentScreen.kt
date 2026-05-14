@@ -167,11 +167,11 @@ fun CommentScreen(
 
     // TODO: Implement image zoom overlay if needed
 
-    if (uiState.showEmailNotVerified) {
+    if (uiState.verifyEmailState.showVerifyDialog) {
         VerifyEmailDialog(
-            verifyEmailState = VerifyEmailState(),
+            verifyEmailState = uiState.verifyEmailState,
             onDismiss = viewModel::dismissEmailNotVerified,
-            onConfirm = viewModel::dismissEmailNotVerified
+            onConfirm = { viewModel.verifyEmail(context) }
         )
     }
 }

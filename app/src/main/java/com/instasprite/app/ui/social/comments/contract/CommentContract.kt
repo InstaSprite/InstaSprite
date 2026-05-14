@@ -1,6 +1,7 @@
 package com.instasprite.app.ui.social.comments.contract
 
 import com.instasprite.app.domain.model.PostData
+import com.instasprite.app.ui.social.feed.VerifyEmailState
 
 data class Comment(
     val id: String,
@@ -41,7 +42,7 @@ data class CommentState(
     val currentUserImageUrl: String? = null,
     val replyParentId: Long? = null,
     val showLoginRequiredError: Boolean = false,
-    val showEmailNotVerified: Boolean = false
+    val verifyEmailState: VerifyEmailState = VerifyEmailState()
 )
 
 data class CommentScreenEvent(

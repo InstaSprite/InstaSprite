@@ -85,11 +85,12 @@ fun CreatePostScreen(
         event = event
     )
 
-    if (uiState.showEmailNotVerified) {
+    if (uiState.verifyEmailState.showVerifyDialog) {
+        val context = LocalContext.current
         VerifyEmailDialog(
-            verifyEmailState = VerifyEmailState(),
+            verifyEmailState = uiState.verifyEmailState,
             onDismiss = viewModel::dismissEmailNotVerified,
-            onConfirm = viewModel::dismissEmailNotVerified
+            onConfirm = { viewModel.verifyEmail(context) }
         )
     }
 }

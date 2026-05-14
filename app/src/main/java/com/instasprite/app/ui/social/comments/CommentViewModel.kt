@@ -7,6 +7,7 @@ import com.instasprite.app.R
 import com.instasprite.app.data.network.ApiError
 import com.instasprite.app.data.network.api.FollowApi
 import com.instasprite.app.data.network.api.ProfileApi
+import com.instasprite.app.data.repository.AuthRepository
 import com.instasprite.app.data.repository.CommentRepository
 import com.instasprite.app.data.repository.PostRepository
 import com.instasprite.app.domain.model.CommentData
@@ -34,7 +35,8 @@ class CommentViewModel @Inject constructor(
     private val commentRepository: CommentRepository,
     private val followApi: FollowApi,
     private val profileApi: ProfileApi,
-    private val sessionManager: SocialSessionManager
+    private val sessionManager: SocialSessionManager,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val prefs by lazy {
@@ -423,7 +425,7 @@ class CommentViewModel @Inject constructor(
                 onFailure = { error ->
                     _uiState.update { it.copy(comments = before, replyParentId = null) }
                     if (error is ApiError.Unauthorized && error.code == "M018") {
-                        _uiState.update { it.copy(showEmailNotVerified = true) }
+                        _uiState.update { it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = true)) }
                     }
                 }
             )
@@ -435,7 +437,44 @@ class CommentViewModel @Inject constructor(
     }
 
     fun dismissEmailNotVerified() {
-        _uiState.update { it.copy(showEmailNotVerified = false) }
+        _uiState.update { it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false)) }
+    }
+
+    fun verifyEmail(context: Context) {
+        _uiState.update {
+            it.copy(verifyEmailState = it.verifyEmailState.copy(isSending = true))
+        }
+        viewModelScope.launch {
+            authRepository.verifyEmail().fold(
+                onSuccess = {
+                    _uiState.update {
+                        it.copy(
+                            verifyEmailState = it.verifyEmailState.copy(
+                                isSending = false,
+                                success = true
+                            )
+                        )
+                    }
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.email_sent),
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                    dismissEmailNotVerified()
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            verifyEmailState = it.verifyEmailState.copy(
+                                isSending = false,
+                                success = false,
+                                message = error.toUserMessage(context)
+                            )
+                        )
+                    }
+                }
+            )
+        }
     }
 }
 

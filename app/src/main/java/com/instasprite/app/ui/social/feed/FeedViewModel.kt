@@ -313,6 +313,12 @@ class FeedViewModel @Inject constructor(
                                 verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = true)
                             )
                         }
+                    } else {
+                        _contentState.update {
+                            it.copy(
+                                verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false)
+                            )
+                        }
                     }
                 },
                 onFailure = { error ->

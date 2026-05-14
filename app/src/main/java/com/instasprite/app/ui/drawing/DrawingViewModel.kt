@@ -707,6 +707,7 @@ class DrawingViewModel @AssistedInject constructor(
         strokeTouchedCount = 0
 
         updateHistoryCurrentState()
+        refreshLayerState()
     }
 
     private fun onStrokeCancel() {
@@ -719,6 +720,10 @@ class DrawingViewModel @AssistedInject constructor(
 
         if (tool !is SelectionTool) {
             restorePendingHistoryCapture()
+            refreshLayerState()
+            viewModelScope.launch {
+                refreshBitmapState()
+            }
         }
     }
 

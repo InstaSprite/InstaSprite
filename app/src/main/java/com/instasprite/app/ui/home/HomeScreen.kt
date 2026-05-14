@@ -140,6 +140,7 @@ fun HomeScreen(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(feedViewModel, lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            feedViewModel.getCurrentProfile()
             feedViewModel.startPolling()
         }
     }

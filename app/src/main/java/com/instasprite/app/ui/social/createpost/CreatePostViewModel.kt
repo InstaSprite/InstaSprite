@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.instasprite.app.R
 import com.instasprite.app.data.network.ApiError
+import com.instasprite.app.data.repository.AuthRepository
 import com.instasprite.app.data.repository.PostRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.ui.social.PostInteractionEvent
@@ -26,7 +27,8 @@ import javax.inject.Inject
 class CreatePostViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val postRepository: PostRepository,
-    private val spriteDatabaseRepository: SpriteDatabaseRepository
+    private val spriteDatabaseRepository: SpriteDatabaseRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreatePostState())
@@ -120,7 +122,7 @@ class CreatePostViewModel @Inject constructor(
                     onFailure = { error ->
                         _uiState.update { it.copy(isPostInProgress = false) }
                         if (error is ApiError.Unauthorized && error.code == "M018") {
-                            _uiState.update { it.copy(showEmailNotVerified = true) }
+                            _uiState.update { it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = true)) }
                         } else {
                             viewModelScope.launch(Dispatchers.Main) {
                                 Toast.makeText(
@@ -139,6 +141,43 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun dismissEmailNotVerified() {
-        _uiState.update { it.copy(showEmailNotVerified = false) }
+        _uiState.update { it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false)) }
+    }
+
+    fun verifyEmail(context: Context) {
+        _uiState.update {
+            it.copy(verifyEmailState = it.verifyEmailState.copy(isSending = true))
+        }
+        viewModelScope.launch {
+            authRepository.verifyEmail().fold(
+                onSuccess = {
+                    _uiState.update {
+                        it.copy(
+                            verifyEmailState = it.verifyEmailState.copy(
+                                isSending = false,
+                                success = true
+                            )
+                        )
+                    }
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.email_sent),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    dismissEmailNotVerified()
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            verifyEmailState = it.verifyEmailState.copy(
+                                isSending = false,
+                                success = false,
+                                message = com.instasprite.app.utils.toUserMessage(error, context)
+                            )
+                        )
+                    }
+                }
+            )
+        }
     }
 }

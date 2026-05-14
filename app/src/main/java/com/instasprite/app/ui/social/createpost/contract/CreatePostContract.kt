@@ -2,6 +2,7 @@ package com.instasprite.app.ui.social.createpost.contract
 
 import android.net.Uri
 import com.instasprite.app.domain.model.SpriteWithMeta
+import com.instasprite.app.ui.social.feed.VerifyEmailState
 
 data class CreatePostState(
     val caption: String = "",
@@ -13,7 +14,7 @@ data class CreatePostState(
     val userSprites: List<SpriteWithMeta> = emptyList(),
     val hashtags: List<String> = emptyList(),
     val currentHashtagInput: String = "",
-    val showEmailNotVerified: Boolean = false
+    val verifyEmailState: VerifyEmailState = VerifyEmailState()
 )
 
 data class CreatePostScreenEvent(
