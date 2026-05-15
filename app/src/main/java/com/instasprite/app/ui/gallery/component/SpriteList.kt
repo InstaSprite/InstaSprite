@@ -2,6 +2,7 @@ package com.instasprite.app.ui.gallery.component
 
 import androidx.compose.ui.res.stringResource
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -19,6 +20,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -32,10 +41,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,54 +56,128 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
+import com.instasprite.app.domain.model.Cel
+import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
+import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable
 fun SpriteList(
     onSpriteListEvent: (SpriteListEvent) -> Unit,
     spriteList: List<SpriteWithMeta>,
+    layoutMode: GalleryLayoutMode = GalleryLayoutMode.List,
+    onIsScrolledChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
     val context = LocalContext.current
 
-    LazyColumn(
-        state = lazyListState,
-        modifier = modifier
-    ) {
-        items(
-            items = spriteList,
-            key = { it.sprite.id }
-        ) { (sprite, meta) ->
-            SpriteCard(
-                onDelete = {
-                    onSpriteListEvent(
-                        SpriteListEvent.OpenDeleteDialog(
-                            meta!!.spriteName,
-                            sprite.id
-                        )
-                    )
-                },
-                onRename = {
-                    onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
+    AnimatedContent(
+        targetState = layoutMode,
+        label = "LayoutTransition"
+    ) { currentMode ->
+        when (currentMode) {
+            GalleryLayoutMode.List -> {
+                val isScrolled by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 0 } }
+                LaunchedEffect(isScrolled) { onIsScrolledChange(isScrolled) }
 
-                },
-                onEdit = {
-                    onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context))
-                },
-                onClick = {
-                    onSpriteListEvent(SpriteListEvent.OpenPager(sprite))
-                },
-                sprite = sprite,
-                meta = meta,
-                modifier = Modifier.animateItem()
-            )
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = modifier
+                ) {
+                    items(
+                        items = spriteList,
+                        key = { it.sprite.id }
+                    ) { (sprite, meta) ->
+                        SpriteCard(
+                            onDelete = {
+                                onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id))
+                            },
+                            onRename = {
+                                onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
+                            },
+                            onEdit = {
+                                onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context))
+                            },
+                            onClick = {
+                                onSpriteListEvent(SpriteListEvent.OpenPager(sprite))
+                            },
+                            sprite = sprite,
+                            meta = meta,
+                            modifier = Modifier.animateItem()
+                        )
+                    }
+                }
+            }
+
+            GalleryLayoutMode.StaggeredGrid -> {
+                val staggeredState = rememberLazyStaggeredGridState()
+                val isScrolled by remember { derivedStateOf { staggeredState.firstVisibleItemIndex > 0 } }
+                LaunchedEffect(isScrolled) { onIsScrolledChange(isScrolled) }
+
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),
+                    state = staggeredState,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalItemSpacing = 8.dp,
+                    modifier = modifier
+                ) {
+                    items(
+                        items = spriteList,
+                        key = { it.sprite.id }
+                    ) { spriteWithMeta ->
+                        val (sprite, meta) = spriteWithMeta
+                        SpriteGridCard(
+                            spriteWithMeta = spriteWithMeta,
+                            layoutMode = GalleryLayoutMode.StaggeredGrid,
+                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context)) },
+                            onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
+                            onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
+                            onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
+                            modifier = Modifier.animateItem()
+                        )
+                    }
+                }
+            }
+
+            GalleryLayoutMode.SquareGrid -> {
+                val gridState = rememberLazyGridState()
+                val isScrolled by remember { derivedStateOf { gridState.firstVisibleItemIndex > 0 } }
+                LaunchedEffect(isScrolled) { onIsScrolledChange(isScrolled) }
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    state = gridState,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = modifier
+                ) {
+                    items(
+                        items = spriteList,
+                        key = { it.sprite.id }
+                    ) { spriteWithMeta ->
+                        val (sprite, meta) = spriteWithMeta
+                        SpriteGridCard(
+                            spriteWithMeta = spriteWithMeta,
+                            layoutMode = GalleryLayoutMode.SquareGrid,
+                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context)) },
+                            onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
+                            onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
+                            onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
+                            modifier = Modifier.animateItem()
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -106,7 +192,6 @@ private fun SpriteCard(
     meta: SpriteMeta?,
     modifier: Modifier = Modifier,
 ) {
-
     var showDropdown by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(true) }
 
@@ -136,7 +221,7 @@ private fun SpriteCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = meta?.spriteName ?: "Untitled",
+                    text = meta?.spriteName ?: stringResource(R.string.untitled),
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
 
@@ -190,7 +275,7 @@ private fun SpriteCard(
 }
 
 @Composable
-private fun SpriteDropdownMenu(
+internal fun SpriteDropdownMenu(
     expanded: Boolean,
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
@@ -236,6 +321,105 @@ private fun SpriteDropdownMenu(
                 )
             },
             onClick = onDelete,
+        )
+    }
+}
+
+private val previewSprites = listOf(
+    SpriteWithMeta(
+        sprite = Sprite(
+            id = "p1", width = 16, height = 16,
+            layers = listOf(
+                Layer(
+                    id = "l1", name = "Layer 1",
+                    cel = Cel(
+                        x = 0, y = 0, width = 16, height = 16,
+                        pixels = IntArray(16 * 16) { 0xFF89B4FA.toInt()}
+                    )
+                )
+            )
+        ),
+        meta = SpriteMeta(spriteId = "p1", spriteName = "1")
+    ),
+    SpriteWithMeta(
+        sprite = Sprite(
+            id = "p2", width = 16, height = 24,
+            layers = listOf(
+                Layer(
+                    id = "l2", name = "Layer 1",
+                    cel = Cel(
+                        x = 0, y = 0, width = 16, height = 24,
+                        pixels = IntArray(16 * 24) { 0xFFA6E3A1.toInt()  }
+                    )
+                )
+            )
+        ),
+        meta = SpriteMeta(spriteId = "p2", spriteName = "2")
+    ),
+    SpriteWithMeta(
+        sprite = Sprite(
+            id = "p3", width = 32, height = 16,
+            layers = listOf(
+                Layer(
+                    id = "l3", name = "Layer 1",
+                    cel = Cel(
+                        x = 0, y = 0, width = 32, height = 16,
+                        pixels = IntArray(32 * 16) { 0xFFF38BA8.toInt() }
+                    )
+                )
+            )
+        ),
+        meta = SpriteMeta(spriteId = "p3", spriteName = "3")
+    ),
+    SpriteWithMeta(
+        sprite = Sprite(
+            id = "p4", width = 32, height = 32,
+            layers = listOf(
+                Layer(
+                    id = "l4", name = "Layer 1",
+                    cel = Cel(
+                        x = 0, y = 0, width = 32, height = 32,
+                        pixels = IntArray(32 * 32) { 0xFFCBA6F7.toInt()  } // Mauve/Base
+                    )
+                )
+            )
+        ),
+        meta = SpriteMeta(spriteId = "p4", spriteName = "4")
+    )
+)
+
+@Preview(showBackground = true, name = "SpriteList List", heightDp = 600)
+@Composable
+private fun SpriteListListPreview() {
+    InstaSpriteTheme {
+        SpriteList(
+            onSpriteListEvent = {},
+            spriteList = previewSprites,
+            layoutMode = GalleryLayoutMode.List
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "SpriteList Staggered", heightDp = 600)
+@Composable
+private fun SpriteListStaggeredPreview() {
+    InstaSpriteTheme {
+        SpriteList(
+            onSpriteListEvent = {},
+            spriteList = previewSprites,
+            layoutMode = GalleryLayoutMode.StaggeredGrid
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "SpriteList Square Grid", heightDp = 600)
+@Composable
+private fun SpriteListSquareGridPreview() {
+    InstaSpriteTheme {
+        SpriteList(
+            onSpriteListEvent = {},
+            spriteList = previewSprites,
+            layoutMode = GalleryLayoutMode.SquareGrid
         )
     }
 }

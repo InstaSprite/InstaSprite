@@ -11,7 +11,7 @@ import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.ui.gallery.dialog.RenameDialog
 import com.instasprite.app.ui.gallery.dialog.SaveImageDialog
-import com.instasprite.app.ui.gallery.dialog.SelectSortOptionDialog
+import com.instasprite.app.ui.gallery.dialog.DisplayOptionsDialog
 import com.instasprite.app.ui.drawing.dialog.LoadISpriteDialog
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -20,7 +20,7 @@ sealed interface GalleryDialog : Dialog {
     data class SaveImage(val sprite: SpriteWithMeta) : GalleryDialog
     data class Rename(val spriteId: String) : GalleryDialog
     data class DeleteSpriteConfirm(val spriteName: String, val spriteId: String) : GalleryDialog
-    data object SelectSortOption : GalleryDialog
+    data object DisplayOptions : GalleryDialog
     data object LoadISprite : GalleryDialog
 }
 
@@ -31,6 +31,7 @@ fun GalleryScreenDialogs(
 ) {
     var lastSavedUri = viewModel.lastSavedLocation.collectAsState().value
     val spriteListOrder = viewModel.spriteListOrder.collectAsState().value
+    val layoutMode = viewModel.uiState.collectAsState().value.layoutMode
 
     LaunchedEffect(Unit) {
         lastSavedUri = viewModel.getLastSavedLocation()
@@ -72,13 +73,15 @@ fun GalleryScreenDialogs(
                     onDismiss = viewModel::closeTopDialog
                 )
 
-            is GalleryDialog.SelectSortOption ->
-                SelectSortOptionDialog(
+            is GalleryDialog.DisplayOptions ->
+                DisplayOptionsDialog(
                     onSortOrderSelected = { sortOrder ->
                         viewModel.setSpriteListOrder(order = sortOrder)
                         viewModel.saveSortSetting(sortOrder)
                     },
                     spriteListOrder = spriteListOrder,
+                    onLayoutModeSelected = viewModel::setLayoutMode,
+                    layoutMode = layoutMode,
                     onDismiss = viewModel::closeTopDialog
                 )
 

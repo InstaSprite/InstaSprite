@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -43,9 +44,12 @@ enum class SpriteListOrder {
     LastModifiedDesc
 }
 
+enum class GalleryLayoutMode { List, StaggeredGrid, SquareGrid }
+
 data class GalleryState(
     val showSearchBar: Boolean = false,
-    val showImagePager: Boolean = false
+    val showImagePager: Boolean = false,
+    val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List
 )
 
 @HiltViewModel
@@ -131,7 +135,7 @@ class GalleryViewModel @Inject constructor(
     fun onBottomBarEvent(event: BottomBarEvent) {
         when (event) {
             is BottomBarEvent.ToggleSearchBar -> toggleSearchBar()
-            is BottomBarEvent.OpenSelectSortOption -> openDialog(GalleryDialog.SelectSortOption)
+            is BottomBarEvent.OpenDisplayOptions -> openDialog(GalleryDialog.DisplayOptions)
         }
     }
 
@@ -190,6 +194,10 @@ class GalleryViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             showSearchBar = !_uiState.value.showSearchBar
         )
+    }
+
+    fun setLayoutMode(mode: GalleryLayoutMode) {
+        _uiState.update { it.copy(layoutMode = mode) }
     }
 
     fun toggleImagePager(selectedSprite: Sprite?) {

@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,6 +36,7 @@ import com.instasprite.app.ui.components.composable.FabMenuColors
 import com.instasprite.app.ui.components.composable.FabMenuItem
 import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 
 @Composable
 fun HomeBottomBar(
@@ -83,7 +85,7 @@ fun HomeBottomBar(
             BottomBarItem(
                 iconResourceId = R.drawable.ic_sort,
                 onClick = {
-                    onBottomBarEvent(BottomBarEvent.OpenSelectSortOption)
+                    onBottomBarEvent(BottomBarEvent.OpenDisplayOptions)
                 },
                 iconTint = AppTheme.colors.TextColorLight
             )
@@ -183,6 +185,16 @@ fun FeedFab(
             tint = colors.fabIcon,
             modifier = Modifier
                 .size(30.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Bottom Bar")
+@Composable
+private fun HomeBottomBarPreview() {
+    InstaSpriteTheme {
+        HomeBottomBar(
+            onBottomBarEvent = {}
         )
     }
 }
