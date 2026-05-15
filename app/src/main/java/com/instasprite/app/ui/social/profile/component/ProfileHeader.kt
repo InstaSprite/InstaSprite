@@ -47,7 +47,6 @@ fun ProfileHeader(
             }
         },
         actions = {
-            // Hamburger menu button (always visible)
             IconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = Icons.Default.Menu,
