@@ -60,6 +60,7 @@ import com.instasprite.app.ui.social.comments.contract.PostAuthor
 import com.instasprite.app.ui.social.createpost.composable.TopBar
 import com.instasprite.app.ui.social.feed.VerifyEmailState
 import com.instasprite.app.ui.social.feed.dialog.VerifyEmailDialog
+import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.ui.social.session.SocialSessionState
 import com.instasprite.app.ui.social.session.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
@@ -188,6 +189,7 @@ private fun CommentScreenContent(
     onLoginClick: () -> Unit
 ) {
     LocalContext.current
+    var commentPendingDelete by remember { mutableStateOf<String?>(null) }
 
     if (uiState.isLoading) {
         Box(
@@ -227,7 +229,8 @@ private fun CommentScreenContent(
             },
             bottomBar = {
                 if (isLoggedIn) {
-                    val replyingToComment = uiState.comments.find { it.id == uiState.replyParentId?.toString() }
+                    val replyingToComment =
+                        uiState.comments.find { it.id == uiState.replyParentId?.toString() }
                     CommentInput(
                         text = newCommentText,
                         onTextChange = onNewCommentTextChange,
@@ -332,7 +335,7 @@ private fun CommentScreenContent(
                         onProfileClick = event.onProfileClick,
                         onLikeClick = event.onToggleCommentLike,
                         onReplyClick = { id -> event.onStartReply(id.toLongOrNull() ?: 0L) },
-                        onDeleteClick = event.onDeleteComment
+                        onDeleteClick = { id -> commentPendingDelete = id }
                     )
                 }
 
@@ -340,6 +343,21 @@ private fun CommentScreenContent(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
+        }
+
+        commentPendingDelete?.let { id ->
+            ConfirmationDialog(
+                title = stringResource(R.string.delete_comment),
+                text = stringResource(R.string.are_you_sure_you_want_to_delete),
+                highlightText = stringResource(R.string.delete_comment),
+                confirmButtonText = stringResource(R.string.delete),
+                dismissButtonText = stringResource(R.string.cancel),
+                onConfirm = {
+                    event.onDeleteComment(id)
+                    commentPendingDelete = null
+                },
+                onDismiss = { commentPendingDelete = null }
+            )
         }
     }
 }

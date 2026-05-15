@@ -151,6 +151,13 @@ fun PostList(
                         .padding(horizontal = 10.dp),
                     contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
+                    stickyHeader {
+                        FeedSortChipBar(
+                            currentFilter = state.uiState.postFilter,
+                            isLoggedIn = isLoggedIn,
+                            onSelectFilter = event.onSelectPostFilter
+                        )
+                    }
                     items(
                         count = pagedItems.itemCount,
                         key = pagedItems.itemKey { it.postId }
