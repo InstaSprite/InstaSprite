@@ -137,6 +137,7 @@
     <!-- Profile Screen -->
     <string name="edit_profile">Edit Profile</string>
     <string name="change_photo">Change Photo</string>
+    <string name="crop_image">Crop Image</string>
     <string name="change_cover">Change Cover</string>
     <string name="privacy_settings">Privacy Settings</string>
     <string name="account_settings">Account Settings</string>

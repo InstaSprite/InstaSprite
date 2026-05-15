@@ -135,6 +135,7 @@
     <!-- Profile Screen -->
     <string name="edit_profile">Chỉnh sửa Hồ sơ</string>
     <string name="change_photo">Đổi Ảnh</string>
+    <string name="crop_image">Cắt Ảnh</string>
     <string name="change_cover">Đổi Ảnh Bìa</string>
     <string name="privacy_settings">Cài đặt Quyền riêng tư</string>
     <string name="account_settings">Cài đặt Tài khoản</string>

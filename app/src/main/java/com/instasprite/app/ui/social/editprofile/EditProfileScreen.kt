@@ -1,6 +1,7 @@
 package com.instasprite.app.ui.social.editprofile
 
-import android.app.Activity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -40,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
@@ -53,7 +55,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.yalantis.ucrop.UCrop
+import com.instasprite.app.ui.components.composable.ImageCropperDialog
+import com.mr0xf00.easycrop.CropResult
+import com.mr0xf00.easycrop.crop
+import com.mr0xf00.easycrop.rememberImageCropper
 import com.instasprite.app.R
 import com.instasprite.app.ui.social.editprofile.component.AvatarSourceSheet
 import com.instasprite.app.ui.social.editprofile.component.EditAvatarSection
@@ -63,6 +68,10 @@ import com.instasprite.app.ui.social.editprofile.contract.EditProfileState
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import java.io.File
+import java.io.FileOutputStream
+import androidx.compose.ui.graphics.asAndroidBitmap
+import kotlinx.coroutines.launch
+import androidx.core.graphics.scale
 
 @Composable
 fun EditProfileScreen(
@@ -71,6 +80,8 @@ fun EditProfileScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val imageCropper = rememberImageCropper()
 
     LaunchedEffect(state.savedSuccess) {
         if (state.savedSuccess) onBackClick()
@@ -83,27 +94,29 @@ fun EditProfileScreen(
         }
     }
 
-    val cropLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            val resultUri = UCrop.getOutput(result.data!!)
-            if (resultUri != null) viewModel.onAvatarPicked(resultUri)
-        }
-    }
-
     val devicePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            val destFile = File(context.cacheDir, "avatar_crop_${System.currentTimeMillis()}.jpg")
-            val cropIntent = UCrop.of(uri, Uri.fromFile(destFile))
-                .withAspectRatio(1f, 1f)
-                .withMaxResultSize(512, 512)
-                .getIntent(context)
-            cropLauncher.launch(cropIntent)
+            scope.launch {
+                val result = imageCropper.crop(uri, context)
+                if (result is CropResult.Success) {
+                    val destFile = File(context.cacheDir, "avatar_crop_${System.currentTimeMillis()}.png")
+                    FileOutputStream(destFile).use { out ->
+                        result.bitmap.asAndroidBitmap().compress(
+                            android.graphics.Bitmap.CompressFormat.PNG, 100, out
+                        )
+                    }
+                    viewModel.onAvatarPicked(Uri.fromFile(destFile))
+                }
+            }
         }
     }
+
+    ImageCropperDialog(
+        imageCropper = imageCropper,
+        aspectLock = true
+    )
 
     val event = remember(viewModel) {
         EditProfileEvent(
@@ -115,7 +128,37 @@ fun EditProfileScreen(
             onPickFromDevice = { devicePickerLauncher.launch("image/*") },
             onPickFromSprite = viewModel::openSpritePicker,
             onDismissSpritePicker = viewModel::dismissSpritePicker,
-            onSpriteSelected = viewModel::selectSpriteForAvatar,
+            onSpriteSelected = { spriteId ->
+                viewModel.dismissSpritePicker()
+                scope.launch {
+                    val file = File(context.filesDir, "thumbnail_$spriteId.png")
+                    if (file.exists()) {
+                        val original = BitmapFactory.decodeFile(file.absolutePath)
+                        val targetWidth = 256
+                        val targetHeight = (original.height.toFloat() / original.width.toFloat() * targetWidth).toInt()
+                        val scaled = original.scale(targetWidth, targetHeight, false)
+                        val tempFile = File(context.cacheDir, "scaled_sprite_$spriteId.png")
+                        FileOutputStream(tempFile).use { out ->
+                            scaled.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+                        
+                        val result = imageCropper.crop(Uri.fromFile(tempFile), context)
+                        if (tempFile.exists()) {
+                            tempFile.delete()
+                        }
+                        
+                        if (result is CropResult.Success) {
+                            val destFile = File(context.cacheDir, "avatar_crop_${System.currentTimeMillis()}.png")
+                            FileOutputStream(destFile).use { out ->
+                                result.bitmap.asAndroidBitmap().compress(
+                                    Bitmap.CompressFormat.PNG, 100, out
+                                )
+                            }
+                            viewModel.onAvatarPicked(Uri.fromFile(destFile))
+                        }
+                    }
+                }
+            },
             onAvatarPicked = viewModel::onAvatarPicked,
             onSave = viewModel::save,
             onClearError = viewModel::clearError,
