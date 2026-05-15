@@ -172,6 +172,9 @@ fun GalleryPageContent(
     event: GalleryScreenEvent,
     modifier: Modifier = Modifier,
 ) {
+
+    var isScrolled by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -183,9 +186,22 @@ fun GalleryPageContent(
             SpriteList(
                 onSpriteListEvent = event.onSpriteListEvent,
                 spriteList = spriteList,
+                layoutMode = uiState.layoutMode,
+                onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp)
             )
+
+            AnimatedVisibility(
+                visible = isScrolled,
+                enter = scaleIn(),
+                exit = scaleOut(),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 10.dp)
+            ) {
+                JumpToTopButton(listState = lazyListState)
+            }
         } else {
             Text(
                 text = stringResource(R.string.click_plus_to_create),

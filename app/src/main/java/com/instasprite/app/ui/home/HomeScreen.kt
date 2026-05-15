@@ -323,17 +323,6 @@ fun HomeScreen(
                 }
             }
 
-            AnimatedVisibility(
-                visible = firstGalleryItemVisible && pagerState.currentPage == 0,
-                enter = scaleIn(),
-                exit = scaleOut(),
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 56.dp)
-            ) {
-                JumpToTopButton(listState = galleryListState)
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
