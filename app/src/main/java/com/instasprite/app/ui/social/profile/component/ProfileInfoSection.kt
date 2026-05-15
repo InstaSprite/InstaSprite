@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -42,17 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.AsyncImageView
-import com.instasprite.app.ui.social.profile.contract.ProfileImageUiState
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
 fun ProfileInfoSection(
     userProfile: UserProfileState,
-    profileImageState: ProfileImageUiState,
     onEditProfileClick: () -> Unit,
     onFollowClick: () -> Unit,
-    onEditAvatarClick: () -> Unit = {},
     onFollowersClick: () -> Unit = {},
     onFollowingClick: () -> Unit = {},
     isLoggedIn: Boolean = false
@@ -88,18 +84,9 @@ fun ProfileInfoSection(
                             .clip(CircleShape)
                             .background(AppTheme.colors.BackgroundColorDarker)
                     ) {
-                        if (profileImageState.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .align(Alignment.Center),
-                                color = AppTheme.colors.BottomBarColor,
-                                strokeWidth = 2.dp
-                            )
-                        } else if (profileImageState.imageUrl != null) {
-
+                        if (!userProfile.profileImageUrl.isNullOrEmpty()) {
                             AsyncImageView(
-                                imageUrl = profileImageState.imageUrl,
+                                imageUrl = userProfile.profileImageUrl,
                                 altText = stringResource(R.string.profile_picture),
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -118,28 +105,28 @@ fun ProfileInfoSection(
                     }
                 }
 
-                // Floating edit button - only show for own profile
-                if (userProfile.isOwnProfile) {
-                    FloatingActionButton(
-                        onClick = onEditAvatarClick,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .align(Alignment.BottomEnd)
-                            .offset(x = -6.dp, y = -12.dp), // Position it higher up on the circle
-                        containerColor = AppTheme.colors.BottomBarColor,
-                        contentColor = AppTheme.colors.TextColorLight,
-                        elevation = FloatingActionButtonDefaults.elevation(
-                            defaultElevation = 6.dp,
-                            pressedElevation = 10.dp
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.edit_avatar),
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
+//                // Floating edit button - only show for own profile
+//                if (userProfile.isOwnProfile) {
+//                    FloatingActionButton(
+//                        onClick = onEditProfileClick,
+//                        modifier = Modifier
+//                            .size(28.dp)
+//                            .align(Alignment.BottomEnd)
+//                            .offset(x = -6.dp, y = -12.dp),
+//                        containerColor = AppTheme.colors.BottomBarColor,
+//                        contentColor = AppTheme.colors.TextColorLight,
+//                        elevation = FloatingActionButtonDefaults.elevation(
+//                            defaultElevation = 6.dp,
+//                            pressedElevation = 10.dp
+//                        )
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Edit,
+//                            contentDescription = stringResource(R.string.edit_avatar),
+//                            modifier = Modifier.size(14.dp)
+//                        )
+//                    }
+//                }
             }
 
             Spacer(modifier = Modifier.width(8.dp))

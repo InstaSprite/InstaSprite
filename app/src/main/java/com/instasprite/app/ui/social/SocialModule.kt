@@ -7,6 +7,7 @@ import com.instasprite.app.ui.social.auth.AuthScreen
 import com.instasprite.app.ui.social.comments.CommentScreen
 import com.instasprite.app.ui.social.completionprofile.ProfileCompletionScreen
 import com.instasprite.app.ui.social.createpost.CreatePostScreen
+import com.instasprite.app.ui.social.editprofile.EditProfileScreen
 import com.instasprite.app.ui.social.hashtag.HashtagFeedScreen
 import com.instasprite.app.ui.social.notification.NotificationScreen
 import com.instasprite.app.ui.social.profile.ProfileScreen
@@ -86,7 +87,8 @@ object SocialModule {
                 onBackClick = { navigator.goBack() },
                 onPostClick = { postId -> navigator.goTo(Screen.Comments(postId)) },
                 onMenuClick = {},
-                onLoginClick = { navigator.goTo(Screen.Auth) }
+                onLoginClick = { navigator.goTo(Screen.Auth) },
+                onNavigateToEditProfile = { navigator.goTo(Screen.EditProfile) }
             )
         }
     }
@@ -114,6 +116,16 @@ object SocialModule {
                 onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
                 onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
                 onOpenHashtag = { hashtag -> navigator.goTo(Screen.Hashtag(hashtag)) }
+            )
+        }
+    }
+
+    @Provides
+    @IntoSet
+    fun provideEditProfileEntry(navigator: Navigator): EntryProviderInstaller = {
+        entry<Screen.EditProfile> {
+            EditProfileScreen(
+                onBackClick = { navigator.goBack() }
             )
         }
     }

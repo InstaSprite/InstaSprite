@@ -129,6 +129,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.zoomable)
     implementation(libs.compose.material.icons)
+    implementation(libs.ucrop)
 
     // --- Persistence / Storage ---
     implementation(libs.androidx.room.runtime)

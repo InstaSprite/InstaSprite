@@ -2,8 +2,6 @@ package com.instasprite.app.ui.social.profile
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,29 +24,21 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -68,7 +58,6 @@ import com.instasprite.app.ui.social.profile.contract.ProfileTab
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
 import com.instasprite.app.ui.social.session.SocialSessionState
 import com.instasprite.app.ui.social.session.SocialSessionViewModel
-import com.instasprite.app.ui.social.profile.dialog.EditProfileDialog
 import com.instasprite.app.ui.social.profile.dialog.FollowersDialog
 import com.instasprite.app.ui.social.profile.dialog.FollowingDialog
 import com.instasprite.app.ui.theme.AppTheme
@@ -86,6 +75,7 @@ fun ProfileScreen(
     onPostClick: ((postId: Long) -> Unit)? = null,
     onMenuClick: (() -> Unit)? = null,
     onLoginClick: () -> Unit = {},
+    onNavigateToEditProfile: () -> Unit = {},
     viewModel: ProfileScreenViewModel = hiltViewModel(),
     sessionViewModel: SocialSessionViewModel = hiltViewModel()
 ) {
@@ -97,10 +87,8 @@ fun ProfileScreen(
     LaunchedEffect(userId) {
         if (userId == null) {
             viewModel.loadCurrentUserProfile()
-            viewModel.loadProfileImage(null)
         } else {
             viewModel.loadUserProfile(userId)
-            viewModel.loadProfileImage(userId)
         }
     }
 
@@ -139,24 +127,20 @@ fun ProfileScreen(
             state = contentState,
             event = ProfileScreenEvent(
                 onBackClick = onBackClick,
-                onEditProfileClick = { viewModel.toggleEditProfileDialog() },
-                onEditAvatarClick = { viewModel.toggleEditAvatarDialog() },
+                onEditProfileClick = onNavigateToEditProfile,
                 onFollowClick = { viewModel.toggleFollow() },
                 onFollowersClick = { viewModel.showFollowersDialog() },
                 onFollowingClick = { viewModel.showFollowingDialog() },
                 onTabSelected = { index -> viewModel.selectTab(index) },
-                onUpdateProfile = { displayName, bio -> viewModel.updateUserProfile(displayName, bio) },
                 onFollowUser = { id -> viewModel.followUser(id) },
                 onUnfollowUser = { id -> viewModel.unfollowUser(id) },
-                onUploadAvatar = { uri -> viewModel.uploadProfileImage(uri) },
                 onPostClick = { postId -> onPostClick?.invoke(postId) },
                 onMenuClick = { onMenuClick?.invoke() },
                 onClearError = { viewModel.clearError() },
-                onDismissEditProfile = { viewModel.toggleEditProfileDialog() },
-                onDismissAvatarDialog = { viewModel.toggleEditAvatarDialog() },
                 onDismissFollowers = { viewModel.hideFollowersDialog() },
                 onDismissFollowing = { viewModel.hideFollowingDialog() },
-                onConsumeLoginRequiredError = { viewModel.consumeLoginRequiredError() }
+                onConsumeLoginRequiredError = { viewModel.consumeLoginRequiredError() },
+                onNavigateToEditProfile = onNavigateToEditProfile
             ),
             isLoggedIn = isLoggedIn
         )
@@ -222,10 +206,8 @@ fun ProfileContent(
         ) {
             ProfileInfoSection(
                 userProfile = state.userProfile,
-                profileImageState = state.profileImageUiState,
                 onEditProfileClick = event.onEditProfileClick,
                 onFollowClick = event.onFollowClick,
-                onEditAvatarClick = event.onEditAvatarClick,
                 onFollowersClick = event.onFollowersClick,
                 onFollowingClick = event.onFollowingClick,
                 isLoggedIn = isLoggedIn
@@ -371,116 +353,6 @@ fun ProfileContent(
             onBackClick = event.onBackClick,
             onMenuClick = event.onMenuClick,
             modifier = Modifier.align(Alignment.TopStart)
-        )
-    }
-
-    // Dialogs
-    if (state.showEditProfileDialog) {
-        EditProfileDialog(
-            userProfile = state.userProfile,
-            onDismiss = event.onDismissEditProfile,
-            onSave = { newDisplayName, newBio ->
-                event.onUpdateProfile(newDisplayName, newBio)
-                event.onDismissEditProfile()
-            }
-        )
-    }
-
-    if (state.showEditAvatarDialog) {
-        var pendingAvatarUri by remember { mutableStateOf<android.net.Uri?>(null) }
-        val imagePicker = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri -> if (uri != null) pendingAvatarUri = uri }
-
-        AlertDialog(
-            onDismissRequest = {
-                event.onDismissAvatarDialog()
-                pendingAvatarUri = null
-            },
-            confirmButton = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(
-                        16.dp,
-                        Alignment.CenterHorizontally
-                    ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(onClick = {
-                        event.onDismissAvatarDialog()
-                        pendingAvatarUri = null
-                    }) {
-                        Text(text = stringResource(R.string.cancel))
-                    }
-                    Button(
-                        onClick = {
-                            pendingAvatarUri?.let { uri ->
-                                event.onUploadAvatar(uri)
-                                pendingAvatarUri = null
-                            }
-                        },
-                        enabled = pendingAvatarUri != null && !state.profileImageUiState.isLoading
-                    ) {
-                        if (state.profileImageUiState.isLoading) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp,
-                                    color = AppTheme.colors.TextColorLight
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = stringResource(R.string.uploading))
-                            }
-                        } else {
-                            Text(
-                                text = stringResource(R.string.confirm),
-                                color = AppTheme.colors.TextColorDark
-                            )
-                        }
-                    }
-                }
-            },
-            title = {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text(text = stringResource(R.string.change_profile_photo))
-                }
-            },
-            text = {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    val previewSource = pendingAvatarUri ?: state.profileImageUiState.imageUrl
-                    Box(
-                        modifier = Modifier
-                            .size(140.dp)
-                            .clip(androidx.compose.foundation.shape.CircleShape)
-                            .background(AppTheme.colors.Foreground2Color)
-                    ) {
-                        AsyncImageView(
-                            imageUrl = previewSource.toString(),
-                            altText = stringResource(R.string.avatar_preview),
-                            modifier = Modifier
-                                .matchParentSize()
-                                .clip(androidx.compose.foundation.shape.CircleShape)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .clip(androidx.compose.foundation.shape.CircleShape)
-                                .background(Color.Black.copy(alpha = 0.45f))
-                                .clickable(enabled = !state.profileImageUiState.isLoading) {
-                                    if (!state.profileImageUiState.isLoading) imagePicker.launch("image/*")
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = stringResource(R.string.pick_image),
-                                tint = AppTheme.colors.TextColorLight,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                    }
-                }
-            }
         )
     }
 

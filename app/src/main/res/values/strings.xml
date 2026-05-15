@@ -370,4 +370,6 @@
     <string name="no_posts_found">No posts found</string>
     <string name="trending">Trending</string>
     <string name="no_trending_posts_yet">No trending posts yet</string>
+    <string name="pick_from_device">Pick from Device</string>
+    <string name="pick_from_sprite">Pick from Sprite</string>
 </resources>

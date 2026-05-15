@@ -1,12 +1,9 @@
 package com.instasprite.app.ui.social.profile
 
 import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.instasprite.app.data.network.model.EditProfileRequestDto
 import com.instasprite.app.data.network.model.FollowerDto
-import com.instasprite.app.data.repository.AccountRepository
 import com.instasprite.app.data.repository.FollowRepository
 import com.instasprite.app.data.repository.ProfileRepository
 import com.instasprite.app.ui.social.PostInteractionEvent
@@ -20,7 +17,6 @@ import com.instasprite.app.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import coil3.imageLoader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +29,6 @@ import javax.inject.Inject
 class ProfileScreenViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val followRepository: FollowRepository,
-    private val accountRepository: AccountRepository,
     private val sessionManager: SocialSessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -172,14 +167,6 @@ class ProfileScreenViewModel @Inject constructor(
         }
     }
 
-    fun toggleEditProfileDialog() {
-        _contentState.update { it.copy(showEditProfileDialog = !it.showEditProfileDialog) }
-    }
-
-    fun toggleEditAvatarDialog() {
-        _contentState.update { it.copy(showEditAvatarDialog = !it.showEditAvatarDialog) }
-    }
-
     fun selectTab(tabIndex: Int) {
         _contentState.update { it.copy(selectedTabIndex = tabIndex) }
         viewModelScope.launch(Dispatchers.IO) {
@@ -197,56 +184,6 @@ class ProfileScreenViewModel @Inject constructor(
                     _contentState.update { it.copy(sharedPosts = emptyList()) }
                 }
             }
-        }
-    }
-
-    fun updateUserProfile(displayName: String, bio: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _contentState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            profileRepository.getEditProfile().fold(
-                onSuccess = { editData ->
-                    val currentProfile = _contentState.value.userProfile
-                    val request = EditProfileRequestDto(
-                        memberUsername = currentProfile.username,
-                        memberName = displayName,
-                        memberIntroduce = bio,
-                        memberEmail = editData.memberEmail
-                    )
-
-                    profileRepository.editProfile(request).fold(
-                        onSuccess = {
-                            sessionManager.currentUsername()?.let { currentUsername ->
-                                viewModelScope.launch(Dispatchers.IO) {
-                                    accountRepository.updateAccount(currentUsername) { acc ->
-                                        acc.copy(name = displayName)
-                                    }
-                                }
-                            }
-                            _contentState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    errorMessage = null,
-                                    userProfile = it.userProfile.copy(
-                                        displayName = displayName,
-                                        bio = bio
-                                    )
-                                )
-                            }
-                        },
-                        onFailure = { error ->
-                            _contentState.update {
-                                it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
-                            }
-                        }
-                    )
-                },
-                onFailure = { error ->
-                    _contentState.update {
-                        it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
-                    }
-                }
-            )
         }
     }
 
@@ -369,99 +306,6 @@ class ProfileScreenViewModel @Inject constructor(
             followRepository.unfollow(user.username).onFailure {
                 PostInteractionEvent.emitFollowEvent(user.username, true)
             }
-        }
-    }
-
-    fun loadProfileImage(userId: String? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _contentState.update {
-                it.copy(
-                    profileImageUiState = it.profileImageUiState.copy(isLoading = true, error = null)
-                )
-            }
-
-            val currentUsername = sessionManager.currentUsername()
-            val result = if (userId.isNullOrBlank() && currentUsername != null) {
-                profileRepository.getUserProfile(currentUsername)
-            } else if (!userId.isNullOrBlank()) {
-                profileRepository.getUserProfile(userId)
-            } else {
-                profileRepository.getCurrentUserProfile()
-            }
-
-            result.fold(
-                onSuccess = { data ->
-                    val imageUrl = data.memberImage?.imageUrl ?: data.memberImageUrl
-                    val finalUrl = if (!imageUrl.isNullOrEmpty()) {
-                        if (imageUrl.startsWith("http")) {
-                            "$imageUrl?ts=${System.currentTimeMillis()}"
-                        } else {
-                            "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
-                        }
-                    } else {
-                        null
-                    }
-                    
-                    if (userId.isNullOrBlank() || userId == sessionManager.currentUsername()) {
-                        sessionManager.currentUsername()?.let { currentUsername ->
-                            viewModelScope.launch(Dispatchers.IO) {
-                                accountRepository.updateAccount(currentUsername) { acc ->
-                                    acc.copy(avatarUrl = finalUrl)
-                                }
-                            }
-                        }
-                    }
-
-                    _contentState.update {
-                        it.copy(
-                            profileImageUiState = it.profileImageUiState.copy(
-                                isLoading = false, imageUrl = finalUrl, error = null
-                            )
-                        )
-                    }
-                },
-                onFailure = { error ->
-                    _contentState.update {
-                        it.copy(
-                            profileImageUiState = it.profileImageUiState.copy(
-                                isLoading = false, imageUrl = null, error = error.toUserMessage(context)
-                            )
-                        )
-                    }
-                }
-            )
-        }
-    }
-
-    fun uploadProfileImage(imageUri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _contentState.update {
-                it.copy(
-                    profileImageUiState = it.profileImageUiState.copy(isLoading = true, error = null)
-                )
-            }
-
-            profileRepository.uploadProfileImage(imageUri, context).fold(
-                onSuccess = {
-                    context.imageLoader.diskCache?.clear()
-                    context.imageLoader.memoryCache?.clear()
-
-                    if (_contentState.value.userProfile.isOwnProfile) {
-                        loadProfileImage()
-                        loadCurrentUserProfile()
-                    }
-                    _contentState.update { it.copy(showEditAvatarDialog = false) }
-                },
-                onFailure = { error ->
-                    _contentState.update {
-                        it.copy(
-                            profileImageUiState = it.profileImageUiState.copy(
-                                isLoading = false, error = error.toUserMessage(context)
-                            )
-                        )
-                    }
-                }
-            )
         }
     }
 

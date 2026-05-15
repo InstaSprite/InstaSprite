@@ -43,3 +43,8 @@
 # Protobuf
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
 -keep class com.google.protobuf.** { *; }
+
+# uCrop
+-dontwarn com.yalantis.ucrop.**
+-keep class com.yalantis.ucrop.** { *; }
+-keep interface com.yalantis.ucrop.** { *; }

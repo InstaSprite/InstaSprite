@@ -1,20 +1,16 @@
 package com.instasprite.app.ui.social.profile.contract
 
-import android.net.Uri
 import com.instasprite.app.domain.model.PostData
 
 data class ProfileContentState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val showEditProfileDialog: Boolean = false,
-    val showEditAvatarDialog: Boolean = false,
     val selectedTabIndex: Int = 0,
     val showFollowersDialog: Boolean = false,
     val showFollowingDialog: Boolean = false,
     val userProfile: UserProfileState = UserProfileState(),
     val userPosts: List<PostData> = emptyList(),
     val sharedPosts: List<PostData> = emptyList(),
-    val profileImageUiState: ProfileImageUiState = ProfileImageUiState(),
     val followers: List<FollowerUser> = emptyList(),
     val following: List<FollowerUser> = emptyList(),
     val followersLoading: Boolean = false,
@@ -40,12 +36,6 @@ data class UserProfileState(
     val joinDate: Long = System.currentTimeMillis()
 )
 
-data class ProfileImageUiState(
-    val isLoading: Boolean = false,
-    val imageUrl: String? = null,
-    val error: String? = null
-)
-
 data class FollowerUser(
     val id: String,
     val username: String,
@@ -62,21 +52,17 @@ enum class ProfileTab(val title: String) {
 data class ProfileScreenEvent(
     val onBackClick: () -> Unit = {},
     val onEditProfileClick: () -> Unit = {},
-    val onEditAvatarClick: () -> Unit = {},
     val onFollowClick: () -> Unit = {},
     val onFollowersClick: () -> Unit = {},
     val onFollowingClick: () -> Unit = {},
     val onTabSelected: (Int) -> Unit = {},
-    val onUpdateProfile: (name: String, bio: String) -> Unit = { _, _ -> },
     val onFollowUser: (userId: String) -> Unit = {},
     val onUnfollowUser: (userId: String) -> Unit = {},
-    val onUploadAvatar: (Uri) -> Unit = {},
     val onPostClick: (postId: Long) -> Unit = {},
     val onMenuClick: () -> Unit = {},
     val onClearError: () -> Unit = {},
-    val onDismissEditProfile: () -> Unit = {},
-    val onDismissAvatarDialog: () -> Unit = {},
     val onDismissFollowers: () -> Unit = {},
     val onDismissFollowing: () -> Unit = {},
-    val onConsumeLoginRequiredError: () -> Unit = {}
+    val onConsumeLoginRequiredError: () -> Unit = {},
+    val onNavigateToEditProfile: () -> Unit = {},
 )

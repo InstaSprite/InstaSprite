@@ -12,6 +12,7 @@ import com.instasprite.app.data.repository.PostRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.createpost.contract.CreatePostState
+import com.instasprite.app.utils.toUserMessage
 import java.io.File
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -172,7 +173,7 @@ class CreatePostViewModel @Inject constructor(
                             verifyEmailState = it.verifyEmailState.copy(
                                 isSending = false,
                                 success = false,
-                                message = com.instasprite.app.utils.toUserMessage(error, context)
+                                message = error.toUserMessage(context)
                             )
                         )
                     }
