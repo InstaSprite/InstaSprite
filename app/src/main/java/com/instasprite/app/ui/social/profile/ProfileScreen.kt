@@ -158,13 +158,6 @@ fun ProfileContent(
     val lazyListState = rememberLazyListState()
 
     val profileHeaderHeightPx = with(LocalDensity.current) { 220.dp.toPx() }
-    val compressionProgress by remember {
-        derivedStateOf {
-            if (lazyListState.firstVisibleItemIndex > 0) 1f
-            else (lazyListState.firstVisibleItemScrollOffset.toFloat() / profileHeaderHeightPx)
-                .coerceIn(0f, 1f)
-        }
-    }
 
     val isOwnProfile = state.userProfile.isOwnProfile
     val displayedTabs = if (isOwnProfile) ProfileTab.values() else arrayOf(ProfileTab.POSTS)
@@ -197,7 +190,7 @@ fun ProfileContent(
             item {
                 ProfileInfoSection(
                     userProfile = state.userProfile,
-                    compressionProgress = compressionProgress,
+                    compressionProgress = 0f,
                     onEditProfileClick = event.onEditProfileClick,
                     onFollowClick = event.onFollowClick,
                     onFollowersClick = event.onFollowersClick,

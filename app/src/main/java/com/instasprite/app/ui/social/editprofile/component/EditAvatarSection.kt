@@ -37,20 +37,20 @@ fun EditAvatarSection(
     val model: Any? = pendingAvatarUri ?: avatarUrl
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Box(modifier = Modifier.size(108.dp), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.size(150.dp), contentAlignment = Alignment.Center) {
             AsyncImage(
                 model = model,
                 contentDescription = stringResource(R.string.profile_picture),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(150.dp)
                     .clip(CircleShape)
                     .background(AppTheme.colors.Foreground2Color)
                     .border(2.dp, AppTheme.colors.BackgroundColor, CircleShape)
             )
             Box(
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(32.dp)
                     .clip(CircleShape)
                     .background(AppTheme.colors.TextColorLight)
                     .clickable(onClick = onOpenSheet)
@@ -62,7 +62,7 @@ fun EditAvatarSection(
                     imageVector = Icons.Default.Edit,
                     contentDescription = stringResource(R.string.change_profile_photo),
                     tint = AppTheme.colors.TextColorDark,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
