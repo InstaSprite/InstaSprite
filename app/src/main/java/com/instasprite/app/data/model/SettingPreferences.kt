@@ -1,5 +1,7 @@
 package com.instasprite.app.data.model
 
+import com.instasprite.app.ui.gallery.GalleryLayoutMode
+import com.instasprite.app.ui.gallery.SpriteListOrder
 import com.instasprite.app.ui.theme.ThemeFlavour
 import kotlinx.serialization.Serializable
 
@@ -7,10 +9,17 @@ import kotlinx.serialization.Serializable
 data class SettingPreferences(
     val language: String = "en",
     val themeFlavour: ThemeFlavour = ThemeFlavour.MOCHA,
-    val drawSetting: DrawSetting = DrawSetting()
+    val drawSetting: DrawSetting = DrawSetting(),
+    val gallerySettings: GallerySettings = GallerySettings()
 )
 
 @Serializable
 data class DrawSetting(
     val isCursorMode: Boolean = false
+)
+
+@Serializable
+data class GallerySettings(
+    val sortOrder: SpriteListOrder = SpriteListOrder.DateCreatedDesc,
+    val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List
 )

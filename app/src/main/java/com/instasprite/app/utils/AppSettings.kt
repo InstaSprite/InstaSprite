@@ -4,8 +4,11 @@ import android.content.Context
 import com.instasprite.app.ui.theme.ThemeFlavour
 import android.content.res.Configuration
 import com.instasprite.app.data.model.DrawSetting
+import com.instasprite.app.data.model.GallerySettings
 import com.instasprite.app.data.model.SettingPreferences
 import com.instasprite.app.di.settingsDataStore
+import com.instasprite.app.ui.gallery.GalleryLayoutMode
+import com.instasprite.app.ui.gallery.SpriteListOrder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
@@ -27,6 +30,18 @@ object AppSettings {
 
     fun getDrawSetting(context: Context): DrawSetting {
         return getPersistedSettings(context).drawSetting
+    }
+
+    fun getGallerySettings(context: Context): GallerySettings {
+        return getPersistedSettings(context).gallerySettings
+    }
+
+    fun setGalleryOrder(context: Context, order: SpriteListOrder) {
+        persist(context) { it.copy(gallerySettings = it.gallerySettings.copy(sortOrder = order)) }
+    }
+
+    fun setGalleryLayout(context: Context, mode: GalleryLayoutMode) {
+        persist(context) { it.copy(gallerySettings = it.gallerySettings.copy(layoutMode = mode)) }
     }
 
     fun setLanguage(context: Context, language: String): Context {

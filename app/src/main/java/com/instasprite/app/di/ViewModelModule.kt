@@ -6,7 +6,6 @@ import com.instasprite.app.data.network.lospec.LospecService
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.data.repository.FileRepository
 import com.instasprite.app.data.repository.PixelCanvasRepository
-import com.instasprite.app.data.repository.SortSettingRepository
 import com.instasprite.app.domain.dialog.DialogController
 import com.instasprite.app.domain.dialog.DialogControllerImpl
 import com.instasprite.app.domain.model.PixelCanvas
@@ -35,11 +34,6 @@ object ViewModelModule {
     fun providePixelCanvasRepository(): PixelCanvasRepository {
         // Default 16x16, viewModel will resize this based on the Intent extras.
         return PixelCanvasRepository(PixelCanvas(16, 16))
-    }
-
-    @Provides
-    fun provideSortSettingRepository(@ApplicationContext context: Context): SortSettingRepository {
-        return SortSettingRepository(context)
     }
 
     @Provides

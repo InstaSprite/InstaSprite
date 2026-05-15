@@ -77,7 +77,6 @@ fun GalleryScreenDialogs(
                 DisplayOptionsDialog(
                     onSortOrderSelected = { sortOrder ->
                         viewModel.setSpriteListOrder(order = sortOrder)
-                        viewModel.saveSortSetting(sortOrder)
                     },
                     spriteListOrder = spriteListOrder,
                     onLayoutModeSelected = viewModel::setLayoutMode,

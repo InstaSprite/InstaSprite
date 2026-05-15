@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.gallery
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -8,20 +9,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.instasprite.app.domain.model.SpriteWithMeta
+import com.instasprite.app.data.repository.FileRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
-import com.instasprite.app.data.repository.SortSettingRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
 import com.instasprite.app.domain.dialog.DialogController
-import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.export.ImageExporter
-import com.instasprite.app.data.repository.FileRepository
+import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.Sprite
+import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
+import com.instasprite.app.utils.AppSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,10 +57,10 @@ data class GalleryState(
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
     private val spriteDatabaseRepository: SpriteDatabaseRepository,
-    private val sortSettingRepository: SortSettingRepository,
     private val storageLocationRepository: StorageLocationRepository,
     private val fileRepository: FileRepository,
-    private val dialogController: DialogController<GalleryDialog>
+    private val dialogController: DialogController<GalleryDialog>,
+    @ApplicationContext private val context: Context
 ) : ViewModel(),
     DialogController<GalleryDialog> by dialogController {
 
@@ -125,11 +127,10 @@ class GalleryViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch {
-            sortSettingRepository.getLastSortSetting()?.let {
-                _spriteListOrder.value = it
-            }
-        }
+        _spriteListOrder.value = AppSettings.getGallerySettings(context).sortOrder
+        _uiState.value = _uiState.value.copy(
+            layoutMode = AppSettings.getGallerySettings(context).layoutMode
+        )
     }
 
     fun onBottomBarEvent(event: BottomBarEvent) {
@@ -198,6 +199,7 @@ class GalleryViewModel @Inject constructor(
 
     fun setLayoutMode(mode: GalleryLayoutMode) {
         _uiState.update { it.copy(layoutMode = mode) }
+        AppSettings.setGalleryLayout(context, mode)
     }
 
     fun toggleImagePager(selectedSprite: Sprite?) {
@@ -283,11 +285,6 @@ class GalleryViewModel @Inject constructor(
         }
     }
 
-    fun saveSortSetting(spriteListOrder: SpriteListOrder) {
-        viewModelScope.launch {
-            sortSettingRepository.setLastSortSetting(spriteListOrder)
-        }
-    }
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
@@ -295,6 +292,7 @@ class GalleryViewModel @Inject constructor(
 
     fun setSpriteListOrder(order: SpriteListOrder) {
         _spriteListOrder.value = order
+        AppSettings.setGalleryOrder(context, order)
     }
 
     fun getSpriteDataFromFile(fileUri: Uri): Sprite? {
