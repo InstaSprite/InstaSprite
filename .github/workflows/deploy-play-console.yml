@@ -24,26 +24,26 @@ jobs:
       - name: Decode local.properties
         env:
           LOCAL_PROPERTIES_BASE64: ${{ secrets.LOCAL_PROPERTIES_BASE64 }}
-        run: echo $LOCAL_PROPERTIES_BASE64 | base64 --decode > local.properties
+        run: echo "$LOCAL_PROPERTIES_BASE64" | base64 --decode > local.properties
 
       - name: Decode google-services.json
         env:
           GOOGLE_SERVICES_BASE64: ${{ secrets.GOOGLE_SERVICES_BASE64 }}
-        run: echo $GOOGLE_SERVICES_BASE64 | base64 --decode > app/google-services.json
+        run: echo "$GOOGLE_SERVICES_BASE64" | base64 --decode > app/google-services.json
 
       - name: Decode Keystore
         env:
           PLAY_STORE_KEYSTORE_BASE64: ${{ secrets.PLAY_STORE_KEYSTORE_BASE64 }}
-        run: echo $PLAY_STORE_KEYSTORE_BASE64 | base64 --decode > release.keystore
+        run: echo "$PLAY_STORE_KEYSTORE_BASE64" | base64 --decode > app/release.keystore
 
       - name: Decode Play Console Credentials
         env:
           PLAY_STORE_CREDENTIALS_BASE64: ${{ secrets.PLAY_STORE_CREDENTIALS_BASE64 }}
-        run: echo $PLAY_STORE_CREDENTIALS_BASE64 | base64 --decode > play-store-service-account.json
+        run: echo "$PLAY_STORE_CREDENTIALS_BASE64" | base64 --decode > play-store-service-account.json
 
       - name: Build Release AAB
         env:
-          KEYSTORE_FILE: ../release.keystore
+          KEYSTORE_FILE: release.keystore
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
