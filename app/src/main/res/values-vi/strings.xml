@@ -2,6 +2,10 @@
 <resources>
     <string name="app_name">InstaSprite</string>
     <!-- Common UI Strings -->
+    <string name="time_just_now">vừa xong</string>
+    <string name="time_minutes_ago">%dp</string>
+    <string name="time_hours_ago">%dg</string>
+    <string name="time_days_ago">%dn</string>
     <string name="login">Đăng nhập</string>
     <string name="login_required">Cần đăng nhập để thực hiện hành động này</string>
     <string name="logout">Đăng xuất</string>

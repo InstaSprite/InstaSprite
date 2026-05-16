@@ -53,9 +53,8 @@ import com.instasprite.app.ui.components.composable.ParsedPostText
 
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.toSuffixString
-import java.time.Duration
+import com.instasprite.app.utils.TimeUtils
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -75,6 +74,7 @@ fun FeedPostItem(
     showDeleteButton: Boolean = false,
     showBookmarkButton: Boolean = !showDeleteButton,
 ) {
+    val context = LocalContext.current
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -112,7 +112,7 @@ fun FeedPostItem(
                             fontSize = 14.sp
                         )
                         Text(
-                            text = formatTimeAgo(post.postUploadDate),
+                            text = TimeUtils.formatTimeAgo(context, post.postUploadDate),
                             color = AppTheme.colors.Subtext0Color,
                             fontSize = 12.sp
                         )
@@ -305,15 +305,3 @@ fun FeedPostItem(
     }
 }
 
-private fun formatTimeAgo(dateTime: LocalDateTime): String {
-    val now = LocalDateTime.now()
-    val duration = Duration.between(dateTime, now)
-
-    return when {
-        duration.toMinutes() < 1 -> "now"
-        duration.toMinutes() < 60 -> "${duration.toMinutes()}m"
-        duration.toHours() < 24 -> "${duration.toHours()}h"
-        duration.toDays() < 7 -> "${duration.toDays()}d"
-        else -> dateTime.format(DateTimeFormatter.ofPattern("MMM d"))
-    }
-}

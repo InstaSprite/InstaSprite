@@ -28,12 +28,16 @@ import androidx.compose.ui.unit.sp
 import com.instasprite.app.domain.model.NotificationData
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.TimeUtils
+import androidx.compose.ui.platform.LocalContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
 fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
+    val context = LocalContext.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,7 +82,7 @@ fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = formatTimestamp(notification.createdAt),
+                text = TimeUtils.formatTimeAgo(context, notification.createdAt),
                 fontSize = 12.sp,
                 color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f)
             )
@@ -92,23 +96,6 @@ fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
             )
-        }
-    }
-}
-
-private fun formatTimestamp(dateTime: java.time.LocalDateTime): String {
-    val timestamp = dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
-    val now = System.currentTimeMillis()
-    val diff = now - timestamp
-
-    return when {
-        diff < 60 * 1000 -> "just now"
-        diff < 60 * 60 * 1000 -> "${diff / (60 * 1000)}m ago"
-        diff < 24 * 60 * 60 * 1000 -> "${diff / (60 * 60 * 1000)}h ago"
-        diff < 7 * 24 * 60 * 60 * 1000 -> "${diff / (24 * 60 * 60 * 1000)}d ago"
-        else -> {
-            val sdf = SimpleDateFormat("MMM dd", Locale.getDefault())
-            sdf.format(Date(timestamp))
         }
     }
 }

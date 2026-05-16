@@ -65,7 +65,7 @@ import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.UiUtils
-import com.instasprite.app.utils.formatTimeAgo
+import com.instasprite.app.utils.TimeUtils
 import java.time.ZoneId
 
 @Composable
@@ -370,7 +370,7 @@ private fun PostHeader(
     onToggleFollow: () -> Unit,
     isLoggedIn: Boolean
 ) {
-    LocalContext.current
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -396,12 +396,7 @@ private fun PostHeader(
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = formatTimeAgo(
-                    detail.postUploadDate
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()
-                ),
+                text = TimeUtils.formatTimeAgo(context, detail.postUploadDate),
                 color = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
                 fontSize = 12.sp
             )

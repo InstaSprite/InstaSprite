@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">InstaSprite</string>
     <!-- Common UI Strings -->
+    <string name="time_just_now">just now</string>
+    <string name="time_minutes_ago">%dm</string>
+    <string name="time_hours_ago">%dh</string>
+    <string name="time_days_ago">%dd</string>
     <string name="login">Login</string>
     <string name="login_required">Login required to perform this action</string>
     <string name="logout">Logout</string>

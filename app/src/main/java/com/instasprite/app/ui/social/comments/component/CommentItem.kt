@@ -44,7 +44,7 @@ import com.instasprite.app.R
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.comments.contract.Comment
 import com.instasprite.app.ui.theme.AppTheme
-import com.instasprite.app.utils.formatTimeAgo
+import com.instasprite.app.utils.TimeUtils
 
 @Composable
 fun CommentItem(
@@ -54,7 +54,7 @@ fun CommentItem(
     onReplyClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit
 ) {
-    LocalContext.current
+    val context = LocalContext.current
     val isReply = comment.parentId != null
 
     val likeScale by animateFloatAsState(
@@ -127,7 +127,7 @@ fun CommentItem(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = formatTimeAgo(comment.createdAt),
+                    text = TimeUtils.formatTimeAgo(context, comment.createdAt),
                     color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
                     fontSize = 11.sp
                 )
