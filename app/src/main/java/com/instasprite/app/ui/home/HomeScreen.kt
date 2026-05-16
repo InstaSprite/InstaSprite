@@ -28,7 +28,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,7 +41,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.JumpToTopButton
 import com.instasprite.app.ui.gallery.GalleryDialog
 import com.instasprite.app.ui.gallery.GalleryPageContent
 import com.instasprite.app.ui.gallery.GalleryScreenDialogs
@@ -50,12 +48,13 @@ import com.instasprite.app.ui.gallery.GalleryScreenEvent
 import com.instasprite.app.ui.gallery.GalleryViewModel
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
-import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.home.component.FeedFab
 import com.instasprite.app.ui.home.component.HomeBottomBar
 import com.instasprite.app.ui.home.component.HomeDrawer
 import com.instasprite.app.ui.home.component.HomeFab
 import com.instasprite.app.ui.social.feed.FeedContent
+import com.instasprite.app.ui.social.feed.FeedDialog
+import com.instasprite.app.ui.social.feed.FeedScreenDialogs
 import com.instasprite.app.ui.social.feed.FeedViewModel
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
@@ -104,6 +103,7 @@ fun HomeScreen(
     val galleryListState = rememberLazyListState()
 
     val feedState by feedViewModel.contentState.collectAsState(initial = FeedContentState())
+    val feedDialogState by feedViewModel.dialogState.collectAsState()
     val sessionState by sessionViewModel.sessionState.collectAsState()
     val feedListState = rememberLazyListState()
     val isLoggedIn = sessionState is SocialSessionState.LoggedIn
@@ -157,6 +157,7 @@ fun HomeScreen(
     }
 
     GalleryScreenDialogs(galleryDialogState, galleryViewModel)
+    FeedScreenDialogs(feedDialogState, feedViewModel)
 
     val galleryEvent = remember(galleryViewModel) {
         galleryViewModel.onOpenDrawing = onNavigateToDrawing
@@ -172,18 +173,16 @@ fun HomeScreen(
     }
 
     val feedEvent = remember(feedViewModel, onLoginClick, onOpenComments, onOpenProfile) {
+        feedViewModel.openSearch = onOpenSearch
         FeedScreenEvent(
             onLoginClick = onLoginClick,
-            onDismissVerifyEmailDialog = feedViewModel::dismissVerifyDialog,
-            onVerifyEmail = feedViewModel::verifyEmail,
-            onDismissPostFilterDialog = feedViewModel::togglePostFilterDialog,
-            onSelectPostFilter = feedViewModel::setPostFilter,
+            onBottomBarEvent = feedViewModel::onBottomBarEvent,
             onOpenComments = onOpenComments,
             onOpenProfile = onOpenProfile,
             onToggleLike = feedViewModel::toggleLikePost,
             onToggleBookmark = feedViewModel::toggleBookmarkPost,
             onToggleFollow = feedViewModel::toggleFollow,
-            onDeletePost = feedViewModel::deletePost,
+            onDeleteClick = { postId -> feedViewModel.openDialog(FeedDialog.DeletePostConfirm(postId)) },
             onRefreshed = feedViewModel::onRefreshed,
             onConsumeRefreshPending = feedViewModel::consumeRefreshPending,
             onUpdateTopPostId = feedViewModel::updateTopPostId,
@@ -192,10 +191,6 @@ fun HomeScreen(
             onRetryConnection = feedViewModel::retryConnection,
             onConsumeLoginRequiredError = feedViewModel::consumeLoginRequiredError
         )
-    }
-
-    val firstGalleryItemVisible by remember {
-        derivedStateOf { galleryListState.firstVisibleItemIndex > 0 }
     }
 
     fun launchDrawerAction(action: () -> Unit = {}) {
@@ -279,12 +274,11 @@ fun HomeScreen(
                 },
                 bottomBar = {
                     HomeBottomBar(
-                        onBottomBarEvent = if (pagerState.currentPage == 0)
+                        onBottomBarEvent = if (pagerState.currentPage == 0) {
                             galleryEvent.onBottomBarEvent
-                        else
-                            { event: BottomBarEvent ->
-                                if (event is BottomBarEvent.ToggleSearchBar) onOpenSearch()
-                            },
+                        } else {
+                            feedEvent.onBottomBarEvent
+                        },
                         onMenuClick = {
                             scope.launch {
                                 drawerState.open()

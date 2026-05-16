@@ -26,6 +26,7 @@ import com.instasprite.app.ui.social.feed.component.PostList
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.DummyData.mockPagedPosts
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,16 +70,13 @@ fun HashtagFeedScreenContent(
 
     val event = FeedScreenEvent(
         onLoginClick = {},
-        onDismissVerifyEmailDialog = {},
-        onVerifyEmail = {},
-        onDismissPostFilterDialog = {},
-        onSelectPostFilter = {},
+        onBottomBarEvent = {},
         onOpenComments = onOpenComments,
         onOpenProfile = onOpenProfile,
         onToggleLike = { _, _ -> },
         onToggleBookmark = { _, _ -> },
         onToggleFollow = { _, _ -> },
-        onDeletePost = {},
+        onDeleteClick = {},
         onRefreshed = {},
         onConsumeRefreshPending = {},
         onUpdateTopPostId = {},
@@ -136,7 +134,7 @@ fun HashtagFeedScreenContent(
 fun HashtagFeedScreenContentPreview() {
     HashtagFeedScreenContent(
         hashtag = "pixelart",
-        state = FeedContentState(),
+        state = FeedContentState(pagedPosts = mockPagedPosts),
         onBackClick = {},
         onOpenProfile = {},
         onOpenComments = {},
@@ -150,7 +148,7 @@ fun HashtagFeedScreenContentPreview() {
 fun HashtagFeedScreenContentLongTagPreview() {
     HashtagFeedScreenContent(
         hashtag = "retrogaming",
-        state = FeedContentState(),
+        state = FeedContentState(pagedPosts = mockPagedPosts),
         onBackClick = {},
         onOpenProfile = {},
         onOpenComments = {},

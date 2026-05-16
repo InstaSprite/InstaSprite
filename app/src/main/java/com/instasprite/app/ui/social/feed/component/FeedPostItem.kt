@@ -35,10 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,7 +50,7 @@ import com.instasprite.app.R
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.ui.components.composable.AsyncImageView
 import com.instasprite.app.ui.components.composable.ParsedPostText
-import com.instasprite.app.ui.social.feed.dialog.DeletePostConfirmDialog
+
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.toSuffixString
 import java.time.Duration
@@ -78,18 +75,6 @@ fun FeedPostItem(
     showDeleteButton: Boolean = false,
     showBookmarkButton: Boolean = !showDeleteButton,
 ) {
-
-    LocalContext.current
-    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
-
-    if (showDeleteConfirmDialog) {
-        DeletePostConfirmDialog(
-            onConfirm = { onDeleteClick(post.postId) },
-            onDismiss = {
-                showDeleteConfirmDialog = false
-            }
-        )
-    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -163,7 +148,7 @@ fun FeedPostItem(
 
                 if (showDeleteButton) {
                     IconButton(
-                        onClick = { showDeleteConfirmDialog = true },
+                        onClick = { onDeleteClick(post.postId) },
                         modifier = Modifier.size(20.dp)
                     ) {
                         Icon(

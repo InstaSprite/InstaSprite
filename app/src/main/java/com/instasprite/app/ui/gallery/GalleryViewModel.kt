@@ -89,14 +89,8 @@ class GalleryViewModel @Inject constructor(
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var currentSelectedSpriteIndex by mutableIntStateOf(0)
     var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
-    var selectedNewCanvasPalette by mutableStateOf<ColorPalette?>(null)
-
     var onOpenDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit = { _, _, _, _, _ -> }
-    var onOpenPalette: () -> Unit = {}
 
-    fun onCanvasPaletteSelected(palette: ColorPalette) {
-        selectedNewCanvasPalette = palette
-    }
 
     val sortedAndFilteredSprites: StateFlow<List<SpriteWithMeta>> = combine(
         sprites,

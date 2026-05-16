@@ -15,17 +15,16 @@ import androidx.paging.cachedIn
 import com.instasprite.app.R
 import com.instasprite.app.data.network.ApiError
 import com.instasprite.app.data.paging.FeedPagingSource
-import com.instasprite.app.data.repository.AccountRepository
 import com.instasprite.app.data.repository.AuthRepository
 import com.instasprite.app.data.repository.FollowRepository
 import com.instasprite.app.data.repository.PostRepository
-import com.instasprite.app.data.repository.ProfileRepository
 import com.instasprite.app.domain.model.PostData
+import com.instasprite.app.domain.dialog.DialogController
+import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.session.SocialSessionManager
 import com.instasprite.app.ui.social.session.SocialSessionState
-import com.instasprite.app.utils.Constants
 import com.instasprite.app.utils.ConnectivityObserver
 import com.instasprite.app.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,7 +53,6 @@ enum class PostFilter {
 }
 
 data class FeedUiState(
-    val showPostFilterDialog: Boolean = false,
     val postFilter: PostFilter = PostFilter.Recent
 )
 
@@ -69,13 +67,13 @@ data class VerifyEmailState(
 class FeedViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val postRepository: PostRepository,
-    private val profileRepository: ProfileRepository,
     private val followRepository: FollowRepository,
-    private val accountRepository: AccountRepository,
     private val sessionManager: SocialSessionManager,
     private val connectivityObserver: ConnectivityObserver,
+    private val dialogController: DialogController<FeedDialog>,
     @ApplicationContext private val context: Context
-) : ViewModel() {
+) : ViewModel(),
+    DialogController<FeedDialog> by dialogController {
 
     private val _contentState = MutableStateFlow(FeedContentState())
     val contentState: StateFlow<FeedContentState> = _contentState.asStateFlow()
@@ -85,6 +83,7 @@ class FeedViewModel @Inject constructor(
 
     private var currentTopPostId: Long = 0L
     private var isLoggedIn: Boolean = false
+    var openSearch: () -> Unit = {}
 
     var profileImageRefreshCounter by mutableIntStateOf(0)
 
@@ -132,13 +131,9 @@ class FeedViewModel @Inject constructor(
             sessionManager.currentUser.collectLatest { user ->
                 _contentState.update { it.copy(currentUser = user) }
                 if (user != null && !user.isVerified) {
-                    _contentState.update {
-                        it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = true))
-                    }
+                    openDialog(FeedDialog.VerifyEmail)
                 } else if (user != null && user.isVerified) {
-                    _contentState.update {
-                        it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false))
-                    }
+                    closeAllDialogs()
                 }
             }
         }
@@ -237,9 +232,10 @@ class FeedViewModel @Inject constructor(
         _contentState.update { it.copy(hasNewPosts = false) }
     }
 
-    fun togglePostFilterDialog() {
-        _contentState.update {
-            it.copy(uiState = it.uiState.copy(showPostFilterDialog = !it.uiState.showPostFilterDialog))
+    fun onBottomBarEvent(event: BottomBarEvent) {
+        when(event) {
+            BottomBarEvent.OpenDisplayOptions -> openDialog(FeedDialog.PostFilter)
+            BottomBarEvent.ToggleSearchBar -> openSearch()
         }
     }
 
@@ -324,12 +320,6 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    fun dismissVerifyDialog() {
-        _contentState.update {
-            it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false))
-        }
-    }
-
     fun verifyEmail(context: Context) {
         _contentState.update {
             it.copy(verifyEmailState = it.verifyEmailState.copy(isSending = true))
@@ -350,7 +340,7 @@ class FeedViewModel @Inject constructor(
                         context.getString(R.string.email_sent),
                         Toast.LENGTH_SHORT
                     ).show()
-                    dismissVerifyDialog()
+                    closeTopDialog()
                 },
                 onFailure = { error ->
                     _contentState.update {
@@ -416,9 +406,7 @@ class FeedViewModel @Inject constructor(
     private fun handleEmailVerification() {
         viewModelScope.launch(Dispatchers.IO) {
             sessionManager.refreshCurrentUser()
-            _contentState.update {
-                it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false))
-            }
+            closeAllDialogs()
         }
     }
 }

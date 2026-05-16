@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.gallery.component
 
-import androidx.compose.ui.res.stringResource
-
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -18,12 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -47,17 +45,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.domain.model.Cel
-import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
@@ -66,8 +63,7 @@ import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.tooling.preview.Preview
+import com.instasprite.app.utils.DummyData
 
 
 @Composable
@@ -325,76 +321,13 @@ internal fun SpriteDropdownMenu(
     }
 }
 
-private val previewSprites = listOf(
-    SpriteWithMeta(
-        sprite = Sprite(
-            id = "p1", width = 16, height = 16,
-            layers = listOf(
-                Layer(
-                    id = "l1", name = "Layer 1",
-                    cel = Cel(
-                        x = 0, y = 0, width = 16, height = 16,
-                        pixels = IntArray(16 * 16) { 0xFF89B4FA.toInt()}
-                    )
-                )
-            )
-        ),
-        meta = SpriteMeta(spriteId = "p1", spriteName = "1")
-    ),
-    SpriteWithMeta(
-        sprite = Sprite(
-            id = "p2", width = 16, height = 24,
-            layers = listOf(
-                Layer(
-                    id = "l2", name = "Layer 1",
-                    cel = Cel(
-                        x = 0, y = 0, width = 16, height = 24,
-                        pixels = IntArray(16 * 24) { 0xFFA6E3A1.toInt()  }
-                    )
-                )
-            )
-        ),
-        meta = SpriteMeta(spriteId = "p2", spriteName = "2")
-    ),
-    SpriteWithMeta(
-        sprite = Sprite(
-            id = "p3", width = 32, height = 16,
-            layers = listOf(
-                Layer(
-                    id = "l3", name = "Layer 1",
-                    cel = Cel(
-                        x = 0, y = 0, width = 32, height = 16,
-                        pixels = IntArray(32 * 16) { 0xFFF38BA8.toInt() }
-                    )
-                )
-            )
-        ),
-        meta = SpriteMeta(spriteId = "p3", spriteName = "3")
-    ),
-    SpriteWithMeta(
-        sprite = Sprite(
-            id = "p4", width = 32, height = 32,
-            layers = listOf(
-                Layer(
-                    id = "l4", name = "Layer 1",
-                    cel = Cel(
-                        x = 0, y = 0, width = 32, height = 32,
-                        pixels = IntArray(32 * 32) { 0xFFCBA6F7.toInt()  } // Mauve/Base
-                    )
-                )
-            )
-        ),
-        meta = SpriteMeta(spriteId = "p4", spriteName = "4")
-    )
-)
-
 @Preview(showBackground = true, name = "SpriteList List", heightDp = 600)
 @Composable
 private fun SpriteListListPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
-            spriteList = previewSprites,
+            spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.List
         )
     }
@@ -406,7 +339,7 @@ private fun SpriteListStaggeredPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
-            spriteList = previewSprites,
+            spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.StaggeredGrid
         )
     }
@@ -418,7 +351,7 @@ private fun SpriteListSquareGridPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
-            spriteList = previewSprites,
+            spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.SquareGrid
         )
     }

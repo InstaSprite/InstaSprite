@@ -58,6 +58,7 @@ import com.instasprite.app.ui.home.component.HomeBottomBar
 import com.instasprite.app.ui.home.component.HomeFab
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.DummyData
 import com.instasprite.app.utils.UiUtils
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -182,14 +183,14 @@ fun GalleryPageContent(
             .background(AppTheme.colors.BackgroundColorDarker)
             .animateContentSize()
     ) {
-        if (spriteList.size > 0) {
+        if (spriteList.isNotEmpty()) {
             SpriteList(
                 onSpriteListEvent = event.onSpriteListEvent,
                 spriteList = spriteList,
                 layoutMode = uiState.layoutMode,
                 onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp)
+                modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
             )
 
             AnimatedVisibility(
@@ -313,66 +314,55 @@ private fun GalleryScreenContent(
 @Preview
 @Composable
 private fun GalleryScreenPreview() {
-
     InstaSpriteTheme {
         GalleryScreenContent(
             uiState = GalleryState(),
             lazyListState = LazyListState(),
-            spriteList =
-                listOf(
-                    SpriteWithMeta(
-                        sprite = Sprite(
-                            id = "1",
-                            width = 16,
-                            height = 16,
-                            layers = listOf(
-                                Layer(
-                                    id = "test1",
-                                    name = "Layer 1",
-                                    cel = Cel(
-                                        x = 0,
-                                        y = 0,
-                                        width = 16,
-                                        height = 16,
-                                        pixels = IntArray(16 * 16) {
-                                            AppTheme.colors.InfoColor.toArgb()
-                                        }
-                                    )
-                                )
-                            )
-                        ),
-                        meta = SpriteMeta(
-                            spriteId = "1",
-                            spriteName = "Test",
-                        )
-                    ),
-                    SpriteWithMeta(
-                        sprite = Sprite(
-                            id = "2",
-                            width = 16,
-                            height = 16,
-                            layers = listOf(
-                                Layer(
-                                    id = "test2",
-                                    name = "Layer 1",
-                                    cel = Cel(
-                                        x = 0,
-                                        y = 0,
-                                        width = 16,
-                                        height = 16,
-                                        pixels = IntArray(16 * 16) {
-                                            AppTheme.colors.SecondaryAccentColor.toArgb()
-                                        }
-                                    )
-                                )
-                            )
-                        ),
-                        meta = SpriteMeta(
-                            spriteId = "2",
-                            spriteName = "Test",
-                        )
-                    )
-                ),
+            spriteList = DummyData.previewSprites,
+            searchQuery = "",
+            event = GalleryScreenEvent(
+                onBottomBarEvent = {},
+                onImagePagerEvent = {},
+                onSearchBarEvent = {},
+                onSpriteListEvent = {},
+                onCreateNewCanvas = {},
+                onLoadCanvas = {},
+                onLoadImage = {},
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun GalleryScreenPreviewStaggeredLayout() {
+    InstaSpriteTheme {
+        GalleryScreenContent(
+            uiState = GalleryState(layoutMode = GalleryLayoutMode.StaggeredGrid),
+            lazyListState = LazyListState(),
+            spriteList = DummyData.previewSprites,
+            searchQuery = "",
+            event = GalleryScreenEvent(
+                onBottomBarEvent = {},
+                onImagePagerEvent = {},
+                onSearchBarEvent = {},
+                onSpriteListEvent = {},
+                onCreateNewCanvas = {},
+                onLoadCanvas = {},
+                onLoadImage = {},
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun GalleryScreenPreviewSquareLayout() {
+    InstaSpriteTheme {
+        GalleryScreenContent(
+            uiState = GalleryState(layoutMode = GalleryLayoutMode.SquareGrid),
+            lazyListState = LazyListState(),
+            spriteList = DummyData.previewSprites,
             searchQuery = "",
             event = GalleryScreenEvent(
                 onBottomBarEvent = {},

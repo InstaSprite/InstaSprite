@@ -1,10 +1,9 @@
 package com.instasprite.app.ui.social.feed.contract
 
-import android.content.Context
 import androidx.paging.PagingData
 import com.instasprite.app.domain.model.PostData
+import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.social.feed.FeedUiState
-import com.instasprite.app.ui.social.feed.PostFilter
 import com.instasprite.app.ui.social.feed.VerifyEmailState
 import com.instasprite.app.ui.social.session.CurrentUserState
 import kotlinx.coroutines.flow.Flow
@@ -28,16 +27,13 @@ data class FeedContentState(
 
 data class FeedScreenEvent(
     val onLoginClick: () -> Unit,
-    val onDismissVerifyEmailDialog: () -> Unit,
-    val onVerifyEmail: (Context) -> Unit,
-    val onDismissPostFilterDialog: () -> Unit,
-    val onSelectPostFilter: (PostFilter) -> Unit,
+    val onBottomBarEvent: (BottomBarEvent) -> Unit,
     val onOpenComments: (commentId: Long) -> Unit,
     val onOpenProfile: (profileId: String) -> Unit,
     val onToggleLike: (postId: Long, isLike: Boolean) -> Unit,
     val onToggleBookmark: (postId: Long, isBookmark: Boolean) -> Unit,
     val onToggleFollow: (userId: String, isFollow: Boolean) -> Unit,
-    val onDeletePost: (postId: Long) -> Unit,
+    val onDeleteClick: (postId: Long) -> Unit,
     val onRefreshed: () -> Unit,
     val onConsumeRefreshPending: () -> Unit,
     val onUpdateTopPostId: (Long) -> Unit,

@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -39,6 +40,8 @@ import com.instasprite.app.ui.components.composable.MaintenanceScreen
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.DummyData
 import com.instasprite.app.utils.toUserMessage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -151,13 +154,6 @@ fun PostList(
                         .padding(horizontal = 10.dp),
                     contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
-                    stickyHeader {
-                        FeedSortChipBar(
-                            currentFilter = state.uiState.postFilter,
-                            isLoggedIn = isLoggedIn,
-                            onSelectFilter = event.onSelectPostFilter
-                        )
-                    }
                     items(
                         count = pagedItems.itemCount,
                         key = pagedItems.itemKey { it.postId }
@@ -214,7 +210,7 @@ fun PostList(
                                     event.onToggleBookmark(rawPost.postId, isBookmarked)
                                 },
                                 onCommentClick = { event.onOpenComments(rawPost.postId) },
-                                onDeleteClick = event.onDeletePost,
+                                onDeleteClick = event.onDeleteClick,
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 showFollowButton = isLoggedIn && !isOwnPost,
                                 showDeleteButton = isOwnPost,
@@ -268,5 +264,37 @@ fun PostList(
                 listState = lazyListState,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    InstaSpriteTheme {
+        PostList(
+            state = FeedContentState(
+                pagedPosts = DummyData.mockPagedPosts
+            ),
+            event = FeedScreenEvent(
+                onLoginClick = {},
+                onBottomBarEvent = {},
+                onOpenComments = {},
+                onOpenProfile = {},
+                onToggleLike = { _, _ -> },
+                onToggleBookmark = { _, _ -> },
+                onToggleFollow = { _, _ -> },
+                onDeleteClick = {},
+                onRefreshed = {},
+                onConsumeRefreshPending = {},
+                onUpdateTopPostId = {},
+                onOpenHashtag = {},
+                onClearError = {},
+                onRetryConnection = {},
+                onConsumeLoginRequiredError = {}
+            ),
+            lazyListState = LazyListState(),
+            isOnline = true,
+            isLoggedIn = true
+        )
     }
 }

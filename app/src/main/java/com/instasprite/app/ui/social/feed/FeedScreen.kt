@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,16 +22,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.MaintenanceScreen
 import com.instasprite.app.ui.social.feed.component.PostList
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
-import com.instasprite.app.ui.social.feed.dialog.PostFilterDialog
-import com.instasprite.app.ui.social.feed.dialog.VerifyEmailDialog
 import com.instasprite.app.ui.social.session.SocialSessionState
 import com.instasprite.app.ui.social.session.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.DummyData.mockPagedPosts
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -48,7 +47,6 @@ fun FeedScreen(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val isLoggedIn = sessionState is SocialSessionState.LoggedIn
     val isOnline by viewModel.isOnline.collectAsState()
-    val context = LocalContext.current
 
     LaunchedEffect(viewModel, lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -59,16 +57,13 @@ fun FeedScreen(
     val event = remember(viewModel, onLoginClick, onOpenComments, onOpenProfile) {
         FeedScreenEvent(
             onLoginClick = onLoginClick,
-            onDismissVerifyEmailDialog = viewModel::dismissVerifyDialog,
-            onVerifyEmail = viewModel::verifyEmail,
-            onDismissPostFilterDialog = viewModel::togglePostFilterDialog,
-            onSelectPostFilter = viewModel::setPostFilter,
+            onBottomBarEvent = viewModel::onBottomBarEvent,
             onOpenComments = onOpenComments,
             onOpenProfile = onOpenProfile,
             onToggleLike = viewModel::toggleLikePost,
             onToggleBookmark = viewModel::toggleBookmarkPost,
             onToggleFollow = viewModel::toggleFollow,
-            onDeletePost = viewModel::deletePost,
+            onDeleteClick = { postId -> viewModel.openDialog(FeedDialog.DeletePostConfirm(postId)) },
             onRefreshed = viewModel::onRefreshed,
             onConsumeRefreshPending = viewModel::consumeRefreshPending,
             onUpdateTopPostId = viewModel::updateTopPostId,
@@ -78,6 +73,9 @@ fun FeedScreen(
             onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError
         )
     }
+
+    val feedDialogState by viewModel.dialogState.collectAsState()
+    FeedScreenDialogs(feedDialogState, viewModel)
 
     FeedContent(
         isLoggedIn = isLoggedIn,
@@ -96,7 +94,7 @@ fun FeedContent(
     listState: LazyListState,
     event: FeedScreenEvent,
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.showLoginRequiredError) {
@@ -111,38 +109,21 @@ fun FeedContent(
                 withDismissAction = true
             )
             job.cancel()
-            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+            if (result == SnackbarResult.ActionPerformed) {
                 event.onLoginClick()
             }
             event.onConsumeLoginRequiredError()
         }
     }
 
-    if (state.verifyEmailState.showVerifyDialog) {
-        VerifyEmailDialog(
-            verifyEmailState = state.verifyEmailState,
-            onDismiss = event.onDismissVerifyEmailDialog,
-            onConfirm = {
-                event.onVerifyEmail(context)
-            }
-        )
-    }
-
-    if (state.uiState.showPostFilterDialog) {
-        PostFilterDialog(
-            onDismiss = event.onDismissPostFilterDialog,
-            onFilterSelected = event.onSelectPostFilter,
-            currentFilter = state.uiState.postFilter
-        )
-    }
-
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        when {
-            state.isServerMaintenance -> MaintenanceScreen(
-                onReload = event.onRetryConnection
-            )
-            else -> PostList(state = state, event = event, lazyListState = listState, isOnline = isOnline, isLoggedIn = isLoggedIn)
-        }
+        PostList(
+            state = state,
+            event = event,
+            lazyListState = listState,
+            isOnline = isOnline,
+            isLoggedIn = isLoggedIn
+        )
 
         SnackbarHost(
             hostState = snackbarHostState,
@@ -164,89 +145,21 @@ fun FeedContent(
 
 @Preview
 @Composable
-private fun FeedContentLoggedOutPreview() {
+private fun FeedContentPreview() {
     InstaSpriteTheme {
         FeedContent(
             isLoggedIn = false,
-            state = FeedContentState(),
+            state = FeedContentState(pagedPosts = mockPagedPosts),
             listState = LazyListState(),
             event = FeedScreenEvent(
                 onLoginClick = {},
-                onDismissVerifyEmailDialog = {},
-                onVerifyEmail = {},
-                onDismissPostFilterDialog = {},
-                onSelectPostFilter = {},
+                onBottomBarEvent = {},
                 onOpenComments = {},
                 onOpenProfile = {},
                 onToggleLike = { _, _ -> },
                 onToggleBookmark = { _, _ -> },
                 onToggleFollow = { _, _ -> },
-                onDeletePost = {},
-                onRefreshed = {},
-                onConsumeRefreshPending = {},
-                onUpdateTopPostId = {},
-                onOpenHashtag = {},
-                onClearError = {},
-                onRetryConnection = {},
-                onConsumeLoginRequiredError = {}
-            )
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun FeedContentLoggedInPreview() {
-    InstaSpriteTheme {
-        FeedContent(
-            isLoggedIn = true,
-            state = FeedContentState(),
-            listState = LazyListState(),
-            event = FeedScreenEvent(
-                onLoginClick = {},
-                onDismissVerifyEmailDialog = {},
-                onVerifyEmail = {},
-                onDismissPostFilterDialog = {},
-                onSelectPostFilter = {},
-                onOpenComments = {},
-                onOpenProfile = {},
-                onToggleLike = { _, _ -> },
-                onToggleBookmark = { _, _ -> },
-                onToggleFollow = { _, _ -> },
-                onDeletePost = {},
-                onRefreshed = {},
-                onConsumeRefreshPending = {},
-                onUpdateTopPostId = {},
-                onOpenHashtag = {},
-                onClearError = {},
-                onRetryConnection = {},
-                onConsumeLoginRequiredError = {}
-            )
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun FeedContentMaintenancePreview() {
-    InstaSpriteTheme {
-        FeedContent(
-            isLoggedIn = true,
-            isOnline = false,
-            state = FeedContentState(),
-            listState = LazyListState(),
-            event = FeedScreenEvent(
-                onLoginClick = {},
-                onDismissVerifyEmailDialog = {},
-                onVerifyEmail = {},
-                onDismissPostFilterDialog = {},
-                onSelectPostFilter = {},
-                onOpenComments = {},
-                onOpenProfile = {},
-                onToggleLike = { _, _ -> },
-                onToggleBookmark = { _, _ -> },
-                onToggleFollow = { _, _ -> },
-                onDeletePost = {},
+                onDeleteClick = {},
                 onRefreshed = {},
                 onConsumeRefreshPending = {},
                 onUpdateTopPostId = {},
