@@ -2,7 +2,8 @@ package com.instasprite.app.ui.social.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.instasprite.app.data.network.model.NotificationDto
+import com.instasprite.app.domain.model.NotificationData
+import com.instasprite.app.data.network.model.toDomain
 import com.instasprite.app.data.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class NotificationUiState(
-    val notifications: List<NotificationDto> = emptyList(),
+    val notifications: List<NotificationData> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val page: Int = 0,
@@ -46,7 +47,7 @@ class NotificationViewModel @Inject constructor(
                     _uiState.update { state ->
                         val currentList = if (refresh) emptyList() else state.notifications
                         state.copy(
-                            notifications = currentList + pageDto.content,
+                            notifications = currentList + pageDto.content.map { it.toDomain() },
                             isLoading = false,
                             page = nextPage + 1,
                             hasMore = !pageDto.last

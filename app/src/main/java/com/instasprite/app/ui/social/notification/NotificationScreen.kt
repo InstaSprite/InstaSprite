@@ -19,6 +19,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.instasprite.app.R
+import com.instasprite.app.domain.model.NotificationType
 import com.instasprite.app.ui.social.notification.composable.NotificationItem
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.UiUtils
@@ -94,45 +98,70 @@ fun NotificationScreen(
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier.fillMaxSize()
+                val pullRefreshState = rememberPullToRefreshState()
+                val isRefreshing = uiState.isLoading && uiState.page == 0
+
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = { viewModel.loadNotifications(refresh = true) },
+                    state = pullRefreshState,
+                    modifier = Modifier.fillMaxSize(),
+                    indicator = {
+                        Indicator(
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            isRefreshing = isRefreshing,
+                            containerColor = AppTheme.colors.BackgroundColor,
+                            color = AppTheme.colors.SelectedColor,
+                            state = pullRefreshState
+                        )
+                    }
                 ) {
-                    items(uiState.notifications) { notification ->
-                        NotificationItem(
-                            notification = notification,
-                            onClick = {
-                                if (!notification.isRead) {
-                                    viewModel.markAsRead(notification.id)
-                                }
-                                val entityId = notification.relatedEntityId
-                                if (entityId != null) {
-                                    when (notification.type) {
-                                        "FOLLOW" -> onNavigateToProfile(entityId)
-                                        "LIKE", "MENTION", "COMMENT" -> {
-                                            val postId = entityId.toLongOrNull()
-                                            if (postId != null) {
-                                                onNavigateToPost(postId)
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(uiState.notifications) { notification ->
+                            NotificationItem(
+                                notification = notification,
+                                onClick = {
+                                    if (!notification.isRead) {
+                                        viewModel.markAsRead(notification.id)
+                                    }
+                                    val entityId = notification.relatedEntityId
+                                    if (entityId != null) {
+                                        when (notification.type) {
+                                            NotificationType.FOLLOW -> {
+                                                val username = notification.senderUsername
+                                                if (!username.isNullOrEmpty()) {
+                                                    onNavigateToProfile(username)
+                                                }
                                             }
+                                            NotificationType.LIKE, NotificationType.MENTION, NotificationType.COMMENT -> {
+                                                val postId = entityId.toLongOrNull()
+                                                if (postId != null) {
+                                                    onNavigateToPost(postId)
+                                                }
+                                            }
+                                            NotificationType.UNKNOWN -> {}
                                         }
                                     }
                                 }
-                            }
-                        )
-                        HorizontalDivider(
-                            color = Color.LightGray.copy(alpha = 0.3f)
-                        )
-                    }
+                            )
+                            HorizontalDivider(
+                                color = Color.LightGray.copy(alpha = 0.3f)
+                            )
+                        }
 
-                    if (uiState.isLoading) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
+                        if (uiState.isLoading && uiState.page > 0) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
+                                }
                             }
                         }
                     }

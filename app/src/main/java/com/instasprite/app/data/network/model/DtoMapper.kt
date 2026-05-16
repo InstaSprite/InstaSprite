@@ -10,6 +10,9 @@ import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.domain.model.PostImageData
 import com.instasprite.app.domain.model.PostTagData
 import com.instasprite.app.utils.Constants
+import com.instasprite.app.domain.model.NotificationData
+import com.instasprite.app.domain.model.NotificationType
+import com.instasprite.app.data.network.model.NotificationDto
 import java.time.LocalDateTime
 
 /**
@@ -133,6 +136,29 @@ fun JwtDto.toDomain(): Jwt {
         username = username,
         email = email,
         isFirstTime = isFirstTime
+    )
+}
+
+fun NotificationDto.toDomain(): NotificationData {
+    val fullImageUrl = if (senderAvatarUrl?.startsWith("http") == true) {
+        senderAvatarUrl
+    } else if (!senderAvatarUrl.isNullOrEmpty()) {
+        "${Constants.BASE_URL}/images/$senderAvatarUrl"
+    } else {
+        null
+    }
+
+    return NotificationData(
+        id = id,
+        title = title,
+        body = body,
+        type = NotificationType.fromString(type),
+        relatedEntityId = relatedEntityId,
+        isRead = isRead,
+        createdAt = parseDateTime(createdAt),
+        senderName = senderName,
+        senderUsername = senderUsername,
+        senderAvatarUrl = fullImageUrl
     )
 }
 

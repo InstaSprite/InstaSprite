@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.instasprite.app.data.network.model.NotificationDto
+import com.instasprite.app.domain.model.NotificationData
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 import java.text.SimpleDateFormat
@@ -33,7 +33,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun NotificationItem(notification: NotificationDto, onClick: () -> Unit = {}) {
+fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,29 +96,19 @@ fun NotificationItem(notification: NotificationDto, onClick: () -> Unit = {}) {
     }
 }
 
-private fun formatTimestamp(isoDateString: String?): String {
-    if (isoDateString.isNullOrEmpty()) return ""
+private fun formatTimestamp(dateTime: java.time.LocalDateTime): String {
+    val timestamp = dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val now = System.currentTimeMillis()
+    val diff = now - timestamp
 
-    return try {
-        // Assuming ISO-8601 like 2026-05-05T12:00:00
-        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-        val date = parser.parse(isoDateString) ?: return isoDateString
-        val timestamp = date.time
-        
-        val now = System.currentTimeMillis()
-        val diff = now - timestamp
-
-        when {
-            diff < 60 * 1000 -> "just now"
-            diff < 60 * 60 * 1000 -> "${diff / (60 * 1000)}m ago"
-            diff < 24 * 60 * 60 * 1000 -> "${diff / (60 * 60 * 1000)}h ago"
-            diff < 7 * 24 * 60 * 60 * 1000 -> "${diff / (24 * 60 * 60 * 1000)}d ago"
-            else -> {
-                val sdf = SimpleDateFormat("MMM dd", Locale.getDefault())
-                sdf.format(Date(timestamp))
-            }
+    return when {
+        diff < 60 * 1000 -> "just now"
+        diff < 60 * 60 * 1000 -> "${diff / (60 * 1000)}m ago"
+        diff < 24 * 60 * 60 * 1000 -> "${diff / (60 * 60 * 1000)}h ago"
+        diff < 7 * 24 * 60 * 60 * 1000 -> "${diff / (24 * 60 * 60 * 1000)}d ago"
+        else -> {
+            val sdf = SimpleDateFormat("MMM dd", Locale.getDefault())
+            sdf.format(Date(timestamp))
         }
-    } catch (e: Exception) {
-        isoDateString // fallback
     }
 }
