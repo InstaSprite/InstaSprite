@@ -35,10 +35,14 @@ class SocialSessionManager @Inject constructor(
     }
 
     fun refreshFromStorage() {
-        _sessionState.value = if (tokenStore.isLoggedIn()) {
+        val isLoggedIn = tokenStore.isLoggedIn()
+        _sessionState.value = if (isLoggedIn) {
             SocialSessionState.LoggedIn(tokenStore.getUsername().orEmpty())
         } else {
             SocialSessionState.LoggedOut
+        }
+        if (isLoggedIn) {
+            refreshCurrentUser()
         }
     }
 
