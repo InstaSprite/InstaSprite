@@ -75,9 +75,19 @@ object EraserTool : StrokeTool {
         col: Int,
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ) {
+        val maxPixels = strokeScale * strokeScale
+        val indices = IntArray(maxPixels)
+        val colors = IntArray(maxPixels)
+        var count = 0
+
         forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
-            canvas.setPixel(r, c, Color.Transparent)
+            indices[count] = r * canvasWidth + c
+            count++
             onCommittedPixel(r, c)
+        }
+
+        if (count > 0) {
+            canvas.batchSetPixels(indices, colors, count)
         }
     }
 }
