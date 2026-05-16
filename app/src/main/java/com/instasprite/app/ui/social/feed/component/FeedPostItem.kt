@@ -112,13 +112,9 @@ fun FeedPostItem(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable { onProfileClick(post.member.memberUsername) }
                 ) {
-                    AsyncImageView(
-                        imageUrl = post.member.memberImage?.imageUrl ?: "",
-                        altText = "User Avatar",
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(AppTheme.colors.Foreground2Color),
+                    ProfileImage(
+                        imageUrl = post.member.memberImage?.imageUrl,
+                        size = 40.dp
                     )
 
                     Spacer(modifier = Modifier.width(12.dp))

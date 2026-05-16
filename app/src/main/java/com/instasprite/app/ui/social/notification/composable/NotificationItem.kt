@@ -26,7 +26,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.data.network.model.NotificationDto
-import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -47,31 +47,10 @@ fun NotificationItem(notification: NotificationDto, onClick: () -> Unit = {}) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (notification.senderAvatarUrl != null) {
-            AsyncImageView(
-                imageUrl = notification.senderAvatarUrl,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.colors.Foreground0Color)
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = notification.title.firstOrNull()?.uppercase() ?: "?",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
+        ProfileImage(
+            imageUrl = notification.senderAvatarUrl,
+            size = 48.dp
+        )
         Spacer(modifier = Modifier.width(12.dp))
 
         // Notification content

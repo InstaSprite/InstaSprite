@@ -49,6 +49,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.comments.component.CommentActions
 import com.instasprite.app.ui.social.comments.component.CommentInput
 import com.instasprite.app.ui.social.comments.component.CommentItem
@@ -378,12 +379,10 @@ private fun PostHeader(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImageView(
-            imageUrl = detail.member.memberImage?.imageUrl ?: "",
-            altText = stringResource(R.string.profile_picture),
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape),
+        ProfileImage(
+            imageUrl = detail.member.memberImage?.imageUrl,
+            modifier = Modifier.size(40.dp),
+            size = 40.dp
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {

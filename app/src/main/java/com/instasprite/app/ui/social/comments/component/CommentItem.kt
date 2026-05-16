@@ -41,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.comments.contract.Comment
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.formatTimeAgo
@@ -100,20 +100,11 @@ fun CommentItem(
             .clip(CircleShape)
             .clickable { onProfileClick(comment.username) }
 
-        if (!comment.profileImageUrl.isNullOrBlank()) {
-            AsyncImageView(
-                imageUrl = comment.profileImageUrl,
-                altText = stringResource(R.string.profile_picture),
-                modifier = avatarModifier,
-            )
-        } else {
-            Image(
-                painter = painterResource(id = comment.profileImageRes),
-                contentDescription = stringResource(R.string.profile_picture),
-                modifier = avatarModifier,
-                contentScale = ContentScale.Crop
-            )
-        }
+        ProfileImage(
+            imageUrl = comment.profileImageUrl,
+            modifier = avatarModifier,
+            size = if (isReply) 24.dp else 32.dp
+        )
 
         Spacer(modifier = Modifier.width(12.dp))
 

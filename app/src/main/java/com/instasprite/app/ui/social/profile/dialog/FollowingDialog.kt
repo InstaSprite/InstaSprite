@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.profile.contract.FollowerUser
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -142,20 +142,11 @@ private fun FollowingItem(
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-                .clickable { onProfileClick(user.username) }
-        ) {
-            AsyncImageView(
-                imageUrl = user.profileImageUrl ?: "",
-                altText = stringResource(R.string.profile_picture),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape),
-            )
-        }
+        ProfileImage(
+            imageUrl = user.profileImageUrl,
+            modifier = Modifier.clickable { onProfileClick(user.username) },
+            size = 50.dp
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 

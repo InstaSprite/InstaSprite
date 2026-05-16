@@ -45,7 +45,7 @@ import com.instasprite.app.data.model.AccountPreferences
 import com.instasprite.app.data.model.AccountType
 import com.instasprite.app.data.model.InputField
 import com.instasprite.app.domain.model.LoginRequest
-import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -91,12 +91,9 @@ fun SavedAccountLoginDialog(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AsyncImageView(
-                    imageUrl = account.avatarUrl ?: "",
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .background(AppTheme.colors.Foreground0Color)
+                ProfileImage(
+                    imageUrl = account.avatarUrl,
+                    size = 72.dp
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))

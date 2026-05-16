@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.data.model.AccountPreferences
 import com.instasprite.app.data.model.AccountType
-import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -53,12 +53,9 @@ fun SavedAccountItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box {
-            AsyncImageView(
-                imageUrl = account.avatarUrl ?: "",
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.colors.Foreground0Color)
+            ProfileImage(
+                imageUrl = account.avatarUrl,
+                size = 48.dp
             )
 
             if (account.accountType == AccountType.GOOGLE) {

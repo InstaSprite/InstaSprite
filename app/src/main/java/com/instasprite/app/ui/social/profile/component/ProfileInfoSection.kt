@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -85,26 +85,13 @@ fun ProfileInfoSection(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
-                            .background(AppTheme.colors.BackgroundColorDarker)
+                            .background(AppTheme.colors.BackgroundColorDarker),
+                        contentAlignment = Alignment.Center
                     ) {
-                        if (!userProfile.profileImageUrl.isNullOrEmpty()) {
-                            AsyncImageView(
-                                imageUrl = userProfile.profileImageUrl,
-                                altText = stringResource(R.string.profile_picture),
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape),
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_launcher),
-                                contentDescription = stringResource(R.string.profile_picture),
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                        ProfileImage(
+                            imageUrl = userProfile.profileImageUrl,
+                            size = avatarSize
+                        )
                     }
                 }
             }
