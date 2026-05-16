@@ -35,16 +35,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.ui.social.feed.ProfileImageState
-import com.instasprite.app.ui.social.feed.ProfileState
 import com.instasprite.app.ui.social.feed.component.ProfileImage
+import com.instasprite.app.ui.social.session.CurrentUserState
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
 fun HomeDrawer(
     isLoggedIn: Boolean,
-    profileState: ProfileState,
-    profileImageState: ProfileImageState,
+    currentUser: CurrentUserState?,
     username: String?,
     onHomeClick: () -> Unit,
     onProfileClick: () -> Unit,
@@ -65,10 +63,8 @@ fun HomeDrawer(
         selectedTextColor = AppTheme.colors.TextColorLight,
     )
 
-    val memberName = profileState.memberName.ifBlank {
-        username?.takeIf { it.isNotBlank() } ?: stringResource(R.string.app_name)
-    }
-    val memberUsername = profileState.memberUsername.ifBlank { username.orEmpty() }
+    val memberName = currentUser?.displayName?.takeIf { it.isNotBlank() } ?: username?.takeIf { it.isNotBlank() } ?: stringResource(R.string.app_name)
+    val memberUsername = currentUser?.username?.takeIf { it.isNotBlank() } ?: username.orEmpty()
 
     ModalDrawerSheet(
         drawerContainerColor = AppTheme.colors.TopBarColor,
@@ -97,36 +93,27 @@ fun HomeDrawer(
                     contentAlignment = Alignment.Center
                 ) {
                     ProfileImage(
-                        state = profileImageState,
+                        imageUrl = currentUser?.avatarUrl,
                         size = 96.dp
                     )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                if (profileState.isLoading && memberUsername.isBlank()) {
+                Text(
+                    text = memberName,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = AppTheme.colors.TextColorLight
+                )
+
+                if (memberUsername.isNotBlank()) {
                     Text(
-                        text = stringResource(R.string.loading),
+                        text = "@$memberUsername",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
                     )
-                } else {
-                    Text(
-                        text = memberName,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = AppTheme.colors.TextColorLight
-                    )
-
-                    if (memberUsername.isNotBlank()) {
-                        Text(
-                            text = "@$memberUsername",
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))

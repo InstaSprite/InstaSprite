@@ -198,7 +198,7 @@ fun PostList(
                             )
 
                             val isOwnPost =
-                                state.profileState.memberUsername.equals(targetUser, ignoreCase = true)
+                                state.currentUser?.username.equals(targetUser, ignoreCase = true)
 
                             FeedPostItem(
                                 post = effectivePost,

@@ -99,19 +99,6 @@ fun FeedContent(
     val context = androidx.compose.ui.platform.LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(state.profileState.error, state.profileImageState.error) {
-        val error = state.profileState.error ?: state.profileImageState.error
-        if (error != null) {
-            val job = launch {
-                delay(5000)
-                snackbarHostState.currentSnackbarData?.dismiss()
-            }
-            snackbarHostState.showSnackbar(error)
-            job.cancel()
-            event.onClearError()
-        }
-    }
-
     LaunchedEffect(state.showLoginRequiredError) {
         if (state.showLoginRequiredError) {
             val job = launch {
@@ -121,7 +108,7 @@ fun FeedContent(
             val result = snackbarHostState.showSnackbar(
                 message = context.getString(R.string.login_required),
                 actionLabel = context.getString(R.string.login),
-                true
+                withDismissAction = true
             )
             job.cancel()
             if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {

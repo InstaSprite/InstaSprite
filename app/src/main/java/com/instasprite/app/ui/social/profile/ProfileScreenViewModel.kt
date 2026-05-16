@@ -123,6 +123,7 @@ class ProfileScreenViewModel @Inject constructor(
                     _contentState.update {
                         it.copy(isLoading = false, errorMessage = null, userProfile = userProfile)
                     }
+                    sessionManager.refreshCurrentUser()
                     refreshPosts(userProfile.username)
                 },
                 onFailure = { error ->
@@ -322,13 +323,20 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     private fun mapUserProfileResponseToUserProfile(response: com.instasprite.app.data.network.model.UserProfileDto): UserProfileState {
+        val rawUrl = response.memberImage?.imageUrl ?: response.memberImageUrl
+        val resolvedUrl = when {
+            rawUrl.isNullOrEmpty() -> null
+            rawUrl.startsWith("http") -> "$rawUrl?ts=${System.currentTimeMillis()}"
+            else -> "${Constants.BASE_URL}/images/$rawUrl?ts=${System.currentTimeMillis()}"
+        }
+
         return UserProfileState(
             id = response.memberId.toString(),
             username = response.memberUsername,
             displayName = response.memberName,
             bio = response.memberIntroduce ?: "",
             email = "",
-            profileImageUrl = response.memberImage?.imageUrl ?: response.memberImageUrl,
+            profileImageUrl = resolvedUrl,
             postsCount = response.memberPostsCount,
             followersCount = response.memberFollowersCount,
             followingCount = response.memberFollowingsCount,

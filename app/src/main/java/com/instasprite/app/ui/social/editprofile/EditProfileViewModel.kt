@@ -8,6 +8,7 @@ import com.instasprite.app.data.network.model.EditProfileRequestDto
 import com.instasprite.app.data.repository.AccountRepository
 import com.instasprite.app.data.repository.ProfileRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
+import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.editprofile.contract.EditProfileState
 import com.instasprite.app.ui.social.session.SocialSessionManager
 import com.instasprite.app.utils.Constants
@@ -143,11 +144,8 @@ class EditProfileViewModel @Inject constructor(
                 )
                 profileRepository.editProfile(request).fold(
                     onSuccess = {
-                        sessionManager.currentUsername()?.let { username ->
-                            accountRepository.updateAccount(username) { acc ->
-                                acc.copy(name = displayName)
-                            }
-                        }
+                        sessionManager.refreshCurrentUser()
+                        PostInteractionEvent.emitProfileRefreshEvent()
                         _state.update { it.copy(isSaving = false, savedSuccess = true) }
                     },
                     onFailure = { error ->

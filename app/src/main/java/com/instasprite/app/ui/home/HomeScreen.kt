@@ -110,7 +110,7 @@ fun HomeScreen(
     val isOnline by feedViewModel.isOnline.collectAsState()
     val currentUsername = (sessionState as? SocialSessionState.LoggedIn)?.username
         ?.takeIf { it.isNotBlank() }
-        ?: feedState.profileState.memberUsername.takeIf { it.isNotBlank() }
+        ?: feedState.currentUser?.username?.takeIf { it.isNotBlank() }
 
 
     LaunchedEffect(galleryViewModel.lastEditedSpriteId) {
@@ -140,7 +140,6 @@ fun HomeScreen(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(feedViewModel, lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            feedViewModel.getCurrentProfile()
             feedViewModel.startPolling()
         }
     }
@@ -211,8 +210,7 @@ fun HomeScreen(
         drawerContent = {
             HomeDrawer(
                 isLoggedIn = isLoggedIn,
-                profileState = feedState.profileState,
-                profileImageState = feedState.profileImageState,
+                currentUser = feedState.currentUser,
                 username = currentUsername,
                 onHomeClick = { launchDrawerAction() },
                 onProfileClick = {

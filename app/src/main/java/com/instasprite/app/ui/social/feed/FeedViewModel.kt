@@ -58,24 +58,11 @@ data class FeedUiState(
     val postFilter: PostFilter = PostFilter.Recent
 )
 
-data class ProfileImageState(
-    val isLoading: Boolean = false,
-    val imageUrl: String? = null,
-    val error: String? = null
-)
-
 data class VerifyEmailState(
     val showVerifyDialog: Boolean = false,
     val isSending: Boolean = false,
     val message: String = "",
     val success: Boolean = false
-)
-
-data class ProfileState(
-    val isLoading: Boolean = false,
-    val memberName: String = "",
-    val memberUsername: String = "",
-    val error: String? = null
 )
 
 @HiltViewModel
@@ -103,7 +90,7 @@ class FeedViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pagedPosts: Flow<PagingData<PostData>> = _contentState
-        .map { it.uiState.postFilter to it.profileState.memberUsername }
+        .map { it.uiState.postFilter to it.currentUser?.username }
         .distinctUntilChanged()
         .flatMapLatest { (filter, _) ->
             Pager(
@@ -135,12 +122,23 @@ class FeedViewModel @Inject constructor(
                 val loggedInNow = sessionState is SocialSessionState.LoggedIn
                 isLoggedIn = loggedInNow
 
-                if (loggedInNow) {
-                    getCurrentProfile()
-                    loadProfileImage()
-                } else {
+                if (!loggedInNow) {
                     _contentState.update { it.copy(uiState = it.uiState.copy(postFilter = PostFilter.Recent)) }
                     clearFeed()
+                }
+            }
+        }
+        viewModelScope.launch {
+            sessionManager.currentUser.collectLatest { user ->
+                _contentState.update { it.copy(currentUser = user) }
+                if (user != null && !user.isVerified) {
+                    _contentState.update {
+                        it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = true))
+                    }
+                } else if (user != null && user.isVerified) {
+                    _contentState.update {
+                        it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false))
+                    }
                 }
             }
         }
@@ -196,8 +194,8 @@ class FeedViewModel @Inject constructor(
 
         viewModelScope.launch {
             PostInteractionEvent.profileRefreshEvent.collectLatest {
-                forceReloadProfileImage()
-                getCurrentProfile()
+                profileImageRefreshCounter++
+                sessionManager.refreshCurrentUser()
             }
         }
     }
@@ -254,8 +252,6 @@ class FeedViewModel @Inject constructor(
     fun clearError() {
         _contentState.update {
             it.copy(
-                profileState = it.profileState.copy(error = null),
-                profileImageState = it.profileImageState.copy(error = null),
                 verifyEmailState = it.verifyEmailState.copy(message = "")
             )
         }
@@ -263,142 +259,10 @@ class FeedViewModel @Inject constructor(
 
     fun retryConnection() {
         _contentState.update { it.copy(isServerMaintenance = false) }
-        getCurrentProfile()
-        loadProfileImage()
+        sessionManager.refreshCurrentUser()
     }
 
-    fun getCurrentProfile() {
-        if (!isLoggedIn) return
-        if (_contentState.value.profileState.isLoading) return
 
-        viewModelScope.launch(Dispatchers.IO) {
-            _contentState.update {
-                it.copy(profileState = it.profileState.copy(isLoading = true, error = null))
-            }
-            profileRepository.getCurrentUserProfile().fold(
-                onSuccess = { data ->
-                    _contentState.update {
-                        it.copy(
-                            profileState = it.profileState.copy(
-                                isLoading = false,
-                                memberName = data.memberName,
-                                memberUsername = data.memberUsername,
-                                error = null
-                            )
-                        )
-                    }
-
-                    val imageUrl = data.memberImage?.imageUrl ?: data.memberImageUrl
-                    val avatarUrl = if (!imageUrl.isNullOrEmpty()) {
-                        if (imageUrl.startsWith("http")) {
-                            imageUrl
-                        } else {
-                            "${Constants.BASE_URL}/images/$imageUrl"
-                        }
-                    } else {
-                        null
-                    }
-
-                    accountRepository.updateAccount(username = data.memberUsername) { currentAccount ->
-                        currentAccount.copy(
-                            name = data.memberName,
-                            avatarUrl = avatarUrl,
-                            isVerified = data.verifiedEmail
-                        )
-                    }
-
-                    if (!data.verifiedEmail) {
-                        _contentState.update {
-                            it.copy(
-                                verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = true)
-                            )
-                        }
-                    } else {
-                        _contentState.update {
-                            it.copy(
-                                verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false)
-                            )
-                        }
-                    }
-                },
-                onFailure = { error ->
-                    val isDeviceOnline = isOnline.value
-                    val isServerDown = isDeviceOnline && (error is ApiError.Network || error is ApiError.Server || error is ApiError.Unknown)
-                    _contentState.update {
-                        it.copy(
-                            isServerMaintenance = isServerDown,
-                            profileState = it.profileState.copy(
-                                isLoading = false,
-                                error = if (isServerDown) null else error.toUserMessage(context)
-                            )
-                        )
-                    }
-                }
-            )
-        }
-    }
-
-    fun loadProfileImage() {
-        if (!isLoggedIn) return
-        if (_contentState.value.profileImageState.isLoading) return
-
-        viewModelScope.launch(Dispatchers.IO) {
-            _contentState.update {
-                it.copy(
-                    profileImageState = it.profileImageState.copy(
-                        isLoading = true,
-                        error = null
-                    )
-                )
-            }
-            profileRepository.getCurrentUserProfile().fold(
-                onSuccess = { data ->
-                    val imageUrl = data.memberImage?.imageUrl ?: data.memberImageUrl
-                    val finalUrl = if (!imageUrl.isNullOrEmpty()) {
-                        if (imageUrl.startsWith("http")) {
-                            "$imageUrl?ts=${System.currentTimeMillis()}"
-                        } else {
-                            "${Constants.BASE_URL}/images/$imageUrl?ts=${System.currentTimeMillis()}"
-                        }
-                    } else {
-                        null
-                    }
-                    _contentState.update {
-                        it.copy(
-                            profileImageState = it.profileImageState.copy(
-                                isLoading = false,
-                                imageUrl = finalUrl,
-                                error = null
-                            )
-                        )
-                    }
-                },
-                onFailure = { error ->
-                    val isDeviceOnline = isOnline.value
-                    val isServerDown = isDeviceOnline && (error is ApiError.Network || error is ApiError.Server || error is ApiError.Unknown)
-                    _contentState.update {
-                        it.copy(
-                            isServerMaintenance = isServerDown,
-                            profileImageState = it.profileImageState.copy(
-                                isLoading = false,
-                                error = if (isServerDown) null else error.toUserMessage(context)
-                            )
-                        )
-                    }
-                }
-            )
-        }
-    }
-
-    fun forceRefreshProfileImage() {
-        profileImageRefreshCounter++
-    }
-
-    fun forceReloadProfileImage() {
-        _contentState.update { it.copy(profileImageState = ProfileImageState()) }
-        forceRefreshProfileImage()
-        loadProfileImage()
-    }
 
     fun toggleLikePost(postId: Long, currentStatus: Boolean) {
         if (!isLoggedIn) {
@@ -436,7 +300,7 @@ class FeedViewModel @Inject constructor(
             _contentState.update { it.copy(showLoginRequiredError = true) }
             return
         }
-        if (_contentState.value.profileState.memberUsername.equals(
+        if (_contentState.value.currentUser?.username.equals(
                 username,
                 ignoreCase = true
             )
@@ -525,8 +389,7 @@ class FeedViewModel @Inject constructor(
                 localBookmarkState = emptyMap(),
                 localCommentState = emptyMap(),
                 localFollowState = emptyMap(),
-                profileState = ProfileState(),
-                profileImageState = ProfileImageState(),
+                currentUser = null,
                 verifyEmailState = VerifyEmailState(),
                 refreshPending = false,
                 hasNewPosts = false,
@@ -552,7 +415,7 @@ class FeedViewModel @Inject constructor(
 
     private fun handleEmailVerification() {
         viewModelScope.launch(Dispatchers.IO) {
-            getCurrentProfile()
+            sessionManager.refreshCurrentUser()
             _contentState.update {
                 it.copy(verifyEmailState = it.verifyEmailState.copy(showVerifyDialog = false))
             }

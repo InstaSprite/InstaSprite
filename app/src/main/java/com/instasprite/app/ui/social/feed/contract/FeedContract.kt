@@ -5,17 +5,15 @@ import androidx.paging.PagingData
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.ui.social.feed.FeedUiState
 import com.instasprite.app.ui.social.feed.PostFilter
-import com.instasprite.app.ui.social.feed.ProfileImageState
-import com.instasprite.app.ui.social.feed.ProfileState
 import com.instasprite.app.ui.social.feed.VerifyEmailState
+import com.instasprite.app.ui.social.session.CurrentUserState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
 data class FeedContentState(
     val uiState: FeedUiState = FeedUiState(),
     val verifyEmailState: VerifyEmailState = VerifyEmailState(),
-    val profileImageState: ProfileImageState = ProfileImageState(),
-    val profileState: ProfileState = ProfileState(),
+    val currentUser: CurrentUserState? = null,
     val pagedPosts: Flow<PagingData<PostData>> = emptyFlow(),
     val localLikeState: Map<Long, Boolean> = emptyMap(),
     val localBookmarkState: Map<Long, Boolean> = emptyMap(),
