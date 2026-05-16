@@ -15,11 +15,13 @@ import coil3.request.crossfade
 
 @Composable
 fun AsyncImageView(
-    imageUrl: String,
+    imageUrl: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.FillWidth,
     altText: String = "Image",
     placeHolder : Painter? = null,
+    fallback : Painter? = null,
+    error : Painter? = null,
     onLoading: ((AsyncImagePainter.State.Loading) -> Unit)? = null,
     onSuccess: ((AsyncImagePainter.State.Success) -> Unit)? = null,
     onError: ((AsyncImagePainter.State.Error) -> Unit)? = null
@@ -37,6 +39,8 @@ fun AsyncImageView(
         filterQuality = FilterQuality.None,
         contentScale = contentScale,
         placeholder = placeHolder,
+        fallback = fallback,
+        error = error,
         onError = onError,
         onLoading = onLoading,
         onSuccess = onSuccess,
