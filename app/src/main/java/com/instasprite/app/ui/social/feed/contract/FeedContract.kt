@@ -5,7 +5,7 @@ import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.social.feed.FeedUiState
 import com.instasprite.app.ui.social.feed.VerifyEmailState
-import com.instasprite.app.ui.social.session.CurrentUserState
+import com.instasprite.app.domain.session.CurrentUserState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 

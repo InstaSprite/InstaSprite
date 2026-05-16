@@ -10,7 +10,7 @@ import com.instasprite.app.data.repository.ProfileRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.editprofile.contract.EditProfileState
-import com.instasprite.app.ui.social.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionManager
 import com.instasprite.app.utils.Constants
 import com.instasprite.app.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel

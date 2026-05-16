@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.instasprite.app.data.network.model.JwtDto
 import com.instasprite.app.data.network.model.RefreshTokenRequestDto
 import com.instasprite.app.data.network.model.ResultResponse
-import com.instasprite.app.ui.social.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionManager
 import com.instasprite.app.utils.Constants
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -74,10 +74,10 @@ class AuthInterceptor @Inject constructor(
                         return chain.proceed(retryRequest)
                     }
                 } catch (e: Exception) {
-                    sessionManager.onLogout()
+                    sessionManager.logout()
                 }
             } else {
-                sessionManager.onLogout()
+                sessionManager.logout()
             }
         }
 

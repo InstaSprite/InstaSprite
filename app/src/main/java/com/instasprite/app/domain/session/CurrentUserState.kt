@@ -1,4 +1,4 @@
-package com.instasprite.app.ui.social.session
+package com.instasprite.app.domain.session
 
 data class CurrentUserState(
     val memberId: Int,

@@ -23,8 +23,8 @@ import com.instasprite.app.domain.dialog.DialogController
 import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
-import com.instasprite.app.ui.social.session.SocialSessionManager
-import com.instasprite.app.ui.social.session.SocialSessionState
+import com.instasprite.app.domain.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionState
 import com.instasprite.app.utils.ConnectivityObserver
 import com.instasprite.app.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel

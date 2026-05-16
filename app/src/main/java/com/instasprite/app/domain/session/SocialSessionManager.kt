@@ -1,7 +1,10 @@
-package com.instasprite.app.ui.social.session
+package com.instasprite.app.domain.session
 
+import android.util.Log
+import com.google.firebase.messaging.FirebaseMessaging
 import com.instasprite.app.data.network.SessionTokenStore
 import com.instasprite.app.data.repository.AccountRepository
+import com.instasprite.app.data.repository.NotificationRepository
 import com.instasprite.app.data.repository.ProfileRepository
 import com.instasprite.app.domain.model.Jwt
 import com.instasprite.app.utils.Constants
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,7 +24,8 @@ import javax.inject.Singleton
 class SocialSessionManager @Inject constructor(
     private val tokenStore: SessionTokenStore,
     private val profileRepository: Lazy<ProfileRepository>,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val notificationRepository: Lazy<NotificationRepository>
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -72,10 +77,19 @@ class SocialSessionManager @Inject constructor(
         _sessionState.value = SocialSessionState.LoggedIn(username.orEmpty())
     }
 
-    fun onLogout() {
-        tokenStore.clearTokens()
-        _sessionState.value = SocialSessionState.LoggedOut
-        _currentUser.value = null
+    fun logout() {
+        scope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                notificationRepository.get().deleteFcmToken(token)
+            } catch (e: Exception) {
+                Log.w("SocialSessionManager", "Failed to delete FCM token", e)
+            } finally {
+                tokenStore.clearTokens()
+                _sessionState.value = SocialSessionState.LoggedOut
+                _currentUser.value = null
+            }
+        }
     }
 
     fun currentUsername(): String? {

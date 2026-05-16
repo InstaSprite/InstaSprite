@@ -10,8 +10,8 @@ import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.profile.contract.FollowerUser
 import com.instasprite.app.ui.social.profile.contract.ProfileContentState
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
-import com.instasprite.app.ui.social.session.SocialSessionManager
-import com.instasprite.app.ui.social.session.SocialSessionState
+import com.instasprite.app.domain.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionState
 import com.instasprite.app.utils.Constants
 import com.instasprite.app.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -59,11 +58,10 @@ import com.instasprite.app.ui.social.comments.contract.CommentScreenEvent
 import com.instasprite.app.ui.social.comments.contract.CommentState
 import com.instasprite.app.ui.social.comments.contract.PostAuthor
 import com.instasprite.app.ui.social.createpost.composable.TopBar
-import com.instasprite.app.ui.social.feed.VerifyEmailState
 import com.instasprite.app.ui.social.feed.dialog.VerifyEmailDialog
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
-import com.instasprite.app.ui.social.session.SocialSessionState
-import com.instasprite.app.ui.social.session.SocialSessionViewModel
+import com.instasprite.app.domain.session.SocialSessionState
+import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.UiUtils

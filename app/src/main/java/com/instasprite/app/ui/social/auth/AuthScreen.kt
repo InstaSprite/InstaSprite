@@ -60,8 +60,8 @@ import com.instasprite.app.ui.social.auth.contract.AuthScreenEvent
 import com.instasprite.app.ui.social.auth.contract.GoogleAuthUiState
 import com.instasprite.app.ui.social.auth.dialog.ForgotPasswordDialog
 import com.instasprite.app.ui.social.auth.dialog.SavedAccountLoginDialog
-import com.instasprite.app.ui.social.session.SocialSessionState
-import com.instasprite.app.ui.social.session.SocialSessionViewModel
+import com.instasprite.app.domain.session.SocialSessionState
+import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.UiUtils

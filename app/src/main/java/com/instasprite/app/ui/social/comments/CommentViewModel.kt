@@ -15,7 +15,8 @@ import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.comments.contract.Comment
 import com.instasprite.app.ui.social.comments.contract.CommentState
 import com.instasprite.app.ui.social.comments.contract.PostAuthor
-import com.instasprite.app.ui.social.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionState
 import com.instasprite.app.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -195,7 +196,7 @@ class CommentViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
     }
     private val isLoggedIn: Boolean
-        get() = sessionManager.sessionState.value is com.instasprite.app.ui.social.session.SocialSessionState.LoggedIn
+        get() = sessionManager.sessionState.value is SocialSessionState.LoggedIn
 
     fun toggleLike() {
         if (!isLoggedIn) {

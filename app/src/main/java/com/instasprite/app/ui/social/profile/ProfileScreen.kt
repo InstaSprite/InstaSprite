@@ -28,7 +28,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -52,8 +51,8 @@ import com.instasprite.app.ui.social.profile.contract.ProfileTab
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
 import com.instasprite.app.ui.social.profile.dialog.FollowersDialog
 import com.instasprite.app.ui.social.profile.dialog.FollowingDialog
-import com.instasprite.app.ui.social.session.SocialSessionState
-import com.instasprite.app.ui.social.session.SocialSessionViewModel
+import com.instasprite.app.domain.session.SocialSessionState
+import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.UiUtils

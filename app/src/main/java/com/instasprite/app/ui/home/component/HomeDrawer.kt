@@ -36,7 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.ui.social.feed.component.ProfileImage
-import com.instasprite.app.ui.social.session.CurrentUserState
+import com.instasprite.app.domain.session.CurrentUserState
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable

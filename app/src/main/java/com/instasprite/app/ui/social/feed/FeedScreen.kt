@@ -25,8 +25,8 @@ import com.instasprite.app.R
 import com.instasprite.app.ui.social.feed.component.PostList
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
-import com.instasprite.app.ui.social.session.SocialSessionState
-import com.instasprite.app.ui.social.session.SocialSessionViewModel
+import com.instasprite.app.domain.session.SocialSessionState
+import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.DummyData.mockPagedPosts

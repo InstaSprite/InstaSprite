@@ -18,7 +18,7 @@ import com.instasprite.app.ui.social.auth.contract.AuthContentState
 import com.instasprite.app.ui.social.auth.contract.AuthMode
 import com.instasprite.app.ui.social.auth.contract.ForgotPasswordUiState
 import com.instasprite.app.ui.social.auth.contract.GoogleAuthUiState
-import com.instasprite.app.ui.social.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionManager
 import com.instasprite.app.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

@@ -7,8 +7,8 @@ import com.instasprite.app.data.repository.FollowRepository
 import com.instasprite.app.data.repository.PostRepository
 import com.instasprite.app.data.repository.ProfileRepository
 import com.instasprite.app.ui.social.PostInteractionEvent
-import com.instasprite.app.ui.social.session.SocialSessionManager
-import com.instasprite.app.ui.social.session.SocialSessionState
+import com.instasprite.app.domain.session.SocialSessionManager
+import com.instasprite.app.domain.session.SocialSessionState
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.coVerify
