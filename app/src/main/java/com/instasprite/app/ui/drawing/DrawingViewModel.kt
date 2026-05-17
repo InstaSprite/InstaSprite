@@ -19,6 +19,8 @@ import com.instasprite.app.domain.canvashistory.TransformEntry
 import com.instasprite.app.domain.canvashistory.TransformType
 import com.instasprite.app.domain.dialog.DialogController
 import com.instasprite.app.domain.model.Sprite
+import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.EraserTool
 import com.instasprite.app.domain.tool.FillTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
@@ -62,6 +64,7 @@ data class DrawingScreenState(
     val isSaving: Boolean = false,
     val selectedTool: Tool,
     val toolSize: Int,
+    val brushShape: BrushShape = BrushShape.Circle,
     val showLayerDrawer: Boolean = false,
     val isAppendSelectionMode: Boolean = false,
     val isCursorMode: Boolean = false,
@@ -491,6 +494,10 @@ class DrawingViewModel @AssistedInject constructor(
         _uiState.value = _uiState.value.copy(toolSize = size)
     }
 
+    fun setBrushShape(shape: BrushShape) {
+        _uiState.value = _uiState.value.copy(brushShape = shape)
+    }
+
     fun toggleLayerDrawer() {
         _uiState.value = _uiState.value.copy(showLayerDrawer = !_uiState.value.showLayerDrawer)
     }
@@ -587,6 +594,11 @@ class DrawingViewModel @AssistedInject constructor(
 
         val color = activeColor.value
         val scale = _uiState.value.toolSize
+        val shape = _uiState.value.brushShape
+
+        if (tool is PencilTool) tool.brushShape = shape
+        if (tool is EraserTool) tool.brushShape = shape
+
         ensureOverlayBitmap()
         if (!tool.commitsImmediately) {
             beginOverlayStrokeTracking()

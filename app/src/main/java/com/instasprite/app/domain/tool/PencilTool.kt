@@ -15,9 +15,11 @@ object PencilTool : StrokeTool {
     private var lastRow = 0
     private var lastCol = 0
     private var strokeColor: Int = 0
-    private var strokeScale: Int = 1
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
+    private var stamp: BrushStamp = BrushStamp.create(BrushShape.Square, 1)
+
+    var brushShape: BrushShape = BrushShape.Square
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, color)
@@ -39,9 +41,9 @@ object PencilTool : StrokeTool {
         lastRow = row
         lastCol = col
         strokeColor = color.toArgb()
-        strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
+        stamp = BrushStamp.create(brushShape, scale)
 
         stampBrush(row, col, plotPreviewPixel)
         return StrokeUpdate()
@@ -62,9 +64,7 @@ object PencilTool : StrokeTool {
         return StrokeUpdate()
     }
 
-    override fun endStroke() {
-        // No-op: preview pixels are committed by DrawingViewModel from touched overlay indices.
-    }
+    override fun endStroke() {}
 
     override fun cancelStroke() {
         lastRow = 0
@@ -76,9 +76,8 @@ object PencilTool : StrokeTool {
         col: Int,
         plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit
     ) {
-        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+        stamp.forEach(row, col, canvasWidth, canvasHeight) { r, c ->
             plotPreviewPixel(r, c, strokeColor)
         }
     }
-
 }

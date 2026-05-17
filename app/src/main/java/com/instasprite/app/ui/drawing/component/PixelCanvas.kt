@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
+import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
@@ -59,6 +60,7 @@ fun PixelCanvas(
     isCursorMode: Boolean = false,
     cursorState: CursorState = CursorState(),
     toolSize: Int = 1,
+    brushShape: BrushShape = BrushShape.Square,
     activeColor: Color = Color.White,
     onCursorDrawEvent: (CursorDrawEvent) -> Unit = {},
     onTransform: (Offset, Offset, Float, IntSize) -> Unit,
@@ -214,6 +216,7 @@ fun PixelCanvas(
                             cursorState = cursorState,
                             selectedTool = selectedTool,
                             toolSize = toolSize,
+                            brushShape = brushShape,
                             canvasWidth = canvasWidth,
                             canvasHeight = canvasHeight,
                             dstSize = dstSize,

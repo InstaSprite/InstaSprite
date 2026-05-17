@@ -13,14 +13,16 @@ object EraserTool : StrokeTool {
 
     private var lastRow = 0
     private var lastCol = 0
-    private var strokeScale: Int = 1
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
+    private var stamp: BrushStamp = BrushStamp.create(BrushShape.Square, 1)
 
     private var touchedMask: BooleanArray = BooleanArray(0)
     private var batchIndices: IntArray = IntArray(0)
     private var batchColors: IntArray = IntArray(0)
     private var batchCount: Int = 0
+
+    var brushShape: BrushShape = BrushShape.Square
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, Color.Transparent)
@@ -41,15 +43,15 @@ object EraserTool : StrokeTool {
     ): StrokeUpdate {
         lastRow = row
         lastCol = col
-        strokeScale = scale
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
+        stamp = BrushStamp.create(brushShape, scale)
 
         val totalPixels = canvasWidth * canvasHeight
         if (touchedMask.size != totalPixels) {
             touchedMask = BooleanArray(totalPixels)
         }
-        val bufferSize = minOf(totalPixels, scale * scale * (canvasWidth + canvasHeight))
+        val bufferSize = minOf(totalPixels, stamp.count * (canvasWidth + canvasHeight))
         if (batchIndices.size < bufferSize) {
             batchIndices = IntArray(bufferSize)
             batchColors = IntArray(bufferSize)
@@ -91,9 +93,7 @@ object EraserTool : StrokeTool {
         return StrokeUpdate()
     }
 
-    override fun endStroke() {
-        // No-op for immediate commit tools.
-    }
+    override fun endStroke() {}
 
     override fun cancelStroke() {
         lastRow = 0
@@ -101,7 +101,7 @@ object EraserTool : StrokeTool {
     }
 
     private inline fun collectBrushPixels(row: Int, col: Int) {
-        forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
+        stamp.forEach(row, col, canvasWidth, canvasHeight) { r, c ->
             val idx = r * canvasWidth + c
             if (!touchedMask[idx]) {
                 touchedMask[idx] = true

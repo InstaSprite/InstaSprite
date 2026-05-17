@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import com.instasprite.app.domain.model.SelectionState
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
+import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.BrushStamp
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.ui.drawing.contract.CursorState
@@ -34,6 +36,7 @@ fun DrawScope.drawCursorOverlay(
     cursorState: CursorState,
     selectedTool: Tool?,
     toolSize: Int,
+    brushShape: BrushShape = BrushShape.Square,
     canvasWidth: Int,
     canvasHeight: Int,
     dstSize: IntSize,
@@ -58,44 +61,23 @@ fun DrawScope.drawCursorOverlay(
         else -> 1
     }
 
-    val halfExpand = (cursorSizeCells - 1) / 2
-    val startCol = (gridCellX - halfExpand).coerceAtLeast(0)
-    val startRow = (gridCellY - halfExpand).coerceAtLeast(0)
-    val endCol = (gridCellX + (cursorSizeCells - halfExpand - 1)).coerceAtMost(canvasWidth - 1)
-    val endRow = (gridCellY + (cursorSizeCells - halfExpand - 1)).coerceAtMost(canvasHeight - 1)
-
-    val cellLeft = startCol * pxW
-    val cellTop = startRow * pxH
-    val cellRight = (endCol + 1) * pxW
-    val cellBottom = (endRow + 1) * pxH
-
-//    val fillColor = when (selectedTool) {
-//        is EraserTool -> Color.White.copy(alpha = 0.25f)
-//        is PencilTool -> activeColor.copy(alpha = 0.35f)
-//        else -> Color.White.copy(alpha = 0.15f)
-//    }
-//
-//    drawRect(
-//        color = fillColor,
-//        topLeft = Offset(cellLeft, cellTop),
-//        size = Size(cellRight - cellLeft, cellBottom - cellTop)
-//    )
+    val stamp = BrushStamp.create(brushShape, cursorSizeCells)
+    val outlinePath = stamp.createPath(pxW, pxH)
 
     val strokeWidth = 1.5f.dp.toPx() / scale
 
-    drawRect(
-        color = Color.White,
-        topLeft = Offset(cellLeft + strokeWidth, cellTop + strokeWidth),
-        size = Size(cellRight - cellLeft - strokeWidth * 2, cellBottom - cellTop - strokeWidth * 2),
-        style = Stroke(width = strokeWidth),
-    )
-
-    drawRect(
-        color = Color.Black,
-        topLeft = Offset(cellLeft, cellTop),
-        size = Size(cellRight - cellLeft, cellBottom - cellTop),
-        style = Stroke(width = strokeWidth),
-    )
+    translate(left = gridCellX * pxW, top = gridCellY * pxH) {
+        drawPath(
+            path = outlinePath,
+            color = Color.Black,
+            style = Stroke(width = strokeWidth * 3)
+        )
+        drawPath(
+            path = outlinePath,
+            color = Color.White,
+            style = Stroke(width = strokeWidth)
+        )
+    }
 
     val iconSizePx = 32.dp.toPx() / scale
 

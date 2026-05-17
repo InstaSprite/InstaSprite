@@ -41,12 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.data.repository.ColorPaletteRepository
+import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.ui.components.composable.DrawerLayout
 import com.instasprite.app.ui.components.composable.DrawerSide
+import com.instasprite.app.ui.drawing.component.BrushShapeSelector
 import com.instasprite.app.ui.drawing.component.ColorPalette
 import com.instasprite.app.ui.drawing.component.CursorDrawButton
 import com.instasprite.app.ui.drawing.component.CursorModeToggle
@@ -77,6 +79,7 @@ data class DrawingScreenEvent(
     val onToolSelectorEvent: (ToolSelectorEvent) -> Unit,
     val onCanvasEvent: (PixelCanvasEvent) -> Unit,
     val onToolSizeChange: (Int) -> Unit,
+    val onBrushShapeChange: (BrushShape) -> Unit,
     val onToggleLayerDrawer: () -> Unit,
     val onLayerEvent: (LayerEvent) -> Unit,
     val onCursorDrawEvent: (CursorDrawEvent) -> Unit
@@ -119,6 +122,7 @@ fun DrawingScreen(
             onToolSelectorEvent = viewModel::onToolSelectorEvent,
             onCanvasEvent = viewModel::onCanvasEvent,
             onToolSizeChange = viewModel::setToolSize,
+            onBrushShapeChange = viewModel::setBrushShape,
             onToggleLayerDrawer = viewModel::toggleLayerDrawer,
             onLayerEvent = viewModel::onLayerEvent,
             onCursorDrawEvent = viewModel::onCursorDrawEvent
@@ -210,6 +214,12 @@ private fun DrawingScreenContent(
                     onShapeSelected = { tool ->
                         event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
                     }
+                )
+
+                BrushShapeSelector(
+                    isVisible = (uiState.selectedTool is StrokeTool && uiState.selectedTool !is SelectionTool && uiState.selectedTool !is ShapeTool),
+                    selectedShape = uiState.brushShape,
+                    onShapeSelected = event.onBrushShapeChange
                 )
 
                 Row(
@@ -332,6 +342,7 @@ private fun DrawingScreenContent(
                     isCursorMode = uiState.isCursorMode,
                     cursorState = uiState.cursorState,
                     toolSize = uiState.toolSize,
+                    brushShape = uiState.brushShape,
                     activeColor = colorPaletteState.activeColor,
                     onCursorDrawEvent = event.onCursorDrawEvent,
                     onTransform = { centroid, panChange, zoomChange, layoutSize ->
@@ -391,6 +402,7 @@ private fun DrawingScreenPreviewLoading() {
                 onToolSelectorEvent = {},
                 onCanvasEvent = {},
                 onToolSizeChange = {},
+                onBrushShapeChange = {},
                 onLayerEvent = {},
                 onToggleLayerDrawer = {},
                 onCursorDrawEvent = {}
@@ -436,6 +448,7 @@ private fun DrawingScreenPreview() {
                 onToolSelectorEvent = {},
                 onCanvasEvent = {},
                 onToolSizeChange = {},
+                onBrushShapeChange = {},
                 onLayerEvent = {},
                 onToggleLayerDrawer = {},
                 onCursorDrawEvent = {}
