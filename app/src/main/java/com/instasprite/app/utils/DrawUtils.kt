@@ -49,6 +49,30 @@ fun bresenhamLine(x0: Int, y0: Int, x1: Int, y1: Int): List<Pair<Int, Int>> {
     return points
 }
 
+inline fun bresenhamLine(x0: Int, y0: Int, x1: Int, y1: Int, action: (x: Int, y: Int) -> Unit) {
+    val dx = abs(x1 - x0)
+    val dy = -abs(y1 - y0)
+    val sx = if (x0 < x1) 1 else -1
+    val sy = if (y0 < y1) 1 else -1
+    var err = dx + dy
+    var x = x0
+    var y = y0
+
+    while (true) {
+        action(x, y)
+        if (x == x1 && y == y1) break
+        val e2 = 2 * err
+        if (e2 >= dy) {
+            err += dy
+            x += sx
+        }
+        if (e2 <= dx) {
+            err += dx
+            y += sy
+        }
+    }
+}
+
 @Composable
 fun Modifier.drawingPointerInput(
     canvasWidth: Int,

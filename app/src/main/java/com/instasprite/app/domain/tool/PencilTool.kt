@@ -54,8 +54,7 @@ object PencilTool : StrokeTool {
         plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
-        val points = bresenhamLine(lastCol, lastRow, col, row)
-        for ((px, py) in points) {
+        bresenhamLine(lastCol, lastRow, col, row) { px, py ->
             stampBrush(py, px, plotPreviewPixel)
         }
         lastRow = row

@@ -17,6 +17,11 @@ object EraserTool : StrokeTool {
     private var canvasWidth: Int = 0
     private var canvasHeight: Int = 0
 
+    private var touchedMask: BooleanArray = BooleanArray(0)
+    private var batchIndices: IntArray = IntArray(0)
+    private var batchColors: IntArray = IntArray(0)
+    private var batchCount: Int = 0
+
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         canvas.setPixel(row, col, Color.Transparent)
     }
@@ -40,7 +45,25 @@ object EraserTool : StrokeTool {
         canvasWidth = canvas.getCanvasWidth()
         canvasHeight = canvas.getCanvasHeight()
 
-        stampCommittedBrush(canvas, row, col, onCommittedPixel)
+        val totalPixels = canvasWidth * canvasHeight
+        if (touchedMask.size != totalPixels) {
+            touchedMask = BooleanArray(totalPixels)
+        }
+        val bufferSize = minOf(totalPixels, scale * scale * (canvasWidth + canvasHeight))
+        if (batchIndices.size < bufferSize) {
+            batchIndices = IntArray(bufferSize)
+            batchColors = IntArray(bufferSize)
+        }
+
+        batchCount = 0
+        touchedMask.fill(false)
+        collectBrushPixels(row, col)
+
+        if (batchCount > 0) {
+            canvas.batchSetPixels(batchIndices, batchColors, batchCount)
+            notifyCommittedPixels(onCommittedPixel)
+        }
+
         return StrokeUpdate()
     }
 
@@ -51,10 +74,18 @@ object EraserTool : StrokeTool {
         plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
-        val points = bresenhamLine(lastCol, lastRow, col, row)
-        for ((px, py) in points) {
-            stampCommittedBrush(canvas, py, px, onCommittedPixel)
+        batchCount = 0
+        touchedMask.fill(false)
+
+        bresenhamLine(lastCol, lastRow, col, row) { px, py ->
+            collectBrushPixels(py, px)
         }
+
+        if (batchCount > 0) {
+            canvas.batchSetPixels(batchIndices, batchColors, batchCount)
+            notifyCommittedPixels(onCommittedPixel)
+        }
+
         lastRow = row
         lastCol = col
         return StrokeUpdate()
@@ -69,25 +100,21 @@ object EraserTool : StrokeTool {
         lastCol = 0
     }
 
-    private fun stampCommittedBrush(
-        canvas: PixelCanvasUseCase,
-        row: Int,
-        col: Int,
-        onCommittedPixel: (row: Int, col: Int) -> Unit
-    ) {
-        val maxPixels = strokeScale * strokeScale
-        val indices = IntArray(maxPixels)
-        val colors = IntArray(maxPixels)
-        var count = 0
-
+    private inline fun collectBrushPixels(row: Int, col: Int) {
         forEachBrushPixel(row, col, strokeScale, canvasWidth, canvasHeight) { r, c ->
-            indices[count] = r * canvasWidth + c
-            count++
-            onCommittedPixel(r, c)
+            val idx = r * canvasWidth + c
+            if (!touchedMask[idx]) {
+                touchedMask[idx] = true
+                batchIndices[batchCount] = idx
+                batchCount++
+            }
         }
+    }
 
-        if (count > 0) {
-            canvas.batchSetPixels(indices, colors, count)
+    private inline fun notifyCommittedPixels(onCommittedPixel: (row: Int, col: Int) -> Unit) {
+        for (i in 0 until batchCount) {
+            val idx = batchIndices[i]
+            onCommittedPixel(idx / canvasWidth, idx % canvasWidth)
         }
     }
 }
