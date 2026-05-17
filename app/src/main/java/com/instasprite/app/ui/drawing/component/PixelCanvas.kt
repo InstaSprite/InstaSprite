@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -21,13 +22,16 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.EyedropperTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
@@ -39,12 +43,9 @@ import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.cursorPointerInput
 import com.instasprite.app.utils.drawCheckerboard
+import com.instasprite.app.utils.drawCursorOverlay
 import com.instasprite.app.utils.drawSelectionOverlay
 import com.instasprite.app.utils.drawingPointerInput
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
-import com.instasprite.app.domain.tool.EyedropperTool
-import com.instasprite.app.utils.drawCursorOverlay
 
 @Composable
 fun PixelCanvas(
@@ -88,20 +89,23 @@ fun PixelCanvas(
     }
 
     val aspectRatio = canvasWidth.toFloat() / canvasHeight.toFloat()
-    val borderSize = 5.dp
 
     var canvasLayoutSize by remember { mutableStateOf(IntSize.Zero) }
 
     val context = LocalContext.current
     val toolIconBitmap = remember(selectedTool) {
         when (selectedTool) {
-            is PencilTool, is EyedropperTool -> ContextCompat.getDrawable(context, selectedTool.icon)
+            is PencilTool, is EyedropperTool -> ContextCompat.getDrawable(
+                context,
+                selectedTool.icon
+            )
                 ?.toBitmap(64, 64)
                 ?.asImageBitmap()
+
             else -> null
         }
     }
-    
+
     val isShowColorCursor = remember(selectedTool) {
         when (selectedTool) {
             is PencilTool, is EyedropperTool -> true
@@ -135,98 +139,81 @@ fun PixelCanvas(
         )
     }
 
-    val canvasBorderColor = AppTheme.colors.BackgroundColor
-
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
-    ) {
 
-        Box(
+    ) {
+        Canvas(
             modifier = Modifier
+                .aspectRatio(aspectRatio)
+                .fillMaxWidth(0.9f)
                 .graphicsLayer(
                     scaleX = scale,
                     scaleY = scale,
                     translationX = offset.x,
                     translationY = offset.y
                 )
-//                .border(borderSize, AppTheme.colors.BackgroundColor)
-                .drawBehind(onDraw = {
-                    drawRect(
-                        color = canvasBorderColor
-                    )
-                })
-                .padding(borderSize)
+                .onSizeChanged { canvasLayoutSize = it }
+                .drawCheckerboard(
+                    canvasWidth = canvasWidth,
+                    canvasHeight = canvasHeight
+                )
+                .then(pointerInputModifier)
+                .clipToBounds()
         ) {
-            Box(
-                modifier = Modifier
-                    .aspectRatio(aspectRatio)
-                    .fillMaxWidth(0.9f)
-            ) {
-                Canvas(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .onSizeChanged { canvasLayoutSize = it }
-                        .drawCheckerboard(
-                            canvasWidth = canvasWidth,
-                            canvasHeight = canvasHeight
-                        )
-                        .then(pointerInputModifier)
-                ) {
-                    val dstSize = IntSize(size.width.toInt(), size.height.toInt())
+            val dstSize = IntSize(size.width.toInt(), size.height.toInt())
 
-                    drawImage(
-                        image = imageBitmap,
-                        dstOffset = IntOffset.Zero,
-                        dstSize = dstSize,
-                        filterQuality = FilterQuality.None
-                    )
+            drawImage(
+                image = imageBitmap,
+                dstOffset = IntOffset.Zero,
+                dstSize = dstSize,
+                filterQuality = FilterQuality.None
+            )
 
-                    selectionImageBitmap?.let {
-                        drawImage(
-                            image = it,
-                            dstOffset = IntOffset.Zero,
-                            dstSize = dstSize,
-                            filterQuality = FilterQuality.None
-                        )
-                    }
+            selectionImageBitmap?.let {
+                drawImage(
+                    image = it,
+                    dstOffset = IntOffset.Zero,
+                    dstSize = dstSize,
+                    filterQuality = FilterQuality.None
+                )
+            }
 
-                    overlayImageBitmap?.let {
-                        drawImage(
-                            image = it,
-                            dstOffset = IntOffset.Zero,
-                            dstSize = dstSize,
-                            filterQuality = FilterQuality.None
-                        )
-                    }
+            overlayImageBitmap?.let {
+                drawImage(
+                    image = it,
+                    dstOffset = IntOffset.Zero,
+                    dstSize = dstSize,
+                    filterQuality = FilterQuality.None
+                )
+            }
 
-                    if (selectionState != null) {
-                        drawSelectionOverlay(
-                            selectionState = selectionState,
-                            showGrabHandle = (selectedTool is RectangleSelectionTool && !isSelectionAppendMode),
-                            canvasWidth = canvasWidth,
-                            canvasHeight = canvasHeight,
-                            dstSize = dstSize,
-                            scale = scale
-                        )
-                    }
+            if (selectionState != null) {
+                drawSelectionOverlay(
+                    selectionState = selectionState,
+                    showGrabHandle = (selectedTool is RectangleSelectionTool && !isSelectionAppendMode),
+                    canvasWidth = canvasWidth,
+                    canvasHeight = canvasHeight,
+                    dstSize = dstSize,
+                    scale = scale
+                )
+            }
 
-                    if (isCursorMode && cursorState.isVisible) {
-                        drawCursorOverlay(
-                            cursorState = cursorState,
-                            selectedTool = selectedTool,
-                            toolSize = toolSize,
-                            brushShape = brushShape,
-                            canvasWidth = canvasWidth,
-                            canvasHeight = canvasHeight,
-                            dstSize = dstSize,
-                            activeColor = activeColor,
-                            scale = scale,
-                            toolIconBitmap = toolIconBitmap,
-                            isShowColor = isShowColorCursor
-                        )
-                    }
-                }
+            if (isCursorMode && cursorState.isVisible) {
+                drawCursorOverlay(
+                    cursorState = cursorState,
+                    selectedTool = selectedTool,
+                    toolSize = toolSize,
+                    brushShape = brushShape,
+                    canvasWidth = canvasWidth,
+                    canvasHeight = canvasHeight,
+                    dstSize = dstSize,
+                    activeColor = activeColor,
+                    scale = scale,
+                    toolIconBitmap = toolIconBitmap,
+                    isShowColor = isShowColorCursor
+                )
             }
         }
     }
