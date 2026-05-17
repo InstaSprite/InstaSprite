@@ -307,6 +307,8 @@ fun Modifier.cursorPointerInput(
     canvasHeight: Int,
     cursorState: CursorState,
     scale: Float,
+    offset: Offset,
+    viewportSize: IntSize,
     onCursorMove: (cursorX: Float, cursorY: Float) -> Unit,
     onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit
 ): Modifier {
@@ -315,6 +317,9 @@ fun Modifier.cursorPointerInput(
     val touchSlop = LocalViewConfiguration.current.touchSlop
     val latestCursorX by rememberUpdatedState(cursorState.cursorX)
     val latestCursorY by rememberUpdatedState(cursorState.cursorY)
+    val latestScale by rememberUpdatedState(scale)
+    val latestOffset by rememberUpdatedState(offset)
+    val latestViewportSize by rememberUpdatedState(viewportSize)
 
     return this.pointerInput(canvasWidth, canvasHeight) {
         awaitEachGesture {
@@ -326,6 +331,9 @@ fun Modifier.cursorPointerInput(
                 cursorY = latestCursorY,
                 touchSlop = touchSlop,
                 layoutSize = size,
+                getScale = { latestScale },
+                getOffset = { latestOffset },
+                getViewportSize = { latestViewportSize },
                 onCursorMove = onCursorMove,
                 onTransform = onTransform,
                 startEvent = down
@@ -349,6 +357,9 @@ private class CursorGestureHandler(
     private var cursorY: Float,
     private val touchSlop: Float,
     private val layoutSize: IntSize,
+    private val getScale: () -> Float,
+    private val getOffset: () -> Offset,
+    private val getViewportSize: () -> IntSize,
     private val onCursorMove: (cursorX: Float, cursorY: Float) -> Unit,
     private val onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
     startEvent: PointerInputChange
@@ -361,13 +372,16 @@ private class CursorGestureHandler(
     private var isPanningOnly = false
     private var panAccumulated = Offset.Zero
     private var zoomAccumulated = 1f
+    private var skipEdgePan = false
 
     private val cellWidth = layoutSize.width.toFloat() / canvasWidth
     private val cellHeight = layoutSize.height.toFloat() / canvasHeight
+    private val canvasMaxX = canvasWidth.toFloat()
+    private val canvasMaxY = canvasHeight.toFloat()
+
 
     fun processEvent(event: PointerEvent): Boolean {
-        val isCanceled = event.changes.any { it.isConsumed }
-        if (isCanceled) {
+        if (event.changes.any { it.isConsumed }) {
             state = CursorGestureState.Canceled
             return true
         }
@@ -375,12 +389,16 @@ private class CursorGestureHandler(
         val pressedChanges = event.changes.filter { it.pressed }
         val pointerCount = pressedChanges.size
 
-        if (pointerCount > 1 && state != CursorGestureState.Transforming) {
-            state = CursorGestureState.Transforming
-        } else if (pointerCount == 1 && state == CursorGestureState.Transforming) {
-            state = CursorGestureState.Dragging
-            pointerId = pressedChanges.first().id
-            lastPosition = pressedChanges.first().position
+        when {
+            pointerCount > 1 && state != CursorGestureState.Transforming -> {
+                state = CursorGestureState.Transforming
+            }
+            pointerCount == 1 && state == CursorGestureState.Transforming -> {
+                state = CursorGestureState.Dragging
+                pointerId = pressedChanges.first().id
+                lastPosition = pressedChanges.first().position
+                skipEdgePan = true
+            }
         }
 
         when (state) {
@@ -391,6 +409,10 @@ private class CursorGestureHandler(
         return false
     }
 
+    fun onGestureEnded() {
+
+    }
+
     private fun handleDragging(event: PointerEvent, pressedChanges: List<PointerInputChange>) {
         val pointerChange = event.changes.firstOrNull { it.id == pointerId }
             ?: pressedChanges.firstOrNull() ?: return
@@ -399,22 +421,76 @@ private class CursorGestureHandler(
         val delta = pointerChange.position - lastPosition
         lastPosition = pointerChange.position
 
-        val deltaGridX = delta.x / cellWidth
-        val deltaGridY = delta.y / cellHeight
+        val rawX = cursorX + delta.x / cellWidth
+        val rawY = cursorY + delta.y / cellHeight
 
-        val rawX = cursorX + deltaGridX
-        val rawY = cursorY + deltaGridY
-        val maxX = canvasWidth.toFloat() - 0.01f
-        val maxY = canvasHeight.toFloat() - 0.01f
-        val clampedX = rawX.coerceIn(0f, maxX)
-        val clampedY = rawY.coerceIn(0f, maxY)
+        val bounds = getVisibleGridBounds()
+        val clampedX = rawX.coerceIn(bounds.minX, bounds.maxX)
+        val clampedY = rawY.coerceIn(bounds.minY, bounds.maxY)
 
         cursorX = clampedX
         cursorY = clampedY
-        onCursorMove(clampedX, clampedY)
+
+        applyEdgePan(
+            overflowX = rawX - clampedX,
+            overflowY = rawY - clampedY,
+            bounds = bounds
+        )
+        skipEdgePan = false
+
+        onCursorMove(cursorX, cursorY)
 
         if (pointerChange.positionChange() != Offset.Zero) {
             pointerChange.consume()
+        }
+    }
+
+    private data class GridBounds(
+        val minX: Float, val maxX: Float,
+        val minY: Float, val maxY: Float
+    )
+
+    private fun getVisibleGridBounds(): GridBounds {
+        val scale = getScale()
+        val offset = getOffset()
+        val viewport = getViewportSize()
+
+        val canvasW = layoutSize.width.toFloat()
+        val canvasH = layoutSize.height.toFloat()
+        val vpHalfW = viewport.width.toFloat() / 2f
+        val vpHalfH = viewport.height.toFloat() / 2f
+
+        val minLocalX = canvasW / 2f - (vpHalfW + offset.x) / scale
+        val maxLocalX = canvasW / 2f + (vpHalfW - offset.x) / scale
+        val minLocalY = canvasH / 2f - (vpHalfH + offset.y) / scale
+        val maxLocalY = canvasH / 2f + (vpHalfH - offset.y) / scale
+
+        return GridBounds(
+            minX = (minLocalX / cellWidth).coerceIn(0f, canvasMaxX),
+            maxX = (maxLocalX / cellWidth).coerceIn(0f, canvasMaxX),
+            minY = (minLocalY / cellHeight).coerceIn(0f, canvasMaxY),
+            maxY = (maxLocalY / cellHeight).coerceIn(0f, canvasMaxY)
+        )
+    }
+
+    private fun applyEdgePan(overflowX: Float, overflowY: Float, bounds: GridBounds) {
+        if (skipEdgePan || getScale() <= 1f) return
+        if (overflowX == 0f && overflowY == 0f) return
+
+        val panX = when {
+            overflowX < 0f && bounds.minX > 0f       -> -overflowX * cellWidth
+            overflowX > 0f && bounds.maxX < canvasMaxX -> -overflowX * cellWidth
+            else -> 0f
+        }
+        val panY = when {
+            overflowY < 0f && bounds.minY > 0f       -> -overflowY * cellHeight
+            overflowY > 0f && bounds.maxY < canvasMaxY -> -overflowY * cellHeight
+            else -> 0f
+        }
+
+        if (panX != 0f || panY != 0f) {
+            val center = Offset(layoutSize.width / 2f, layoutSize.height / 2f)
+            onTransform(center, Offset(panX, panY), 1f)
         }
     }
 
@@ -455,8 +531,6 @@ private class CursorGestureHandler(
 
         event.changes.forEach { if (it.pressed) it.consume() }
     }
-
-    fun onGestureEnded() {}
 }
 
 private enum class CursorGestureState {

@@ -91,6 +91,7 @@ fun PixelCanvas(
     val aspectRatio = canvasWidth.toFloat() / canvasHeight.toFloat()
 
     var canvasLayoutSize by remember { mutableStateOf(IntSize.Zero) }
+    var viewportSize by remember { mutableStateOf(IntSize.Zero) }
 
     val context = LocalContext.current
     val toolIconBitmap = remember(selectedTool) {
@@ -119,6 +120,8 @@ fun PixelCanvas(
             canvasHeight = canvasHeight,
             cursorState = cursorState,
             scale = scale,
+            offset = offset,
+            viewportSize = viewportSize,
             onCursorMove = { cursorX, cursorY ->
                 onCursorDrawEvent(CursorDrawEvent.MoveCursor(cursorX, cursorY))
             },
@@ -140,7 +143,8 @@ fun PixelCanvas(
     }
 
     Box(
-        modifier = modifier,
+        modifier = modifier
+            .onSizeChanged { viewportSize = it },
         contentAlignment = Alignment.Center
 
     ) {
