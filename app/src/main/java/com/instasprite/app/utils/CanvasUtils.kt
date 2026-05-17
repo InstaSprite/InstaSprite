@@ -39,7 +39,8 @@ fun DrawScope.drawCursorOverlay(
     dstSize: IntSize,
     activeColor: Color,
     scale: Float,
-    toolIconBitmap: ImageBitmap? = null
+    toolIconBitmap: ImageBitmap? = null,
+    isShowColor: Boolean = false
 ) {
     if (!cursorState.isVisible) return
 
@@ -108,6 +109,34 @@ fun DrawScope.drawCursorOverlay(
         translate(left = iconX, top = iconY) {
             scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
                 drawImage(image = toolIconBitmap)
+
+                if (isShowColor) {
+                    val indicatorSize = toolIconBitmap.width * 0.6f
+                    val stroke = 1.dp.toPx()
+
+                    val topLeft = Offset(
+                        toolIconBitmap.width * 0.5f,
+                        0f
+                    )
+
+                    drawRect(
+                        color = Color.Black,
+                        topLeft = topLeft,
+                        size = Size(indicatorSize, indicatorSize)
+                    )
+
+                    drawRect(
+                        color = Color.White,
+                        topLeft = topLeft + Offset(stroke, stroke),
+                        size = Size(indicatorSize - stroke * 2, indicatorSize - stroke * 2)
+                    )
+
+                    drawRect(
+                        color = activeColor,
+                        topLeft = topLeft + Offset(stroke * 2, stroke * 2),
+                        size = Size(indicatorSize - stroke * 4, indicatorSize - stroke * 4)
+                    )
+                }
             }
         }
     } else { // crosshair

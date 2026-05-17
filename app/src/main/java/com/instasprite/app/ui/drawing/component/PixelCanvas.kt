@@ -99,6 +99,13 @@ fun PixelCanvas(
             else -> null
         }
     }
+    
+    val isShowColorCursor = remember(selectedTool) {
+        when (selectedTool) {
+            is PencilTool, is EyedropperTool -> true
+            else -> false
+        }
+    }
 
     val pointerInputModifier = if (isCursorMode) {
         Modifier.cursorPointerInput(
@@ -212,7 +219,8 @@ fun PixelCanvas(
                             dstSize = dstSize,
                             activeColor = activeColor,
                             scale = scale,
-                            toolIconBitmap = toolIconBitmap
+                            toolIconBitmap = toolIconBitmap,
+                            isShowColor = isShowColorCursor
                         )
                     }
                 }
