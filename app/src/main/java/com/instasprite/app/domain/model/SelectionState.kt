@@ -11,6 +11,37 @@ data class SelectionState(
     val canvasWidth: Int,
     val canvasHeight: Int
 ) {
+    fun deepCopy(): SelectionState {
+        return SelectionState(
+            mask = mask.copyOf(),
+            bounds = Rect(bounds),
+            canvasWidth = canvasWidth,
+            canvasHeight = canvasHeight
+        )
+    }
+
+    companion object {
+        fun computeBounds(mask: BooleanArray, w: Int, h: Int): Rect {
+            var left = w
+            var top = h
+            var right = -1
+            var bottom = -1
+            for (r in 0 until h) {
+                val offset = r * w
+                for (c in 0 until w) {
+                    if (mask[offset + c]) {
+                        if (c < left) left = c
+                        if (c > right) right = c
+                        if (r < top) top = r
+                        if (r > bottom) bottom = r
+                    }
+                }
+            }
+            if (right == -1) return Rect(0, 0, 0, 0)
+            return Rect(left, top, right + 1, bottom + 1)
+        }
+    }
+
     val outlinePath: Path by lazy {
         val region = Region()
         val w = canvasWidth

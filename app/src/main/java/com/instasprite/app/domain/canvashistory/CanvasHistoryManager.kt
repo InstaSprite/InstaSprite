@@ -131,7 +131,8 @@ class CanvasHistoryManager {
             width = state.width,
             height = state.height,
             layers = state.layers.map { it.copy() },
-            activeLayerId = state.activeLayerId
+            activeLayerId = state.activeLayerId,
+            selectionState = state.selectionState?.deepCopy()
         )
     }
 

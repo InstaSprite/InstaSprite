@@ -11,7 +11,13 @@ data class StrokeUpdate(
 )
 
 interface StrokeTool : Tool {
+
+    // true => the tool writes directly to the main canvas during updateStroke.
+    // false => track preview pixels on the overlay and commit them during endStroke.
     val commitsImmediately: Boolean
+
+    // not finish until commit or cancel
+    val staysPendingAfterStroke: Boolean get() = false
 
     fun beginStroke(
         canvas: PixelCanvasUseCase,

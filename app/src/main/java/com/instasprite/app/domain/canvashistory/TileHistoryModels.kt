@@ -1,6 +1,7 @@
 package com.instasprite.app.domain.canvashistory
 
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.model.TileCoord
 
 sealed interface HistoryEntry {
@@ -15,16 +16,19 @@ data class TileDelta(
 )
 
 data class UndoEntry(
-    val deltas: List<TileDelta>
+    val deltas: List<TileDelta>,
+    val beforeSelection: SelectionState? = null,
+    val afterSelection: SelectionState? = null
 ) : HistoryEntry {
-    override fun isEmpty(): Boolean = deltas.isEmpty()
+    override fun isEmpty(): Boolean = deltas.isEmpty() && beforeSelection == afterSelection
 }
 
 data class HistoryCanvasState(
     val width: Int,
     val height: Int,
     val layers: List<Layer>,
-    val activeLayerId: String
+    val activeLayerId: String,
+    val selectionState: SelectionState? = null
 )
 
 data class OperationEntry(

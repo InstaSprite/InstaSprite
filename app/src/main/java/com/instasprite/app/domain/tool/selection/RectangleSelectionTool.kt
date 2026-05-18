@@ -72,7 +72,7 @@ object RectangleSelectionTool : StrokeTool, SelectionTool {
             // Handle size is visually 16dp.
             // On a zoomed canvas, 1 canvas pixel = 1 * zoomScale screen pixels.
             // We use half of that for tolerance from the center point.
-            var tol = maxOf(2, (12f / zoomScale).toInt())
+            var tol = maxOf(1, (6f / zoomScale).toInt())
             val maxTolX = maxOf(1, (right - left) / 3)
             val maxTolY = maxOf(1, (bottom - top) / 3)
             val tolX = minOf(tol, maxTolX)

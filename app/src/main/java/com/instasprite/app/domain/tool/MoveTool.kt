@@ -9,6 +9,7 @@ object MoveTool : StrokeTool {
     override val name: String = "Move"
     override val description: String = "Move layer or selection"
     override val commitsImmediately: Boolean = false
+    override val staysPendingAfterStroke: Boolean = true
 
     private var session: MoveSession? = null
     val isMoving: Boolean get() = session != null
@@ -87,6 +88,7 @@ object MoveTool : StrokeTool {
         val s = session ?: return null
         val result = StrokeUpdate(
             mainLayerPixels = s.originalPixels,
+            updatedSelectionMask = s.selectionMask,
             overlayPixels = IntArray(0)
         )
         canvas.setAllPixels(s.originalPixels)
