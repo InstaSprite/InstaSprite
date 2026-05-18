@@ -16,7 +16,7 @@ interface SelectionTool {
 }
 
 object RectangleSelectionTool : StrokeTool, SelectionTool {
-    override val icon: Int = R.drawable.ic_rect_tool
+    override val icon: Int = R.drawable.ic_selection_tool
     override val name: String = "Rect"
     override val description: String = "Select a rectangular area"
     override val commitsImmediately: Boolean = false

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
@@ -26,27 +24,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
-import androidx.core.graphics.drawable.toBitmap
+import com.instasprite.app.R
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.EyedropperTool
+import com.instasprite.app.domain.tool.FillTool
+import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.PencilTool
-import com.instasprite.app.domain.tool.StrokeTool
+import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
 import com.instasprite.app.ui.drawing.contract.CursorState
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasState
-import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.cursorPointerInput
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.drawCursorOverlay
 import com.instasprite.app.utils.drawSelectionOverlay
 import com.instasprite.app.utils.drawingPointerInput
+import com.instasprite.app.utils.rememberIconBitmap
 
 @Composable
 fun PixelCanvas(
@@ -95,23 +93,20 @@ fun PixelCanvas(
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
 
     val context = LocalContext.current
-    val toolIconBitmap = remember(selectedTool) {
-        when (selectedTool) {
-            is PencilTool, is EyedropperTool -> ContextCompat.getDrawable(
-                context,
-                selectedTool.icon
-            )
-                ?.toBitmap(64, 64)
-                ?.asImageBitmap()
+    val toolIconBitmap = rememberIconBitmap(selectedTool?.icon)
+    val cursorBitmap = rememberIconBitmap(R.drawable.ic_cursor)
 
-            else -> null
-        }
+    val isUseToolIconCursor by remember(selectedTool) {
+        mutableStateOf(
+            selectedTool is PencilTool
+                    || selectedTool is EyedropperTool
+        )
     }
 
     val cursorColor = remember(selectedTool, activeColor, cursorState.previewColor) {
         when (selectedTool) {
             is EyedropperTool -> cursorState.previewColor
-            is PencilTool, is StrokeTool -> activeColor
+            is PencilTool, is ShapeTool, is FillTool -> activeColor
             else -> null
         }
     }
@@ -217,7 +212,9 @@ fun PixelCanvas(
                     dstSize = dstSize,
                     scale = scale,
                     toolIconBitmap = toolIconBitmap,
-                    cursorColor = cursorColor
+                    cursorIconBitmap = cursorBitmap,
+                    cursorColor = cursorColor,
+                    useToolIcon = isUseToolIconCursor
                 )
             }
         }
@@ -257,7 +254,7 @@ private fun PreviewCursorMode() {
                 height = 16
             ),
             bitmap = createBitmap(16, 16),
-            selectedTool = PencilTool,
+            selectedTool = MoveTool,
             isSelectionAppendMode = false,
             scale = 1f,
             offset = Offset.Zero,

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.LassoSelectionTool
@@ -58,8 +59,8 @@ fun SelectionModeSelector(
                 painter = painterResource(id = selectedTool.icon),
                 contentDescription = selectedTool.name,
                 modifier = Modifier.size(20.dp),
-                tint = AppTheme.colors.TextColorLight
-            )
+                tint = Color.Unspecified,
+                )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = selectedTool.name, fontSize = 12.sp)
         }
@@ -76,7 +77,7 @@ fun SelectionModeSelector(
                         Icon(
                             painter = painterResource(id = tool.icon),
                             contentDescription = null,
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = Color.Unspecified,
                             modifier = Modifier.size(24.dp)
                         )
                     },

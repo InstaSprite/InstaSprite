@@ -45,7 +45,9 @@ fun DrawScope.drawCursorOverlay(
     dstSize: IntSize,
     scale: Float,
     toolIconBitmap: ImageBitmap? = null,
-    cursorColor: Color? = null
+    cursorIconBitmap: ImageBitmap? = null,
+    cursorColor: Color? = null,
+    useToolIcon: Boolean = false
 ) {
     if (!cursorState.isVisible) return
 
@@ -83,85 +85,123 @@ fun DrawScope.drawCursorOverlay(
 
     val iconSizePx = 32.dp.toPx() / scale
 
-    if (toolIconBitmap != null) {
-        val iconX = cursorScreenX
-        val iconY = cursorScreenY - iconSizePx
+    if (toolIconBitmap != null && cursorIconBitmap != null) {
+        if (!useToolIcon) {
+            val iconX = cursorScreenX
+            val iconY = cursorScreenY
 
-        val scaleX = iconSizePx / toolIconBitmap.width
-        val scaleY = iconSizePx / toolIconBitmap.height
-
-        translate(left = iconX, top = iconY) {
-            scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
-                drawImage(image = toolIconBitmap)
-
-                if (cursorColor != null && cursorColor != Color.Transparent) {
-                    val indicatorSize = toolIconBitmap.width * 0.6f
-                    val stroke = 1.dp.toPx()
-
-                    val topLeft = Offset(
-                        toolIconBitmap.width * 0.5f,
-                        0f
-                    )
-
-                    drawRect(
-                        color = Color.Black,
-                        topLeft = topLeft,
-                        size = Size(indicatorSize, indicatorSize)
-                    )
-
-                    drawRect(
-                        color = Color.White,
-                        topLeft = topLeft + Offset(stroke, stroke),
-                        size = Size(indicatorSize - stroke * 2, indicatorSize - stroke * 2)
-                    )
-
-                    drawRect(
-                        color = cursorColor,
-                        topLeft = topLeft + Offset(stroke * 2, stroke * 2),
-                        size = Size(indicatorSize - stroke * 4, indicatorSize - stroke * 4)
+            val scaleX = iconSizePx / cursorIconBitmap.width
+            val scaleY = iconSizePx / cursorIconBitmap.height
+            translate(left = iconX, top = iconY) {
+                scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
+                    drawImage(image = cursorIconBitmap)
+                    drawColorPreview(
+                        cursorColor, toolIconBitmap, Offset(
+                            toolIconBitmap.width * 0.5f,
+                            toolIconBitmap.width * 0.5f
+                        )
                     )
                 }
             }
+        } else {
+            val iconX = cursorScreenX
+            val iconY = cursorScreenY - iconSizePx
+
+            val scaleX = iconSizePx / toolIconBitmap.width
+            val scaleY = iconSizePx / toolIconBitmap.height
+
+            translate(left = iconX, top = iconY) {
+                scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
+                    drawImage(image = toolIconBitmap)
+                    drawColorPreview(
+                        cursorColor, toolIconBitmap, Offset(
+                            toolIconBitmap.width * 0.5f,
+                            0f
+                        )
+                    )
+                }
+            }
+
         }
     } else { // crosshair
-        val centerX = cursorScreenX
-        val centerY = cursorScreenY
+        drawCrosshair(cursorScreenX, cursorScreenY, iconSizePx, scale)
+    }
+}
 
-        val crosshairSize = iconSizePx * 0.4f
+private fun DrawScope.drawCrosshair(
+    cursorScreenX: Float,
+    cursorScreenY: Float,
+    iconSizePx: Float,
+    scale: Float
+) {
+    val centerX = cursorScreenX
+    val centerY = cursorScreenY
 
-        val strokeOuter = 5.dp.toPx() / scale
-        val strokeInner = 3.dp.toPx() / scale
+    val crosshairSize = iconSizePx * 0.4f
 
-        drawLine(
+    val strokeOuter = 5.dp.toPx() / scale
+    val strokeInner = 3.dp.toPx() / scale
+
+    drawLine(
+        color = Color.Black,
+        start = Offset(centerX - crosshairSize, centerY),
+        end = Offset(centerX + crosshairSize, centerY),
+        strokeWidth = strokeOuter,
+        cap = StrokeCap.Square
+    )
+
+    drawLine(
+        color = Color.Black,
+        start = Offset(centerX, centerY - crosshairSize),
+        end = Offset(centerX, centerY + crosshairSize),
+        strokeWidth = strokeOuter,
+        cap = StrokeCap.Square
+    )
+
+    drawLine(
+        color = Color.White,
+        start = Offset(centerX - crosshairSize, centerY),
+        end = Offset(centerX + crosshairSize, centerY),
+        strokeWidth = strokeInner,
+        cap = StrokeCap.Square
+    )
+
+    drawLine(
+        color = Color.White,
+        start = Offset(centerX, centerY - crosshairSize),
+        end = Offset(centerX, centerY + crosshairSize),
+        strokeWidth = strokeInner,
+        cap = StrokeCap.Square
+    )
+}
+
+private fun DrawScope.drawColorPreview(
+    cursorColor: Color?,
+    toolIconBitmap: ImageBitmap,
+    offset: Offset
+) {
+    if (cursorColor != null && cursorColor != Color.Transparent) {
+        val indicatorSize = toolIconBitmap.width * 0.6f
+        val stroke = 1.dp.toPx()
+
+        val topLeft = offset
+
+        drawRect(
             color = Color.Black,
-            start = Offset(centerX - crosshairSize, centerY),
-            end = Offset(centerX + crosshairSize, centerY),
-            strokeWidth = strokeOuter,
-            cap = StrokeCap.Square
+            topLeft = topLeft,
+            size = Size(indicatorSize, indicatorSize)
         )
 
-        drawLine(
-            color = Color.Black,
-            start = Offset(centerX, centerY - crosshairSize),
-            end = Offset(centerX, centerY + crosshairSize),
-            strokeWidth = strokeOuter,
-            cap = StrokeCap.Square
-        )
-
-        drawLine(
+        drawRect(
             color = Color.White,
-            start = Offset(centerX - crosshairSize, centerY),
-            end = Offset(centerX + crosshairSize, centerY),
-            strokeWidth = strokeInner,
-            cap = StrokeCap.Square
+            topLeft = topLeft + Offset(stroke, stroke),
+            size = Size(indicatorSize - stroke * 2, indicatorSize - stroke * 2)
         )
 
-        drawLine(
-            color = Color.White,
-            start = Offset(centerX, centerY - crosshairSize),
-            end = Offset(centerX, centerY + crosshairSize),
-            strokeWidth = strokeInner,
-            cap = StrokeCap.Square
+        drawRect(
+            color = cursorColor,
+            topLeft = topLeft + Offset(stroke * 2, stroke * 2),
+            size = Size(indicatorSize - stroke * 4, indicatorSize - stroke * 4)
         )
     }
 }

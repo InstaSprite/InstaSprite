@@ -9,7 +9,7 @@ import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import java.util.ArrayDeque
 
 object MagicWandTool : Tool, SelectionTool {
-    override val icon: Int = R.drawable.ic_rect_tool
+    override val icon: Int = R.drawable.ic_wand_tool
     override val name: String = "Wand"
     override val description: String = "Select contiguous pixels of the same color"
 

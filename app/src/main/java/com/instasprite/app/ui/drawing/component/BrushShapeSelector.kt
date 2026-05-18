@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.ui.theme.AppTheme
@@ -53,7 +54,7 @@ fun BrushShapeSelector(
                 painter = painterResource(id = selectedShape.icon),
                 contentDescription = selectedShape.name,
                 modifier = Modifier.size(20.dp),
-                tint = AppTheme.colors.TextColorLight
+                tint = Color.Unspecified
             )
         }
 
@@ -69,7 +70,7 @@ fun BrushShapeSelector(
                         Icon(
                             painter = painterResource(id = shape.icon),
                             contentDescription = null,
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = Color.Unspecified,
                             modifier = Modifier.size(24.dp)
                         )
                     },

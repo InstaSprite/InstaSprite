@@ -10,7 +10,7 @@ import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.utils.bresenhamLine
 
 object LassoSelectionTool : StrokeTool, SelectionTool {
-    override val icon: Int = R.drawable.ic_rect_tool
+    override val icon: Int = R.drawable.ic_lasso_tool
     override val name: String = "Lasso"
     override val description: String = "Draw a freeform selection area"
     override val commitsImmediately: Boolean = false
