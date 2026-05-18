@@ -1,12 +1,9 @@
 package com.instasprite.app.ui.drawing
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import android.graphics.Bitmap
+import android.graphics.Rect
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,20 +32,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.instasprite.app.R
 import com.instasprite.app.data.repository.ColorPaletteRepository
+import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.StrokeTool
+import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.ui.components.composable.DrawerLayout
 import com.instasprite.app.ui.components.composable.DrawerSide
@@ -61,8 +61,9 @@ import com.instasprite.app.ui.drawing.component.PixelCanvas
 import com.instasprite.app.ui.drawing.component.SelectionModeSelector
 import com.instasprite.app.ui.drawing.component.SelectionToolOption
 import com.instasprite.app.ui.drawing.component.ShapeSelector
+import com.instasprite.app.ui.drawing.component.ToolOptionMenu
 import com.instasprite.app.ui.drawing.component.ToolSelector
-import com.instasprite.app.ui.drawing.component.ToolSizeSlider
+import com.instasprite.app.ui.drawing.component.ToolSizeOption
 import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
@@ -205,57 +206,67 @@ private fun DrawingScreenContent(
             Column(
                 modifier = Modifier.background(AppTheme.colors.BackgroundColor)
             ) {
-                SelectionToolOption(
-                    isVisible = (canvasState.selectionState != null),
-                    isAppendMode = uiState.isAppendSelectionMode,
-                    onAppendModeToggle = { event.onToolSelectorEvent(ToolSelectorEvent.ToggleAppendSelectionMode) },
-                    onClearSelect = { event.onCanvasEvent(PixelCanvasEvent.ClearSelection) },
-                    onInvertSelect = { event.onCanvasEvent(PixelCanvasEvent.InvertSelection) }
-                )
-
-                ShapeSelector(
-                    isVisible = (uiState.selectedTool is ShapeTool),
-                    selectedTool = uiState.selectedTool,
-                    onShapeSelected = { tool ->
-                        event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
-                    }
-                )
-
-                BrushShapeSelector(
-                    isVisible = (uiState.selectedTool is StrokeTool
-                            && uiState.selectedTool !is SelectionTool
-                            && uiState.selectedTool !is ShapeTool
-                            && uiState.selectedTool !is MoveTool),
-                    selectedShape = uiState.brushShape,
-                    onShapeSelected = event.onBrushShapeChange
-                )
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .height(65.dp)
-                        .padding(12.dp)
+                        .padding(horizontal = 5.dp)
                 ) {
+                    ToolOptionMenu(
+                        selectedTool = uiState.selectedTool,
+                        modifier = Modifier
+                            .weight(8f)
+                    ) {
+                        if (uiState.selectedTool is SelectionTool) {
+                            item {
+                                SelectionModeSelector(
+                                    selectedTool = uiState.selectedTool,
+                                    onSelectionToolSelected = { tool ->
+                                        event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
+                                    }
+                                )
+                            }
+                        }
 
-                    Box(modifier = Modifier.weight(8f)) {
-                        if (uiState.selectedTool is StrokeTool && uiState.selectedTool !is SelectionTool && uiState.selectedTool !is MoveTool) {
-                            ToolSizeSlider(
-                                toolSizeValue = toolSizeValue,
-                                onValueChange = {
-                                    toolSizeValue = it
-                                    event.onToolSizeChange(it)
-                                }
-                            )
-                        } else if (uiState.selectedTool !is MoveTool) {
-                            SelectionModeSelector(
-                                isVisible = (uiState.selectedTool is SelectionTool),
-                                selectedTool = uiState.selectedTool,
-                                onSelectionToolSelected = { tool ->
-                                    event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
-                                }
-                            )
+                        if (uiState.selectedTool is ShapeTool) {
+                            item {
+                                ShapeSelector(
+                                    selectedTool = uiState.selectedTool,
+                                    onShapeSelected = { tool ->
+                                        event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
+                                    }
+                                )
+                            }
+                        }
+
+                        if (uiState.selectedTool is StrokeTool
+                            && uiState.selectedTool !is SelectionTool
+                            && uiState.selectedTool !is ShapeTool
+                            && uiState.selectedTool !is MoveTool
+                        ) {
+                            item {
+                                BrushShapeSelector(
+                                    selectedShape = uiState.brushShape,
+                                    onShapeSelected = event.onBrushShapeChange
+                                )
+                            }
+                        }
+
+                        if (uiState.selectedTool is StrokeTool
+                            && uiState.selectedTool !is SelectionTool
+                            && uiState.selectedTool !is MoveTool
+                        ) {
+                            item {
+                                ToolSizeOption(
+                                    toolSize = toolSizeValue,
+                                    onToolSizeChange = {
+                                        toolSizeValue = it
+                                        event.onToolSizeChange(it)
+                                    },
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                            }
                         }
                     }
 
@@ -274,7 +285,8 @@ private fun DrawingScreenContent(
                                 cy = centerY / cellHeight
                             }
                             event.onCursorDrawEvent(CursorDrawEvent.ToggleCursorMode(cx, cy))
-                        }
+                        },
+                        modifier = Modifier.weight(1f)
                     )
 
                     IconButton(
@@ -323,15 +335,26 @@ private fun DrawingScreenContent(
             }
         } else {
             Box(
+                contentAlignment = Alignment.TopCenter,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .background(AppTheme.colors.BackgroundColorDarker)
 
             ) {
+                if (canvasState.selectionState != null) {
+                    SelectionToolOption(
+                        isAppendMode = uiState.isAppendSelectionMode,
+                        onAppendModeToggle = { event.onToolSelectorEvent(ToolSelectorEvent.ToggleAppendSelectionMode) },
+                        onClearSelect = { event.onCanvasEvent(PixelCanvasEvent.ClearSelection) },
+                        onInvertSelect = { event.onCanvasEvent(PixelCanvasEvent.InvertSelection) },
+                        modifier = Modifier
+                            .padding(bottom = 24.dp)
+                            .align(Alignment.BottomCenter),
+                    )
+                }
                 PixelCanvas(
                     modifier = Modifier
-                        .align(Alignment.Center)
                         .padding(5.dp)
                         .fillMaxSize()
                         .fillMaxHeight(0.7f)
@@ -374,7 +397,7 @@ private fun DrawingScreenContent(
 
 @Preview
 @Composable
-private fun DrawingScreenPreviewLoading() {
+private fun DrawingScreenPreview() {
 
     val context = LocalContext.current
     val colorPaletteRepository = ColorPaletteRepository(
@@ -421,7 +444,60 @@ private fun DrawingScreenPreviewLoading() {
 
 @Preview
 @Composable
-private fun DrawingScreenPreview() {
+private fun DrawingScreenPreviewSelection() {
+
+    val context = LocalContext.current
+    val colorPaletteRepository = ColorPaletteRepository(
+        context,
+        colorPaletteDao = DummyData.MockClass.MockColorPaletteDao(),
+        lospecService = DummyData.MockClass.MockLospecService()
+    )
+    val colors = colorPaletteRepository.colors.collectAsState()
+    val activeColor = colorPaletteRepository.activeColor.collectAsState()
+
+    InstaSpriteTheme {
+        DrawingScreenContent(
+            uiState = DrawingScreenState(
+                isLoading = false,
+                selectedTool = RectangleSelectionTool,
+                toolSize = 1
+            ),
+            canvasState = PixelCanvasState(
+                width = 16,
+                height = 16,
+                selectionState = SelectionState(
+                    mask = BooleanArray(16 * 16),
+                    bounds = Rect(3, 3, 3, 3),
+                    canvasWidth = 16,
+                    canvasHeight = 16
+                )
+            ),
+            colorPaletteState = ColorPaletteState(
+                colorPalette = colors.value,
+                activeColor = activeColor.value,
+                recentColors = emptyList()
+            ),
+            event = DrawingScreenEvent(
+                onColorPaletteEvent = {},
+                onCanvasMenuEvent = {},
+                onToolSelectorEvent = {},
+                onCanvasEvent = {},
+                onToolSizeChange = {},
+                onBrushShapeChange = {},
+                onLayerEvent = {},
+                onToggleLayerDrawer = {},
+                onCursorDrawEvent = {}
+            ),
+            bitmap = createBitmap(16, 16),
+            overlayBitmap = null,
+            selectionBitmap = null
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DrawingScreenPreviewLoading() {
 
     val context = LocalContext.current
     val colorPaletteRepository = ColorPaletteRepository(
