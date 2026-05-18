@@ -20,15 +20,16 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.olaz.instasprite"
+    namespace = "com.instasprite.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.olaz.instasprite"
+        applicationId = "com.instasprite.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        val ciVersionCode = project.findProperty("ciVersionCode")?.toString()?.toIntOrNull()
+        versionCode = ciVersionCode ?: 3
+        versionName = "0.7.1"
 
         buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL", "\"\""))
         buildConfigField("String", "GOOGLE_WEBCLIENT_ID", localProperties.getProperty("GOOGLE_WEBCLIENT_ID", "\"\""))
@@ -36,13 +37,37 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("KEYSTORE_FILE") ?: "release.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+        }
+    }
+
+    flavorDimensions += "env"
+
+    productFlavors {
+        create("dev") {
+            dimension = "env"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "InstaSprite Dev")
+        }
+        create("prod") {
+            dimension = "env"
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isDebuggable = true
@@ -87,6 +112,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.palette.ktx)
 
 
 
@@ -117,6 +143,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.zoomable)
     implementation(libs.compose.material.icons)
+    implementation(libs.easycrop)
 
     // --- Persistence / Storage ---
     implementation(libs.androidx.room.runtime)

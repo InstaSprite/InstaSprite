@@ -63,3 +63,4 @@ captures/
 
 # Kotlin
 .kotlin
+/app/release/
