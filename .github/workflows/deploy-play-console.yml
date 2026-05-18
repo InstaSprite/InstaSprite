@@ -47,7 +47,9 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew bundleRelease -PciVersionCode=${{ github.run_number }}
+        run: |
+          VERSION_CODE=$((${{ github.run_number }} + 3))
+          ./gradlew bundleRelease -PciVersionCode=$VERSION_CODE
 
       - name: Upload to Play Console Closed Testing
         uses: r0adkll/upload-google-play@v1

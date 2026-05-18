@@ -29,7 +29,7 @@ android {
         targetSdk = 36
         val ciVersionCode = project.findProperty("ciVersionCode")?.toString()?.toIntOrNull()
         versionCode = ciVersionCode ?: 3
-        versionName = "0.7.1"
+        versionName = "0.7.2"
 
         buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL", "\"\""))
         buildConfigField("String", "GOOGLE_WEBCLIENT_ID", localProperties.getProperty("GOOGLE_WEBCLIENT_ID", "\"\""))
