@@ -124,10 +124,12 @@ object MoveTool : StrokeTool {
                 for (srcX in 0 until w) {
                     val srcIdx = srcY * w + srcX
                     if (selectionMask != null && !selectionMask[srcIdx]) continue
+                    val pixel = originalPixels[srcIdx]
+                    if (pixel == 0) continue
                     val dstX = srcX + offsetX
                     val dstY = srcY + offsetY
                     if (dstX in 0 until w && dstY in 0 until h) {
-                        result[dstY * w + dstX] = originalPixels[srcIdx]
+                        result[dstY * w + dstX] = pixel
                     }
                 }
             }
