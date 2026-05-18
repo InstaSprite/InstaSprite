@@ -25,6 +25,7 @@ import com.instasprite.app.domain.tool.FillTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.StrokeTool
+import com.instasprite.app.domain.tool.StrokeUpdate
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.data.repository.FileRepository
@@ -432,6 +433,44 @@ class DrawingViewModel @AssistedInject constructor(
         }
     }
 
+    private fun applyStrokeUpdate(update: StrokeUpdate): Boolean {
+        var applied = false
+        update.mainLayerPixels?.let {
+            pixelCanvasUseCase.setAllPixels(it)
+            viewModelScope.launch { refreshBitmapState() }
+            _drawVersion++
+            applied = true
+        }
+        update.overlayPixels?.let {
+            val bmp = _overlayBitmap ?: return@let
+            if (it.isEmpty()) clearOverlayBitmap()
+            else bmp.setPixels(it, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
+            _overlayVersion++
+            applied = true
+        }
+        update.updatedSelectionMask?.let { mask ->
+            pixelCanvasUseCase.setSelectionMask(mask)
+            val w = canvasWidth; val h = canvasHeight
+            _canvasState.value = _canvasState.value.copy(
+                selectionState = com.instasprite.app.domain.model.SelectionState(
+                    mask = mask,
+                    bounds = android.graphics.Rect(0, 0, w, h),
+                    canvasWidth = w,
+                    canvasHeight = h
+                )
+            )
+            refreshSelectionBitmap()
+            applied = true
+        }
+        if (applied) {
+            _canvasState.value = _canvasState.value.copy(
+                drawVersion = _drawVersion,
+                overlayVersion = _overlayVersion
+            )
+        }
+        return applied
+    }
+
     private fun clearSelection() {
         pixelCanvasUseCase.setSelectionMask(null)
         _canvasState.value = _canvasState.value.copy(selectionState = null)
@@ -487,6 +526,13 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun selectTool(tool: Tool) {
+        val prev = _uiState.value.selectedTool
+        if (prev is StrokeTool) {
+            prev.commitPending(pixelCanvasUseCase)?.let {
+                applyStrokeUpdate(it)
+                updateHistoryCurrentState()
+            }
+        }
         _uiState.value = _uiState.value.copy(selectedTool = tool)
     }
 
@@ -613,7 +659,7 @@ class DrawingViewModel @AssistedInject constructor(
             }
         }
 
-        tool.beginStroke(
+        val update = tool.beginStroke(
             canvas = pixelCanvasUseCase,
             row = row,
             col = col,
@@ -623,12 +669,14 @@ class DrawingViewModel @AssistedInject constructor(
             onCommittedPixel = { r, c -> applyCommittedPixelToMainBitmap(r, c) }
         )
 
-        if (tool.commitsImmediately) {
-            _drawVersion++
-            _canvasState.value = _canvasState.value.copy(drawVersion = _drawVersion)
-        } else {
-            _overlayVersion++
-            _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+        if (!applyStrokeUpdate(update)) {
+            if (tool.commitsImmediately) {
+                _drawVersion++
+                _canvasState.value = _canvasState.value.copy(drawVersion = _drawVersion)
+            } else {
+                _overlayVersion++
+                _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+            }
         }
     }
 
@@ -653,7 +701,7 @@ class DrawingViewModel @AssistedInject constructor(
             beginOverlayStrokeTracking()
         }
 
-        tool.updateStroke(
+        val update = tool.updateStroke(
             canvas = pixelCanvasUseCase,
             row = row,
             col = col,
@@ -661,8 +709,10 @@ class DrawingViewModel @AssistedInject constructor(
             onCommittedPixel = { _, _ -> }
         )
 
-        _overlayVersion++
-        _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+        if (!applyStrokeUpdate(update)) {
+            _overlayVersion++
+            _canvasState.value = _canvasState.value.copy(overlayVersion = _overlayVersion)
+        }
     }
 
     private fun onStrokeEnd() {
@@ -726,7 +776,12 @@ class DrawingViewModel @AssistedInject constructor(
         val tool = _uiState.value.selectedTool
         if (tool !is StrokeTool) return
 
-        tool.cancelStroke()
+        val pendingUpdate = tool.cancelPending(pixelCanvasUseCase)
+        if (pendingUpdate != null) {
+            applyStrokeUpdate(pendingUpdate)
+        } else {
+            tool.cancelStroke()
+        }
         clearOverlayBitmap()
         _overlayVersion++
 

@@ -4,7 +4,10 @@ import androidx.compose.ui.graphics.Color
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 data class StrokeUpdate(
-    val isFullPreview: Boolean = false
+    val isFullPreview: Boolean = false,
+    val overlayPixels: IntArray? = null,
+    val mainLayerPixels: IntArray? = null,
+    val updatedSelectionMask: BooleanArray? = null
 )
 
 interface StrokeTool : Tool {
@@ -30,6 +33,9 @@ interface StrokeTool : Tool {
 
     fun endStroke()
     fun cancelStroke()
+
+    fun commitPending(canvas: PixelCanvasUseCase): StrokeUpdate? = null
+    fun cancelPending(canvas: PixelCanvasUseCase): StrokeUpdate? = null
 }
 
 interface ShapeTool : StrokeTool {

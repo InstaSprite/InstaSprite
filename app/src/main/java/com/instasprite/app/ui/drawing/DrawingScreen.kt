@@ -45,6 +45,7 @@ import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.StrokeTool
@@ -221,7 +222,10 @@ private fun DrawingScreenContent(
                 )
 
                 BrushShapeSelector(
-                    isVisible = (uiState.selectedTool is StrokeTool && uiState.selectedTool !is SelectionTool && uiState.selectedTool !is ShapeTool),
+                    isVisible = (uiState.selectedTool is StrokeTool
+                            && uiState.selectedTool !is SelectionTool
+                            && uiState.selectedTool !is ShapeTool
+                            && uiState.selectedTool !is MoveTool),
                     selectedShape = uiState.brushShape,
                     onShapeSelected = event.onBrushShapeChange
                 )
@@ -236,7 +240,7 @@ private fun DrawingScreenContent(
                 ) {
 
                     Box(modifier = Modifier.weight(8f)) {
-                        if (uiState.selectedTool is StrokeTool && uiState.selectedTool !is SelectionTool) {
+                        if (uiState.selectedTool is StrokeTool && uiState.selectedTool !is SelectionTool && uiState.selectedTool !is MoveTool) {
                             ToolSizeSlider(
                                 toolSizeValue = toolSizeValue,
                                 onValueChange = {
@@ -244,7 +248,7 @@ private fun DrawingScreenContent(
                                     event.onToolSizeChange(it)
                                 }
                             )
-                        } else {
+                        } else if (uiState.selectedTool !is MoveTool) {
                             SelectionModeSelector(
                                 isVisible = (uiState.selectedTool is SelectionTool),
                                 selectedTool = uiState.selectedTool,

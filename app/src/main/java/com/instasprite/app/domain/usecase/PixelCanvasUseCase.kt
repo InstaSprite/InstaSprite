@@ -66,6 +66,10 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.selectionMask = mask
     }
 
+    fun getSelectionMask(): BooleanArray? {
+        return pixelCanvasRepository.selectionMask
+    }
+
     fun setCanvas(sprite: Sprite) {
         pixelCanvasRepository.setCanvasData(sprite.width, sprite.height, sprite.layers)
     }
