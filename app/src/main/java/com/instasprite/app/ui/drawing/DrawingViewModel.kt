@@ -16,6 +16,7 @@ import com.instasprite.app.domain.draw.DrawingEngine
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.EyedropperTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
@@ -278,7 +279,18 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun selectTool(tool: Tool) {
         commitPendingTool()
-        _uiState.value = _uiState.value.copy(selectedTool = tool)
+        val state = _uiState.value.cursorState
+        
+        var previewColor: Color? = null
+        if (tool is EyedropperTool) {
+            val pixel = pixelCanvasUseCase.getCompositedPixelAt(state.gridY, state.gridX)
+            previewColor = if (pixel != 0) Color(pixel) else Color.Transparent
+        }
+        
+        _uiState.value = _uiState.value.copy(
+            selectedTool = tool,
+            cursorState = state.copy(previewColor = previewColor)
+        )
     }
 
     private fun commitPendingTool() {
@@ -317,10 +329,21 @@ class DrawingViewModel @AssistedInject constructor(
             val ch = canvasState.value.height
             val startX = if (cx >= 0f) cx else (cw / 2f)
             val startY = if (cy >= 0f) cy else (ch / 2f)
+            
+            val clampedX = startX.coerceIn(0f, cw.toFloat() - 0.01f)
+            val clampedY = startY.coerceIn(0f, ch.toFloat() - 0.01f)
+            
+            var previewColor: Color? = null
+            if (current.selectedTool is EyedropperTool) {
+                val pixel = pixelCanvasUseCase.getCompositedPixelAt(clampedY.toInt(), clampedX.toInt())
+                previewColor = if (pixel != 0) Color(pixel) else Color.Transparent
+            }
+            
             CursorState(
-                cursorX = startX.coerceIn(0f, cw.toFloat() - 0.01f),
-                cursorY = startY.coerceIn(0f, ch.toFloat() - 0.01f),
-                isVisible = true
+                cursorX = clampedX,
+                cursorY = clampedY,
+                isVisible = true,
+                previewColor = previewColor
             )
         } else {
             CursorState()
@@ -344,10 +367,17 @@ class DrawingViewModel @AssistedInject constructor(
         val newGridX = clampedX.toInt()
         val newGridY = clampedY.toInt()
 
+        var previewColor: Color? = null
+        if (_uiState.value.selectedTool is EyedropperTool) {
+            val pixel = pixelCanvasUseCase.getCompositedPixelAt(newGridY, newGridX)
+            previewColor = if (pixel != 0) Color(pixel) else Color.Transparent
+        }
+
         _uiState.value = _uiState.value.copy(
             cursorState = current.copy(
                 cursorX = clampedX,
-                cursorY = clampedY
+                cursorY = clampedY,
+                previewColor = previewColor
             )
         )
 

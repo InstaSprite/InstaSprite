@@ -28,6 +28,9 @@ import androidx.core.graphics.set
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.BrushStamp
 import com.instasprite.app.domain.tool.StrokeTool
+import com.instasprite.app.domain.tool.PencilTool
+import com.instasprite.app.domain.tool.EraserTool
+import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.ui.drawing.contract.CursorState
 
@@ -40,10 +43,9 @@ fun DrawScope.drawCursorOverlay(
     canvasWidth: Int,
     canvasHeight: Int,
     dstSize: IntSize,
-    activeColor: Color,
     scale: Float,
     toolIconBitmap: ImageBitmap? = null,
-    isShowColor: Boolean = false
+    cursorColor: Color? = null
 ) {
     if (!cursorState.isVisible) return
 
@@ -57,7 +59,7 @@ fun DrawScope.drawCursorOverlay(
     val gridCellY = cursorState.gridY
 
     val cursorSizeCells = when (selectedTool) {
-        is StrokeTool -> toolSize
+        is PencilTool, is EraserTool, is ShapeTool -> toolSize
         else -> 1
     }
 
@@ -92,7 +94,7 @@ fun DrawScope.drawCursorOverlay(
             scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
                 drawImage(image = toolIconBitmap)
 
-                if (isShowColor) {
+                if (cursorColor != null && cursorColor != Color.Transparent) {
                     val indicatorSize = toolIconBitmap.width * 0.6f
                     val stroke = 1.dp.toPx()
 
@@ -114,7 +116,7 @@ fun DrawScope.drawCursorOverlay(
                     )
 
                     drawRect(
-                        color = activeColor,
+                        color = cursorColor,
                         topLeft = topLeft + Offset(stroke * 2, stroke * 2),
                         size = Size(indicatorSize - stroke * 4, indicatorSize - stroke * 4)
                     )

@@ -33,6 +33,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.EyedropperTool
 import com.instasprite.app.domain.tool.PencilTool
+import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
@@ -107,10 +108,11 @@ fun PixelCanvas(
         }
     }
 
-    val isShowColorCursor = remember(selectedTool) {
+    val cursorColor = remember(selectedTool, activeColor, cursorState.previewColor) {
         when (selectedTool) {
-            is PencilTool, is EyedropperTool -> true
-            else -> false
+            is EyedropperTool -> cursorState.previewColor
+            is PencilTool, is StrokeTool -> activeColor
+            else -> null
         }
     }
 
@@ -213,10 +215,9 @@ fun PixelCanvas(
                     canvasWidth = canvasWidth,
                     canvasHeight = canvasHeight,
                     dstSize = dstSize,
-                    activeColor = activeColor,
                     scale = scale,
                     toolIconBitmap = toolIconBitmap,
-                    isShowColor = isShowColorCursor
+                    cursorColor = cursorColor
                 )
             }
         }
