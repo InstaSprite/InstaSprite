@@ -1,16 +1,11 @@
 package com.instasprite.app.ui.drawing.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,17 +39,12 @@ fun ToolSizeOption(
             Text(text = "$toolSize px", fontSize = 12.sp)
         }
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .background(AppTheme.colors.BackgroundColor)
-                .padding(8.dp)
-        ) {
-            ToolSizeSlider(
-                toolSizeValue = toolSize,
-                onValueChange = onToolSizeChange,
-                modifier = Modifier.width(250.dp)
+        if (expanded) {
+            ToolSizeWheelPopup(
+                toolSize = toolSize,
+                onDismiss = { expanded = false },
+                itemHeight = 36.dp,
+                onValueChange = onToolSizeChange
             )
         }
     }
