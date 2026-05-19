@@ -23,4 +23,8 @@ data class Sprite(
             }
             return result
         }
+
+    override fun toString(): String {
+        return "Sprite(id='$id', width=$width, height=$height, layers=${layers.size}, colorPaletteSize=${colorPalette?.size ?: 0})"
+    }
 }

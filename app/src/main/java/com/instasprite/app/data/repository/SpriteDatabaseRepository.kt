@@ -27,7 +27,7 @@ class SpriteDatabaseRepository @Inject constructor(
     @ApplicationContext private val context: android.content.Context
 ) {
     suspend fun saveSprite(sprite: Sprite) {
-        Log.d("ISpriteDatabaseRepository", "Saving sprite: $sprite")
+        Log.d("ISpriteDatabaseRepository", "Saving sprite: ${sprite.id}")
         val now = System.currentTimeMillis()
         val entity = sprite.toEntity()
 

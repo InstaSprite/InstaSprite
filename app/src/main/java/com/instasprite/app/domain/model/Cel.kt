@@ -34,4 +34,9 @@ data class Cel(
         result = 31 * result + pixels.contentHashCode()
         return result
     }
+
+    override fun toString(): String {
+        return "Cel(x=$x, y=$y, width=$width, height=$height, pixels=[size=${pixels.size}])"
+    }
+
 }
