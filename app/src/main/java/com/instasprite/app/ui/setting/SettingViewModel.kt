@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.instasprite.app.data.repository.AuthRepository
+import com.instasprite.app.domain.session.SocialSessionManager
 import com.instasprite.app.ui.theme.ThemeFlavour
 import com.instasprite.app.utils.AppSettings
 import com.instasprite.app.utils.toUserMessage
@@ -38,12 +39,18 @@ data class SettingUiState(
     val isDisabling2FA: Boolean = false,
     val otpError: String? = null,
     val enable2FAError: String? = null,
-    val disable2FAError: String? = null
+    val disable2FAError: String? = null,
+    val hasPassword: Boolean = true,
+    val showSetPasswordDialog: Boolean = false,
+    val isSettingPassword: Boolean = false,
+    val setPasswordError: String? = null,
+    val setPasswordSuccess: Boolean = false
 )
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val sessionManager: SocialSessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -53,6 +60,7 @@ class SettingViewModel @Inject constructor(
     init {
         loadSettings()
         load2FAStatus()
+        loadPasswordStatus()
     }
 
     private fun loadSettings() {
@@ -258,6 +266,59 @@ class SettingViewModel @Inject constructor(
             context.startActivity(mainIntent)
 
             Runtime.getRuntime().exit(0)
+        }
+    }
+
+    // ── Set Password (Google-only accounts) ──────────────────
+
+    private fun loadPasswordStatus() {
+        viewModelScope.launch {
+            sessionManager.currentUser.collect { user ->
+                if (user != null) {
+                    _uiState.value = _uiState.value.copy(hasPassword = user.hasPassword)
+                }
+            }
+        }
+    }
+
+    fun showSetPasswordDialog() {
+        _uiState.value = _uiState.value.copy(
+            showSetPasswordDialog = true,
+            setPasswordError = null,
+            setPasswordSuccess = false
+        )
+    }
+
+    fun dismissSetPasswordDialog() {
+        _uiState.value = _uiState.value.copy(showSetPasswordDialog = false)
+    }
+
+    fun setPassword(password: String) {
+        _uiState.value = _uiState.value.copy(
+            isSettingPassword = true,
+            setPasswordError = null
+        )
+
+        viewModelScope.launch {
+            val result = authRepository.setPassword(password)
+            result.fold(
+                onSuccess = {
+                    _uiState.value = _uiState.value.copy(
+                        isSettingPassword = false,
+                        setPasswordSuccess = true,
+                        hasPassword = true,
+                        showSetPasswordDialog = false
+                    )
+                    // Refresh session to update hasPassword
+                    sessionManager.refreshCurrentUser()
+                },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isSettingPassword = false,
+                        setPasswordError = error.toUserMessage(context)
+                    )
+                }
+            )
         }
     }
 }

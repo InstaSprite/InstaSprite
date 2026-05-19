@@ -9,5 +9,6 @@ data class CurrentUserState(
     val isVerified: Boolean,
     val postsCount: Int,
     val followersCount: Int,
-    val followingCount: Int
+    val followingCount: Int,
+    val hasPassword: Boolean = true
 )

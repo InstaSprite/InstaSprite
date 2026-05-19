@@ -10,6 +10,7 @@ import com.instasprite.app.data.network.model.OtpStatusDto
 import com.instasprite.app.data.network.model.RefreshTokenRequestDto
 import com.instasprite.app.data.network.model.RegisterRequestDto
 import com.instasprite.app.data.network.model.ResetPasswordRequestDto
+import com.instasprite.app.data.network.model.SetPasswordRequestDto
 import com.instasprite.app.data.network.model.ResultResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -79,5 +80,11 @@ interface AuthApi {
     @POST("/api/v1/auth/password/reset")
     suspend fun resetPassword(
         @Body request: ResetPasswordRequestDto
+    ): Response<ResultResponse<Any?>>
+
+    @Headers("Content-Type: application/json")
+    @POST("/api/v1/auth/password/set")
+    suspend fun setPassword(
+        @Body request: SetPasswordRequestDto
     ): Response<ResultResponse<Any?>>
 }

@@ -39,6 +39,10 @@
     <string name="feed">Bảng tin</string>
     <string name="settings">Cài đặt</string>
     <string name="setting">Cài đặt</string>
+    <string name="set_password">Thiết lập Mật khẩu</string>
+    <string name="set_password_description">Thiết lập mật khẩu để cho phép đăng nhập trực tiếp bằng email của bạn.</string>
+    <string name="new_password">Mật khẩu mới</string>
+    <string name="setting_password">Đang thiết lập...</string>
     <string name="notifications">Thông báo</string>
     <string name="gallery">Thư viện</string>
     <string name="about">Giới thiệu</string>

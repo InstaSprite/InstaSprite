@@ -53,6 +53,9 @@ data class UserProfileDto(
     val blocked: Boolean = false,
 
     @SerializedName("verifiedEmail")
-    val verifiedEmail: Boolean = false
+    val verifiedEmail: Boolean = false,
+
+    @SerializedName("hasPassword")
+    val hasPassword: Boolean = true
 )
 

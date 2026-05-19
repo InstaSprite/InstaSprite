@@ -7,6 +7,7 @@ import com.instasprite.app.data.network.model.OtpEnableRequestDto
 import com.instasprite.app.data.network.model.OtpEnrollmentDto
 import com.instasprite.app.data.network.model.RefreshTokenRequestDto
 import com.instasprite.app.data.network.model.ResetPasswordRequestDto
+import com.instasprite.app.data.network.model.SetPasswordRequestDto
 import com.instasprite.app.data.network.model.toDomain
 import com.instasprite.app.data.network.safeApiCall
 import com.instasprite.app.data.network.toResult
@@ -64,5 +65,9 @@ class AuthRepository @Inject constructor(
 
     suspend fun resetPassword(temporaryPassword: String, newPassword: String): Result<Unit> = safeApiCall {
         authApi.resetPassword(ResetPasswordRequestDto(temporaryPassword, newPassword)).toResultUnit()
+    }
+
+    suspend fun setPassword(password: String): Result<Unit> = safeApiCall {
+        authApi.setPassword(SetPasswordRequestDto(password)).toResultUnit()
     }
 }

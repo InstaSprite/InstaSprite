@@ -40,6 +40,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +57,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.dialog.OtpDialog
 import com.instasprite.app.ui.components.dialog.OtpEnrollmentDialog
+import com.instasprite.app.ui.components.dialog.SetPasswordDialog
 import com.instasprite.app.ui.setting.composable.SettingItem
 import com.instasprite.app.ui.theme.AppColors
 import com.instasprite.app.ui.theme.AppTheme
@@ -75,6 +78,12 @@ fun SettingScreen(
 
     UiUtils.SetStatusBarColor(colors.BackgroundColorDarker)
     UiUtils.SetNavigationBarColor(colors.BackgroundColorDarker)
+
+    LaunchedEffect(uiState.setPasswordSuccess) {
+        if (uiState.setPasswordSuccess) {
+            Toast.makeText(context, R.string.success_settings_saved, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -165,6 +174,28 @@ fun SettingScreen(
                 thickness = 1.dp
             )
 
+            if (!uiState.hasPassword) {
+                SettingItem(
+                    icon = Icons.Default.Key,
+                    title = stringResource(R.string.set_password),
+                    subtitle = stringResource(R.string.set_password_description),
+                    onClick = { viewModel.showSetPasswordDialog() },
+                    trailing = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.set_password),
+                            tint = colors.Subtext0Color,
+                            modifier = Modifier.graphicsLayer(rotationZ = 180f)
+                        )
+                    }
+                )
+
+                HorizontalDivider(
+                    color = colors.Foreground1Color,
+                    thickness = 1.dp
+                )
+            }
+
             SettingItem(
                 icon = Icons.Default.Key,
                 title = context.getString(R.string.enable2fa),
@@ -248,6 +279,15 @@ fun SettingScreen(
                     }
                 },
                 containerColor = colors.DialogColor
+            )
+        }
+
+        if (uiState.showSetPasswordDialog) {
+            SetPasswordDialog(
+                enabled = !uiState.isSettingPassword,
+                errorText = uiState.setPasswordError,
+                onDismiss = { viewModel.dismissSetPasswordDialog() },
+                onConfirm = { password -> viewModel.setPassword(password) }
             )
         }
 

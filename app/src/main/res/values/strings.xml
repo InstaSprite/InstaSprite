@@ -38,6 +38,10 @@
     <string name="feed">Feed</string>
     <string name="settings">Settings</string>
     <string name="setting">Setting</string>
+    <string name="set_password">Set Password</string>
+    <string name="set_password_description">Set a password to allow signing in with your email directly.</string>
+    <string name="new_password">New Password</string>
+    <string name="setting_password">Setting Password...</string>
     <string name="notifications">Notifications</string>
     <string name="gallery">Gallery</string>
     <string name="about">About</string>

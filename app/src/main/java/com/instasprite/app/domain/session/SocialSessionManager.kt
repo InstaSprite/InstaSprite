@@ -119,7 +119,8 @@ class SocialSessionManager @Inject constructor(
                     isVerified = response.verifiedEmail,
                     postsCount = response.memberPostsCount,
                     followersCount = response.memberFollowersCount,
-                    followingCount = response.followingMemberFollowCount
+                    followingCount = response.followingMemberFollowCount,
+                    hasPassword = response.hasPassword
                 )
 
                 // Sync with DataStore for Account Switcher
