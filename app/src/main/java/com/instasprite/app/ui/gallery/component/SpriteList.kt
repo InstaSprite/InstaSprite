@@ -48,9 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,6 +57,7 @@ import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
 import com.instasprite.app.ui.theme.AppTheme
@@ -228,10 +227,9 @@ private fun SpriteCard(
                             .align(Alignment.CenterEnd)
                             .size(40.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_three_dots),
+                        PixelIcon(
+                            icon =R.drawable.ic_three_dots,
                             contentDescription = stringResource(R.string.options),
-                            tint = Color.Unspecified,
                             modifier = Modifier.size(24.dp)
                         )
                     }

@@ -94,8 +94,10 @@ fun PixelCanvas(
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
 
     val context = LocalContext.current
-    val toolIconBitmap = rememberIconBitmap(selectedTool?.icon)
-    val cursorBitmap = rememberIconBitmap(R.drawable.ic_cursor)
+
+    // app icon has 1 pixel transparent border (idk why)
+    val toolIconBitmap = rememberIconBitmap(selectedTool?.icon, 1)
+    val cursorBitmap = rememberIconBitmap(R.drawable.ic_cursor, 1)
 
     val isUseToolIconCursor by remember(selectedTool) {
         mutableStateOf(

@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import androidx.compose.ui.res.stringResource
-
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,7 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.domain.tool.EraserTool
@@ -34,6 +31,7 @@ import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeToolPlaceholder
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.SelectionToolPlaceholder
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -78,10 +76,9 @@ fun ToolSelector(
                 tools.reversed().forEach { tool ->
                     DropdownMenuItem(
                         leadingIcon = {
-                            Icon(
-                                painter = painterResource(tool.icon),
+                            PixelIcon(
+                                icon = tool.icon,
                                 contentDescription = tool.description,
-                                tint = Color.Unspecified,
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -186,10 +183,9 @@ fun ToolItem(
         modifier = modifier.size(56.dp),
         onClick = onClick,
     ) {
-        Icon(
-            painter = painterResource(id = iconResourceId),
+        PixelIcon(
+            icon = iconResourceId,
             contentDescription = contentDescription,
-            tint = Color.Unspecified,
             modifier = Modifier.size(32.dp)
         )
     }

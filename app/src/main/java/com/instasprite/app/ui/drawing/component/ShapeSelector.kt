@@ -12,23 +12,22 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.shape.CircleTool
 import com.instasprite.app.domain.tool.shape.DiamondTool
 import com.instasprite.app.domain.tool.shape.LineTool
 import com.instasprite.app.domain.tool.shape.OvalTool
 import com.instasprite.app.domain.tool.shape.RectangleTool
-import com.instasprite.app.domain.tool.Tool
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -58,11 +57,10 @@ fun ShapeSelector(
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
             modifier = Modifier.height(36.dp)
         ) {
-            Icon(
-                painter = painterResource(id = selectedTool.icon),
+            PixelIcon(
+                icon = selectedTool.icon,
                 contentDescription = selectedTool.name,
                 modifier = Modifier.size(20.dp),
-                tint = AppTheme.colors.TextColorLight
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = selectedTool.name, fontSize = 12.sp)
@@ -77,10 +75,9 @@ fun ShapeSelector(
                 DropdownMenuItem(
                     text = { Text(tool.name, color = AppTheme.colors.TextColorLight) },
                     leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = tool.icon),
+                        PixelIcon(
+                            icon = tool.icon,
                             contentDescription = null,
-                            tint = AppTheme.colors.TextColorLight,
                             modifier = Modifier.size(24.dp)
                         )
                     },

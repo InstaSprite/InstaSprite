@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +18,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -36,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,7 +47,10 @@ import com.instasprite.app.data.model.AccountPreferences
 import com.instasprite.app.data.model.AccountType
 import com.instasprite.app.data.network.GoogleAuth
 import com.instasprite.app.data.network.model.GoogleLoginRequestDto
+import com.instasprite.app.domain.session.SocialSessionState
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.OtpDialog
+import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.social.auth.component.AuthForm
 import com.instasprite.app.ui.social.auth.component.GoogleSignInButton
 import com.instasprite.app.ui.social.auth.component.SavedAccountList
@@ -60,8 +61,6 @@ import com.instasprite.app.ui.social.auth.contract.AuthScreenEvent
 import com.instasprite.app.ui.social.auth.contract.GoogleAuthUiState
 import com.instasprite.app.ui.social.auth.dialog.ForgotPasswordDialog
 import com.instasprite.app.ui.social.auth.dialog.SavedAccountLoginDialog
-import com.instasprite.app.domain.session.SocialSessionState
-import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.UiUtils
@@ -255,8 +254,8 @@ fun AuthContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher),
+            PixelIcon(
+                icon = R.drawable.ic_launcher,
                 contentDescription = stringResource(R.string.app_logo),
                 modifier = Modifier.size(100.dp),
             )

@@ -1,28 +1,26 @@
 package com.instasprite.app
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import androidx.compose.foundation.Image
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.UiUtils
+import com.instasprite.app.utils.rememberPixelPainter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -59,8 +57,8 @@ fun SplashScreen() {
     )
     {
         Image(
-            painter = painterResource(R.drawable.splash),
-            modifier = Modifier
+            painter = rememberPixelPainter(R.drawable.ic_splash),
+                    modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .fillMaxHeight(0.7f),
             contentDescription = stringResource(R.string.splash_screen),

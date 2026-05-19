@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -42,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.ColorPaletteView
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
@@ -237,10 +237,9 @@ private fun CanvasMenuDropdownMenu(
                 Text(text = stringResource(R.string.rotate_canvas))
             },
             leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_redo),
+                PixelIcon(
+                   icon = R.drawable.ic_redo,
                     contentDescription = stringResource(R.string.rotate_canvas),
-                    tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
             },
@@ -252,10 +251,9 @@ private fun CanvasMenuDropdownMenu(
                 Text(text = stringResource(R.string.horizontal_flip))
             },
             leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_hflip),
+                PixelIcon(
+                    icon = R.drawable.ic_hflip,
                     contentDescription = stringResource(R.string.flip_canvas_horizontal),
-                    tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
             },
@@ -267,10 +265,9 @@ private fun CanvasMenuDropdownMenu(
                 Text(text = stringResource(R.string.vertical_flip))
             },
             leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_vflip),
+                PixelIcon(
+                    icon = R.drawable.ic_vflip,
                     contentDescription = stringResource(R.string.flip_canvas_vertical),
-                    tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
             },
@@ -282,10 +279,9 @@ private fun CanvasMenuDropdownMenu(
                 Text(text = stringResource(R.string.resize))
             },
             leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_resize),
+                PixelIcon(
+                    icon = R.drawable.ic_resize,
                     contentDescription = stringResource(R.string.resize_canvas),
-                    tint = Color.Unspecified,
                     modifier = Modifier.size(32.dp)
                 )
             },

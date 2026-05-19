@@ -6,11 +6,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.utils.rememberPixelPainter
 
 @Composable
 fun ProfileImage(
@@ -31,9 +31,9 @@ fun ProfileImage(
         onSuccess = { success ->
             Log.d("ProfileImage", "Successfully loaded image")
         },
-        fallback = painterResource(R.drawable.ic_launcher),
-        error = painterResource(R.drawable.ic_launcher),
-        placeHolder = painterResource(R.drawable.ic_launcher)
+        fallback = rememberPixelPainter(R.drawable.ic_launcher),
+        error = rememberPixelPainter(R.drawable.ic_launcher),
+        placeHolder = rememberPixelPainter(R.drawable.ic_launcher)
     )
 
 }

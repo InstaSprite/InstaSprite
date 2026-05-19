@@ -12,19 +12,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -50,11 +48,10 @@ fun BrushShapeSelector(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Icon(
-                painter = painterResource(id = selectedShape.icon),
+            PixelIcon(
+                icon = selectedShape.icon,
                 contentDescription = selectedShape.name,
-                modifier = Modifier.size(20.dp),
-                tint = Color.Unspecified
+                modifier = Modifier.size(20.dp)
             )
         }
 
@@ -67,10 +64,9 @@ fun BrushShapeSelector(
                 DropdownMenuItem(
                     text = { Text(shape.name, color = AppTheme.colors.TextColorLight) },
                     leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = shape.icon),
+                        PixelIcon(
+                            icon = shape.icon,
                             contentDescription = null,
-                            tint = Color.Unspecified,
                             modifier = Modifier.size(24.dp)
                         )
                     },

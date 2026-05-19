@@ -14,6 +14,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.instasprite.app.MainActivity
 import com.instasprite.app.R
 import com.instasprite.app.data.repository.NotificationRepository
+import com.instasprite.app.utils.loadIconBitmap
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,8 +78,9 @@ class InstaSpriteMessagingService : FirebaseMessagingService() {
 
         val channelId = getString(R.string.default_notification_channel_id)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title ?: getString(R.string.app_name))
             .setContentText(messageBody)
             .setAutoCancel(true)

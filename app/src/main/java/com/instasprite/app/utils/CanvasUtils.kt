@@ -93,9 +93,10 @@ fun DrawScope.drawCursorOverlay(
             val scaleY = iconSizePx / cursorIconBitmap.height
             translate(left = iconX, top = iconY) {
                 scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
-                    drawImage(image = cursorIconBitmap)
+                    drawImage(image = cursorIconBitmap, filterQuality = FilterQuality.None)
                     drawColorPreview(
                         cursorColor, toolIconBitmap, Offset(
+                            // tool icon dimension = 14x14
                             toolIconBitmap.width * 0.5f,
                             toolIconBitmap.width * 0.5f
                         )
@@ -111,11 +112,11 @@ fun DrawScope.drawCursorOverlay(
 
             translate(left = iconX, top = iconY) {
                 scale(scaleX = scaleX, scaleY = scaleY, pivot = Offset.Zero) {
-                    drawImage(image = toolIconBitmap)
+                    drawImage(image = toolIconBitmap, filterQuality = FilterQuality.None)
                     drawColorPreview(
                         cursorColor, toolIconBitmap, Offset(
-                            toolIconBitmap.width * 0.5f,
-                            0f
+                            8f,
+                            -2.5f
                         )
                     )
                 }
@@ -180,8 +181,8 @@ private fun DrawScope.drawColorPreview(
     offset: Offset
 ) {
     if (cursorColor != null && cursorColor != Color.Transparent) {
-        val indicatorSize = toolIconBitmap.width * 0.6f
-        val stroke = 1.dp.toPx()
+        val indicatorSize = 9f
+        val stroke = 0.7f
 
         val topLeft = offset
 

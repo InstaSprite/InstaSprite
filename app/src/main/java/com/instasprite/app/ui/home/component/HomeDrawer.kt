@@ -31,12 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.domain.session.CurrentUserState
+import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -76,10 +76,9 @@ fun HomeDrawer(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_launcher),
+            PixelIcon(
+                icon = R.drawable.ic_launcher,
                 contentDescription = stringResource(R.string.app_name),
-                tint = Color.Unspecified,
                 modifier = Modifier
                     .padding(16.dp)
                     .size(32.dp)

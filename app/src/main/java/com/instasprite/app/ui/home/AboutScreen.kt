@@ -36,7 +36,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.BuildConfig
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.Catppuccin
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -98,10 +98,9 @@ fun AboutScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             // App Icon
-            Icon(
-                painter = painterResource(id = R.drawable.ic_launcher),
+            PixelIcon(
+                icon = R.drawable.ic_launcher,
                 contentDescription = stringResource(R.string.app_name),
-                tint = Color.Unspecified,
                 modifier = Modifier
                     .size(88.dp)
             )
