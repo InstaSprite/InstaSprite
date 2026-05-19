@@ -27,6 +27,8 @@ class PixelCanvasUseCase(
     fun toggleLock(id: String) = pixelCanvasRepository.toggleLock(id)
     fun mergeLayerDown(id: String) = pixelCanvasRepository.mergeLayerDown(id)
     fun reorderLayer(fromIndex: Int, toIndex: Int) = pixelCanvasRepository.reorderLayer(fromIndex, toIndex)
+    fun setLayerOpacity(id: String, opacity: Float) = pixelCanvasRepository.setLayerOpacity(id, opacity)
+    fun setLayerBlendMode(id: String, mode: com.instasprite.app.domain.model.BlendMode) = pixelCanvasRepository.setLayerBlendMode(id, mode)
 
     fun getCanvasWidth(): Int {
         return pixelCanvasRepository.width
@@ -92,6 +94,10 @@ class PixelCanvasUseCase(
 
     fun getCompositedPixelAt(row: Int, col: Int): Int {
         return pixelCanvasRepository.getCompositedPixelAt(row, col)
+    }
+
+    fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int): Int {
+        return pixelCanvasRepository.getPreviewCompositedPixelAt(row, col, overlayColor)
     }
 
     fun getAllPixelsInRegion(

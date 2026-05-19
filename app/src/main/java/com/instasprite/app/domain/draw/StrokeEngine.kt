@@ -44,9 +44,25 @@ class StrokeEngine(
         }
     }
 
+    private fun restoreTouchedOverlayInMainBitmap() {
+        if (strokeTouchedCount <= 0) return
+        val bmp = bitmapManager.bitmap ?: return
+        val w = pixelCanvasUseCase.getCanvasWidth()
+        val h = pixelCanvasUseCase.getCanvasHeight()
+        for (i in 0 until strokeTouchedCount) {
+            val idx = strokeTouchedIndices[i]
+            val row = idx / w
+            val col = idx % w
+            if (row in 0 until h && col in 0 until w) {
+                bmp[col, row] = pixelCanvasUseCase.getCompositedPixelAt(row, col)
+            }
+        }
+    }
+
     private fun beginOverlayStrokeTracking() {
         val w = pixelCanvasUseCase.getCanvasWidth()
         val h = pixelCanvasUseCase.getCanvasHeight()
+        restoreTouchedOverlayInMainBitmap()
         ensureStrokeTrackingCapacity(w, h)
         strokeTouchedCount = 0
         strokeGeneration += 1
@@ -68,6 +84,9 @@ class StrokeEngine(
         }
         strokeTouchedIndices[strokeTouchedCount++] = index
         bmp[col, row] = color
+
+        val mainBmp = bitmapManager.bitmap ?: return
+        mainBmp[col, row] = pixelCanvasUseCase.getPreviewCompositedPixelAt(row, col, color)
     }
 
     private fun applyCommittedPixelToMainBitmap(row: Int, col: Int) {
@@ -199,6 +218,7 @@ class StrokeEngine(
                 bitmapManager.incrementDrawVersion()
             } else {
                 bitmapManager.incrementOverlayVersion()
+                bitmapManager.incrementDrawVersion()
             }
         }
     }
@@ -234,6 +254,7 @@ class StrokeEngine(
 
         if (!applyStrokeUpdate(update)) {
             bitmapManager.incrementOverlayVersion()
+            bitmapManager.incrementDrawVersion()
         }
     }
 
@@ -270,8 +291,10 @@ class StrokeEngine(
                 pixelCanvasUseCase.setSelectionMask(finalSel.mask)
                 bitmapManager.refreshSelectionBitmap(finalSel)
             }
+            restoreTouchedOverlayInMainBitmap()
             bitmapManager.clearOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
+            bitmapManager.incrementDrawVersion()
             strokeTouchedCount = 0
 
             return StrokeEndResult(updatedSelectionState = finalSel, shouldUpdateHistory = false)
@@ -295,16 +318,19 @@ class StrokeEngine(
 
     fun cancelPendingTool(tool: StrokeTool): Boolean {
         val pendingUpdate = tool.cancelPending(pixelCanvasUseCase)
+        restoreTouchedOverlayInMainBitmap()
         if (pendingUpdate != null) {
             applyStrokeUpdate(pendingUpdate)
             bitmapManager.clearOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
+            bitmapManager.incrementDrawVersion()
             return true
         } else {
             tool.cancelStroke()
         }
         bitmapManager.clearOverlayBitmap()
         bitmapManager.incrementOverlayVersion()
+        bitmapManager.incrementDrawVersion()
         return false
     }
 

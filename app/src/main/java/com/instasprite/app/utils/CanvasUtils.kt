@@ -6,7 +6,6 @@ import android.graphics.Shader
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
@@ -20,16 +19,16 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.instasprite.app.domain.model.SelectionState
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
+import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.BrushStamp
-import com.instasprite.app.domain.tool.StrokeTool
-import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.EraserTool
+import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.ui.drawing.contract.CursorState
@@ -335,6 +334,43 @@ fun Modifier.drawCheckerboard(
     val shader = BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
     val matrix = Matrix()
     matrix.setScale(blockWidth, blockHeight)
+    shader.setLocalMatrix(matrix)
+
+    val composePaint = Paint().apply {
+        this.shader = shader
+        this.filterQuality = FilterQuality.None
+        this.isAntiAlias = false
+    }
+
+    onDrawBehind {
+        drawIntoCanvas { canvas ->
+            canvas.drawRect(
+                left = 0f,
+                top = 0f,
+                right = size.width,
+                bottom = size.height,
+                paint = composePaint
+            )
+        }
+    }
+}
+
+fun Modifier.drawCheckerboard(
+    cellSizePx: Float = 8f,
+    checkerColor1: Color = Color(0xFF808080),
+    checkerColor2: Color = Color(0xFFC0C0C0)
+): Modifier = this.drawWithCache {
+    val bitmap = createBitmap(2, 2)
+    val c1 = checkerColor1.toArgb()
+    val c2 = checkerColor2.toArgb()
+    bitmap[0, 0] = c1
+    bitmap[1, 1] = c1
+    bitmap[1, 0] = c2
+    bitmap[0, 1] = c2
+
+    val shader = BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+    val matrix = Matrix()
+    matrix.setScale(cellSizePx, cellSizePx)
     shader.setLocalMatrix(matrix)
 
     val composePaint = Paint().apply {

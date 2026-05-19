@@ -10,4 +10,5 @@ sealed interface LayerEvent {
     data class DeleteLayer(val layerId: String) : LayerEvent
     data class MergeLayerDown(val layerId: String) : LayerEvent
     data class ReorderLayer(val fromIndex: Int, val toIndex: Int) : LayerEvent
+    data class SetLayerOpacity(val layerId: String, val opacity: Float) : LayerEvent
 }

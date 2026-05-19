@@ -2,11 +2,13 @@ package com.instasprite.app.data.repository
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.PixelCanvas
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.TileCoord
 import com.instasprite.app.utils.TILE_SIZE
+import com.instasprite.app.utils.blendPixel
 import com.instasprite.app.utils.pixelToTileCoord
 import com.instasprite.app.utils.pixelsToTiles
 import com.instasprite.app.utils.tilesToPixels
@@ -68,6 +70,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         buffer: IntArray,
         bufferWidth: Int,
         bufferHeight: Int,
+        layerOpacity: Float = 1.0f,
+        blendMode: BlendMode = BlendMode.NORMAL,
         startRow: Int = 0,
         startCol: Int = 0,
         regionWidth: Int = bufferWidth,
@@ -87,9 +91,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             val srcBase = tileRow * TILE_SIZE
             for (col in colStart until colEnd) {
                 val argb = tilePixels[srcBase + (col - originX)]
-                if (argb != transparentArgb) {
-                    buffer[dstBase + (col - startCol)] = argb
-                }
+                val dstIdx = dstBase + (col - startCol)
+                buffer[dstIdx] = blendPixel(buffer[dstIdx], argb, layerOpacity, blendMode)
             }
         }
     }
@@ -130,16 +133,21 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return layer.copy(tiles = updatedTiles)
     }
 
-    private fun mergeTiles(bottom: Map<TileCoord, IntArray>, top: Map<TileCoord, IntArray>): Map<TileCoord, IntArray> {
+    private fun mergeTiles(
+        bottom: Map<TileCoord, IntArray>,
+        top: Map<TileCoord, IntArray>,
+        topOpacity: Float = 1.0f,
+        topBlendMode: BlendMode = BlendMode.NORMAL
+    ): Map<TileCoord, IntArray> {
         if (bottom.isEmpty() && top.isEmpty()) return emptyMap()
         val result = mutableTileCopy(bottom)
         for ((coord, topTile) in top) {
             val bottomTile = result[coord]?.copyOf() ?: IntArray(TILE_SIZE * TILE_SIZE)
             var changed = false
             for (i in topTile.indices) {
-                val px = topTile[i]
-                if (px != transparentArgb) {
-                    bottomTile[i] = px
+                val blended = blendPixel(bottomTile[i], topTile[i], topOpacity, topBlendMode)
+                if (blended != bottomTile[i]) {
+                    bottomTile[i] = blended
                     changed = true
                 }
             }
@@ -206,7 +214,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         if (index > 0) {
             val topLayer = _layers[index]
             val bottomLayer = _layers[index - 1]
-            val merged = mergeTiles(bottomLayer.tiles, topLayer.tiles)
+            val merged =
+                mergeTiles(bottomLayer.tiles, topLayer.tiles, topLayer.opacity, topLayer.blendMode)
             _layers[index - 1] = bottomLayer.copy(tiles = merged)
             _layers.removeAt(index)
             if (activeLayerId == id) {
@@ -239,7 +248,13 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                     rotated[newRow * rotatedCanvasWidth + newCol] = argb
                 }
             }
-            _layers[i] = _layers[i].copy(tiles = pixelsToTiles(rotated, rotatedCanvasWidth, rotatedCanvasHeight))
+            _layers[i] = _layers[i].copy(
+                tiles = pixelsToTiles(
+                    rotated,
+                    rotatedCanvasWidth,
+                    rotatedCanvasHeight
+                )
+            )
         }
 
         width = rotatedCanvasWidth
@@ -364,6 +379,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         val composited = IntArray(width * height) { transparentArgb }
         for (layer in _layers) {
             if (!layer.isVisible) continue
+            val layerOpacity = layer.opacity
+            val layerBlendMode = layer.blendMode
             for ((coord, tilePixels) in layer.tiles) {
                 val originX = coord.x * TILE_SIZE
                 val originY = coord.y * TILE_SIZE
@@ -376,9 +393,9 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                         val canvasCol = originX + localCol
                         if (canvasCol !in 0 until width) continue
                         val argb = tilePixels[srcBase + localCol]
-                        if (argb != transparentArgb) {
-                            composited[dstBase + canvasCol] = argb
-                        }
+                        val dstIdx = dstBase + canvasCol
+                        composited[dstIdx] =
+                            blendPixel(composited[dstIdx], argb, layerOpacity, layerBlendMode)
                     }
                 }
             }
@@ -392,9 +409,20 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         for (layer in _layers) {
             if (!layer.isVisible) continue
             val argb = tilePixelAt(layer.tiles, row, col)
-            if (argb != transparentArgb) {
-                color = argb
-            }
+            color = blendPixel(color, argb, layer.opacity, layer.blendMode)
+        }
+        return color
+    }
+
+    fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int): Int {
+        if (row !in 0 until height || col !in 0 until width) return transparentArgb
+        var color = transparentArgb
+        val activeIdx = getActiveLayerIndex()
+        for (i in _layers.indices) {
+            val layer = _layers[i]
+            if (!layer.isVisible) continue
+            val argb = if (i == activeIdx) overlayColor else tilePixelAt(layer.tiles, row, col)
+            color = blendPixel(color, argb, layer.opacity, layer.blendMode)
         }
         return color
     }
@@ -411,6 +439,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
         for (layer in _layers) {
             if (!layer.isVisible) continue
+            val layerOpacity = layer.opacity
+            val layerBlendMode = layer.blendMode
             for ((coord, tilePixels) in layer.tiles) {
                 val originX = coord.x * TILE_SIZE
                 val originY = coord.y * TILE_SIZE
@@ -426,9 +456,9 @@ class PixelCanvasRepository(var model: PixelCanvas) {
                     val srcBase = tileRow * TILE_SIZE
                     for (col in startCanvasCol until endCanvasCol) {
                         val argb = tilePixels[srcBase + (col - originX)]
-                        if (argb != transparentArgb) {
-                            result[dstBase + (col - startCol)] = argb
-                        }
+                        val dstIdx = dstBase + (col - startCol)
+                        result[dstIdx] =
+                            blendPixel(result[dstIdx], argb, layerOpacity, layerBlendMode)
                     }
                 }
             }
@@ -509,13 +539,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             }
         }
 
-        _layers[idx] = Layer(
-            id = layer.id,
-            name = layer.name,
-            isVisible = layer.isVisible,
-            isLocked = layer.isLocked,
-            tiles = updatedTiles
-        )
+        _layers[idx] = layer.copy(tiles = updatedTiles)
     }
 
     fun getActiveLayerPixelsDirect(): IntArray? {
@@ -553,5 +577,21 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             height = height,
             layers = _layers.map { it.copy() }
         )
+    }
+
+    fun setLayerOpacity(id: String, opacity: Float) {
+        val index = _layers.indexOfFirst { it.id == id }
+        if (index != -1) {
+            val layer = _layers[index]
+            _layers[index] = layer.copy(opacity = opacity.coerceIn(0f, 1f))
+        }
+    }
+
+    fun setLayerBlendMode(id: String, mode: BlendMode) {
+        val index = _layers.indexOfFirst { it.id == id }
+        if (index != -1) {
+            val layer = _layers[index]
+            _layers[index] = layer.copy(blendMode = mode)
+        }
     }
 }

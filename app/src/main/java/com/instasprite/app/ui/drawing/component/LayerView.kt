@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,19 +24,26 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.createBitmap
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.ui.drawing.contract.LayerEvent
@@ -79,107 +83,140 @@ fun LayerView(
         }
     }
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(8.dp)
-            .clickable(enabled = true, onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    var localOpacity by remember(layer.opacity) { mutableFloatStateOf(layer.opacity) }
 
-        Box(
-            modifier = Modifier
-                .height(100.dp)
-                .aspectRatio(1f)
-                .background(AppTheme.colors.BackgroundColorDarker),
-            contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier.background(backgroundColor)
+    ) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clickable(enabled = true, onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (bitmapImage != null) {
-                Image(
-                    bitmap = bitmapImage,
-                    contentDescription = stringResource(R.string.layer_preview),
-                    contentScale = ContentScale.FillWidth,
-                    filterQuality = FilterQuality.None,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .drawCheckerboard(
-                            canvasWidth = canvasWidth,
-                            canvasHeight = canvasHeight
+            Box(
+                modifier = Modifier
+                    .height(100.dp)
+                    .aspectRatio(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                if (bitmapImage != null) {
+                    Image(
+                        bitmap = bitmapImage,
+                        contentDescription = stringResource(R.string.layer_preview),
+                        contentScale = ContentScale.FillWidth,
+                        filterQuality = FilterQuality.None,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .drawCheckerboard(
+                                canvasWidth = canvasWidth,
+                                canvasHeight = canvasHeight
+                            )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column(
+                verticalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = layer.name,
+                        color = AppTheme.colors.TextColorLight,
+                        fontSize = 14.sp
+                    )
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete_layer),
+                            tint = AppTheme.colors.DismissButtonColor,
+                            modifier = Modifier.size(20.dp)
                         )
-                )
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    IconButton(
+                        onClick = onVisibilityToggle,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (layer.isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = stringResource(R.string.toggle_visibility),
+                            tint = AppTheme.colors.TextColorLight,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = onLockToggle,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (layer.isLocked) Icons.Default.Lock else Icons.Outlined.LockOpen,
+                            contentDescription = stringResource(R.string.toggle_lock),
+                            tint = AppTheme.colors.TextColorLight,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = { onEvent(LayerEvent.MergeLayerDown(layer.id)) },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = stringResource(R.string.merge_down),
+                            tint = AppTheme.colors.TextColorLight,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                }
             }
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Column(
-            verticalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth()
+        // Opacity slider
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = layer.name,
-                    color = AppTheme.colors.TextColorLight,
-                    fontSize = 14.sp
-                )
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.delete_layer),
-                        tint = AppTheme.colors.DismissButtonColor,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                IconButton(
-                    onClick = onVisibilityToggle,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = if (layer.isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = stringResource(R.string.toggle_visibility),
-                        tint = AppTheme.colors.TextColorLight,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                IconButton(
-                    onClick = onLockToggle,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = if (layer.isLocked) Icons.Default.Lock else Icons.Outlined.LockOpen,
-                        contentDescription = stringResource(R.string.toggle_lock),
-                        tint = AppTheme.colors.TextColorLight,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                IconButton(
-                    onClick = { onEvent(LayerEvent.MergeLayerDown(layer.id)) },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = stringResource(R.string.merge_down),
-                        tint = AppTheme.colors.TextColorLight,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-            }
+            Text(
+                text = "${(localOpacity * 100).toInt()}%",
+                color = AppTheme.colors.TextColorLight,
+                fontSize = 11.sp,
+                modifier = Modifier.width(36.dp)
+            )
+            Slider(
+                value = localOpacity,
+                onValueChange = { localOpacity = it },
+                onValueChangeFinished = {
+                    onEvent(LayerEvent.SetLayerOpacity(layer.id, localOpacity))
+                },
+                valueRange = 0f..1f,
+                colors = SliderDefaults.colors(
+                    thumbColor = AppTheme.colors.LinkColor,
+                    activeTrackColor = AppTheme.colors.LinkColor,
+                    inactiveTrackColor = AppTheme.colors.BackgroundColorDarker
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(24.dp)
+            )
         }
     }
+
 }
 
 @Preview

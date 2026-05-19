@@ -8,6 +8,8 @@ class Layer(
     val name: String,
     val isVisible: Boolean = true,
     val isLocked: Boolean = false,
+    val opacity: Float = 1.0f,
+    val blendMode: BlendMode = BlendMode.NORMAL,
     val tiles: Map<TileCoord, IntArray>
 ) {
     constructor(
@@ -15,12 +17,16 @@ class Layer(
         name: String,
         isVisible: Boolean = true,
         isLocked: Boolean = false,
+        opacity: Float = 1.0f,
+        blendMode: BlendMode = BlendMode.NORMAL,
         cel: Cel
     ) : this(
         id = id,
         name = name,
         isVisible = isVisible,
         isLocked = isLocked,
+        opacity = opacity,
+        blendMode = blendMode,
         tiles = celToTiles(cel)
     )
 
@@ -32,6 +38,8 @@ class Layer(
         name: String = this.name,
         isVisible: Boolean = this.isVisible,
         isLocked: Boolean = this.isLocked,
+        opacity: Float = this.opacity,
+        blendMode: BlendMode = this.blendMode,
         tiles: Map<TileCoord, IntArray>? = null,
         cel: Cel? = null
     ): Layer {
@@ -40,7 +48,7 @@ class Layer(
             cel != null -> celToTiles(cel)
             else -> deepCopyTiles(this.tiles)
         }
-        return Layer(id, name, isVisible, isLocked, nextTiles)
+        return Layer(id, name, isVisible, isLocked, opacity, blendMode, nextTiles)
     }
 
     private fun deepCopyTiles(source: Map<TileCoord, IntArray>): Map<TileCoord, IntArray> {
@@ -52,6 +60,7 @@ class Layer(
         if (this === other) return true
         if (other !is Layer) return false
         if (id != other.id || name != other.name || isVisible != other.isVisible || isLocked != other.isLocked) return false
+        if (opacity != other.opacity || blendMode != other.blendMode) return false
         if (tiles.size != other.tiles.size) return false
         for ((coord, pixels) in tiles) {
             val otherPixels = other.tiles[coord] ?: return false
@@ -65,6 +74,8 @@ class Layer(
         result = 31 * result + name.hashCode()
         result = 31 * result + isVisible.hashCode()
         result = 31 * result + isLocked.hashCode()
+        result = 31 * result + opacity.hashCode()
+        result = 31 * result + blendMode.hashCode()
         for ((coord, pixels) in tiles) {
             result = 31 * result + coord.hashCode()
             result = 31 * result + pixels.contentHashCode()
@@ -73,5 +84,5 @@ class Layer(
     }
 
     override fun toString(): String =
-        "Layer(id='$id', name='$name', isVisible=$isVisible, isLocked=$isLocked, tiles=${tiles.size}, cel=$cel)"
+        "Layer(id='$id', name='$name', isVisible=$isVisible, isLocked=$isLocked, opacity=$opacity, blendMode=$blendMode, tiles=${tiles.size}, cel=$cel)"
 }

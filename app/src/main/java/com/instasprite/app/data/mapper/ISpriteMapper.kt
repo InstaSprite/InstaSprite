@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString
 import com.instasprite.app.CelData
 import com.instasprite.app.ISprite
 import com.instasprite.app.LayerData
+import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
@@ -28,6 +29,8 @@ fun Sprite.toISprite(): ISprite {
             .setName(layer.name)
             .setIsVisible(layer.isVisible)
             .setIsLocked(layer.isLocked)
+            .setOpacity(layer.opacity)
+            .setBlendMode(layer.blendMode.name)
 
         if (layer.tiles.isNotEmpty()) {
             layerBuilder.setCel(layer.toProtoCel())
@@ -52,16 +55,27 @@ fun Sprite.toISprite(): ISprite {
 
 fun ISprite.toSprite(): Sprite {
     val layers = this.layersList.map { layerData ->
+        // Backward compatibility: pb defaults float to 0.0 and string to ""
+        val opacity = if (layerData.opacity > 0f) layerData.opacity else 1.0f
+        val blendMode = try {
+            if (layerData.blendMode.isNotEmpty()) BlendMode.valueOf(layerData.blendMode) else BlendMode.NORMAL
+        } catch (_: IllegalArgumentException) {
+            BlendMode.NORMAL
+        }
+
         Layer(
             id = layerData.id,
             name = layerData.name,
             isVisible = layerData.isVisible,
             isLocked = layerData.isLocked,
+            opacity = opacity,
+            blendMode = blendMode,
             tiles = when {
                 layerData.hasCel() -> {
                     val decodedTiles = decodeTilesFromByteArray(layerData.cel.pixels.toByteArray())
                     decodedTiles ?: celToTiles(layerData.cel.toDomain())
                 }
+
                 !layerData.pixels.isEmpty -> celToTiles(
                     Cel(
                         x = 0,
@@ -71,6 +85,7 @@ fun ISprite.toSprite(): Sprite {
                         pixels = layerData.pixels.toIntArray()
                     )
                 )
+
                 else -> emptyMap()
             }
         )

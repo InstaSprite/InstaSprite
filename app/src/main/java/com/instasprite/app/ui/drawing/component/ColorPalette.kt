@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import androidx.compose.ui.res.stringResource
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,16 +35,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
+import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.toHexString
 import kotlinx.coroutines.launch
 
@@ -194,10 +194,14 @@ private fun ActiveColor(
     modifier: Modifier = Modifier
 ) {
     val textColor = if (activeColor.luminance() < 0.4f) Color.White else Color.Black
+    val showAlpha = activeColor.alpha < 1f
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
+            .then(
+                if (showAlpha) Modifier.drawCheckerboard() else Modifier
+            )
             .background(activeColor)
             .border(
                 width = 5.dp,
@@ -208,7 +212,7 @@ private fun ActiveColor(
             )
     ) {
         Text(
-            text = activeColor.toHexString(),
+            text = activeColor.toHexString(includeAlpha = showAlpha),
             color = textColor,
             style = MaterialTheme.typography.bodyLarge
         )

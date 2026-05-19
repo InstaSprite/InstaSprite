@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.drawing.dialog
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -28,9 +25,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,10 +47,12 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toRect
+import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorItem
 import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.dialog.CustomDialog
@@ -78,12 +77,15 @@ fun ColorWheelDialog(
         mutableStateOf(Triple(hsvArray[0], hsvArray[1], hsvArray[2]))
     }
 
-    val selectedColor = remember(hsv.value) {
+    val alphaValue = remember { mutableStateOf(initialColor.alpha) }
+
+    val selectedColor = remember(hsv.value, alphaValue.value) {
         mutableStateOf(
             Color.hsv(
                 hsv.value.first,
                 hsv.value.second,
-                hsv.value.third
+                hsv.value.third,
+                alphaValue.value
             )
         )
     }
@@ -92,16 +94,19 @@ fun ColorWheelDialog(
     val greenValue =
         remember { mutableStateOf((selectedColor.value.green * 255).toInt().toString()) }
     val blueValue = remember { mutableStateOf((selectedColor.value.blue * 255).toInt().toString()) }
+    val alphaInputValue =
+        remember { mutableStateOf((selectedColor.value.alpha * 255).toInt().toString()) }
 
     val hexValue = remember {
-        mutableStateOf(String.format("%06X", (selectedColor.value.toArgb() and 0xFFFFFF)))
+        mutableStateOf(String.format("%08X", selectedColor.value.toArgb()))
     }
 
     fun updateInputFields() {
         redValue.value = (selectedColor.value.red * 255).toInt().toString()
         greenValue.value = (selectedColor.value.green * 255).toInt().toString()
         blueValue.value = (selectedColor.value.blue * 255).toInt().toString()
-        hexValue.value = String.format("%06X", (selectedColor.value.toArgb() and 0xFFFFFF))
+        alphaInputValue.value = (selectedColor.value.alpha * 255).toInt().toString()
+        hexValue.value = String.format("%08X", selectedColor.value.toArgb())
     }
 
     fun updateColorFromRGB() {
@@ -109,11 +114,13 @@ fun ColorWheelDialog(
             val r = redValue.value.toIntOrNull()?.coerceIn(0, 255) ?: return
             val g = greenValue.value.toIntOrNull()?.coerceIn(0, 255) ?: return
             val b = blueValue.value.toIntOrNull()?.coerceIn(0, 255) ?: return
+            val a = alphaInputValue.value.toIntOrNull()?.coerceIn(0, 255) ?: return
 
-            val color = Color(r / 255f, g / 255f, b / 255f)
+            val color = Color(r / 255f, g / 255f, b / 255f, a / 255f)
             val hsvArray = floatArrayOf(0f, 0f, 0f)
             AndroidColor.colorToHSV(color.toArgb(), hsvArray)
             hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+            alphaValue.value = a / 255f
         } catch (_: Exception) {
         }
     }
@@ -121,12 +128,24 @@ fun ColorWheelDialog(
     fun updateColorFromHex() {
         try {
             val cleanHex = hexValue.value.removePrefix("#")
-            if (cleanHex.length == 6) {
-                val colorInt = cleanHex.toLong(16).toInt()
-                val color = Color(colorInt or 0xFF000000.toInt())
-                val hsvArray = floatArrayOf(0f, 0f, 0f)
-                AndroidColor.colorToHSV(color.toArgb(), hsvArray)
-                hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+            when (cleanHex.length) {
+                8 -> {
+                    val colorLong = cleanHex.toLong(16)
+                    val color = Color(colorLong.toInt())
+                    val hsvArray = floatArrayOf(0f, 0f, 0f)
+                    AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                    hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                    alphaValue.value = color.alpha
+                }
+
+                6 -> {
+                    val colorInt = cleanHex.toLong(16).toInt()
+                    val color = Color(colorInt or 0xFF000000.toInt())
+                    val hsvArray = floatArrayOf(0f, 0f, 0f)
+                    AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                    hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                    alphaValue.value = 1f
+                }
             }
         } catch (_: Exception) {
         }
@@ -174,12 +193,40 @@ fun ColorWheelDialog(
                     )
                 }
 
+                // Alpha bar
+                AlphaBar(
+                    alpha = alphaValue.value,
+                    hue = hsv.value.first,
+                    saturation = hsv.value.second,
+                    value = hsv.value.third,
+                    modifier = Modifier
+                        .height(32.dp)
+                        .fillMaxWidth()
+                ) { newAlpha ->
+                    alphaValue.value = newAlpha
+                    updateInputFields()
+                }
+
+                // Value/Brightness bar
+                ValueBar(
+                    hue = hsv.value.first,
+                    saturation = hsv.value.second,
+                    value = hsv.value.third,
+                    modifier = Modifier
+                        .height(32.dp)
+                        .fillMaxWidth()
+                ) { newValue ->
+                    hsv.value = Triple(hsv.value.first, hsv.value.second, newValue)
+                    updateInputFields()
+                }
+
                 ColorPaletteView(
                     colors = colorPalette,
                     onColorSelected = { color ->
                         val hsvArray = floatArrayOf(0f, 0f, 0f)
                         AndroidColor.colorToHSV(color.toArgb(), hsvArray)
                         hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                        alphaValue.value = color.alpha
                         updateInputFields()
                     },
                 )
@@ -189,12 +236,12 @@ fun ColorWheelDialog(
                         value = hexValue.value,
                         onValueChange = { newText ->
                             val filtered = newText.uppercase().filter { it in "0123456789ABCDEF" }
-                            hexValue.value = filtered.take(6)
+                            hexValue.value = filtered.take(8)
                             updateColorFromHex()
                         },
                         label = "Hex",
                         labelColor = AppTheme.colors.SelectedColor,
-                        placeholder = "FFFFFF",
+                        placeholder = "FF000000",
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -215,7 +262,7 @@ fun ColorWheelDialog(
                             label = "R",
                             labelColor = AppTheme.colors.DismissButtonColor,
                             placeholder = "0",
-                            modifier = Modifier.weight(0.2f),
+                            modifier = Modifier.weight(1f),
                             keyboardType = KeyboardType.Number
                         )
 
@@ -232,7 +279,7 @@ fun ColorWheelDialog(
                             label = "G",
                             labelColor = AppTheme.colors.AccentButtonColor,
                             placeholder = "0",
-                            modifier = Modifier.weight(0.2f),
+                            modifier = Modifier.weight(1f),
                             keyboardType = KeyboardType.Number
                         )
 
@@ -249,7 +296,24 @@ fun ColorWheelDialog(
                             label = "B",
                             labelColor = AppTheme.colors.LinkColor,
                             placeholder = "0",
-                            modifier = Modifier.weight(0.2f),
+                            modifier = Modifier.weight(1f),
+                            keyboardType = KeyboardType.Number
+                        )
+
+                        ColorInputTextField(
+                            value = alphaInputValue.value,
+                            onValueChange = { newText ->
+                                val filtered = newText.filter { it in "0123456789" }
+                                alphaInputValue.value = if (filtered.isEmpty()) "" else minOf(
+                                    filtered.take(3).toInt(),
+                                    255
+                                ).toString()
+                                updateColorFromRGB()
+                            },
+                            label = "A",
+                            labelColor = AppTheme.colors.TextColorLight,
+                            placeholder = "255",
+                            modifier = Modifier.weight(1f),
                             keyboardType = KeyboardType.Number
                         )
                     }
@@ -262,7 +326,10 @@ fun ColorWheelDialog(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = stringResource(R.string.choose_another_palette), color = AppTheme.colors.TextColorDark)
+                    Text(
+                        text = stringResource(R.string.choose_another_palette),
+                        color = AppTheme.colors.TextColorDark
+                    )
                 }
             }
         }
@@ -379,6 +446,143 @@ private fun HueBar(
             style = Stroke(
                 width = 2.dp.toPx()
             )
+        )
+    }
+}
+
+@Composable
+private fun AlphaBar(
+    alpha: Float,
+    hue: Float,
+    saturation: Float,
+    value: Float,
+    modifier: Modifier = Modifier,
+    onAlphaChanged: (Float) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressOffset = remember { mutableStateOf(Offset.Zero) }
+
+    Canvas(
+        modifier = modifier
+            .border(width = 5.dp, color = AppTheme.colors.BackgroundColorDarker)
+            .clip(RectangleShape)
+            .emitDragGesture(interactionSource)
+    ) {
+        val drawScopeSize = size
+        val w = size.width.toInt().coerceAtLeast(1)
+        val h = size.height.toInt().coerceAtLeast(1)
+        val bitmap = createBitmap(w, h)
+        val alphaCanvas = Canvas(bitmap)
+        val panel = RectF(0f, 0f, w.toFloat(), h.toFloat())
+
+        // Draw checkerboard background
+        val checkerSize = h / 2f
+        val checkerPaint = Paint()
+        for (row in 0..(h / checkerSize.toInt())) {
+            for (col in 0..(w / checkerSize.toInt())) {
+                val isLight = (row + col) % 2 == 0
+                checkerPaint.color = if (isLight) 0xFFCCCCCC.toInt() else 0xFF999999.toInt()
+                alphaCanvas.drawRect(
+                    col * checkerSize, row * checkerSize,
+                    (col + 1) * checkerSize, (row + 1) * checkerSize,
+                    checkerPaint
+                )
+            }
+        }
+
+        // Draw alpha gradient overlay
+        val opaqueColor = AndroidColor.HSVToColor(255, floatArrayOf(hue, saturation, value))
+        val transparentColor = AndroidColor.HSVToColor(0, floatArrayOf(hue, saturation, value))
+        val gradient = LinearGradient(
+            0f, 0f, w.toFloat(), 0f,
+            transparentColor, opaqueColor,
+            Shader.TileMode.CLAMP
+        )
+        val gradientPaint = Paint().apply { shader = gradient }
+        alphaCanvas.drawRect(panel, gradientPaint)
+
+        drawBitmap(bitmap = bitmap, panel = panel)
+
+        fun pointToAlpha(pointX: Float): Float {
+            val x = pointX.coerceIn(0f, drawScopeSize.width)
+            return x / drawScopeSize.width
+        }
+
+        val indicatorX = alpha * drawScopeSize.width
+        pressOffset.value = Offset(indicatorX, size.height / 2)
+
+        scope.collectForPress(interactionSource) { pressPosition ->
+            val pressPos = pressPosition.x.coerceIn(0f..drawScopeSize.width)
+            pressOffset.value = Offset(pressPos, size.height / 2)
+            onAlphaChanged(pointToAlpha(pressPos))
+        }
+
+        drawCircle(
+            Color.White,
+            radius = 5.dp.toPx(),
+            center = pressOffset.value,
+            style = Stroke(width = 2.dp.toPx())
+        )
+    }
+}
+
+@Composable
+private fun ValueBar(
+    hue: Float,
+    saturation: Float,
+    value: Float,
+    modifier: Modifier = Modifier,
+    onValueChanged: (Float) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressOffset = remember { mutableStateOf(Offset.Zero) }
+
+    Canvas(
+        modifier = modifier
+            .border(width = 5.dp, color = AppTheme.colors.BackgroundColorDarker)
+            .clip(RectangleShape)
+            .emitDragGesture(interactionSource)
+    ) {
+        val drawScopeSize = size
+        val w = size.width.toInt().coerceAtLeast(1)
+        val h = size.height.toInt().coerceAtLeast(1)
+        val bitmap = createBitmap(w, h)
+        val valueCanvas = Canvas(bitmap)
+        val panel = RectF(0f, 0f, w.toFloat(), h.toFloat())
+
+        val darkColor = AndroidColor.HSVToColor(floatArrayOf(hue, saturation, 0f))
+        val brightColor = AndroidColor.HSVToColor(floatArrayOf(hue, saturation, 1f))
+        val gradient = LinearGradient(
+            0f, 0f, w.toFloat(), 0f,
+            darkColor, brightColor,
+            Shader.TileMode.CLAMP
+        )
+        val gradientPaint = Paint().apply { shader = gradient }
+        valueCanvas.drawRect(panel, gradientPaint)
+
+        drawBitmap(bitmap = bitmap, panel = panel)
+
+        fun pointToValue(pointX: Float): Float {
+            val x = pointX.coerceIn(0f, drawScopeSize.width)
+            return x / drawScopeSize.width
+        }
+
+        val indicatorX = value * drawScopeSize.width
+        pressOffset.value = Offset(indicatorX, size.height / 2)
+
+        scope.collectForPress(interactionSource) { pressPosition ->
+            val pressPos = pressPosition.x.coerceIn(0f..drawScopeSize.width)
+            pressOffset.value = Offset(pressPos, size.height / 2)
+            onValueChanged(pointToValue(pressPos))
+        }
+
+        drawCircle(
+            Color.White,
+            radius = 5.dp.toPx(),
+            center = pressOffset.value,
+            style = Stroke(width = 2.dp.toPx())
         )
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.drawCheckerboard
 
 @Immutable
 data class ColorPaletteConfig(
@@ -55,7 +56,8 @@ fun ColorPaletteView(
     itemColorModifier: Modifier? = null,
 ) {
     with(config) {
-        val resolvedBg = if (backgroundColor == Color.Unspecified) AppTheme.colors.BackgroundColorDarker else backgroundColor
+        val resolvedBg =
+            if (backgroundColor == Color.Unspecified) AppTheme.colors.BackgroundColorDarker else backgroundColor
         Box(
             contentAlignment = Alignment.CenterStart,
             modifier = modifier
@@ -99,6 +101,7 @@ fun ColorItem(
 ) {
     Box(
         modifier = modifier
+            .then(if (color.alpha < 1f) Modifier.drawCheckerboard() else Modifier)
             .background(color)
             .then(
                 if (onColorSelected != null) {
@@ -121,6 +124,7 @@ fun ActiveColorItem(
 
     Box(
         modifier = modifier
+            .then(if (color.alpha < 1f) Modifier.drawCheckerboard() else Modifier)
             .background(color)
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
     ) {

@@ -34,6 +34,7 @@ import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
+import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
 import com.instasprite.app.ui.drawing.contract.CursorState
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
@@ -181,13 +182,15 @@ fun PixelCanvas(
                 )
             }
 
-            overlayImageBitmap?.let {
-                drawImage(
-                    image = it,
-                    dstOffset = IntOffset.Zero,
-                    dstSize = dstSize,
-                    filterQuality = FilterQuality.None
-                )
+            if (selectedTool is SelectionTool) {
+                overlayImageBitmap?.let {
+                    drawImage(
+                        image = it,
+                        dstOffset = IntOffset.Zero,
+                        dstSize = dstSize,
+                        filterQuality = FilterQuality.None
+                    )
+                }
             }
 
             if (selectionState != null) {

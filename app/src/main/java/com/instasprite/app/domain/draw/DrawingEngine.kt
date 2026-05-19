@@ -280,6 +280,17 @@ class DrawingEngine(
         }
     }
 
+    fun setLayerOpacity(layerId: String, opacity: Float) {
+        recordOperationHistory {
+            pixelCanvasUseCase.setLayerOpacity(layerId, opacity)
+        }
+        refreshLayerState()
+        scope.launch {
+            bitmapManager.refreshBitmapState()
+            syncStateVersions()
+        }
+    }
+
     // Transform
 
     fun rotate() {
