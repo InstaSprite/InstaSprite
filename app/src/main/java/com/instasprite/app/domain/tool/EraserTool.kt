@@ -25,11 +25,11 @@ object EraserTool : StrokeTool {
     var brushShape: BrushShape = BrushShape.Square
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
-        canvas.setPixel(row, col, Color.Transparent)
+        canvas.setPixel(row, col, Color.Transparent, blend = false)
     }
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int) {
-        canvas.setPixel(row, col, Color.Transparent, scale)
+        canvas.setPixel(row, col, Color.Transparent, scale, blend = false)
     }
 
     override fun beginStroke(
@@ -62,7 +62,7 @@ object EraserTool : StrokeTool {
         collectBrushPixels(row, col)
 
         if (batchCount > 0) {
-            canvas.batchSetPixels(batchIndices, batchColors, batchCount)
+            canvas.batchSetPixels(batchIndices, batchColors, batchCount, blend = false)
             notifyCommittedPixels(onCommittedPixel)
         }
 
@@ -84,7 +84,7 @@ object EraserTool : StrokeTool {
         }
 
         if (batchCount > 0) {
-            canvas.batchSetPixels(batchIndices, batchColors, batchCount)
+            canvas.batchSetPixels(batchIndices, batchColors, batchCount, blend = false)
             notifyCommittedPixels(onCommittedPixel)
         }
 

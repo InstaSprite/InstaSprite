@@ -46,14 +46,14 @@ class PixelCanvasUseCase(
         tileChangeTracker = null
     }
 
-    fun setPixel(row: Int, col: Int, color: Color) {
+    fun setPixel(row: Int, col: Int, color: Color, blend: Boolean = true) {
         captureActiveTileBeforeMutation(row, col)
-        pixelCanvasRepository.setPixel(row, col, color)
+        pixelCanvasRepository.setPixel(row, col, color, blend)
     }
 
-    fun setPixel(row: Int, col: Int, color: Color, scale: Int) {
+    fun setPixel(row: Int, col: Int, color: Color, scale: Int, blend: Boolean = true) {
         captureTileSpanBeforeMutation(row, col, scale)
-        pixelCanvasRepository.setPixel(row, col, color, scale)
+        pixelCanvasRepository.setPixel(row, col, color, scale, blend)
     }
 
     fun getPixel(row: Int, col: Int): Color {
@@ -81,9 +81,9 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.setAllPixels(pixels)
     }
 
-    fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int) {
+    fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int, blend: Boolean = true) {
         captureBatchPixelChanges(indices, colors.size, count)
-        pixelCanvasRepository.batchSetPixels(indices, colors, count)
+        pixelCanvasRepository.batchSetPixels(indices, colors, count, blend)
     }
 
     fun getActiveLayerPixelsDirect(): IntArray? = pixelCanvasRepository.getActiveLayerPixelsDirect()
@@ -96,8 +96,8 @@ class PixelCanvasUseCase(
         return pixelCanvasRepository.getCompositedPixelAt(row, col)
     }
 
-    fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int): Int {
-        return pixelCanvasRepository.getPreviewCompositedPixelAt(row, col, overlayColor)
+    fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int, blend: Boolean = true): Int {
+        return pixelCanvasRepository.getPreviewCompositedPixelAt(row, col, overlayColor, blend)
     }
 
     fun getAllPixelsInRegion(

@@ -109,7 +109,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         tiles: Map<TileCoord, IntArray>,
         row: Int,
         col: Int,
-        argb: Int
+        argb: Int,
+        blend: Boolean = true
     ): Map<TileCoord, IntArray> {
         if (row !in 0 until height || col !in 0 until width) return tiles
 
@@ -118,7 +119,9 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         val localCol = col - coord.x * TILE_SIZE
         val mutable = mutableTileCopy(tiles)
         val tile = mutable[coord]?.copyOf() ?: IntArray(TILE_SIZE * TILE_SIZE)
-        tile[localRow * TILE_SIZE + localCol] = argb
+        val dstColor = tile[localRow * TILE_SIZE + localCol]
+        val newColor = if (blend) blendPixel(dstColor, argb, 1f) else argb
+        tile[localRow * TILE_SIZE + localCol] = newColor
 
         if (isTileEmpty(tile)) {
             mutable.remove(coord)
@@ -128,8 +131,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return mutable
     }
 
-    private fun setLayerPixel(layer: Layer, row: Int, col: Int, argb: Int): Layer {
-        val updatedTiles = setTilePixel(layer.tiles, row, col, argb)
+    private fun setLayerPixel(layer: Layer, row: Int, col: Int, argb: Int, blend: Boolean = true): Layer {
+        val updatedTiles = setTilePixel(layer.tiles, row, col, argb, blend)
         return layer.copy(tiles = updatedTiles)
     }
 
@@ -324,7 +327,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         }
     }
 
-    fun setPixel(row: Int, col: Int, color: Color) {
+    fun setPixel(row: Int, col: Int, color: Color, blend: Boolean = true) {
         if (row in 0 until height && col in 0 until width) {
             if (selectionMask?.get(row * width + col) == false) return
             
@@ -332,12 +335,12 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             if (index !in _layers.indices) return
             val layer = _layers[index]
             if (!layer.isLocked && layer.isVisible) {
-                _layers[index] = setLayerPixel(layer, row, col, color.toArgb())
+                _layers[index] = setLayerPixel(layer, row, col, color.toArgb(), blend)
             }
         }
     }
 
-    fun setPixel(row: Int, col: Int, color: Color, scale: Int) {
+    fun setPixel(row: Int, col: Int, color: Color, scale: Int, blend: Boolean = true) {
         var xStart = row
         var xEnd = row
         var yStart = col
@@ -360,7 +363,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
         for (r in xStart..xEnd) {
             for (c in yStart..yEnd) {
-                setPixel(r, c, color)
+                setPixel(r, c, color, blend)
             }
         }
     }
@@ -414,14 +417,19 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return color
     }
 
-    fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int): Int {
+    fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int, blend: Boolean = true): Int {
         if (row !in 0 until height || col !in 0 until width) return transparentArgb
         var color = transparentArgb
         val activeIdx = getActiveLayerIndex()
         for (i in _layers.indices) {
             val layer = _layers[i]
             if (!layer.isVisible) continue
-            val argb = if (i == activeIdx) overlayColor else tilePixelAt(layer.tiles, row, col)
+            val argb = if (i == activeIdx) {
+                val originalPixel = tilePixelAt(layer.tiles, row, col)
+                if (blend) blendPixel(originalPixel, overlayColor, 1f) else overlayColor
+            } else {
+                tilePixelAt(layer.tiles, row, col)
+            }
             color = blendPixel(color, argb, layer.opacity, layer.blendMode)
         }
         return color
@@ -490,7 +498,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         }
     }
 
-    fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int) {
+    fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int, blend: Boolean = true) {
         val idx = getActiveLayerIndex()
         if (idx !in _layers.indices) return
         val layer = _layers[idx]
@@ -529,7 +537,9 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
             val localRow = row - coord.y * TILE_SIZE
             val localCol = col - coord.x * TILE_SIZE
-            tile[localRow * TILE_SIZE + localCol] = color
+            val dstColor = tile[localRow * TILE_SIZE + localCol]
+            val newColor = if (blend) blendPixel(dstColor, color, 1f) else color
+            tile[localRow * TILE_SIZE + localCol] = newColor
         }
 
         for (coord in touchedTiles) {
