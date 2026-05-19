@@ -342,7 +342,7 @@ private fun DrawingScreenContent(
                     .background(AppTheme.colors.BackgroundColorDarker)
 
             ) {
-                if (canvasState.selectionState != null) {
+                if (canvasState.selectionState != null && !uiState.showLayerDrawer) {
                     SelectionToolOption(
                         isAppendMode = uiState.isAppendSelectionMode,
                         onAppendModeToggle = { event.onToolSelectorEvent(ToolSelectorEvent.ToggleAppendSelectionMode) },
