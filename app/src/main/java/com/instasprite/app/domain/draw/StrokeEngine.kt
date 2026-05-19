@@ -131,7 +131,7 @@ class StrokeEngine(
     private fun applyStrokeUpdate(update: StrokeUpdate): Boolean {
         var applied = false
         update.mainLayerPixels?.let { pixels ->
-            pixelCanvasUseCase.setAllPixels(pixels)
+            pixelCanvasUseCase.setAllPixels(pixels, ignoreSelection = true)
             val bmp = bitmapManager.bitmap
             val w = pixelCanvasUseCase.getCanvasWidth()
             val h = pixelCanvasUseCase.getCanvasHeight()

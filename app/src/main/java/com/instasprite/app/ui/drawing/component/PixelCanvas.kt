@@ -182,7 +182,7 @@ fun PixelCanvas(
                 )
             }
 
-            if (selectedTool is SelectionTool) {
+            if (selectedTool is SelectionTool || selectedTool is MoveTool) {
                 overlayImageBitmap?.let {
                     drawImage(
                         image = it,

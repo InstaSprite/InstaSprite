@@ -475,12 +475,12 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return result
     }
 
-    fun setAllPixels(pixels: IntArray) {
+    fun setAllPixels(pixels: IntArray, ignoreSelection: Boolean = false) {
         val idx = getActiveLayerIndex()
         if (idx !in _layers.indices) return
         val layer = _layers[idx]
         if (!layer.isLocked && pixels.size == width * height) {
-            if (selectionMask != null) {
+            if (!ignoreSelection && selectionMask != null) {
                 val currentPixels = tilesToPixels(layer.tiles, width, height)
                 var changed = false
                 for (i in pixels.indices) {

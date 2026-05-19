@@ -79,7 +79,6 @@ object MoveTool : StrokeTool {
             updatedSelectionMask = s.computeShiftedMask(),
             overlayPixels = IntArray(0)
         )
-        canvas.setAllPixels(s.computeShiftedPixels())
         session = null
         return result
     }
@@ -91,7 +90,6 @@ object MoveTool : StrokeTool {
             updatedSelectionMask = s.selectionMask,
             overlayPixels = IntArray(0)
         )
-        canvas.setAllPixels(s.originalPixels)
         session = null
         return result
     }

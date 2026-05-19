@@ -76,9 +76,9 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.setCanvasData(sprite.width, sprite.height, sprite.layers)
     }
 
-    fun setAllPixels(pixels: IntArray) {
-        captureActiveLayerReplacement(pixels)
-        pixelCanvasRepository.setAllPixels(pixels)
+    fun setAllPixels(pixels: IntArray, ignoreSelection: Boolean = false) {
+        captureActiveLayerReplacement(pixels, ignoreSelection)
+        pixelCanvasRepository.setAllPixels(pixels, ignoreSelection)
     }
 
     fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int, blend: Boolean = true) {
@@ -206,7 +206,7 @@ class PixelCanvasUseCase(
         }
     }
 
-    private fun captureActiveLayerReplacement(newPixels: IntArray) {
+    private fun captureActiveLayerReplacement(newPixels: IntArray, ignoreSelection: Boolean = false) {
         val tracker = tileChangeTracker ?: return
         val layer = pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId } ?: return
         if (layer.isLocked || !layer.isVisible) return
@@ -215,6 +215,7 @@ class PixelCanvasUseCase(
         if (width <= 0 || height <= 0 || newPixels.size != width * height) return
 
         val currentPixels = pixelCanvasRepository.getActiveLayerPixelsDirect() ?: return
+        val mask = if (!ignoreSelection) pixelCanvasRepository.selectionMask else null
         val seenCoords = LinkedHashMap<TileCoord, Boolean>()
         val tileCols = (width + TILE_SIZE - 1) / TILE_SIZE
         val tileRows = (height + TILE_SIZE - 1) / TILE_SIZE
@@ -235,8 +236,10 @@ class PixelCanvasUseCase(
                         if (canvasCol >= width) break
                         val index = srcBase + canvasCol
                         if (currentPixels[index] != newPixels[index]) {
-                            changed = true
-                            break
+                            if (mask == null || mask[index]) {
+                                changed = true
+                                break
+                            }
                         }
                     }
                     if (changed) break
