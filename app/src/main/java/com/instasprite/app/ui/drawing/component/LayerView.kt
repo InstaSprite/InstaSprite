@@ -17,11 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
@@ -29,6 +30,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,13 +48,16 @@ import androidx.core.graphics.createBitmap
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.ui.drawing.contract.LayerEvent
+import com.instasprite.app.ui.drawing.dialog.LayerOptionsDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.inflateCel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LayerView(
     layer: Layer,
@@ -120,8 +125,8 @@ fun LayerView(
             Spacer(modifier = Modifier.width(8.dp))
 
             Column(
-                verticalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier.fillMaxWidth()
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().height(100.dp)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -132,8 +137,10 @@ fun LayerView(
                         color = AppTheme.colors.TextColorLight,
                         fontSize = 14.sp
                     )
+                    var showDeleteConfirm by remember { mutableStateOf(false) }
+
                     IconButton(
-                        onClick = onDelete,
+                        onClick = { showDeleteConfirm = true },
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
@@ -143,7 +150,32 @@ fun LayerView(
                             modifier = Modifier.size(20.dp)
                         )
                     }
+
+                    if (showDeleteConfirm) {
+                        ConfirmationDialog(
+                            title = "Delete layer",
+                            text = "Are you sure you want to delete this layer",
+                            highlightText = "",
+                            confirmButtonText = "Delete",
+                            dismissButtonText = "Cancel",
+                            highlightTextColor = AppTheme.colors.DismissButtonColor,
+                            hasQuestionMark = true,
+                            onConfirm = {
+                                showDeleteConfirm = false
+                                onDelete()
+                            },
+                            onDismiss = {
+                                showDeleteConfirm = false
+                            }
+                        )
+                    }
                 }
+
+                Text(
+                    text = layer.blendMode.toString().uppercase(),
+                    color = AppTheme.colors.TextColorLight,
+                    fontSize = 14.sp
+                )
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -171,15 +203,37 @@ fun LayerView(
                             modifier = Modifier.size(20.dp)
                         )
                     }
+                    var showOptionsDialog by remember { mutableStateOf(false) }
+
                     IconButton(
-                        onClick = { onEvent(LayerEvent.MergeLayerDown(layer.id)) },
+                        onClick = { showOptionsDialog = true },
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = stringResource(R.string.merge_down),
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Layer Options",
                             tint = AppTheme.colors.TextColorLight,
                             modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    if (showOptionsDialog) {
+                        LayerOptionsDialog(
+                            layer = layer,
+                            layerImage = bitmapImage,
+                            canvasWidth = canvasWidth,
+                            canvasHeight = canvasHeight,
+                            canMergeDown = true,
+                            onBlendModeSelected = { mode ->
+                                onEvent(
+                                    LayerEvent.SetBlendMode(
+                                        layer.id,
+                                        mode
+                                    )
+                                )
+                            },
+                            onMergeDown = { onEvent(LayerEvent.MergeLayerDown(layer.id)) },
+                            onDismiss = { showOptionsDialog = false }
                         )
                     }
 
@@ -190,7 +244,9 @@ fun LayerView(
         // Opacity slider
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
         ) {
             Text(
                 text = "${(localOpacity * 100).toInt()}%",
@@ -205,11 +261,14 @@ fun LayerView(
                     onEvent(LayerEvent.SetLayerOpacity(layer.id, localOpacity))
                 },
                 valueRange = 0f..1f,
-                colors = SliderDefaults.colors(
-                    thumbColor = AppTheme.colors.LinkColor,
-                    activeTrackColor = AppTheme.colors.LinkColor,
-                    inactiveTrackColor = AppTheme.colors.BackgroundColorDarker
-                ),
+                colors = AppTheme.colors.sliderColors(),
+                track = { sliderState ->
+                    SliderDefaults.Track(
+                        sliderState = sliderState,
+                        colors = AppTheme.colors.sliderColors(),
+                        modifier = Modifier.height(8.dp)
+                    )
+                },
                 modifier = Modifier
                     .weight(1f)
                     .height(24.dp)

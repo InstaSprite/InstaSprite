@@ -182,6 +182,7 @@ class DrawingViewModel @AssistedInject constructor(
             is LayerEvent.MergeLayerDown -> drawingEngine.mergeLayerDown(event.layerId)
             is LayerEvent.ReorderLayer -> drawingEngine.reorderLayer(event.fromIndex, event.toIndex)
             is LayerEvent.SetLayerOpacity -> drawingEngine.setLayerOpacity(event.layerId, event.opacity)
+            is LayerEvent.SetBlendMode -> drawingEngine.setLayerBlendMode(event.layerId, event.mode)
         }
     }
 

@@ -2,6 +2,7 @@
 package com.instasprite.app.ui.theme
 
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -310,6 +311,15 @@ data class AppColors(
             disabledSuffixColor = Subtext1Color,
             errorSuffixColor = DismissButtonColor,
         )
+
+    @Composable
+    fun sliderColors() = SliderDefaults.colors(
+        thumbColor = LinkColor,
+        activeTrackColor = LinkColor,
+        inactiveTrackColor = Foreground0Color,
+        activeTickColor = BackgroundColor,
+        inactiveTickColor = LinkColor
+    )
 }
 
 val LocalAppColors = staticCompositionLocalOf { Catppuccin.toAppColors(Catppuccin.Mocha) }

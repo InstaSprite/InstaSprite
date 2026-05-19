@@ -291,6 +291,17 @@ class DrawingEngine(
         }
     }
 
+    fun setLayerBlendMode(layerId: String, mode: com.instasprite.app.domain.model.BlendMode) {
+        recordOperationHistory {
+            pixelCanvasUseCase.setLayerBlendMode(layerId, mode)
+        }
+        refreshLayerState()
+        scope.launch {
+            bitmapManager.refreshBitmapState()
+            syncStateVersions()
+        }
+    }
+
     // Transform
 
     fun rotate() {

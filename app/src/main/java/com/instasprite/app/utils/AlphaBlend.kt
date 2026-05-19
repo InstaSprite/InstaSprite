@@ -8,6 +8,10 @@ fun blendPixel(dst: Int, src: Int, layerOpacity: Float, mode: BlendMode): Int {
     if (effectiveSrc == 0) return dst
     return when (mode) {
         BlendMode.NORMAL -> blendNormal(dst, effectiveSrc)
+        BlendMode.ADDITIVE -> blendAdditive(dst, effectiveSrc)
+        BlendMode.MULTIPLY -> blendMultiply(dst, effectiveSrc)
+        BlendMode.SCREEN -> blendScreen(dst, effectiveSrc)
+        BlendMode.OVERLAY -> blendOverlay(dst, effectiveSrc)
     }
 }
 
@@ -52,4 +56,52 @@ private fun blendNormal(dst: Int, src: Int): Int {
             (outR.coerceAtMost(255) shl 16) or
             (outG.coerceAtMost(255) shl 8) or
             outB.coerceAtMost(255)
+}
+
+private inline fun blendWithMode(dst: Int, src: Int, modeFunc: (dstC: Int, srcC: Int) -> Int): Int {
+    val srcA = (src ushr 24) and 0xFF
+    if (srcA == 0) return dst
+    val dstA = (dst ushr 24) and 0xFF
+    if (dstA == 0) return src
+
+    val invSrcA = 255 - srcA
+    val invDstA = 255 - dstA
+
+    val outA = srcA + ((dstA * invSrcA + 127) / 255)
+    if (outA == 0) return 0
+
+    val srcR = (src ushr 16) and 0xFF
+    val srcG = (src ushr 8) and 0xFF
+    val srcB = src and 0xFF
+
+    val dstR = (dst ushr 16) and 0xFF
+    val dstG = (dst ushr 8) and 0xFF
+    val dstB = dst and 0xFF
+
+    val r = (modeFunc(dstR, srcR) * srcA * dstA / 255 + srcR * srcA * invDstA / 255 + dstR * dstA * invSrcA / 255 + outA / 2) / outA
+    val g = (modeFunc(dstG, srcG) * srcA * dstA / 255 + srcG * srcA * invDstA / 255 + dstG * dstA * invSrcA / 255 + outA / 2) / outA
+    val b = (modeFunc(dstB, srcB) * srcA * dstA / 255 + srcB * srcA * invDstA / 255 + dstB * dstA * invSrcA / 255 + outA / 2) / outA
+
+    return (outA.coerceIn(0, 255) shl 24) or
+            (r.coerceIn(0, 255) shl 16) or
+            (g.coerceIn(0, 255) shl 8) or
+            b.coerceIn(0, 255)
+}
+
+private fun blendAdditive(dst: Int, src: Int): Int {
+    return blendWithMode(dst, src) { d, s -> Math.min(255, d + s) }
+}
+
+private fun blendMultiply(dst: Int, src: Int): Int {
+    return blendWithMode(dst, src) { d, s -> (d * s) / 255 }
+}
+
+private fun blendScreen(dst: Int, src: Int): Int {
+    return blendWithMode(dst, src) { d, s -> 255 - ((255 - d) * (255 - s) / 255) }
+}
+
+private fun blendOverlay(dst: Int, src: Int): Int {
+    return blendWithMode(dst, src) { d, s ->
+        if (d < 128) (2 * d * s) / 255 else 255 - (2 * (255 - d) * (255 - s) / 255)
+    }
 }
