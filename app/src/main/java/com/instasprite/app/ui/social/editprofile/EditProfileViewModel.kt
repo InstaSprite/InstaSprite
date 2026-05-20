@@ -49,7 +49,7 @@ class EditProfileViewModel @Inject constructor(
                     val imageUrl = data.memberImageUrl
                     val finalUrl = if (imageUrl.isNotEmpty()) {
                         if (imageUrl.startsWith("http")) imageUrl
-                        else "${Constants.BASE_URL}/images/$imageUrl"
+                        else "${Constants.IMG_URL}/$imageUrl"
                     } else null
                     _state.update {
                         it.copy(

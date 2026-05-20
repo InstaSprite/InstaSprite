@@ -107,7 +107,7 @@ class SocialSessionManager @Inject constructor(
                 val resolvedUrl = when {
                     rawUrl.isNullOrEmpty() -> null
                     rawUrl.startsWith("http") -> "$rawUrl?ts=${System.currentTimeMillis()}"
-                    else -> "${Constants.BASE_URL}/images/$rawUrl?ts=${System.currentTimeMillis()}"
+                    else -> "${Constants.IMG_URL}/$rawUrl?ts=${System.currentTimeMillis()}"
                 }
 
                 _currentUser.value = CurrentUserState(

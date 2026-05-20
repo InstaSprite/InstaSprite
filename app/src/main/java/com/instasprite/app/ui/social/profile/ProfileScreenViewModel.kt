@@ -316,7 +316,7 @@ class ProfileScreenViewModel @Inject constructor(
             username = dto.member.username,
             displayName = dto.member.name,
             profileImageUrl = dto.member.image?.imageUrl?.let { imageUrl ->
-                "${Constants.BASE_URL}/images/$imageUrl"
+                "${Constants.IMG_URL}/$imageUrl"
             },
             isFollowing = dto.following
         )
@@ -327,7 +327,7 @@ class ProfileScreenViewModel @Inject constructor(
         val resolvedUrl = when {
             rawUrl.isNullOrEmpty() -> null
             rawUrl.startsWith("http") -> "$rawUrl?ts=${System.currentTimeMillis()}"
-            else -> "${Constants.BASE_URL}/images/$rawUrl?ts=${System.currentTimeMillis()}"
+            else -> "${Constants.IMG_URL}/$rawUrl?ts=${System.currentTimeMillis()}"
         }
 
         return UserProfileState(

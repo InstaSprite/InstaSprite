@@ -246,7 +246,7 @@ class CommentViewModel @Inject constructor(
 
     private fun toFullImageUrl(imageUrl: String?): String? {
         if (imageUrl.isNullOrBlank()) return null
-        return if (imageUrl.startsWith("http")) imageUrl else "${Constants.BASE_URL}/images/$imageUrl"
+        return if (imageUrl.startsWith("http")) imageUrl else "${Constants.IMG_URL}/$imageUrl"
     }
 
     fun loadCurrentUserProfile() {

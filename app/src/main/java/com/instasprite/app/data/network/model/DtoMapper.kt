@@ -66,13 +66,13 @@ fun MemberDto.toDomain(): MemberData {
 fun MemberImageDto.toDomain(): MemberImageData? {
     val imageUrl = imageUrl ?: return null
     val fullImageUrl = if (imageUrl.startsWith("http")) imageUrl
-        else "${Constants.BASE_URL}/images/$imageUrl"
+        else "${Constants.IMG_URL}/$imageUrl"
     return MemberImageData(fullImageUrl)
 }
 
 fun PostImageDto.toDomain(): PostImageData {
     val fullImageUrl = if (postImageUrl.startsWith("http")) postImageUrl
-        else "${Constants.BASE_URL}/images/$postImageUrl"
+        else "${Constants.IMG_URL}/$postImageUrl"
     return PostImageData(
         id = id,
         postImageUrl = fullImageUrl,
@@ -143,7 +143,7 @@ fun NotificationDto.toDomain(): NotificationData {
     val fullImageUrl = if (senderAvatarUrl?.startsWith("http") == true) {
         senderAvatarUrl
     } else if (!senderAvatarUrl.isNullOrEmpty()) {
-        "${Constants.BASE_URL}/images/$senderAvatarUrl"
+        "${Constants.IMG_URL}/$senderAvatarUrl"
     } else {
         null
     }

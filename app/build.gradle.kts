@@ -32,6 +32,7 @@ android {
         versionName = "0.7.2"
 
         buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL", "\"\""))
+        buildConfigField("String", "IMG_URL", localProperties.getProperty("IMG_URL", "\"\""))
         buildConfigField("String", "GOOGLE_WEBCLIENT_ID", localProperties.getProperty("GOOGLE_WEBCLIENT_ID", "\"\""))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
