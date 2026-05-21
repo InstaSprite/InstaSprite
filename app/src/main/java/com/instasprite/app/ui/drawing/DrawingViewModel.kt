@@ -35,6 +35,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -82,6 +84,28 @@ class DrawingViewModel @AssistedInject constructor(
         ): DrawingViewModel
     }
 
+    private val _fatalError = MutableStateFlow<Throwable?>(null)
+    val fatalError: StateFlow<Throwable?> = _fatalError.asStateFlow()
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        handleFatalError(throwable)
+    }
+
+    private val drawingScope = CoroutineScope(viewModelScope.coroutineContext + exceptionHandler)
+
+    fun handleFatalError(t: Throwable) {
+        if (_fatalError.value != null) return
+        _fatalError.value = t
+        if (t is OutOfMemoryError) {
+            System.gc()
+        }
+        try {
+            drawingEngine.release()
+        } catch (e: Throwable) {
+            // ignore
+        }
+    }
+
     private val initialCanvasWidth: Int = if (width > 0) width else pixelCanvasRepository.width
     private val initialCanvasHeight: Int = if (height > 0) height else pixelCanvasRepository.height
 
@@ -91,7 +115,7 @@ class DrawingViewModel @AssistedInject constructor(
     )
 
     private val drawingEngine =
-        DrawingEngine(pixelCanvasUseCase, colorPaletteRepository, viewModelScope)
+        DrawingEngine(pixelCanvasUseCase, colorPaletteRepository, drawingScope)
 
     val bitmap get() = drawingEngine.bitmapManager.bitmap
     val overlayBitmap get() = drawingEngine.bitmapManager.overlayBitmap
@@ -126,7 +150,7 @@ class DrawingViewModel @AssistedInject constructor(
             recentColors = recent
         )
     }.stateIn(
-        scope = viewModelScope,
+        scope = drawingScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = ColorPaletteState(
             colorPalette = colorPalette.value,
@@ -136,15 +160,23 @@ class DrawingViewModel @AssistedInject constructor(
     )
 
     init {
-        drawingEngine.setCanvasSize(initialCanvasWidth, initialCanvasHeight)
-        applyDrawSetting(AppSettings.getDrawSetting(applicationContext))
+        try {
+            drawingEngine.setCanvasSize(initialCanvasWidth, initialCanvasHeight)
+            applyDrawSetting(AppSettings.getDrawSetting(applicationContext))
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                loadFromDB()
+            drawingScope.launch {
+                try {
+                    withContext(Dispatchers.IO) {
+                        loadFromDB()
+                    }
+                    drawingEngine.refreshFullCanvasState()
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                } catch (t: Throwable) {
+                    handleFatalError(t)
+                }
             }
-            drawingEngine.refreshFullCanvasState()
-            _uiState.value = _uiState.value.copy(isLoading = false)
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 
@@ -160,41 +192,53 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCanvasMenuEvent(event: CanvasMenuEvent) {
-        if (event !is CanvasMenuEvent.OpenResizeDialog) {
-            commitPendingTool()
-        }
-        when (event) {
-            is CanvasMenuEvent.RotateCanvas -> drawingEngine.rotate()
-            is CanvasMenuEvent.HorizontalFlip -> drawingEngine.hFlip()
-            is CanvasMenuEvent.VerticalFlip -> drawingEngine.vFlip()
-            is CanvasMenuEvent.OpenResizeDialog -> openDialog(DrawingDialog.ResizeCanvas)
+        try {
+            if (event !is CanvasMenuEvent.OpenResizeDialog) {
+                commitPendingTool()
+            }
+            when (event) {
+                is CanvasMenuEvent.RotateCanvas -> drawingEngine.rotate()
+                is CanvasMenuEvent.HorizontalFlip -> drawingEngine.hFlip()
+                is CanvasMenuEvent.VerticalFlip -> drawingEngine.vFlip()
+                is CanvasMenuEvent.OpenResizeDialog -> openDialog(DrawingDialog.ResizeCanvas)
+            }
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 
     fun onLayerEvent(event: LayerEvent) {
-        commitPendingTool()
-        when (event) {
-            is LayerEvent.AddLayer -> drawingEngine.addLayer("Layer ${canvasState.value.layers.size + 1}")
-            is LayerEvent.DeleteLayer -> drawingEngine.removeLayer(event.layerId)
-            is LayerEvent.SelectLayer -> drawingEngine.selectLayer(event.layerId)
-            is LayerEvent.ToggleLock -> drawingEngine.toggleLock(event.layerId)
-            is LayerEvent.ToggleVisibility -> drawingEngine.toggleVisibility(event.layerId)
-            is LayerEvent.MergeLayerDown -> drawingEngine.mergeLayerDown(event.layerId)
-            is LayerEvent.ReorderLayer -> drawingEngine.reorderLayer(event.fromIndex, event.toIndex)
-            is LayerEvent.SetLayerOpacity -> drawingEngine.setLayerOpacity(event.layerId, event.opacity)
-            is LayerEvent.SetBlendMode -> drawingEngine.setLayerBlendMode(event.layerId, event.mode)
+        try {
+            commitPendingTool()
+            when (event) {
+                is LayerEvent.AddLayer -> drawingEngine.addLayer("Layer ${canvasState.value.layers.size + 1}")
+                is LayerEvent.DeleteLayer -> drawingEngine.removeLayer(event.layerId)
+                is LayerEvent.SelectLayer -> drawingEngine.selectLayer(event.layerId)
+                is LayerEvent.ToggleLock -> drawingEngine.toggleLock(event.layerId)
+                is LayerEvent.ToggleVisibility -> drawingEngine.toggleVisibility(event.layerId)
+                is LayerEvent.MergeLayerDown -> drawingEngine.mergeLayerDown(event.layerId)
+                is LayerEvent.ReorderLayer -> drawingEngine.reorderLayer(event.fromIndex, event.toIndex)
+                is LayerEvent.SetLayerOpacity -> drawingEngine.setLayerOpacity(event.layerId, event.opacity)
+                is LayerEvent.SetBlendMode -> drawingEngine.setLayerBlendMode(event.layerId, event.mode)
+            }
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 
     fun resizeCanvas(width: Int, height: Int) {
-        drawingEngine.resizeCanvas(width, height)
-        val state = _uiState.value.cursorState
-        _uiState.value = _uiState.value.copy(
-            cursorState = state.copy(
-                cursorX = state.cursorX.coerceIn(0f, width.toFloat()),
-                cursorY = state.cursorY.coerceIn(0f, height.toFloat())
+        try {
+            drawingEngine.resizeCanvas(width, height)
+            val state = _uiState.value.cursorState
+            _uiState.value = _uiState.value.copy(
+                cursorState = state.copy(
+                    cursorX = state.cursorX.coerceIn(0f, width.toFloat()),
+                    cursorY = state.cursorY.coerceIn(0f, height.toFloat())
+                )
             )
-        )
+        } catch (t: Throwable) {
+            handleFatalError(t)
+        }
     }
 
     fun selectColor(color: Color) {
@@ -202,97 +246,109 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCanvasEvent(event: PixelCanvasEvent) {
-        val tool = _uiState.value.selectedTool
-        val color = activeColor.value
-        val scale = _uiState.value.toolSize
-        val shape = _uiState.value.brushShape
+        try {
+            val tool = _uiState.value.selectedTool
+            val color = activeColor.value
+            val scale = _uiState.value.toolSize
+            val shape = _uiState.value.brushShape
 
-        when (event) {
-            is PixelCanvasEvent.OnStrokeStart -> {
-                drawingEngine.onStrokeStart(
-                    tool as? StrokeTool ?: return,
-                    event.y,
-                    event.x,
-                    color,
-                    scale,
-                    shape,
-                    event.zoomScale
-                )
-            }
+            when (event) {
+                is PixelCanvasEvent.OnStrokeStart -> {
+                    drawingEngine.onStrokeStart(
+                        tool as? StrokeTool ?: return,
+                        event.y,
+                        event.x,
+                        color,
+                        scale,
+                        shape,
+                        event.zoomScale
+                    )
+                }
 
-            is PixelCanvasEvent.OnStrokeMove -> {
-                drawingEngine.onStrokeMove(tool as? StrokeTool ?: return, event.y, event.x)
-            }
+                is PixelCanvasEvent.OnStrokeMove -> {
+                    drawingEngine.onStrokeMove(tool as? StrokeTool ?: return, event.y, event.x)
+                }
 
-            is PixelCanvasEvent.OnStrokeEnd -> {
-                drawingEngine.onStrokeEnd(
-                    tool as? StrokeTool ?: return,
-                    _uiState.value.isAppendSelectionMode
-                )
-            }
+                is PixelCanvasEvent.OnStrokeEnd -> {
+                    drawingEngine.onStrokeEnd(
+                        tool as? StrokeTool ?: return,
+                        _uiState.value.isAppendSelectionMode
+                    )
+                }
 
-            is PixelCanvasEvent.OnStrokeCancel -> {
-                drawingEngine.onStrokeCancel(tool as? StrokeTool ?: return)
-            }
+                is PixelCanvasEvent.OnStrokeCancel -> {
+                    drawingEngine.onStrokeCancel(tool as? StrokeTool ?: return)
+                }
 
-            is PixelCanvasEvent.OnTapAt -> {
-                drawingEngine.onTapAt(tool, event.y, event.x, color, scale)
-            }
+                is PixelCanvasEvent.OnTapAt -> {
+                    drawingEngine.onTapAt(tool, event.y, event.x, color, scale)
+                }
 
-            is PixelCanvasEvent.ClearSelection -> {
-                commitPendingTool()
-                drawingEngine.clearSelection(tool)
-            }
+                is PixelCanvasEvent.ClearSelection -> {
+                    commitPendingTool()
+                    drawingEngine.clearSelection(tool)
+                }
 
-            is PixelCanvasEvent.InvertSelection -> {
-                commitPendingTool()
-                drawingEngine.invertSelection()
+                is PixelCanvasEvent.InvertSelection -> {
+                    commitPendingTool()
+                    drawingEngine.invertSelection()
+                }
             }
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 
     fun onToolSelectorEvent(event: ToolSelectorEvent) {
-        when (event) {
-            is ToolSelectorEvent.Undo -> {
-                val tool = _uiState.value.selectedTool as? StrokeTool
-                if (tool != null && drawingEngine.cancelPendingTool(tool)) {
-                    // Cancelled pending state, skip undo
-                } else {
-                    drawingEngine.undo()
+        try {
+            when (event) {
+                is ToolSelectorEvent.Undo -> {
+                    val tool = _uiState.value.selectedTool as? StrokeTool
+                    if (tool != null && drawingEngine.cancelPendingTool(tool)) {
+                        // Cancelled pending state, skip undo
+                    } else {
+                        drawingEngine.undo()
+                    }
+                }
+
+                is ToolSelectorEvent.Redo -> {
+                    commitPendingTool()
+                    drawingEngine.redo()
+                }
+
+                is ToolSelectorEvent.OpenSaveImageDialog -> openDialog(DrawingDialog.SaveImage)
+                is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
+                is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
+                is ToolSelectorEvent.SelectTool -> selectTool(tool = event.tool)
+                is ToolSelectorEvent.ToggleAppendSelectionMode -> {
+                    _uiState.value = _uiState.value.copy(
+                        isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
+                    )
                 }
             }
-
-            is ToolSelectorEvent.Redo -> {
-                commitPendingTool()
-                drawingEngine.redo()
-            }
-
-            is ToolSelectorEvent.OpenSaveImageDialog -> openDialog(DrawingDialog.SaveImage)
-            is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
-            is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
-            is ToolSelectorEvent.SelectTool -> selectTool(tool = event.tool)
-            is ToolSelectorEvent.ToggleAppendSelectionMode -> {
-                _uiState.value = _uiState.value.copy(
-                    isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
-                )
-            }
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 
     fun selectTool(tool: Tool) {
-        commitPendingTool()
-        val state = _uiState.value.cursorState
-        
-        var previewColor: Color? = null
-        if (tool is EyedropperTool) {
-            val pixel = pixelCanvasUseCase.getCompositedPixelAt(state.gridY, state.gridX)
-            previewColor = if (pixel != 0) Color(pixel) else Color.Transparent
+        try {
+            commitPendingTool()
+            val state = _uiState.value.cursorState
+            
+            var previewColor: Color? = null
+            if (tool is EyedropperTool) {
+                val pixel = pixelCanvasUseCase.getCompositedPixelAt(state.gridY, state.gridX)
+                previewColor = if (pixel != 0) Color(pixel) else Color.Transparent
+            }
+            
+            _uiState.value = _uiState.value.copy(
+                selectedTool = tool,
+                cursorState = state.copy(previewColor = previewColor)
+            )
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
-        
-        _uiState.value = _uiState.value.copy(
-            selectedTool = tool,
-            cursorState = state.copy(previewColor = previewColor)
-        )
     }
 
     private fun commitPendingTool() {
@@ -315,11 +371,15 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCursorDrawEvent(event: CursorDrawEvent) {
-        when (event) {
-            is CursorDrawEvent.ToggleCursorMode -> toggleCursorMode(event.cursorX, event.cursorY)
-            is CursorDrawEvent.MoveCursor -> moveCursor(event.cursorX, event.cursorY)
-            is CursorDrawEvent.DrawButtonPressed -> onCursorDrawPressed()
-            is CursorDrawEvent.DrawButtonReleased -> onCursorDrawReleased()
+        try {
+            when (event) {
+                is CursorDrawEvent.ToggleCursorMode -> toggleCursorMode(event.cursorX, event.cursorY)
+                is CursorDrawEvent.MoveCursor -> moveCursor(event.cursorX, event.cursorY)
+                is CursorDrawEvent.DrawButtonPressed -> onCursorDrawPressed()
+                is CursorDrawEvent.DrawButtonReleased -> onCursorDrawReleased()
+            }
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 
@@ -442,33 +502,43 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun saveImage(folderUri: Uri, fileName: String, scalePercent: Int = 100): Boolean {
-        if (fileName.isBlank()) return false
-        val sprite = pixelCanvasUseCase.getSprite()
-        val bmp = ImageExporter.convertToBitmap(
-            sprite.compositedPixels,
-            sprite.width,
-            sprite.height,
-            scalePercent
-        ) ?: return false
+        try {
+            if (fileName.isBlank()) return false
+            val sprite = pixelCanvasUseCase.getSprite()
+            val bmp = ImageExporter.convertToBitmap(
+                sprite.compositedPixels,
+                sprite.width,
+                sprite.height,
+                scalePercent
+            ) ?: return false
 
-        return fileRepository.saveFile(bmp, folderUri, fileName)
+            return fileRepository.saveFile(bmp, folderUri, fileName)
+        } catch (t: Throwable) {
+            handleFatalError(t)
+            return false
+        }
     }
 
     suspend fun saveISprite(folderUri: Uri, fileName: String): Boolean {
-        if (fileName.isBlank()) return false
-        if (_uiState.value.isSaving) return false
+        try {
+            if (fileName.isBlank()) return false
+            if (_uiState.value.isSaving) return false
 
-        _uiState.value = _uiState.value.copy(isSaving = true)
-        return try {
-            withContext(Dispatchers.IO) {
-                fileRepository.saveISpriteFile(
-                    pixelCanvasUseCase.getSprite(),
-                    folderUri,
-                    fileName
-                )
+            _uiState.value = _uiState.value.copy(isSaving = true)
+            return try {
+                withContext(Dispatchers.IO) {
+                    fileRepository.saveISpriteFile(
+                        pixelCanvasUseCase.getSprite(),
+                        folderUri,
+                        fileName
+                    )
+                }
+            } finally {
+                _uiState.value = _uiState.value.copy(isSaving = false)
             }
-        } finally {
-            _uiState.value = _uiState.value.copy(isSaving = false)
+        } catch (t: Throwable) {
+            handleFatalError(t)
+            return false
         }
     }
 
@@ -477,38 +547,50 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     suspend fun loadSprite(sprite: Sprite) {
-        drawingEngine.setCanvasSize(sprite.width, sprite.height)
-        drawingEngine.setCanvas(sprite)
-        sprite.colorPalette?.let {
-            colorPaletteRepository.updatePalette(sprite.colorPalette.map { Color(it) })
+        try {
+            drawingEngine.setCanvasSize(sprite.width, sprite.height)
+            drawingEngine.setCanvas(sprite)
+            sprite.colorPalette?.let {
+                colorPaletteRepository.updatePalette(sprite.colorPalette.map { Color(it) })
+            }
+            drawingEngine.resetHistory()
+            drawingEngine.refreshFullCanvasState()
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
-        drawingEngine.resetHistory()
-        drawingEngine.refreshFullCanvasState()
     }
 
     suspend fun saveToDB(name: String? = null) {
-        if (_uiState.value.isSaving) return
-
-        _uiState.value = _uiState.value.copy(isSaving = true)
         try {
-            withContext(Dispatchers.IO) {
-                val sprite = pixelCanvasUseCase.getSprite()
-                spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
-                name?.let {
-                    spriteDataRepository.changeName(spriteId, it)
+            if (_uiState.value.isSaving) return
+
+            _uiState.value = _uiState.value.copy(isSaving = true)
+            try {
+                withContext(Dispatchers.IO) {
+                    val sprite = pixelCanvasUseCase.getSprite()
+                    spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
+                    name?.let {
+                        spriteDataRepository.changeName(spriteId, it)
+                    }
                 }
+            } finally {
+                _uiState.value = _uiState.value.copy(isSaving = false)
             }
-        } finally {
-            _uiState.value = _uiState.value.copy(isSaving = false)
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 
     suspend fun loadFromDB() {
-        val sprite = spriteDataRepository.loadSprite(spriteId)
-        if (sprite != null) {
-            loadSprite(sprite)
-        } else {
-            saveToDB(spriteName)
+        try {
+            val sprite = spriteDataRepository.loadSprite(spriteId)
+            if (sprite != null) {
+                loadSprite(sprite)
+            } else {
+                saveToDB(spriteName)
+            }
+        } catch (t: Throwable) {
+            handleFatalError(t)
         }
     }
 

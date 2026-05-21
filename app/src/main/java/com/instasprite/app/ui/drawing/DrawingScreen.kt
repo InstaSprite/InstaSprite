@@ -2,6 +2,7 @@ package com.instasprite.app.ui.drawing
 
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -93,11 +95,25 @@ data class DrawingScreenEvent(
 @Composable
 fun DrawingScreen(
     onNavigateBack: (String) -> Unit,
+    onNavigateBackDirectly: () -> Unit,
     onNavigateToPalette: () -> Unit,
     viewModel: DrawingViewModel = hiltViewModel()
 ) {
     BackHandler(onBack = { onNavigateBack(viewModel.spriteId) })
 
+    val fatalError by viewModel.fatalError.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(fatalError) {
+        fatalError?.let { throwable ->
+            val message = if (throwable is OutOfMemoryError) {
+                "Out of memory: canvas size is too large or system memory is low."
+            } else {
+                "A critical error occurred: ${throwable.localizedMessage ?: "Unknown error"}"
+            }
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            onNavigateBackDirectly()
+        }
+    }
 
     val colorPaletteState by viewModel.colorPaletteState.collectAsState()
     val canvasState by viewModel.canvasState.collectAsState()

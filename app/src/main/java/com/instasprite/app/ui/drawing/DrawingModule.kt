@@ -51,6 +51,9 @@ object DrawingModule {
                         viewModel.saveToDB()
                         navigator.goBackWithResult(spriteId)
                     }
+                },
+                onNavigateBackDirectly = {
+                    navigator.goBack()
                 }
             )
         }
