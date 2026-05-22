@@ -47,8 +47,6 @@ class AuthInterceptor @Inject constructor(
 
         // If we get a 401 Unauthorized response, try to refresh the token
         if (response.code == 401 && authHeader != null) {
-            response.close()
-
             val refreshToken = tokenUtils.getRefreshToken()
             if (refreshToken != null) {
                 try {
@@ -57,6 +55,8 @@ class AuthInterceptor @Inject constructor(
                     }
 
                     if (refreshResponse != null) {
+                        response.close()
+
                         sessionManager.onTokensRefreshed(
                             accessToken = refreshResponse.accessToken,
                             refreshToken = refreshResponse.refreshToken,
@@ -72,6 +72,8 @@ class AuthInterceptor @Inject constructor(
                             .build()
 
                         return chain.proceed(retryRequest)
+                    } else {
+                        sessionManager.logout()
                     }
                 } catch (e: Exception) {
                     sessionManager.logout()

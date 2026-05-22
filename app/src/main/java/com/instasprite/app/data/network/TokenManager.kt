@@ -44,11 +44,12 @@ class TokenManager @Inject constructor(
         tokenType: String,
         username: String?
     ) {
+        val finalUsername = if (!username.isNullOrEmpty()) username else getUsername()
         cachedTokens = TokenPreferences(
             keyAccessToken = accessToken,
             keyRefreshToken = refreshToken,
             keyTokenType = tokenType,
-            keyUsername = username
+            keyUsername = finalUsername
         )
         scope.launch {
             dataStore.updateData {
@@ -56,7 +57,7 @@ class TokenManager @Inject constructor(
                     keyAccessToken = accessToken,
                     keyRefreshToken = refreshToken,
                     keyTokenType = tokenType,
-                    keyUsername = username
+                    keyUsername = finalUsername
                 )
             }
         }
