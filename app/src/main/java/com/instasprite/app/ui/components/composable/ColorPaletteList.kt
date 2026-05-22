@@ -50,12 +50,18 @@ fun ColorPaletteList(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(palettes) { palette ->
+        items(
+            items = palettes,
+            key = { palette ->
+                if (palette.id == -1) "default_${palette.name}" else "saved_${palette.id}"
+            }
+        ) { palette ->
             ListEntry(
                 palette = palette,
                 optionSlot = optionSlot,
                 colorPaletteConfig = colorPaletteConfig,
-                onClick = { onPaletteSelected(palette) }
+                onClick = { onPaletteSelected(palette) },
+                modifier = Modifier.animateItem()
             )
         }
     }
@@ -69,14 +75,14 @@ private fun ListEntry(
     modifier: Modifier = Modifier,
     optionSlot: @Composable (ColorPalette) -> Unit = {}
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(AppTheme.colors.BackgroundColor)
-            .clickable(onClick = onClick)
-            .padding(12.dp)
-    ) {
+    val itemModifier = modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(12.dp))
+        .background(AppTheme.colors.BackgroundColor)
+        .clickable(onClick = onClick)
+        .padding(12.dp)
+
+    Column(modifier = itemModifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically

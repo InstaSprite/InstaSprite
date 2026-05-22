@@ -361,7 +361,7 @@
     <string name="import_location">Vị trí Nhập</string>
     <string name="import_color_palettes">Nhập Bảng màu</string>
     <string name="import_from_lospec">Nhập từ Lospec</string>
-    <string name="import_from_file">Nhập từ Tệp</string>
+    <string name="import_from_gpl">Nhập từ tệp GPL</string>
     <string name="fetch_palette">Tải Bảng màu</string>
     <string name="lospec_url">Đường dẫn Lospec</string>
     <string name="https_lospec_com_palette_list_example">https://lospec.com/palette-list/vi-du</string>
@@ -406,4 +406,8 @@
     <string name="delete_color">Xóa màu</string>
     <string name="add_color">Thêm màu</string>
     <string name="pick_from_device">Chọn từ Thiết bị</string>
+    <string name="only_gpl_supported">Chỉ hỗ trợ tệp .gpl</string>
+    <string name="importing">Đang nhập…</string>
+    <string name="import_success">Đã nhập \"%1$s\" thành công!</string>
+    <string name="import_failed">Nhập tệp GPL thất bại</string>
 </resources>

@@ -361,7 +361,7 @@
     <string name="import_location">Import Location</string>
     <string name="import_color_palettes">Import Color Palettes</string>
     <string name="import_from_lospec">Import from Lospec</string>
-    <string name="import_from_file">Import from File</string>
+    <string name="import_from_gpl">Import GPL File</string>
     <string name="fetch_palette">Fetch Palette</string>
     <string name="lospec_url">Lospec URL</string>
     <string name="https_lospec_com_palette_list_example">https://lospec.com/palette-list/example</string>
@@ -404,4 +404,8 @@
     <string name="tap_color_to_edit">Tap color to edit</string>
     <string name="delete_color">Delete color</string>
     <string name="add_color">Add color</string>
+    <string name="only_gpl_supported">Only .gpl files are supported</string>
+    <string name="importing">Importing…</string>
+    <string name="import_success">Imported \"%1$s\" successfully!</string>
+    <string name="import_failed">Failed to import GPL file</string>
 </resources>

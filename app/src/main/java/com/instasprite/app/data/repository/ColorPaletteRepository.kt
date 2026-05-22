@@ -123,6 +123,72 @@ class ColorPaletteRepository(
             _recentColors.value.removeLast()
         }
     }
+
+    suspend fun importPaletteFromGplUri(uri: android.net.Uri, paletteName: String): ColorPalette? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext null
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            
+            val colors = mutableListOf<Color>()
+            
+            var isGimpPalette = false
+            var line: String?
+            
+            while (reader.readLine().also { line = it } != null) {
+                val trimmed = line?.trim() ?: continue
+                if (trimmed.isEmpty()) continue
+                
+                if (!isGimpPalette) {
+                    if (trimmed.startsWith("GIMP Palette", ignoreCase = true)) {
+                        isGimpPalette = true
+                        continue
+                    } else {
+                        break
+                    }
+                }
+                
+                if (trimmed.startsWith("Name:", ignoreCase = true)) {
+                    continue
+                }
+                
+                if (trimmed.startsWith("Columns:", ignoreCase = true)) {
+                    continue
+                }
+                
+                if (trimmed.startsWith("#")) {
+                    continue
+                }
+                
+                val parts = trimmed.split(Regex("\\s+"))
+                if (parts.size >= 3) {
+                    val r = parts[0].toIntOrNull()
+                    val g = parts[1].toIntOrNull()
+                    val b = parts[2].toIntOrNull()
+                    if (r != null && g != null && b != null &&
+                        r in 0..255 && g in 0..255 && b in 0..255) {
+                        colors.add(Color(red = r / 255f, green = g / 255f, blue = b / 255f))
+                    }
+                }
+            }
+            reader.close()
+            
+            if (!isGimpPalette || colors.isEmpty()) {
+                null
+            } else {
+                val palette = ColorPalette(
+                    name = paletteName,
+                    author = "Imported",
+                    colors = colors
+                )
+                savePaletteToDB(palette)
+                palette
+            }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            Log.e("ColorPaletteRepository", "Failed to parse GPL file", e)
+            null
+        }
+    }
 }
 
 fun loadDefaultColorPalette(context: Context): MutableList<Color> {

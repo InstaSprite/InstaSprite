@@ -7,15 +7,12 @@ import androidx.compose.runtime.Composable
 import com.instasprite.app.domain.dialog.Dialog
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
-import com.instasprite.app.ui.palette.dialogs.ImportOptionsDialog
 import com.instasprite.app.ui.palette.dialogs.LospecImportDialog
 import com.instasprite.app.ui.theme.AppTheme
 
 
 sealed interface ColorPaletteDialog : Dialog {
-    data object ImportColorPalettes : ColorPaletteDialog
     data object LospecPaletteImport : ColorPaletteDialog
-    data object FilePaletteImport : ColorPaletteDialog
     data class DeletePalette(val palette: ColorPalette) : ColorPaletteDialog
 }
 
@@ -27,29 +24,12 @@ fun ColorPaletteScreenDialogs(
 
     dialogState.forEach { dialog ->
         when (dialog) {
-            ColorPaletteDialog.ImportColorPalettes -> {
-                ImportOptionsDialog(
-                    onDismiss = viewModel::closeTopDialog,
-                    onLospecSelected = {
-                        viewModel.openDialog(ColorPaletteDialog.LospecPaletteImport)
-                    },
-                    onFileSelected = {
-                        viewModel.openDialog(ColorPaletteDialog.FilePaletteImport)
-                    }
-                )
-            }
-
-            ColorPaletteDialog.FilePaletteImport -> {
-
-            }
-
             ColorPaletteDialog.LospecPaletteImport -> {
                 LospecImportDialog(
                     onDismiss = viewModel::closeTopDialog,
                     onImportColorsFromLospecUrl = viewModel::importPaletteFromLospecUrl,
                     onImport = {
                         viewModel.savePalette(it)
-                        viewModel.closeTopDialog()
                         viewModel.closeTopDialog()
                     }
                 )
