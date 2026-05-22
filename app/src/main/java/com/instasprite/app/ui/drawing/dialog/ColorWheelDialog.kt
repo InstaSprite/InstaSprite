@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
@@ -69,6 +70,8 @@ fun ColorWheelDialog(
     onDismiss: () -> Unit,
     onColorSelected: (Color) -> Unit,
     onOpenPaletteScreen: () -> Unit,
+    showPalette: Boolean = true,
+    showChoosePalette: Boolean = true
 ) {
 
     val hsv = remember {
@@ -220,16 +223,18 @@ fun ColorWheelDialog(
                     updateInputFields()
                 }
 
-                ColorPaletteView(
-                    colors = colorPalette,
-                    onColorSelected = { color ->
-                        val hsvArray = floatArrayOf(0f, 0f, 0f)
-                        AndroidColor.colorToHSV(color.toArgb(), hsvArray)
-                        hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
-                        alphaValue.value = color.alpha
-                        updateInputFields()
-                    },
-                )
+                if (showPalette) {
+                    ColorPaletteView(
+                        colors = colorPalette,
+                        onColorSelected = { color ->
+                            val hsvArray = floatArrayOf(0f, 0f, 0f)
+                            AndroidColor.colorToHSV(color.toArgb(), hsvArray)
+                            hsv.value = Triple(hsvArray[0], hsvArray[1], hsvArray[2])
+                            alphaValue.value = color.alpha
+                            updateInputFields()
+                        },
+                    )
+                }
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     ColorInputTextField(
@@ -319,17 +324,19 @@ fun ColorWheelDialog(
                     }
                 }
 
-                Button(
-                    onClick = onOpenPaletteScreen,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.AccentButtonColor
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = stringResource(R.string.choose_another_palette),
-                        color = AppTheme.colors.TextColorDark
-                    )
+                if (showChoosePalette) {
+                    Button(
+                        onClick = onOpenPaletteScreen,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.AccentButtonColor
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.choose_another_palette),
+                            color = AppTheme.colors.TextColorDark
+                        )
+                    }
                 }
             }
         }
@@ -702,8 +709,16 @@ private fun SatValPanel(
             setSatVal(sat, brightness)
         }
 
+        val indicatorColor = if (
+            Color.hsv(hue, saturation, value).luminance() > 0.5f
+        ) {
+            Color.Black
+        } else {
+            Color.White
+        }
+
         drawCircle(
-            color = Color.White,
+            color = indicatorColor,
             radius = 8.dp.toPx(),
             center = pressOffset.value,
             style = Stroke(
@@ -712,7 +727,7 @@ private fun SatValPanel(
         )
 
         drawCircle(
-            color = Color.White,
+            color = indicatorColor,
             radius = 2.dp.toPx(),
             center = pressOffset.value,
         )

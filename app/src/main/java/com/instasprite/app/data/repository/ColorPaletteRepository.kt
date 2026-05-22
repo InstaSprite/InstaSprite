@@ -74,7 +74,11 @@ class ColorPaletteRepository(
         }
     }
 
-    suspend fun savePaletteToDB(palette: ColorPalette) {
+    suspend fun savePaletteToDB(palette: ColorPalette, forceSave: Boolean = false) {
+        if (forceSave || palette.id > 0) {
+            colorPaletteDao.insert(palette.toData())
+            return
+        }
         val allPalettes = colorPaletteDao.getAllPalette()
         val exists = allPalettes.any { it.colors == palette.colors }
         if (!exists) {

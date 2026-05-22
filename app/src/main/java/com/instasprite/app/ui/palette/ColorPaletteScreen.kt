@@ -1,36 +1,43 @@
 package com.instasprite.app.ui.palette
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.ui.components.composable.BackButton
-import com.instasprite.app.ui.components.composable.ColorPaletteList
 import com.instasprite.app.ui.components.composable.Bar
+import com.instasprite.app.ui.components.composable.ColorPaletteList
+import com.instasprite.app.ui.components.composable.ExpandableFabMenu
+import com.instasprite.app.ui.components.composable.FabMenuAlignment
+import com.instasprite.app.ui.components.composable.FabMenuColors
+import com.instasprite.app.ui.components.composable.FabMenuItem
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.DummyData
@@ -40,6 +47,8 @@ import com.instasprite.app.utils.rememberBottomBarVisibleState
 fun ColorPaletteScreen(
     onDismiss: () -> Unit,
     onPaletteSelected: (ColorPalette) -> Unit,
+    onPaletteEdit: (ColorPalette) -> Unit = {},
+    onCreateNewPalette: () -> Unit = {},
     viewModel: ColorPaletteViewModel = hiltViewModel()
 ) {
     BackHandler(onBack = onDismiss)
@@ -55,9 +64,14 @@ fun ColorPaletteScreen(
         onPaletteDeleteButton = { paletteToDelete ->
             viewModel.openDialog(ColorPaletteDialog.DeletePalette(paletteToDelete))
         },
-        onFabButton = {
-            viewModel.openDialog(ColorPaletteDialog.ImportColorPalettes)
+        onPaletteEdit = onPaletteEdit,
+        onImportLospec = {
+            viewModel.openDialog(ColorPaletteDialog.LospecPaletteImport)
         },
+        onImportFile = {
+            viewModel.openDialog(ColorPaletteDialog.FilePaletteImport)
+        },
+        onCreateNewPalette = onCreateNewPalette,
         onDismiss = onDismiss,
     )
 }
@@ -67,7 +81,10 @@ private fun ColorPaletteSelectionContent(
     savedPalettes: List<ColorPalette>,
     onPaletteSelected: (ColorPalette) -> Unit = {},
     onPaletteDeleteButton: (ColorPalette) -> Unit = {},
-    onFabButton: () -> Unit = {},
+    onPaletteEdit: (ColorPalette) -> Unit = {},
+    onImportLospec: () -> Unit = {},
+    onImportFile: () -> Unit = {},
+    onCreateNewPalette: () -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
 
@@ -97,21 +114,34 @@ private fun ColorPaletteSelectionContent(
                     onPaletteSelected(it)
                 },
                 optionSlot = { palette ->
-                    Box(
-                        contentAlignment = Alignment.Center,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier
                             .fillMaxHeight()
                             .padding(start = 8.dp)
                     ) {
-                        IconButton(
-                            onClick = { onPaletteDeleteButton(palette) },
-                            modifier = Modifier.size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.delete_palette),
-                                tint = AppTheme.colors.DismissButtonColor
-                            )
+                        if (palette.id > 0) {
+                            IconButton(
+                                onClick = { onPaletteEdit(palette) },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit Palette",
+                                    tint = AppTheme.colors.AccentButtonColor
+                                )
+                            }
+                            IconButton(
+                                onClick = { onPaletteDeleteButton(palette) },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.delete_palette),
+                                    tint = AppTheme.colors.DismissButtonColor
+                                )
+                            }
                         }
                     }
                 },
@@ -125,18 +155,45 @@ private fun ColorPaletteSelectionContent(
                     .size(70.dp)
                     .align(Alignment.BottomEnd)
             ) {
-                FloatingActionButton(
-                    onClick = onFabButton,
-                    shape = CircleShape,
-                    containerColor = AppTheme.colors.SelectedColor,
+                val createLabel = stringResource(R.string.create_palette)
+                val importLospecLabel = stringResource(R.string.import_from_lospec)
+                val importFileLabel = stringResource(R.string.import_from_file)
+
+                val menuItems = remember(
+                    onCreateNewPalette,
+                    onImportLospec,
+                    onImportFile,
+                    createLabel,
+                    importLospecLabel,
+                    importFileLabel
                 ) {
-                    Icon(
-                        Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.floating_action_button),
-                        tint = AppTheme.colors.TextColorDark,
-                        modifier = Modifier.size(30.dp)
+                    listOf(
+                        FabMenuItem(
+                            icon = Icons.Default.Create,
+                            label = createLabel,
+                            onClick = onCreateNewPalette
+                        ),
+                        FabMenuItem(
+                            icon = Icons.Default.CloudDownload,
+                            label = importLospecLabel,
+                            onClick = onImportLospec
+                        ),
+                        FabMenuItem(
+                            icon = Icons.Default.FolderOpen,
+                            label = importFileLabel,
+                            onClick = onImportFile
+                        )
                     )
                 }
+
+                ExpandableFabMenu(
+                    items = menuItems,
+                    alignment = FabMenuAlignment.End,
+                    colors = FabMenuColors.defaults(
+                        fab = AppTheme.colors.SelectedColor,
+                        fabIcon = AppTheme.colors.TextColorDark
+                    )
+                )
             }
 
         }

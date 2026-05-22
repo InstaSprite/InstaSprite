@@ -393,4 +393,15 @@
     <string name="no_trending_posts_yet">No trending posts yet</string>
     <string name="pick_from_device">Pick from Device</string>
     <string name="pick_from_sprite">Pick from Sprite</string>
+
+    <string name="create_palette">Create Palette</string>
+    <string name="edit_palette">Edit Palette</string>
+    <string name="palette_preview">Palette Preview</string>
+    <string name="no_colors_added_yet">No colors added yet</string>
+    <string name="palette_name">Palette Name</string>
+    <string name="author">Author</string>
+    <string name="colors_count">Colors (%1$d)</string>
+    <string name="tap_color_to_edit">Tap color to edit</string>
+    <string name="delete_color">Delete color</string>
+    <string name="add_color">Add color</string>
 </resources>

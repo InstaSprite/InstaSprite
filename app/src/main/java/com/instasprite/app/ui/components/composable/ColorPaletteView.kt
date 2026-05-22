@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,7 +24,9 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.BoxWithConstraints
 import com.instasprite.app.ui.theme.AppTheme
+
 import com.instasprite.app.utils.drawCheckerboard
 
 @Immutable
@@ -33,6 +36,7 @@ data class ColorPaletteConfig(
     val listHeight: Dp = 40.dp,
     val colorItemSize: Dp = 30.dp,
     val isInteractive: Boolean = true,
+    val isWrap: Boolean = false,
 ) {
     init {
         require(listHeight >= colorItemSize) {
@@ -58,40 +62,93 @@ fun ColorPaletteView(
     with(config) {
         val resolvedBg =
             if (backgroundColor == Color.Unspecified) AppTheme.colors.BackgroundColorDarker else backgroundColor
-        Box(
+        BoxWithConstraints(
             contentAlignment = Alignment.CenterStart,
             modifier = modifier
-                .height(height = listHeight)
-                .fillMaxWidth()
+                .then(if (isWrap) Modifier.fillMaxWidth() else Modifier.height(height = listHeight))
                 .background(resolvedBg),
         ) {
-            LazyRow(
-                state = lazyListState,
-                horizontalArrangement = Arrangement.spacedBy(itemSpacing),
-                modifier = Modifier.padding(horizontal = (listHeight - colorItemSize) / 2)
-            ) {
-                items(colors) { color ->
-
-                    val modifier = (itemColorModifier ?: Modifier).size(colorItemSize)
-
-                    if (isInteractive && color == activeColor) {
-                        ActiveColorItem(
-                            color = color,
-                            modifier = modifier,
-                            onClick = { onColorSelected?.invoke(color) }
-                        )
+            val effectiveColorItemSize = if (isWrap && colors.isNotEmpty()) {
+                val wAvailPx = maxOf(0f, (maxWidth - (listHeight - colorItemSize)).value)
+                val dPx = colorItemSize.value
+                val sPx = itemSpacing.value
+                val n = if (dPx + sPx > 0) {
+                    Math.floor(((wAvailPx + sPx) / (dPx + sPx)).toDouble()).toInt()
+                } else {
+                    1
+                }
+                val lines = if (n > 0) Math.ceil(colors.size.toDouble() / n).toInt() else 1
+                if (lines >= 3) {
+                    val nNew = Math.ceil(colors.size.toDouble() / 2.0).toInt()
+                    if (nNew > 0) {
+                        val calculatedSize = (wAvailPx + sPx) / nNew - sPx
+                        maxOf(12f, calculatedSize).dp
                     } else {
-                        ColorItem(
-                            color = color,
-                            onColorSelected = onColorSelected,
-                            modifier = modifier
-                        )
+                        colorItemSize
+                    }
+                } else {
+                    colorItemSize
+                }
+            } else {
+                colorItemSize
+            }
+
+            if (isWrap) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(itemSpacing),
+                    verticalArrangement = Arrangement.spacedBy(itemSpacing),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = (listHeight - effectiveColorItemSize) / 2, vertical = (listHeight - effectiveColorItemSize) / 2)
+                ) {
+                    colors.forEach { color ->
+                        val modifier = (itemColorModifier ?: Modifier).size(effectiveColorItemSize)
+
+                        if (isInteractive && color == activeColor) {
+                            ActiveColorItem(
+                                color = color,
+                                modifier = modifier,
+                                onClick = { onColorSelected?.invoke(color) }
+                            )
+                        } else {
+                            ColorItem(
+                                color = color,
+                                onColorSelected = onColorSelected,
+                                modifier = modifier
+                            )
+                        }
+                    }
+                }
+            } else {
+                LazyRow(
+                    state = lazyListState,
+                    horizontalArrangement = Arrangement.spacedBy(itemSpacing),
+                    modifier = Modifier.padding(horizontal = (listHeight - colorItemSize) / 2)
+                ) {
+                    items(colors) { color ->
+
+                        val modifier = (itemColorModifier ?: Modifier).size(colorItemSize)
+
+                        if (isInteractive && color == activeColor) {
+                            ActiveColorItem(
+                                color = color,
+                                modifier = modifier,
+                                onClick = { onColorSelected?.invoke(color) }
+                            )
+                        } else {
+                            ColorItem(
+                                color = color,
+                                onColorSelected = onColorSelected,
+                                modifier = modifier
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun ColorItem(

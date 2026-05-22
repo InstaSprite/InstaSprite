@@ -27,6 +27,29 @@ object PaletteModule {
                 },
                 onPaletteSelected = { palette ->
                     navigator.goBackWithResult(palette)
+                },
+                onPaletteEdit = { palette ->
+                    navigator.goTo(Screen.PaletteEditor(palette))
+                },
+                onCreateNewPalette = {
+                    navigator.goTo(Screen.PaletteEditor(null))
+                }
+            )
+        }
+    }
+
+    @IntoSet
+    @Provides
+    fun providePaletteEditorEntry(navigator: Navigator): EntryProviderInstaller = {
+        entry<Screen.PaletteEditor> { args ->
+            val viewModel = hiltViewModel<PaletteEditorViewModel, PaletteEditorViewModel.Factory> { factory ->
+                factory.create(args.palette)
+            }
+
+            PaletteEditorScreen(
+                viewModel = viewModel,
+                onDismiss = {
+                    navigator.goBack()
                 }
             )
         }

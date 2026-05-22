@@ -381,4 +381,15 @@
     <string name="no_trending_posts_yet">Chưa có bài viết thịnh hành</string>
     <string name="create_canvas">Tạo bản vẽ</string>
     <string name="no_sprite">Chưa có bản vẽ</string>
+
+    <string name="create_palette">Tạo Bảng màu</string>
+    <string name="edit_palette">Chỉnh sửa Bảng màu</string>
+    <string name="palette_preview">Xem trước Bảng màu</string>
+    <string name="no_colors_added_yet">Chưa có màu nào được thêm</string>
+    <string name="palette_name">Tên Bảng màu</string>
+    <string name="author">Tác giả</string>
+    <string name="colors_count">Màu sắc (%1$d)</string>
+    <string name="tap_color_to_edit">Nhấn vào màu để chỉnh sửa</string>
+    <string name="delete_color">Xóa màu</string>
+    <string name="add_color">Thêm màu</string>
 </resources>
