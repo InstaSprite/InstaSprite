@@ -392,7 +392,7 @@
     <string name="trending">Trending</string>
     <string name="no_trending_posts_yet">No trending posts yet</string>
     <string name="pick_from_device">Pick from Device</string>
-    <string name="pick_from_sprite">Pick from Sprite</string>
+    <string name="pick_from_sprite">Pick from Gallery</string>
 
     <string name="create_palette">Create Palette</string>
     <string name="edit_palette">Edit Palette</string>

@@ -334,7 +334,19 @@
     <string name="search_sprites">Tìm kiếm sprites</string>
     <string name="rename">Đổi tên</string>
     <string name="options">Tùy chọn</string>
+    <string name="display_options">Tùy chọn hiển thị</string>
+    <string name="layout_mode">Chế độ bố cục</string>
+    <string name="untitled">Chưa đặt tên</string>
+    <string name="layout_list">Dạng danh sách</string>
+    <string name="layout_staggered">Lưới</string>
+    <string name="layout_square_grid">Lưới vuông</string>
     <string name="sort_by">Sắp xếp theo</string>
+    <string name="sort_a_z">A - Z</string>
+    <string name="sort_z_a">Z - A</string>
+    <string name="sort_date_created">Ngày tạo</string>
+    <string name="sort_date_created_desc">Ngày tạo (Mới nhất)</string>
+    <string name="sort_date_modified">Ngày chỉnh sửa</string>
+    <string name="sort_date_modified_desc">Ngày chỉnh sửa (Mới nhất)</string>
     <string name="pixel_art_creation_social_sharing">Sáng tạo nghệ thuật pixel &amp; chia sẻ</string>
     <string name="made_with_3_and_lots_of_pixels">Được làm với &lt;3 và rất nhiều pixel</string>
     <string name="floating_action_button">Nút hành động nổi</string>
@@ -382,6 +394,7 @@
     <string name="create_canvas">Tạo bản vẽ</string>
     <string name="no_sprite">Chưa có bản vẽ</string>
 
+    <string name="pick_from_sprite">Chọn từ Thư viện</string>
     <string name="create_palette">Tạo Bảng màu</string>
     <string name="edit_palette">Chỉnh sửa Bảng màu</string>
     <string name="palette_preview">Xem trước Bảng màu</string>
@@ -392,4 +405,5 @@
     <string name="tap_color_to_edit">Nhấn vào màu để chỉnh sửa</string>
     <string name="delete_color">Xóa màu</string>
     <string name="add_color">Thêm màu</string>
+    <string name="pick_from_device">Chọn từ Thiết bị</string>
 </resources>
