@@ -22,11 +22,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
@@ -73,6 +70,7 @@ import java.io.FileOutputStream
 import androidx.compose.ui.graphics.asAndroidBitmap
 import kotlinx.coroutines.launch
 import androidx.core.graphics.scale
+import com.instasprite.app.ui.components.composable.PixelIcon
 
 @Composable
 fun EditProfileScreen(
@@ -198,8 +196,8 @@ fun EditProfileContent(
                 },
                 navigationIcon = {
                     IconButton(onClick = event.onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        PixelIcon(
+                            icon = R.drawable.ic_heart,
                             contentDescription = stringResource(R.string.back),
                             tint = AppTheme.colors.TextColorLight
                         )

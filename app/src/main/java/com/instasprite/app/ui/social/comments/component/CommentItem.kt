@@ -3,7 +3,6 @@ package com.instasprite.app.ui.social.comments.component
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -16,12 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Reply
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,16 +26,15 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
-import com.instasprite.app.ui.social.feed.component.ProfileImage
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.social.comments.contract.Comment
+import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.TimeUtils
 
@@ -128,7 +120,7 @@ fun CommentItem(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = TimeUtils.formatTimeAgo(context, comment.createdAt),
-                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
+                    color = AppTheme.colors.Foreground2Color,
                     fontSize = 11.sp
                 )
             }
@@ -154,19 +146,18 @@ fun CommentItem(
                         .clickable { onLikeClick(comment.id) }
                         .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
                 ) {
-                    Icon(
-                        imageVector = if (comment.isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    PixelIcon(
+                        icon = R.drawable.ic_heart,
                         contentDescription = stringResource(R.string.like_comment),
-                        tint = if (comment.isLiked) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
+                        tint = if (comment.isLiked) AppTheme.colors.DismissButtonColor else AppTheme.colors.Foreground2Color,
                         modifier = Modifier
-                            .size(14.dp)
                             .scale(likeScale)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     if (comment.likesCount > 0) {
                         Text(
                             text = "${comment.likesCount}",
-                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
+                            color = AppTheme.colors.Foreground2Color,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -183,16 +174,15 @@ fun CommentItem(
                             .clickable { onReplyClick(comment.id) }
                             .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Reply,
+                        PixelIcon(
+                            icon = R.drawable.ic_reply,
                             contentDescription = stringResource(R.string.reply),
-                            tint = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
-                            modifier = Modifier.size(14.dp)
+                            tint = AppTheme.colors.TextColorLight,
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(R.string.reply),
-                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
+                            color = AppTheme.colors.TextColorLight,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -207,11 +197,10 @@ fun CommentItem(
                 onClick = { onDeleteClick(comment.id) },
                 modifier = Modifier.size(32.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
+                PixelIcon(
+                    icon = R.drawable.ic_trash,
                     contentDescription = stringResource(R.string.delete_comment),
-                    tint = AppTheme.colors.TextColorLight.copy(alpha = 0.4f),
-                    modifier = Modifier.size(16.dp)
+                    tint = AppTheme.colors.Foreground2Color,
                 )
             }
         }

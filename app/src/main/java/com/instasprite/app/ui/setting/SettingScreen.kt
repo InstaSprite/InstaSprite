@@ -21,10 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Key
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -55,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.OtpDialog
 import com.instasprite.app.ui.components.dialog.OtpEnrollmentDialog
 import com.instasprite.app.ui.components.dialog.SetPasswordDialog
@@ -90,10 +87,10 @@ fun SettingScreen(
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        PixelIcon(
+                            icon = R.drawable.ic_left_arrow,
                             contentDescription = stringResource(R.string.back),
-                            tint = colors.TextColorLight
+                            tint = AppTheme.colors.DismissButtonColor
                         )
                     }
                 },
@@ -155,16 +152,15 @@ fun SettingScreen(
 
             // Language Setting
             SettingItem(
-                icon = Icons.Default.Info,
+                icon = R.drawable.ic_info,
                 title = context?.getString(R.string.change_language) ?: "Language",
                 subtitle = uiState.selectedLanguage,
                 onClick = { viewModel.showLanguageDialog() },
                 trailing = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    PixelIcon(
+                        icon = R.drawable.ic_right_arrow,
                         contentDescription = stringResource(R.string.select_language),
                         tint = colors.Subtext0Color,
-                        modifier = Modifier.graphicsLayer(rotationZ = 180f)
                     )
                 }
             )
@@ -176,16 +172,15 @@ fun SettingScreen(
 
             if (!uiState.hasPassword) {
                 SettingItem(
-                    icon = Icons.Default.Key,
+                    icon = R.drawable.ic_lock,
                     title = stringResource(R.string.set_password),
                     subtitle = stringResource(R.string.set_password_description),
                     onClick = { viewModel.showSetPasswordDialog() },
                     trailing = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        PixelIcon(
+                            icon = R.drawable.ic_right_arrow,
                             contentDescription = stringResource(R.string.set_password),
                             tint = colors.Subtext0Color,
-                            modifier = Modifier.graphicsLayer(rotationZ = 180f)
                         )
                     }
                 )
@@ -197,7 +192,7 @@ fun SettingScreen(
             }
 
             SettingItem(
-                icon = Icons.Default.Key,
+                icon = R.drawable.ic_key,
                 title = context.getString(R.string.enable2fa),
                 subtitle = when {
                     uiState.isLoading2FAStatus -> context.getString(R.string.loading)

@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +37,7 @@ import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -67,7 +65,6 @@ fun SpriteGridCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(cardAspectRatio)
             .clip(RoundedCornerShape(10.dp))
             .background(AppTheme.colors.BackgroundColor)
             .combinedClickable(
@@ -77,62 +74,58 @@ fun SpriteGridCard(
                 onLongClick = { showDropdown = true }
             )
     ) {
-        AsyncCanvasPreviewer(
-            sprite = sprite,
-            meta = meta,
-            modifier = Modifier.fillMaxSize(),
-            onClick = onClick
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .background(AppTheme.colors.BackgroundColor)
-        ) {
-            Box(
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(
-                        AppTheme.colors.BackgroundColor,
-                    )
-                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .background(AppTheme.colors.BackgroundColor.copy(0.9f))
             ) {
-                Text(
-                    text = meta?.spriteName ?: stringResource(R.string.untitled),
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
-            }
-
-            Box {
-                IconButton(
-                    onClick = { showDropdown = true },
-                    modifier = Modifier.size(36.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.options),
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                    Text(
+                        text = meta?.spriteName ?: stringResource(R.string.untitled),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.align(Alignment.CenterStart)
                     )
                 }
-
-                SpriteDropdownMenu(
-                    expanded = showDropdown,
-                    onDismissRequest = { showDropdown = false },
-                    onEdit = { onEdit(); showDropdown = false },
-                    onRename = { onRename(); showDropdown = false },
-                    onDelete = { onDelete(); showDropdown = false }
-                )
+                Box {
+                    IconButton(
+                        onClick = { showDropdown = true },
+                        modifier = Modifier.size(36.dp),
+                        ) {
+                        PixelIcon(
+                            icon = R.drawable.ic_three_dots,
+                            contentDescription = stringResource(R.string.options),
+                            tint = AppTheme.colors.TextColorLight
+                        )
+                    }
+                    SpriteDropdownMenu(
+                        expanded = showDropdown,
+                        onDismissRequest = { showDropdown = false },
+                        onEdit = { onEdit(); showDropdown = false },
+                        onRename = { onRename(); showDropdown = false },
+                        onDelete = { onDelete(); showDropdown = false }
+                    )
+                }
             }
-        }
 
+            AsyncCanvasPreviewer(
+                sprite = sprite,
+                meta = meta,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(cardAspectRatio),
+                onClick = onClick
+            )
+        }
     }
 }
 
@@ -148,19 +141,14 @@ private fun SpriteGridCardStaggeredPreview() {
                     height = 24,
                     layers = listOf(
                         Layer(
-                            id = "l1",
-                            name = "Layer 1",
-                            cel = Cel(
-                                x = 0, y = 0, width = 16, height = 24,
-                                pixels = IntArray(16 * 24) { AppTheme.colors.SelectedColor.hashCode() }
-                            )
-                        )
-                    )
-                ),
-                meta = SpriteMeta(spriteId = "1", spriteName = "My Sprite")
-            ),
-            layoutMode = GalleryLayoutMode.StaggeredGrid
-        )
+                            id = "l1", name = "Layer 1", cel = Cel(
+                                x = 0,
+                                y = 0,
+                                width = 16,
+                                height = 24,
+                                pixels = IntArray(16 * 24) { AppTheme.colors.SelectedColor.hashCode() })))),
+                meta = SpriteMeta(spriteId = "1", spriteName = "My Sprite")),
+            layoutMode = GalleryLayoutMode.StaggeredGrid)
     }
 }
 
@@ -176,18 +164,15 @@ private fun SpriteGridCardSquarePreview() {
                     height = 32,
                     layers = listOf(
                         Layer(
-                            id = "l2",
-                            name = "Layer 1",
-                            cel = Cel(
-                                x = 0, y = 0, width = 32, height = 32,
-                                pixels = IntArray(32 * 32) { AppTheme.colors.AccentButtonColor.hashCode() }
-                            )
-                        )
-                    )
-                ),
-                meta = SpriteMeta(spriteId = "2", spriteName = "Long ahh name asdkjasdlkajsdlkasjdaslkdjad askldjaslkdjasdlkasjdalkdjas")
-            ),
-            layoutMode = GalleryLayoutMode.SquareGrid
-        )
+                            id = "l2", name = "Layer 1", cel = Cel(
+                                x = 0,
+                                y = 0,
+                                width = 32,
+                                height = 32,
+                                pixels = IntArray(32 * 32) { AppTheme.colors.AccentButtonColor.hashCode() })))),
+                meta = SpriteMeta(
+                    spriteId = "2",
+                    spriteName = "Long ahh name asdkjasdlkajsdlkasjdaslkdjad askldjaslkdjasdlkasjdalkdjas"
+                )), layoutMode = GalleryLayoutMode.SquareGrid)
     }
 }

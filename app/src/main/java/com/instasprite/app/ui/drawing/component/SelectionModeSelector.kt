@@ -56,7 +56,6 @@ fun SelectionModeSelector(
             PixelIcon(
                 icon = selectedTool.icon,
                 contentDescription = selectedTool.name,
-                modifier = Modifier.size(20.dp),
                 )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = selectedTool.name, fontSize = 12.sp)
@@ -74,7 +73,6 @@ fun SelectionModeSelector(
                         PixelIcon(
                             icon = tool.icon,
                             contentDescription = null,
-                            modifier = Modifier.size(24.dp)
                         )
                     },
                     onClick = {

@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.loadimage.component
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,12 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,8 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
@@ -67,11 +62,11 @@ fun ProcessedImagePreview(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircleOutline,
+                    PixelIcon(
+                        icon = R.drawable.ic_plus_border,
                         contentDescription = stringResource(R.string.add_image),
                         tint = AppTheme.colors.WarningColor,
-                        modifier = Modifier.size(50.dp)
+                        scale = 3f
                     )
 
                     Text(

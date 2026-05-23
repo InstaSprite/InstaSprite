@@ -19,13 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.rounded.DragHandle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -56,6 +51,7 @@ import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.data.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.drawing.dialog.ColorWheelDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -149,10 +145,10 @@ private fun PaletteEditorContent(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        PixelIcon(
+                            icon = R.drawable.ic_left_arrow,
                             contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.TextColorLight
+                            tint = AppTheme.colors.DismissButtonColor
                         )
                     }
                 },
@@ -364,8 +360,8 @@ private fun PaletteEditorContent(
                                         .width(32.dp),
                                     onClick = {},
                                 ) {
-                                    Icon(
-                                        Icons.Rounded.DragHandle,
+                                    PixelIcon(
+                                        icon = R.drawable.ic_grab_handle,
                                         tint = AppTheme.colors.TextColorLight,
                                         contentDescription = stringResource(R.string.reorder)
                                     )
@@ -388,8 +384,8 @@ private fun PaletteEditorContent(
                                     onClick = { onColorDelete(itemIndex) },
                                     modifier = Modifier.size(36.dp).weight(1f)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
+                                    PixelIcon(
+                                        icon = R.drawable.ic_trash,
                                         contentDescription = stringResource(R.string.delete_color),
                                         tint = AppTheme.colors.ErrorDarkColor
                                     )

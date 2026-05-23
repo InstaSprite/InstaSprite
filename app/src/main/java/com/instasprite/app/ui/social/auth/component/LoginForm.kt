@@ -10,13 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.Text
@@ -39,7 +35,9 @@ import com.instasprite.app.R
 import com.instasprite.app.data.model.InputField
 import com.instasprite.app.domain.model.LoginRequest
 import com.instasprite.app.ui.components.composable.InputTextField
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
@@ -116,8 +114,13 @@ fun LoginForm(
                     ),
                     onCheckedChange = { isPasswordVisible = it },
                 ) {
-                    if (isPasswordVisible) Icon(Icons.Default.Visibility, null)
-                    else Icon(Icons.Default.VisibilityOff, null)
+                    PixelIcon(
+                        icon = if (isPasswordVisible)
+                            R.drawable.ic_visible_on
+                        else
+                            R.drawable.ic_visible_off,
+                        tint = AppTheme.colors.TextColorLight,
+                    )
                 }
             },
             visualTransformation = visualTransformation
@@ -186,6 +189,7 @@ fun LoginForm(
 @Preview
 @Composable
 private fun Preview() {
-
-    LoginForm()
+    InstaSpriteTheme {
+        LoginForm()
+    }
 }

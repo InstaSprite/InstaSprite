@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.components.composable
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
@@ -21,13 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.FolderOpen
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -42,7 +37,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.instasprite.app.R
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import kotlin.math.roundToInt
@@ -65,7 +60,7 @@ enum class FabMenuAlignment {
 }
 
 data class FabMenuItem(
-    val icon: ImageVector,
+    @DrawableRes val icon: Int,
     val label: String,
     val onClick: () -> Unit
 )
@@ -234,12 +229,11 @@ fun ExpandableFabMenu(
                 )
             }
     ) {
-        Icon(
-            Icons.Filled.Add,
+        PixelIcon(
+            icon = R.drawable.ic_plus,
             contentDescription = if (expanded) "Close menu" else "Open menu",
             tint = colors.fabIcon,
             modifier = Modifier
-                .size(mainFabIconSize)
                 .rotate(rotation)
         )
     }
@@ -279,11 +273,10 @@ private fun FabItemView(
                 .size(fabSize)
                 .background(shape = CircleShape, color = colors.itemIconBackground)
         ) {
-            Icon(
-                imageVector = item.icon,
+            PixelIcon(
+                icon = item.icon,
                 contentDescription = item.label,
                 tint = colors.itemIcon,
-                modifier = Modifier.size(22.dp)
             )
         }
 
@@ -302,7 +295,7 @@ private fun FabItemView(
 private fun FabItemViewPreview() {
     InstaSpriteTheme() {
         FabItemView(
-            item = FabMenuItem(Icons.Default.Create, "New Canvas") {},
+            item = FabMenuItem(R.drawable.ic_edit, "New Canvas") {},
             animProgress = 1f,
             colors = FabMenuColors.defaults(),
             onDismiss = {}
@@ -324,8 +317,8 @@ private fun Preview() {
             ExpandableFabMenu(
                 items = listOf(
 
-                    FabMenuItem(Icons.Default.FolderOpen, "Load Canvas") {},
-                    FabMenuItem(Icons.Default.Image, "Load Image") {},
+                    FabMenuItem(R.drawable.ic_edit, "Load Canvas") {},
+                    FabMenuItem(R.drawable.ic_canvas, "Load Image") {},
                 ),
                 modifier = Modifier.padding(16.dp)
             )

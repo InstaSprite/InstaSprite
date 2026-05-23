@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -24,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 
 @Composable
 fun MaintenanceScreen(
@@ -37,11 +36,11 @@ fun MaintenanceScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Build,
+        PixelIcon(
+            icon = R.drawable.ic_wrench,
             contentDescription = null,
             tint = AppTheme.colors.WarningColor,
-            modifier = Modifier.size(80.dp)
+            scale = 2f,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -83,8 +82,10 @@ fun MaintenanceScreen(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF11111B)
+@Preview()
 @Composable
-fun MaintenanceScreenPreview() {
-    MaintenanceScreen()
+private fun MaintenanceScreenPreview() {
+    InstaSpriteTheme {
+        MaintenanceScreen()
+    }
 }

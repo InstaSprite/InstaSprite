@@ -260,7 +260,7 @@ fun AuthContent(
                 modifier = Modifier.size(100.dp),
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             if (state.uiState.authMode == AuthMode.LOGIN || state.currentScreenState == AuthContentScreenState.ACCOUNT_LIST) {
                 Text(
@@ -276,7 +276,7 @@ fun AuthContent(
                 Text(
                     text = stringResource(R.string.create_pixel_art_with_ease),
                     fontSize = 16.sp,
-                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                    color = AppTheme.colors.Foreground2Color,
                     textAlign = TextAlign.Center,
                 )
 

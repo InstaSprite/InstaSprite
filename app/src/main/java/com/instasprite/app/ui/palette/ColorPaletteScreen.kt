@@ -15,12 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -42,6 +36,7 @@ import com.instasprite.app.ui.components.composable.Bar
 import com.instasprite.app.ui.components.composable.ColorPaletteList
 import com.instasprite.app.ui.components.composable.ExpandableFabMenu
 import com.instasprite.app.ui.components.composable.FabMenuItem
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.DummyData
@@ -147,20 +142,21 @@ private fun ColorPaletteSelectionContent(
                                     onClick = { onPaletteEdit(palette) },
                                     modifier = Modifier.size(24.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Edit,
+                                    PixelIcon(
+                                        icon = R.drawable.ic_edit,
                                         contentDescription = "Edit Palette",
-                                        tint = AppTheme.colors.AccentButtonColor
+                                        tint = AppTheme.colors.AccentButtonColor,
                                     )
                                 }
                                 IconButton(
                                     onClick = { onPaletteDeleteButton(palette) },
                                     modifier = Modifier.size(24.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
+                                    PixelIcon(
+                                        icon = R.drawable.ic_trash,
                                         contentDescription = stringResource(R.string.delete_palette),
-                                        tint = AppTheme.colors.DismissButtonColor
+                                        tint = AppTheme.colors.DismissButtonColor,
+
                                     )
                                 }
                             }
@@ -191,17 +187,17 @@ private fun ColorPaletteSelectionContent(
                 ) {
                     listOf(
                         FabMenuItem(
-                            icon = Icons.Default.Create,
+                            icon = R.drawable.ic_edit,
                             label = createLabel,
                             onClick = onCreateNewPalette
                         ),
                         FabMenuItem(
-                            icon = Icons.Default.CloudDownload,
+                            icon = R.drawable.ic_cloud,
                             label = importLospecLabel,
                             onClick = onImportLospec
                         ),
                         FabMenuItem(
-                            icon = Icons.Default.FolderOpen,
+                            icon = R.drawable.ic_folder,
                             label = importGplLabel,
                             onClick = onImportGpl
                         )

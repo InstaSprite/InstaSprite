@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,8 +56,8 @@ fun NumberStepper(
                     onValueChange(newVal)
                 }
             ) {
-                Icon(
-                    imageVector = Icons.Default.RemoveCircle,
+                PixelIcon(
+                    icon = R.drawable.ic_minus_border,
                     contentDescription = stringResource(R.string.decrease),
                     tint = AppTheme.colors.LinkColor
                 )
@@ -88,8 +85,8 @@ fun NumberStepper(
                     onValueChange(newVal)
                 }
             ) {
-                Icon(
-                    imageVector = Icons.Default.AddCircle,
+                PixelIcon(
+                    icon = R.drawable.ic_plus_border,
                     contentDescription = stringResource(R.string.increase),
                     tint = AppTheme.colors.LinkColor
                 )

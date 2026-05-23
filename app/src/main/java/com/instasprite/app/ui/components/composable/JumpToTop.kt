@@ -51,12 +51,11 @@ fun JumpToTopButton(
         contentPadding = PaddingValues(0.dp),
         modifier = modifier.size(48.dp)
     ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_arrowup),
+        PixelIcon(
+            icon = R.drawable.ic_up_arrow,
             contentDescription = stringResource(R.string.jump_to_top),
             tint = AppTheme.colors.TextColorLight,
             modifier = Modifier
-                .size(24.dp)
                 .rotate(rotation.value)
         )
 

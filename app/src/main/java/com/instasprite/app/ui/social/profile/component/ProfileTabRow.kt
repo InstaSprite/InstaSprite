@@ -44,7 +44,7 @@ fun ProfileTabRow(
                         color = if (selectedTabIndex == index)
                             AppTheme.colors.TextColorLight
                         else
-                            AppTheme.colors.TextColorLight.copy(alpha = 0.6f),
+                            AppTheme.colors.Foreground2Color,
                         fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal
                     )
                 }

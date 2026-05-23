@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -40,6 +38,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.instasprite.app.domain.model.MemberData
 import com.instasprite.app.domain.model.PostData
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import java.time.LocalDateTime
 
@@ -140,21 +139,20 @@ fun TrendingPostThumbnail(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .background(AppTheme.colors.BackgroundColorDarker)
+                .background(AppTheme.colors.BackgroundColorDarker.copy(alpha = 0.5f))
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Favorite,
+            PixelIcon(
+                icon = R.drawable.ic_heart,
                 contentDescription = null,
                 tint = AppTheme.colors.DismissButtonColor,
-                modifier = Modifier.size(12.dp)
             )
             Spacer(modifier = Modifier.width(2.dp))
             Text(
                 text = "${post.postLikesCount}",
-                color = AppTheme.colors.TextColorLight.copy(alpha = 0.9f),
-                fontSize = 10.sp,
+                color = AppTheme.colors.Foreground2Color,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )
         }

@@ -4,11 +4,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
@@ -105,3 +108,10 @@ fun Bitmap.trimBorder(pixels: Int = 1): Bitmap {
         newHeight
     )
 }
+
+@Composable
+fun Modifier.noRippleClickable(onClick: () -> Unit) = clickable(
+    indication = null,
+    interactionSource = remember { MutableInteractionSource() },
+    onClick = onClick
+)

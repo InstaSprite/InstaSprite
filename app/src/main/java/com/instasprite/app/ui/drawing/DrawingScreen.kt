@@ -14,8 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Layers
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +53,7 @@ import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.ui.components.composable.DrawerLayout
 import com.instasprite.app.ui.components.composable.DrawerSide
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.drawing.component.BrushShapeSelector
 import com.instasprite.app.ui.drawing.component.ColorPalette
 import com.instasprite.app.ui.drawing.component.CursorDrawButton
@@ -309,10 +309,9 @@ private fun DrawingScreenContent(
                         onClick = { event.onToggleLayerDrawer() },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Layers,
+                        PixelIcon(
+                            icon = R.drawable.ic_layer,
                             contentDescription = stringResource(R.string.layers),
-                            tint = AppTheme.colors.TextColorLight
                         )
                     }
                 }

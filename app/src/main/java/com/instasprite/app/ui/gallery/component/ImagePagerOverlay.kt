@@ -18,16 +18,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,6 +45,7 @@ import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay
 import com.instasprite.app.ui.components.composable.BackButton
 import com.instasprite.app.ui.components.composable.Bar
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.drawCheckerboard
@@ -219,11 +214,10 @@ private fun BottomBar(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
+                        PixelIcon(
+                            icon = R.drawable.ic_down_arrow,
                             contentDescription = stringResource(R.string.save_as_image_1),
                             tint = AppTheme.colors.TextColorDark,
-                            modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
@@ -242,11 +236,10 @@ private fun BottomBar(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
+                        PixelIcon(
+                            icon = R.drawable.ic_edit,
                             contentDescription = stringResource(R.string.edit_sprite),
                             tint = AppTheme.colors.TextColorDark,
-                            modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
@@ -276,11 +269,10 @@ private fun TopBar(
                 IconButton(
                     onClick = { dropdownMenuVisible = true }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
+                    PixelIcon(
+                        icon = R.drawable.ic_three_dots,
                         contentDescription = stringResource(R.string.more),
                         tint = AppTheme.colors.TextColorLight,
-                        modifier = Modifier.size(32.dp)
                     )
                 }
 
@@ -312,10 +304,10 @@ private fun PagerDropdownMenu(
                 Text(text = stringResource(R.string.delete))
             },
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Delete,
+                PixelIcon(
+                    icon = R.drawable.ic_trash,
                     contentDescription = stringResource(R.string.delete_sprite),
-                    tint = AppTheme.colors.TextColorLight
+                    tint = AppTheme.colors.TextColorLight,
                 )
             },
             onClick = {

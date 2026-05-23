@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.social.auth.component
 
-import androidx.compose.ui.res.stringResource
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,9 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.data.model.AccountPreferences
 import com.instasprite.app.data.model.AccountType
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -67,12 +63,10 @@ fun SavedAccountItem(
                         .align(Alignment.BottomEnd)
                         .size(18.dp)
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_google),
+                    PixelIcon(
+                        icon = R.drawable.ic_google,
                         contentDescription = stringResource(R.string.remove_account),
-                        tint = Color.Unspecified,
-                        modifier = Modifier
-                            .size(16.dp)
+                        scale = 0.5f
                     )
                 }
 
@@ -106,7 +100,7 @@ fun SavedAccountItem(
 
             Text(
                 text = account.email!!,
-                color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                color = AppTheme.colors.Foreground2Color,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -114,11 +108,10 @@ fun SavedAccountItem(
         }
 
         IconButton(onClick = onRemove) {
-            Icon(
-                imageVector = Icons.Default.Close,
+            PixelIcon(
+                icon = R.drawable.ic_close,
                 contentDescription = stringResource(R.string.remove_account),
                 tint = AppTheme.colors.DismissButtonColor,
-                modifier = Modifier.size(20.dp)
             )
         }
     }

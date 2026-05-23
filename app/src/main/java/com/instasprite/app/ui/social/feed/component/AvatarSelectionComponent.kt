@@ -19,9 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
@@ -41,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -95,11 +93,11 @@ fun AvatarSelectionComponent(
                         .clip(CircleShape),
                 )
             } else {
-                Icon(
-                    imageVector = Icons.Default.Add,
+                PixelIcon(
+                    icon = R.drawable.ic_plus,
                     contentDescription = stringResource(R.string.add_avatar),
-                    modifier = Modifier.size(48.dp),
-                    tint = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
+                    scale = 2f,
+                    tint = AppTheme.colors.Foreground2Color
                 )
             }
         }
@@ -119,10 +117,9 @@ fun AvatarSelectionComponent(
                 AppTheme.colors.BottomBarColor
             )
         ) {
-            Icon(
-                imageVector = Icons.Default.UploadFile,
+            PixelIcon(
+                icon = R.drawable.ic_folder,
                 contentDescription = stringResource(R.string.gallery),
-                modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.gallery))
@@ -135,7 +132,7 @@ fun AvatarSelectionComponent(
             TextButton(
                 onClick = { onImageSelected(null) },
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
+                    contentColor = AppTheme.colors.Foreground2Color
                 )
             ) {
                 Text(stringResource(R.string.remove_image))

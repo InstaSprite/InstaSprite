@@ -193,7 +193,7 @@ private fun ProfileCompletionForm(
         Text(
             text = stringResource(R.string.lets_set_up_your_profile),
             fontSize = 16.sp,
-            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+            color = AppTheme.colors.Foreground2Color,
             textAlign = TextAlign.Center,
         )
 

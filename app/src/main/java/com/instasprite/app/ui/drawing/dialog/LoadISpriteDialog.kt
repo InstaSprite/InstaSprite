@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +31,7 @@ import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.ui.components.composable.CanvasPreviewer
 import com.instasprite.app.ui.components.composable.ImageZoomableOverlay
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.CustomDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.getFileName
@@ -86,10 +84,10 @@ fun LoadISpriteDialog(
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
+                        PixelIcon(
+                            icon = R.drawable.ic_folder,
                             contentDescription = stringResource(R.string.choose_file),
-                            tint = AppTheme.colors.TextColorLight
+                            tint = AppTheme.colors.LinkColor
                         )
                     },
                     colors = AppTheme.colors.outlineTextFieldColors(),

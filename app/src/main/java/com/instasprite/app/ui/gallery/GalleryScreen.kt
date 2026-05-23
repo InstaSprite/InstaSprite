@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.gallery
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.scaleIn
@@ -13,19 +10,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,16 +30,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.instasprite.app.domain.model.Cel
-import com.instasprite.app.domain.model.Layer
-import com.instasprite.app.domain.model.Sprite
-import com.instasprite.app.domain.model.SpriteMeta
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.JumpToTopButton
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
@@ -177,9 +168,9 @@ fun GalleryPageContent(
     var isScrolled by remember { mutableStateOf(false) }
 
     Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
             .background(AppTheme.colors.BackgroundColorDarker)
             .animateContentSize()
     ) {
@@ -190,7 +181,7 @@ fun GalleryPageContent(
                 layoutMode = uiState.layoutMode,
                 onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
-                modifier = Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                modifier = Modifier.padding(horizontal = 10.dp)
             )
 
             AnimatedVisibility(

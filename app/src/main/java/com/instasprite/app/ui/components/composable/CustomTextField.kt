@@ -57,9 +57,9 @@ fun CustomTextField(
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = AppTheme.colors.SelectedColor,
-            unfocusedBorderColor = AppTheme.colors.TextColorLight.copy(alpha = 0.3f),
+            unfocusedBorderColor = AppTheme.colors.Foreground2Color,
             focusedLabelColor = AppTheme.colors.BottomBarColor,
-            unfocusedLabelColor = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+            unfocusedLabelColor = AppTheme.colors.Foreground2Color,
             focusedTextColor = AppTheme.colors.TextColorLight,
             unfocusedTextColor = AppTheme.colors.TextColorLight,
             cursorColor = AppTheme.colors.TextColorLight,

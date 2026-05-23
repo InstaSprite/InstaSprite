@@ -3,21 +3,13 @@ package com.instasprite.app.ui.social.comments.component
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.noRippleClickable
 
 @Composable
 fun CommentActions(
@@ -60,14 +54,13 @@ fun CommentActions(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { onLikeClick() }
+            modifier = Modifier.noRippleClickable { onLikeClick() }
         ) {
-            Icon(
-                imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+            PixelIcon(
+                icon = R.drawable.ic_heart,
                 contentDescription = stringResource(R.string.like),
                 tint = if (isLiked) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
                 modifier = Modifier
-                    .size(24.dp)
                     .scale(likeScale)
             )
             Spacer(modifier = Modifier.width(6.dp))
@@ -87,14 +80,13 @@ fun CommentActions(
         }
 
         if (showBookmark) {
-            Icon(
-                imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+            PixelIcon(
+                icon = R.drawable.ic_bookmark,
                 contentDescription = stringResource(R.string.bookmark),
-                tint = if (isBookmarked) AppTheme.colors.SelectedColor else AppTheme.colors.TextColorLight,
+                tint = if (isBookmarked) AppTheme.colors.LinkColor else AppTheme.colors.TextColorLight,
                 modifier = Modifier
-                    .size(24.dp)
                     .scale(bookmarkScale)
-                    .clickable { onBookmarkClick() }
+                    .noRippleClickable { onBookmarkClick() }
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.social.profile.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
 fun EmptyStateContent(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     title: String,
     subtitle: String
 ) {
@@ -30,11 +32,10 @@ fun EmptyStateContent(
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = icon,
+        PixelIcon(
+            icon = icon,
             contentDescription = title,
-            tint = AppTheme.colors.TextColorLight.copy(alpha = 0.4f),
-            modifier = Modifier.size(64.dp)
+            tint = AppTheme.colors.Foreground2Color,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -51,7 +52,7 @@ fun EmptyStateContent(
 
         Text(
             text = subtitle,
-            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+            color = AppTheme.colors.Foreground2Color,
             fontSize = 14.sp,
             textAlign = TextAlign.Center
         )

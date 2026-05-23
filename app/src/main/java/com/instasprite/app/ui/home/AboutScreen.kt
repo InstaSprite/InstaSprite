@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.home
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -66,10 +62,10 @@ fun AboutScreen(
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        PixelIcon(
+                            icon = R.drawable.ic_left_arrow,
                             contentDescription = stringResource(R.string.back),
-                            tint = colors.TextColorLight
+                            tint = AppTheme.colors.DismissButtonColor
                         )
                     }
                 },
@@ -166,7 +162,7 @@ fun AboutScreen(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 AboutInfoCard(
-                    icon = Icons.Default.Person,
+                    icon = R.drawable.ic_profile,
                     iconTint = colors.InfoColor,
                     label = "Developer",
                     value = "pBuoc"
@@ -175,7 +171,7 @@ fun AboutScreen(
                 HorizontalDivider(color = colors.Foreground1Color, thickness = 0.5.dp)
 
                 AboutInfoCard(
-                    icon = Icons.Default.Palette,
+                    icon = R.drawable.ic_palette,
                     iconTint = colors.SelectedColor,
                     label = "Theme",
                     value = "Catppuccin"
@@ -184,7 +180,7 @@ fun AboutScreen(
                 HorizontalDivider(color = colors.Foreground1Color, thickness = 0.5.dp)
 
                 AboutInfoCard(
-                    icon = Icons.Default.Code,
+                    icon = R.drawable.ic_notification,
                     iconTint = colors.AccentButtonColor,
                     label = "Built with",
                     value = "Jetpack Compose"
@@ -206,7 +202,7 @@ fun AboutScreen(
 
 @Composable
 private fun AboutInfoCard(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     iconTint: Color,
     label: String,
     value: String
@@ -219,11 +215,10 @@ private fun AboutInfoCard(
             .padding(vertical = 14.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
+        PixelIcon(
+            icon = icon,
             contentDescription = label,
             tint = iconTint,
-            modifier = Modifier.size(22.dp)
         )
 
         Spacer(modifier = Modifier.width(14.dp))

@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -140,11 +137,10 @@ fun ColorPalette(
                     .size(45.dp)
                     .padding(horizontal = 2.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
+                PixelIcon(
+                    icon = R.drawable.ic_plus,
                     contentDescription = stringResource(R.string.show_color_wheel),
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                    tint = AppTheme.colors.TextColorLight,
                 )
             }
 
@@ -160,18 +156,16 @@ fun ColorPalette(
                     .weight(1f)
             )
 
-            // Opt button: show a TODO: dialog with canvas option
             Box {
                 IconButton(
                     onClick = { showCanvasMenu = true },
                     modifier = Modifier
                         .size(45.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
+                    PixelIcon(
+                        icon = R.drawable.ic_three_dots,
                         contentDescription = stringResource(R.string.show_opts),
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
+                        tint = AppTheme.colors.TextColorLight,
                     )
                 }
 
@@ -240,7 +234,6 @@ private fun CanvasMenuDropdownMenu(
                 PixelIcon(
                    icon = R.drawable.ic_redo,
                     contentDescription = stringResource(R.string.rotate_canvas),
-                    modifier = Modifier.size(32.dp)
                 )
             },
             onClick = { onEvent(CanvasMenuEvent.RotateCanvas) }
@@ -254,7 +247,6 @@ private fun CanvasMenuDropdownMenu(
                 PixelIcon(
                     icon = R.drawable.ic_hflip,
                     contentDescription = stringResource(R.string.flip_canvas_horizontal),
-                    modifier = Modifier.size(32.dp)
                 )
             },
             onClick = { onEvent(CanvasMenuEvent.HorizontalFlip) }
@@ -268,7 +260,6 @@ private fun CanvasMenuDropdownMenu(
                 PixelIcon(
                     icon = R.drawable.ic_vflip,
                     contentDescription = stringResource(R.string.flip_canvas_vertical),
-                    modifier = Modifier.size(32.dp)
                 )
             },
             onClick = { onEvent(CanvasMenuEvent.VerticalFlip) }
@@ -282,7 +273,6 @@ private fun CanvasMenuDropdownMenu(
                 PixelIcon(
                     icon = R.drawable.ic_resize,
                     contentDescription = stringResource(R.string.resize_canvas),
-                    modifier = Modifier.size(32.dp)
                 )
             },
             onClick = { onEvent(CanvasMenuEvent.OpenResizeDialog) }

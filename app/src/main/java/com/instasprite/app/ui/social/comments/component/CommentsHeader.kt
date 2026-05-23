@@ -34,7 +34,7 @@ fun CommentsHeader(
         )
         Text(
             text = "($commentsCount)",
-            color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
+            color = AppTheme.colors.Foreground2Color,
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal
         )

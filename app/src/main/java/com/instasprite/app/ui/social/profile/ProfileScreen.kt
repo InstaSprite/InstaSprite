@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,9 +17,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -40,7 +37,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.R
+import com.instasprite.app.domain.session.SocialSessionState
 import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.social.profile.component.EmptyStateContent
 import com.instasprite.app.ui.social.profile.component.ProfileHeader
 import com.instasprite.app.ui.social.profile.component.ProfileInfoSection
@@ -51,8 +50,6 @@ import com.instasprite.app.ui.social.profile.contract.ProfileTab
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
 import com.instasprite.app.ui.social.profile.dialog.FollowersDialog
 import com.instasprite.app.ui.social.profile.dialog.FollowingDialog
-import com.instasprite.app.domain.session.SocialSessionState
-import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.UiUtils
@@ -220,8 +217,8 @@ fun ProfileContent(
                         ProfileTab.SAVED -> stringResource(R.string.posts_you_save_will_appear_here)
                     }
                     val emptyIcon = when (selectedTab) {
-                        ProfileTab.POSTS -> Icons.Default.AccountBox
-                        ProfileTab.SAVED -> Icons.Outlined.Share
+                        ProfileTab.POSTS -> R.drawable.ic_canvas
+                        ProfileTab.SAVED -> R.drawable.ic_profile
                     }
                     EmptyStateContent(
                         icon = emptyIcon,

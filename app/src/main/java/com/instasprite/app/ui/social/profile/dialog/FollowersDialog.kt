@@ -80,7 +80,7 @@ fun FollowersDialog(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = stringResource(R.string.loading_followers),
-                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                            color = AppTheme.colors.Foreground2Color,
                             fontSize = 12.sp
                         )
                     }
@@ -94,7 +94,7 @@ fun FollowersDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.no_followers),
-                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                        color = AppTheme.colors.Foreground2Color,
                         fontSize = 14.sp
                     )
                 }
@@ -167,7 +167,7 @@ private fun FollowerItem(
             if (follower.displayName.isNotEmpty()) {
                 Text(
                     text = follower.displayName,
-                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                    color = AppTheme.colors.Foreground2Color,
                     fontSize = 12.sp
                 )
             }
@@ -183,7 +183,7 @@ private fun FollowerItem(
                 ),
                 border = androidx.compose.foundation.BorderStroke(
                     width = 0.5.dp,
-                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f)
+                    color = AppTheme.colors.Foreground2Color
                 )
             ) {
                 Text(

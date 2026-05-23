@@ -39,7 +39,6 @@ fun CursorModeToggle(
         PixelIcon(
             icon = R.drawable.ic_pencil_tool,
             contentDescription = stringResource(R.string.cursor_mode),
-            modifier = Modifier.size(24.dp)
         )
     }
 }

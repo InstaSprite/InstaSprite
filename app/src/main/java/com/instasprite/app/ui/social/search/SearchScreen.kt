@@ -12,11 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -36,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.domain.model.MemberData
 import com.instasprite.app.domain.model.PostData
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.social.search.component.MemberSearchResults
 import com.instasprite.app.ui.social.search.component.PostSearchResults
 import com.instasprite.app.ui.social.search.component.TrendingSection
@@ -93,10 +90,10 @@ fun SearchScreenContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                PixelIcon(
+                    icon = R.drawable.ic_search,
                     contentDescription = null,
-                    tint = AppTheme.colors.TextColorLight
+                    tint = AppTheme.colors.TextColorLight,
                 )
             }
 
@@ -113,11 +110,10 @@ fun SearchScreenContent(
                 trailingIcon = {
                     if (state.query.isNotEmpty()) {
                         IconButton(onClick = onClearSearch) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
+                            PixelIcon(
+                                icon = R.drawable.ic_close,
                                 contentDescription = null,
                                 tint = AppTheme.colors.DismissButtonColor,
-                                modifier = Modifier.size(28.dp)
                             )
                         }
                     }

@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.home.component
 
-import androidx.compose.ui.res.stringResource
-
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -9,13 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.FolderOpen
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -23,17 +14,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ExpandableFabMenu
 import com.instasprite.app.ui.components.composable.FabMenuColors
 import com.instasprite.app.ui.components.composable.FabMenuItem
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -60,7 +50,7 @@ fun HomeBottomBar(
 
         ) {
             BottomBarItem(
-                imageVector = Icons.Default.Menu,
+                icon = R.drawable.ic_menu,
                 onClick = onMenuClick,
                 iconTint = AppTheme.colors.TextColorLight,
             )
@@ -76,14 +66,14 @@ fun HomeBottomBar(
             horizontalArrangement = Arrangement.End
         ) {
             BottomBarItem(
-                imageVector = Icons.Default.Search,
+                icon = R.drawable.ic_search,
                 onClick = {
                     onBottomBarEvent(BottomBarEvent.ToggleSearchBar)
                 },
                 iconTint = AppTheme.colors.TextColorLight
             )
             BottomBarItem(
-                iconResourceId = R.drawable.ic_sort,
+                icon = R.drawable.ic_sort,
                 onClick = {
                     onBottomBarEvent(BottomBarEvent.OpenDisplayOptions)
                 },
@@ -95,40 +85,18 @@ fun HomeBottomBar(
 
 @Composable
 fun BottomBarItem(
-    imageVector: ImageVector,
+    @DrawableRes icon: Int,
     onClick: () -> Unit,
-    size: Dp = 28.dp,
     iconTint: Color = Color.Unspecified
 ) {
     IconButton(
         onClick = onClick,
         modifier = Modifier.padding(horizontal = 2.dp)
     ) {
-        Icon(
-            imageVector = imageVector,
+        PixelIcon(
+            icon = icon,
             contentDescription = stringResource(R.string.floating_action_button),
             tint = iconTint,
-            modifier = Modifier.size(size)
-        )
-    }
-}
-
-@Composable
-fun BottomBarItem(
-    @DrawableRes iconResourceId: Int,
-    onClick: () -> Unit,
-    size: Dp = 28.dp,
-    iconTint: Color = Color.Unspecified
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.padding(horizontal = 2.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = iconResourceId),
-            contentDescription = stringResource(R.string.floating_action_button),
-            tint = iconTint,
-            modifier = Modifier.size(size)
         )
     }
 }
@@ -144,17 +112,17 @@ fun HomeFab(
     val menuItems = remember(onCreateCanvas, onLoadCanvas, onLoadImage) {
         listOf(
             FabMenuItem(
-                icon = Icons.Default.Create,
+                icon = R.drawable.ic_edit,
                 label = "New Canvas",
                 onClick = onCreateCanvas
             ),
             FabMenuItem(
-                icon = Icons.Default.FolderOpen,
+                icon = R.drawable.ic_folder,
                 label = "Load Canvas",
                 onClick = onLoadCanvas
             ),
             FabMenuItem(
-                icon = Icons.Default.Image,
+                icon = R.drawable.ic_canvas,
                 label = "Load Image",
                 onClick = onLoadImage
             )
@@ -179,12 +147,10 @@ fun FeedFab(
         modifier = Modifier
             .size(70.dp)
     ) {
-        Icon(
-            Icons.Filled.Add,
+        PixelIcon(
+            icon = R.drawable.ic_plus,
             contentDescription = stringResource(R.string.create_post),
             tint = colors.fabIcon,
-            modifier = Modifier
-                .size(30.dp)
         )
     }
 }

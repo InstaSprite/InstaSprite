@@ -79,7 +79,6 @@ fun ToolSelector(
                             PixelIcon(
                                 icon = tool.icon,
                                 contentDescription = tool.description,
-                                modifier = Modifier.size(32.dp)
                             )
                         },
                         text = { Text(tool.name) },
@@ -186,7 +185,7 @@ fun ToolItem(
         PixelIcon(
             icon = iconResourceId,
             contentDescription = contentDescription,
-            modifier = Modifier.size(32.dp)
+            scale = 1.25f
         )
     }
 }

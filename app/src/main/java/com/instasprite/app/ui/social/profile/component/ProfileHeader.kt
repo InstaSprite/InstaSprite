@@ -1,10 +1,6 @@
 package com.instasprite.app.ui.social.profile.component
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -16,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,8 +36,8 @@ fun ProfileHeader(
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.Default.Close,
+                PixelIcon(
+                    icon = R.drawable.ic_close,
                     contentDescription = stringResource(R.string.back),
                     tint = AppTheme.colors.TextColorLight
                 )
@@ -48,8 +45,8 @@ fun ProfileHeader(
         },
         actions = {
             IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
+                PixelIcon(
+                    icon = R.drawable.ic_menu,
                     contentDescription = stringResource(R.string.menu),
                     tint = AppTheme.colors.TextColorLight
                 )

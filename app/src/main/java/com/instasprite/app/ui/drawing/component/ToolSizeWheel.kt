@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +24,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 
@@ -110,8 +109,8 @@ fun ToolSizeWheelPicker(
                 .height(itemHeight)
                 .background(AppTheme.colors.BackgroundColorDarker)
         ) {
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
+            PixelIcon(
+                icon = R.drawable.ic_arrow_head_right,
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.CenterStart),
                 tint = AppTheme.colors.AccentButtonColor

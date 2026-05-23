@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.data.model.AccountPreferences
 import com.instasprite.app.data.model.AccountType
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 
@@ -71,8 +69,8 @@ fun SavedAccountList(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
+            PixelIcon(
+                icon = R.drawable.ic_plus,
                 contentDescription = null,
                 tint = AppTheme.colors.InfoColor
             )

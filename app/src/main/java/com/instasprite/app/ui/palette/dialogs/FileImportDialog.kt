@@ -12,9 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,8 +25,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.InputDialog
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.noRippleClickable
 import kotlinx.coroutines.launch
 
 @Composable
@@ -114,11 +113,11 @@ fun FileImportDialog(
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Home,
+                        PixelIcon(
+                            icon = R.drawable.ic_folder,
                             contentDescription = stringResource(R.string.choose_file),
                             tint = AppTheme.colors.LinkColor,
-                            modifier = Modifier.clickable {
+                            modifier = Modifier.noRippleClickable {
                                 filePickerLauncher.launch(arrayOf("text/plain"))
                             }
                         )

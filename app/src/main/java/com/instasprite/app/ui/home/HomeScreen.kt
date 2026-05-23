@@ -300,7 +300,6 @@ fun HomeScreen(
                             spriteList = sortedSprites,
                             searchQuery = searchQuery,
                             event = galleryEvent,
-                            modifier = Modifier.fillMaxSize()
                         )
 
                         1 -> FeedContent(

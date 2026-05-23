@@ -9,12 +9,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.Text
@@ -36,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.data.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.CustomDialog
 import com.instasprite.app.ui.social.auth.contract.ForgotPasswordUiState
 import com.instasprite.app.ui.theme.AppTheme
@@ -175,8 +172,13 @@ fun ForgotPasswordDialog(
                             ),
                             onCheckedChange = { isTemporaryPasswordVisible = it },
                         ) {
-                            if (isTemporaryPasswordVisible) Icon(Icons.Default.Visibility, null)
-                            else Icon(Icons.Default.VisibilityOff, null)
+                            PixelIcon(
+                                icon = if (isTemporaryPasswordVisible)
+                                    R.drawable.ic_visible_on
+                                else
+                                    R.drawable.ic_visible_off,
+                                tint = AppTheme.colors.TextColorLight,
+                            )
                         }
                     },
                     visualTransformation = if (isTemporaryPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(
@@ -201,8 +203,13 @@ fun ForgotPasswordDialog(
                             ),
                             onCheckedChange = { isNewPasswordVisible = it },
                         ) {
-                            if (isNewPasswordVisible) Icon(Icons.Default.Visibility, null)
-                            else Icon(Icons.Default.VisibilityOff, null)
+                            PixelIcon(
+                                icon = if (isNewPasswordVisible)
+                                    R.drawable.ic_visible_on
+                                else
+                                    R.drawable.ic_visible_off,
+                                tint = AppTheme.colors.TextColorLight,
+                            )
                         }
                     },
                     visualTransformation = if (isNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(
@@ -227,8 +234,13 @@ fun ForgotPasswordDialog(
                             ),
                             onCheckedChange = { isConfirmPasswordVisible = it },
                         ) {
-                            if (isConfirmPasswordVisible) Icon(Icons.Default.Visibility, null)
-                            else Icon(Icons.Default.VisibilityOff, null)
+                            PixelIcon(
+                                icon = if (isConfirmPasswordVisible)
+                                    R.drawable.ic_visible_on
+                                else
+                                    R.drawable.ic_visible_off,
+                                tint = AppTheme.colors.TextColorLight,
+                            )
                         }
                     },
                     visualTransformation = if (isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(

@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.social.auth.component
 
-import androidx.compose.ui.res.stringResource
-
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -20,11 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -46,7 +44,7 @@ fun GoogleSignInButton(
             .height(56.dp)
             .border(
                 width = 1.dp,
-                color = AppTheme.colors.TextColorLight.copy(alpha = 0.2f),
+                color = AppTheme.colors.Foreground2Color,
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
@@ -61,18 +59,15 @@ fun GoogleSignInButton(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_google),
-                    contentDescription = stringResource(R.string.google_logo),
-                    modifier = Modifier.size(20.dp)
+                PixelIcon(
+                    icon = R.drawable.ic_google,
                 )
-
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Text(
                     text = stringResource(R.string.continue_with_google),
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.Black
                 )

@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.setting.composable
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,11 +19,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
 fun SettingItem(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     title: String,
     subtitle: String,
     onClick: () -> Unit = {},
@@ -35,11 +37,10 @@ fun SettingItem(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
+        PixelIcon(
+            icon = icon,
             contentDescription = title,
             tint = AppTheme.colors.TextColorLight,
-            modifier = Modifier.size(24.dp)
         )
 
         Spacer(modifier = Modifier.width(16.dp))

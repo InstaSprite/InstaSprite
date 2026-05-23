@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.social.createpost.composable
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,17 +7,16 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.CustomTextField
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -63,14 +59,14 @@ fun HashtagSection(
                         onClick = { onRemoveHashtag(tag) },
                         label = { Text("#$tag") },
                         trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Close,
+                            PixelIcon(
+                                icon = R.drawable.ic_close,
                                 contentDescription = stringResource(R.string.remove_tag),
-                                modifier = Modifier.size(16.dp)
+                                tint = AppTheme.colors.DismissButtonColor,
                             )
                         },
                         colors = AssistChipDefaults.assistChipColors(
-                            containerColor = AppTheme.colors.Foreground0Color,
+                            containerColor = AppTheme.colors.Foreground2Color,
                             labelColor = AppTheme.colors.TextColorLight,
                             trailingIconContentColor = AppTheme.colors.Subtext0Color
                         ),

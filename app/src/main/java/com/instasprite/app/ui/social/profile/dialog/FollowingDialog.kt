@@ -77,7 +77,7 @@ fun FollowingDialog(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = stringResource(R.string.loading_following),
-                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                            color = AppTheme.colors.Foreground2Color,
                             fontSize = 12.sp
                         )
                     }
@@ -91,7 +91,7 @@ fun FollowingDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.no_following),
-                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                        color = AppTheme.colors.Foreground2Color,
                         fontSize = 14.sp
                     )
                 }
@@ -164,7 +164,7 @@ private fun FollowingItem(
             if (user.displayName.isNotEmpty()) {
                 Text(
                     text = user.displayName,
-                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                    color = AppTheme.colors.Foreground2Color,
                     fontSize = 12.sp
                 )
             }

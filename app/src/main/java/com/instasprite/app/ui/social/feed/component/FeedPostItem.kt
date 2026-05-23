@@ -17,15 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -50,10 +42,12 @@ import com.instasprite.app.R
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.ui.components.composable.AsyncImageView
 import com.instasprite.app.ui.components.composable.ParsedPostText
+import com.instasprite.app.ui.components.composable.PixelIcon
 
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.toSuffixString
 import com.instasprite.app.utils.TimeUtils
+import com.instasprite.app.utils.noRippleClickable
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -133,7 +127,7 @@ fun FeedPostItem(
                         ),
                         border = BorderStroke(
                             width = 0.5.dp,
-                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f)
+                            color = AppTheme.colors.Foreground2Color
                         )
                     ) {
                         Text(
@@ -151,8 +145,8 @@ fun FeedPostItem(
                         onClick = { onDeleteClick(post.postId) },
                         modifier = Modifier.size(20.dp)
                     ) {
-                        Icon(
-                            Icons.Default.Delete,
+                        PixelIcon(
+                            icon = R.drawable.ic_trash,
                             contentDescription = stringResource(R.string.delete),
                             tint = AppTheme.colors.DismissButtonColor
                         )
@@ -238,14 +232,16 @@ fun FeedPostItem(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = if (post.postLikeFlag) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        PixelIcon(
+                            icon = R.drawable.ic_heart,
                             contentDescription = stringResource(R.string.like),
-                            tint = if (post.postLikeFlag) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
+                            tint = if (post.postLikeFlag)
+                                AppTheme.colors.DismissButtonColor
+                            else
+                                AppTheme.colors.TextColorLight,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
-                                .size(20.dp)
-                                .clickable { onLikeClick() }
+                                .noRippleClickable { onLikeClick() }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Box(
@@ -265,14 +261,13 @@ fun FeedPostItem(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ChatBubbleOutline,
+                        PixelIcon(
+                            icon = R.drawable.ic_comment,
                             contentDescription = stringResource(R.string.comment),
                             tint = AppTheme.colors.TextColorLight,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
-                                .size(20.dp)
-                                .clickable { onCommentClick() }
+                                .noRippleClickable { onCommentClick() }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Box(
@@ -282,7 +277,7 @@ fun FeedPostItem(
                             if (post.postCommentsCount > 0) {
                                 Text(
                                     text = "${post.postCommentsCount}",
-                                    color = AppTheme.colors.TextColorLight.copy(alpha = 0.9f),
+                                    color = AppTheme.colors.TextColorLight,
                                     fontSize = 14.sp
                                 )
                             }
@@ -291,13 +286,16 @@ fun FeedPostItem(
                 }
 
                 if (showBookmarkButton) {
-                    Icon(
-                        imageVector = if (post.postBookmarkFlag) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                    PixelIcon(
+                        icon = R.drawable.ic_bookmark,
                         contentDescription = stringResource(R.string.bookmark),
-                        tint = AppTheme.colors.TextColorLight,
+                        tint = if (post.postBookmarkFlag)
+                            AppTheme.colors.LinkColor
+                        else
+                            AppTheme.colors.TextColorLight,
                         modifier = Modifier
                             .size(20.dp)
-                            .clickable { onBookmarkClick() }
+                            .noRippleClickable { onBookmarkClick() }
                     )
                 }
             }

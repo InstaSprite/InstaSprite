@@ -10,12 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -28,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 
@@ -84,8 +81,8 @@ private fun AvatarSourceSheetContent(
                 }
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.GridView,
+            PixelIcon(
+                icon = R.drawable.ic_canvas,
                 contentDescription = null,
                 tint = AppTheme.colors.SelectedColor,
                 modifier = Modifier.size(24.dp)
@@ -108,11 +105,10 @@ private fun AvatarSourceSheetContent(
                 }
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Image,
+            PixelIcon(
+                icon = R.drawable.ic_folder,
                 contentDescription = null,
-                tint = AppTheme.colors.TextColorLight,
-                modifier = Modifier.size(24.dp)
+                tint = AppTheme.colors.LinkColor,
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(

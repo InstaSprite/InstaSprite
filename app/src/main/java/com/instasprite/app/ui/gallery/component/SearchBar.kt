@@ -6,8 +6,6 @@ import com.instasprite.app.R
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -25,6 +23,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -70,11 +69,10 @@ fun SearchBar(
                     onSearchBarEvent(SearchBarContract.UpdateSearchQuery(""))
                 },
             ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
+                PixelIcon(
+                    icon = R.drawable.ic_close,
                     contentDescription = stringResource(R.string.dismiss),
                     tint = AppTheme.colors.DismissButtonColor,
-                    modifier = Modifier.size(28.dp)
                 )
             }
         },

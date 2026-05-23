@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -24,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 
@@ -115,8 +113,8 @@ fun EditProfileFields(
                 )
                 .padding(horizontal = 16.dp, vertical = 14.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Lock,
+            PixelIcon(
+                icon = R.drawable.ic_lock,
                 contentDescription = null,
                 tint = AppTheme.colors.Subtext0Color,
                 modifier = Modifier

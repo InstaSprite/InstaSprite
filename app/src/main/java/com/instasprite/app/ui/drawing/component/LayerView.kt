@@ -15,23 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,6 +40,7 @@ import androidx.core.graphics.createBitmap
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.dialog.LayerOptionsDialog
@@ -143,11 +136,10 @@ fun LayerView(
                         onClick = { showDeleteConfirm = true },
                         modifier = Modifier.size(32.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
+                        PixelIcon(
+                            icon = R.drawable.ic_trash,
                             contentDescription = stringResource(R.string.delete_layer),
                             tint = AppTheme.colors.DismissButtonColor,
-                            modifier = Modifier.size(20.dp)
                         )
                     }
 
@@ -185,19 +177,18 @@ fun LayerView(
                         onClick = onVisibilityToggle,
                         modifier = Modifier.size(32.dp)
                     ) {
-                        Icon(
-                            imageVector = if (layer.isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        PixelIcon(
+                            icon = if (layer.isVisible) R.drawable.ic_visible_on else R.drawable.ic_visible_off,
                             contentDescription = stringResource(R.string.toggle_visibility),
                             tint = AppTheme.colors.TextColorLight,
-                            modifier = Modifier.size(20.dp)
                         )
                     }
                     IconButton(
                         onClick = onLockToggle,
                         modifier = Modifier.size(32.dp)
                     ) {
-                        Icon(
-                            imageVector = if (layer.isLocked) Icons.Default.Lock else Icons.Outlined.LockOpen,
+                        PixelIcon(
+                            icon = if (layer.isLocked) R.drawable.ic_lock else R.drawable.ic_lock_unlock,
                             contentDescription = stringResource(R.string.toggle_lock),
                             tint = AppTheme.colors.TextColorLight,
                             modifier = Modifier.size(20.dp)
@@ -209,11 +200,10 @@ fun LayerView(
                         onClick = { showOptionsDialog = true },
                         modifier = Modifier.size(32.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
+                        PixelIcon(
+                            icon = R.drawable.ic_three_dots,
                             contentDescription = "Layer Options",
                             tint = AppTheme.colors.TextColorLight,
-                            modifier = Modifier.size(20.dp)
                         )
                     }
 

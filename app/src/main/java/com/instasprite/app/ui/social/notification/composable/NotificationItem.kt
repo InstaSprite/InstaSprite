@@ -75,7 +75,7 @@ fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
                     append(notification.body)
                 },
                 fontSize = 14.sp,
-                color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f),
+                color = AppTheme.colors.Foreground2Color,
                 lineHeight = 20.sp
             )
 
@@ -84,7 +84,7 @@ fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
             Text(
                 text = TimeUtils.formatTimeAgo(context, notification.createdAt),
                 fontSize = 12.sp,
-                color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f)
+                color = AppTheme.colors.Foreground2Color
             )
         }
 

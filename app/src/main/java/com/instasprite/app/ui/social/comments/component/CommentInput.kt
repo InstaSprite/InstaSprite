@@ -4,24 +4,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,9 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.RetronFont
+import com.instasprite.app.utils.noRippleClickable
 
 @Composable
 fun CommentInput(
@@ -75,18 +69,16 @@ fun CommentInput(
                 ) {
                     Text(
                         text = "Replying to @$replyingToUsername",
-                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.8f),
+                        color = AppTheme.colors.Foreground2Color,
                         fontSize = 12.sp,
                         modifier = Modifier.weight(1f)
                     )
-                    Icon(
-                        imageVector = Icons.Filled.Close,
+                    PixelIcon(
+                        icon = R.drawable.ic_close,
                         contentDescription = stringResource(R.string.cancel),
-                        tint = AppTheme.colors.TextColorLight.copy(alpha = 0.8f),
+                        tint = AppTheme.colors.Foreground2Color,
                         modifier = Modifier
-                            .size(16.dp)
-                            .clip(CircleShape)
-                            .clickable { onCancelReply() }
+                            .noRippleClickable { onCancelReply() }
                     )
                 }
             }
@@ -95,29 +87,8 @@ fun CommentInput(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.CenterVertically
             ) {
-//                val avatarModifier = Modifier
-//                    .size(36.dp)
-//                    .clip(CircleShape)
-//
-//                if (!profileImageUrl.isNullOrBlank()) {
-//                    AsyncImageView(
-//                        imageUrl = profileImageUrl,
-//                        altText = stringResource(R.string.your_profile),
-//                        modifier = avatarModifier,
-//                    )
-//                } else {
-//                    androidx.compose.foundation.Image(
-//                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_launcher),
-//                        contentDescription = stringResource(R.string.your_profile),
-//                        modifier = avatarModifier,
-//                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
-//                    )
-//                }
-
-//                Spacer(modifier = Modifier.width(12.dp))
-
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -129,7 +100,7 @@ fun CommentInput(
                     if (text.isEmpty()) {
                         Text(
                             text = stringResource(R.string.add_a_comment),
-                            color = AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
+                            color = AppTheme.colors.TextColorLight,
                             fontSize = 14.sp
                         )
                     }
@@ -149,21 +120,12 @@ fun CommentInput(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(if (canSend) AppTheme.colors.AccentButtonColor else AppTheme.colors.BackgroundColor)
-                        .clickable(enabled = canSend) { onSendClick() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.Send,
-                        contentDescription = stringResource(R.string.send),
-                        tint = if (canSend) AppTheme.colors.BackgroundColorDarker else AppTheme.colors.TextColorLight.copy(alpha = 0.3f),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+                PixelIcon(
+                    icon = R.drawable.ic_right_arrow,
+                    contentDescription = stringResource(R.string.send),
+                    tint = if (canSend) AppTheme.colors.AccentButtonColor else AppTheme.colors.Foreground2Color,
+                    modifier = Modifier.noRippleClickable { if (canSend) onSendClick() }
+                )
             }
         }
     }

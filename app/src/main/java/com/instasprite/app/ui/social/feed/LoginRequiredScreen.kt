@@ -42,7 +42,7 @@ fun LoginRequiredScreen(
             imageVector = Icons.AutoMirrored.Filled.Login,
             contentDescription = stringResource(R.string.login_required_1),
             modifier = Modifier.size(80.dp),
-            tint = AppTheme.colors.TextColorLight.copy(alpha = 0.6f)
+            tint = AppTheme.colors.Foreground2Color
         )
 
         Spacer(modifier = Modifier.height(12.dp))

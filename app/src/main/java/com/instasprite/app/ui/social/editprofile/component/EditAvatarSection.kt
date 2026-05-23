@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -24,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 
@@ -58,11 +56,10 @@ fun EditAvatarSection(
 //                    .offset(x = 4.dp, y = 4.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
+                PixelIcon(
+                    icon = R.drawable.ic_edit,
                     contentDescription = stringResource(R.string.change_profile_photo),
                     tint = AppTheme.colors.TextColorDark,
-                    modifier = Modifier.size(24.dp)
                 )
             }
         }

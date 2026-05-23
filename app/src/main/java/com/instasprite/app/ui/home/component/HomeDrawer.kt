@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.home.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,14 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -56,7 +49,7 @@ fun HomeDrawer(
 ) {
     val drawerItemColors = NavigationDrawerItemDefaults.colors(
         unselectedContainerColor = Color.Transparent,
-        selectedContainerColor = AppTheme.colors.Foreground0Color.copy(alpha = 0.85f),
+        selectedContainerColor = AppTheme.colors.Foreground0Color,
         unselectedIconColor = AppTheme.colors.TextColorLight,
         selectedIconColor = AppTheme.colors.TextColorLight,
         unselectedTextColor = AppTheme.colors.TextColorLight,
@@ -76,15 +69,7 @@ fun HomeDrawer(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            PixelIcon(
-                icon = R.drawable.ic_launcher,
-                contentDescription = stringResource(R.string.app_name),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(32.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
             if (isLoggedIn) {
                 Box(
@@ -111,7 +96,7 @@ fun HomeDrawer(
                         text = "@$memberUsername",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = MaterialTheme.typography.bodySmall,
-                        color = AppTheme.colors.TextColorLight.copy(alpha = 0.7f)
+                        color = AppTheme.colors.Foreground2Color
                     )
                 }
 
@@ -119,7 +104,7 @@ fun HomeDrawer(
             }
 
             HomeDrawerItem(
-                icon = Icons.Default.Person,
+                icon = R.drawable.ic_profile,
                 label = if (isLoggedIn) stringResource(R.string.profile) else stringResource(R.string.login),
                 selected = false,
                 colors = drawerItemColors,
@@ -127,7 +112,7 @@ fun HomeDrawer(
             )
 
             HomeDrawerItem(
-                icon = Icons.Default.Home,
+                icon = R.drawable.ic_home,
                 label = stringResource(R.string.home),
                 selected = true,
                 colors = drawerItemColors,
@@ -135,7 +120,7 @@ fun HomeDrawer(
             )
 
             HomeDrawerItem(
-                icon = Icons.Default.Notifications,
+                icon = R.drawable.ic_notification_bell,
                 label = stringResource(R.string.notifications),
                 selected = false,
                 colors = drawerItemColors,
@@ -143,7 +128,7 @@ fun HomeDrawer(
             )
 
             HomeDrawerItem(
-                icon = Icons.Default.Search,
+                icon = R.drawable.ic_search,
                 label = "Search",
                 selected = false,
                 colors = drawerItemColors,
@@ -151,7 +136,7 @@ fun HomeDrawer(
             )
 
             HomeDrawerItem(
-                icon = Icons.Default.Settings,
+                icon = R.drawable.ic_setting,
                 label = stringResource(R.string.settings),
                 selected = false,
                 colors = drawerItemColors,
@@ -161,12 +146,12 @@ fun HomeDrawer(
             Spacer(modifier = Modifier.weight(1f))
 
             HorizontalDivider(
-                color = AppTheme.colors.TextColorLight.copy(alpha = 0.3f),
+                color = AppTheme.colors.Foreground2Color,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
             HomeDrawerItem(
-                icon = Icons.Default.Info,
+                icon = R.drawable.ic_info,
                 label = stringResource(R.string.about),
                 selected = false,
                 colors = drawerItemColors,
@@ -175,7 +160,7 @@ fun HomeDrawer(
 
             if (isLoggedIn) {
                 HomeDrawerItem(
-                    icon = Icons.Default.Delete,
+                    icon = R.drawable.ic_left_arrow,
                     label = stringResource(R.string.logout),
                     selected = false,
                     colors = drawerItemColors,
@@ -190,7 +175,7 @@ fun HomeDrawer(
 
 @Composable
 private fun HomeDrawerItem(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     label: String,
     selected: Boolean,
     colors: androidx.compose.material3.NavigationDrawerItemColors,
@@ -199,11 +184,9 @@ private fun HomeDrawerItem(
     NavigationDrawerItem(
         label = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
+                PixelIcon(
+                    icon = icon,
                     tint = AppTheme.colors.TextColorLight,
-                    modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(text = label)
