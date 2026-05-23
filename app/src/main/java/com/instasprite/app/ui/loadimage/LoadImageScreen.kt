@@ -39,8 +39,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.domain.image2pixel.PixelArtConfig
 import com.instasprite.app.domain.model.ColorPalette
-import com.instasprite.app.ui.components.composable.BackButton
-import com.instasprite.app.ui.components.composable.Bar
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.loadimage.component.ImageConfigView
 import com.instasprite.app.ui.loadimage.component.ProcessedImagePreview
@@ -130,19 +129,10 @@ fun LoadImageScreenContent(
 
     Scaffold(
         topBar = {
-            Bar(
-                leftSlot = {
-                    BackButton(onClick = event.onDismiss)
-                },
-                middleSlot = {
-                    Text(
-                        text = stringResource(R.string.load_image),
-                        color = AppTheme.colors.TextColorLight,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-                rightSlot = {
-
+            TopBar(
+                title = stringResource(R.string.load_image),
+                onBackClick = event.onDismiss,
+                actions = {
                     val isCreateButtonEnabled =
                         uiState.processedBitmap != null && !uiState.isLoading && uiState.spriteName.isNotBlank()
 

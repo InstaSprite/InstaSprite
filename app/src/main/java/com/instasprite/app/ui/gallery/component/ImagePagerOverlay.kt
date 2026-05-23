@@ -46,8 +46,7 @@ import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay
-import com.instasprite.app.ui.components.composable.BackButton
-import com.instasprite.app.ui.components.composable.Bar
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
@@ -89,15 +88,35 @@ fun ImagePagerOverlay(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
+                var dropdownMenuVisible by remember { mutableStateOf(false) }
                 TopBar(
-                    onDismiss = { onDismiss(currentSprite?.sprite) },
-                    onDeleteButtonTap = {
-                        currentSprite?.meta?.let {
-                            onImagePagerEvent(
-                                ImagePagerEvent.OpenDeleteDialog(
-                                    it.spriteName,
-                                    it.spriteId
+                    title = currentSprite?.meta?.spriteName ?: "",
+                    onBackClick = { onDismiss(currentSprite?.sprite) },
+                    actions = {
+                        Box {
+                            IconButton(
+                                onClick = { dropdownMenuVisible = true }
+                            ) {
+                                PixelIcon(
+                                    icon = R.drawable.ic_three_dots,
+                                    contentDescription = stringResource(R.string.more),
+                                    tint = AppTheme.colors.TextColorLight,
                                 )
+                            }
+
+                            PagerDropdownMenu(
+                                expanded = dropdownMenuVisible,
+                                onDismiss = { dropdownMenuVisible = false },
+                                onDeleteButtonTap = {
+                                    currentSprite?.meta?.let {
+                                        onImagePagerEvent(
+                                            ImagePagerEvent.OpenDeleteDialog(
+                                                it.spriteName,
+                                                it.spriteId
+                                            )
+                                        )
+                                    }
+                                }
                             )
                         }
                     }
@@ -259,40 +278,6 @@ private fun BottomBar(
     }
 }
 
-@Composable
-private fun TopBar(
-    onDismiss: () -> Unit,
-    onDeleteButtonTap: () -> Unit
-) {
-    var dropdownMenuVisible by remember { mutableStateOf(false) }
-
-    Bar(
-        leftSlot = {
-            BackButton(onClick = onDismiss)
-        },
-        rightSlot = {
-            Box {
-                IconButton(
-                    onClick = { dropdownMenuVisible = true }
-                ) {
-                    PixelIcon(
-                        icon = R.drawable.ic_three_dots,
-                        contentDescription = stringResource(R.string.more),
-                        tint = AppTheme.colors.TextColorLight,
-                    )
-                }
-
-                PagerDropdownMenu(
-                    expanded = dropdownMenuVisible,
-                    onDismiss = { dropdownMenuVisible = false },
-                    onDeleteButtonTap = {
-                        onDeleteButtonTap()
-                    }
-                )
-            }
-        }
-    )
-}
 
 @Composable
 private fun PagerDropdownMenu(

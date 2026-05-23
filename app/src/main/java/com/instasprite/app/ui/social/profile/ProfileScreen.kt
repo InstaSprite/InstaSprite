@@ -41,9 +41,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.R
 import com.instasprite.app.domain.session.SocialSessionState
 import com.instasprite.app.ui.components.composable.AsyncImageView
+import com.instasprite.app.ui.components.composable.TopBar
+import com.instasprite.app.ui.components.composable.PixelIcon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.IconButton
 import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.social.profile.component.EmptyStateContent
-import com.instasprite.app.ui.social.profile.component.ProfileHeader
 import com.instasprite.app.ui.social.profile.component.ProfileInfoSection
 import com.instasprite.app.ui.social.profile.component.ProfileTabRow
 import com.instasprite.app.ui.social.profile.contract.ProfileContentState
@@ -169,21 +172,20 @@ fun ProfileContent(
 
     val gridHeight = ((currentPosts.size + 1) / 2 * 200 + 32).dp
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppTheme.colors.BackgroundColorDarker)
-    ) {
-        ProfileHeader(
-            title = stringResource(R.string.profile),
-            isOwnProfile = isOwnProfile,
-            onBackClick = event.onBackClick,
-            onMenuClick = event.onMenuClick,
-        )
-
+    Scaffold(
+        containerColor = AppTheme.colors.BackgroundColorDarker,
+        topBar = {
+            TopBar(
+                title = stringResource(R.string.profile),
+                onBackClick = event.onBackClick,
+            )
+        }
+    ) { innerPadding ->
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
             item {
                 ProfileInfoSection(

@@ -10,8 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import com.instasprite.app.ui.components.composable.TopBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -89,27 +88,9 @@ fun HashtagFeedScreenContent(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "#$hashtag",
-                        color = AppTheme.colors.TextColorLight,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        PixelIcon(
-                            icon = R.drawable.ic_left_arrow,
-                            contentDescription = null,
-                            tint = AppTheme.colors.TextColorLight,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.BackgroundColorDarker
-                )
+            TopBar(
+                title = "#$hashtag",
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->

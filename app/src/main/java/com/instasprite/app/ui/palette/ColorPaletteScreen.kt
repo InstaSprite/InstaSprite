@@ -33,8 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.ColorPalette
-import com.instasprite.app.ui.components.composable.BackButton
-import com.instasprite.app.ui.components.composable.Bar
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.components.composable.ColorPaletteList
 import com.instasprite.app.ui.components.composable.ExpandableFabMenu
 import com.instasprite.app.ui.components.composable.FabMenuItem
@@ -105,17 +104,16 @@ private fun ColorPaletteSelectionContent(
     Box {
         Scaffold(
             topBar = {
-                Bar(
-                    leftSlot = {
-                        BackButton(onClick = onDismiss)
-                    }
+                TopBar(
+                    title = stringResource(R.string.palette),
+                    onBackClick = onDismiss
                 )
             },
             bottomBar = {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(38.pixelDp)
+                        .height(48.pixelDp)
                 )
             },
             containerColor = AppTheme.colors.BackgroundColorDarker
@@ -171,7 +169,7 @@ private fun ColorPaletteSelectionContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 14.pixelDp)
+                    .padding(bottom = 8.pixelDp)
                     .background(Color.Transparent),
                 contentAlignment = Alignment.Center,
             ) {

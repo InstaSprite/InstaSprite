@@ -39,10 +39,9 @@ import androidx.compose.ui.unit.dp
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.InputField
-import com.instasprite.app.ui.components.composable.BackButton
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.ColorPaletteView
-import com.instasprite.app.ui.components.composable.Bar
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -113,18 +112,10 @@ fun CreateCanvasScreen(
 
     Scaffold(
         topBar = {
-            Bar(
-                leftSlot = {
-                    BackButton(onClick = onDismiss)
-                },
-                middleSlot = {
-                    Text(
-                        text = stringResource(R.string.new_canvas),
-                        color = AppTheme.colors.TextColorLight,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-                rightSlot = {
+            TopBar(
+                title = stringResource(R.string.new_canvas),
+                onBackClick = onDismiss,
+                actions = {
                     Button(
                         onClick = ::tryConfirm,
                         colors = ButtonDefaults.buttonColors(

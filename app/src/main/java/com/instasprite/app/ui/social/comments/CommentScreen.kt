@@ -63,7 +63,7 @@ import com.instasprite.app.ui.social.comments.contract.Comment
 import com.instasprite.app.ui.social.comments.contract.CommentScreenEvent
 import com.instasprite.app.ui.social.comments.contract.CommentState
 import com.instasprite.app.ui.social.comments.contract.PostAuthor
-import com.instasprite.app.ui.social.createpost.composable.TopBar
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.social.feed.dialog.VerifyEmailDialog
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.domain.session.SocialSessionState
@@ -208,7 +208,8 @@ private fun CommentScreenContent(
         Scaffold(
             topBar = {
                 TopBar(
-                    onDismiss = event.onBackClick
+                    title = stringResource(R.string.comments),
+                    onBackClick = event.onBackClick
                 )
             },
             bottomBar = {

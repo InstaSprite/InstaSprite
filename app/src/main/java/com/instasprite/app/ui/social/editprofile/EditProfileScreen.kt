@@ -24,16 +24,18 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import com.instasprite.app.ui.components.composable.TopBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -187,43 +189,21 @@ fun EditProfileContent(
     Scaffold(
         containerColor = AppTheme.colors.BackgroundColorDarker,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.edit_profile),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AppTheme.colors.TextColorLight
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = event.onBackClick) {
-                        PixelIcon(
-                            icon = R.drawable.ic_left_arrow,
-                            contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.DismissButtonColor
-                        )
-                    }
-                },
+            TopBar(
+                title = stringResource(R.string.edit_profile),
+                onBackClick = event.onBackClick,
                 actions = {
-                    TextButton(
+                    Button(
                         onClick = event.onSave,
-                        enabled = !state.isSaving
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.AccentButtonColor
+                        ),
+                        enabled = !state.isSaving,
+                        shape = MaterialTheme.shapes.small,
                     ) {
-                        Text(
-                            text = stringResource(R.string.save),
-                            color = if (state.isSaving)
-                                AppTheme.colors.Subtext0Color
-                            else
-                                AppTheme.colors.SelectedColor,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
+                        Text(stringResource(R.string.save), color = AppTheme.colors.TextColorDark)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.BackgroundColorDarker
-                )
+                }
             )
         }
     ) { innerPadding ->

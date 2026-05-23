@@ -11,6 +11,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
+import com.instasprite.app.ui.components.composable.TopBar
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -219,33 +221,24 @@ private fun GalleryScreenContent(
     Box {
         Scaffold(
             topBar = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .background(AppTheme.colors.TopBarColor)
-                        .height(38.pixelDp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.home),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(6.pixelDp)
+                Column {
+                    TopBar(
+                        title = stringResource(R.string.home)
                     )
-                }
 
-                AnimatedVisibility(
-                    visible = uiState.showSearchBar,
-                    enter = slideInVertically(initialOffsetY = { -it }),
-                    exit = slideOutVertically(targetOffsetY = { -it }),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(38.pixelDp)
-                ) {
-                    SearchBar(
-                        onSearchBarEvent = event.onSearchBarEvent,
-                        searchQuery = searchQuery,
-                    )
+                    AnimatedVisibility(
+                        visible = uiState.showSearchBar,
+                        enter = slideInVertically(initialOffsetY = { -it }),
+                        exit = slideOutVertically(targetOffsetY = { -it }),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(38.pixelDp)
+                    ) {
+                        SearchBar(
+                            onSearchBarEvent = event.onSearchBarEvent,
+                            searchQuery = searchQuery,
+                        )
+                    }
                 }
             },
             bottomBar = {

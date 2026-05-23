@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.ColorPaletteView
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.data.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
@@ -134,40 +137,21 @@ private fun PaletteEditorContent(
     Scaffold(
         containerColor = AppTheme.colors.BackgroundColorDarker,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = title,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AppTheme.colors.TextColorLight
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        PixelIcon(
-                            icon = R.drawable.ic_left_arrow,
-                            contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.DismissButtonColor
-                        )
-                    }
-                },
+            TopBar(
+                title = title,
+                onBackClick = onBackClick,
                 actions = {
-                    TextButton(
+                    Button(
                         onClick = onSaveClick,
-                        enabled = !isSaving
+                        enabled = !isSaving,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.AccentButtonColor
+                        ),
+                        shape = MaterialTheme.shapes.small,
                     ) {
-                        Text(
-                            text = stringResource(R.string.save),
-                            color = if (isSaving) AppTheme.colors.Subtext0Color else AppTheme.colors.SelectedColor,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
+                        Text(stringResource(R.string.save), color = AppTheme.colors.TextColorDark)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.BackgroundColor
-                )
+                }
             )
         }
     ) { innerPadding ->

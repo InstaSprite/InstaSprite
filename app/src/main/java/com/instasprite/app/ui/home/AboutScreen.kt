@@ -24,8 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import com.instasprite.app.ui.components.composable.TopBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,27 +59,9 @@ fun AboutScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        PixelIcon(
-                            icon = R.drawable.ic_left_arrow,
-                            contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.DismissButtonColor
-                        )
-                    }
-                },
-                title = {
-                    Text(
-                        text = stringResource(R.string.about),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = colors.TextColorLight
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.TopBarColor,
-                )
+            TopBar(
+                title = stringResource(R.string.about),
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->

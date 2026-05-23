@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.NotificationType
 import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.social.notification.composable.NotificationItem
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.UiUtils
@@ -58,27 +59,9 @@ fun NotificationScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        PixelIcon(
-                            icon = R.drawable.ic_left_arrow,
-                            contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.DismissButtonColor
-                        )
-                    }
-                },
-                title = {
-                    Text(
-                        stringResource(R.string.notifications),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        color = AppTheme.colors.TextColorLight
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.TopBarColor,
-                )
+            TopBar(
+                title = stringResource(R.string.notifications),
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->

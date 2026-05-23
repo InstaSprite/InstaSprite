@@ -21,8 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import com.instasprite.app.ui.components.composable.TopBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -117,25 +116,8 @@ fun ProfileCompletionContent(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(R.string.complete_your_profile),
-                            fontWeight = FontWeight.Bold,
-                            color = AppTheme.colors.TextColorLight,
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.titleLarge,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.BackgroundColorDarker,
-                    titleContentColor = AppTheme.colors.TextColorLight
-                )
+            TopBar(
+                title = stringResource(R.string.complete_your_profile)
             )
         },
         containerColor = AppTheme.colors.BackgroundColorDarker

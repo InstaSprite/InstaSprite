@@ -34,8 +34,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import com.instasprite.app.ui.components.composable.TopBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -86,27 +85,9 @@ fun SettingScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        PixelIcon(
-                            icon = R.drawable.ic_left_arrow,
-                            contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.DismissButtonColor
-                        )
-                    }
-                },
-                title = {
-                    Text(
-                        text = context?.getString(R.string.settings) ?: "Settings",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = colors.TextColorLight
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.TopBarColor,
-                )
+            TopBar(
+                title = context?.getString(R.string.settings) ?: "Settings",
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->

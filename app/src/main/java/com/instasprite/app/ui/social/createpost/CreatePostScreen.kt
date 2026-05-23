@@ -48,7 +48,7 @@ import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.social.createpost.composable.CaptionSection
 import com.instasprite.app.ui.social.createpost.composable.HashtagSection
 import com.instasprite.app.ui.social.createpost.composable.ImageSection
-import com.instasprite.app.ui.social.createpost.composable.TopBar
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.social.createpost.contract.CreatePostScreenEvent
 import com.instasprite.app.ui.social.createpost.contract.CreatePostState
 import com.instasprite.app.ui.social.feed.VerifyEmailState
@@ -116,7 +116,23 @@ private fun CreatePostScreenContent(
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
-            TopBar(onDismiss = event.onBackClick)
+            TopBar(
+                title = stringResource(R.string.create_post),
+                onBackClick = event.onBackClick,
+                actions = {
+                    Button(
+                        onClick = event.onCreatePost,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.SelectedColor,
+                            contentColor = AppTheme.colors.TextColorLight
+                        ),
+                        shape = MaterialTheme.shapes.small,
+                        enabled = uiState.caption.isNotBlank() && uiState.selectedImage != null && !uiState.isPostInProgress,
+                    ) {
+                        Text(stringResource(R.string.post), color = AppTheme.colors.TextColorDark)
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         Box(
@@ -171,19 +187,6 @@ private fun CreatePostScreenContent(
 //                        .fillMaxWidth()
 //                        .padding(horizontal = 10.pixelDp)
 //                )
-
-                Button(
-                    onClick = event.onCreatePost,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.SelectedColor,
-                        contentColor = AppTheme.colors.TextColorLight
-                    ),
-                    shape = MaterialTheme.shapes.small,
-                    enabled = uiState.caption.isNotBlank() && uiState.selectedImage != null && !uiState.isPostInProgress,
-                    modifier = Modifier.fillMaxWidth(0.5f)
-                ) {
-                    Text(stringResource(R.string.post), color = AppTheme.colors.TextColorDark)
-                }
             }
         }
 
