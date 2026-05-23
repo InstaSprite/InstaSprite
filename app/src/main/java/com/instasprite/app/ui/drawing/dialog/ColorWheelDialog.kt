@@ -195,7 +195,7 @@ fun ColorWheelDialog(
                         modifier = Modifier
                             .padding(start = 6.pixelDp)
                             .size(26.pixelDp)
-                            .border(width = 4.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
+                            .border(width = 2.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
                     )
                 }
 
@@ -394,7 +394,7 @@ private fun HueBar(
     Canvas(
         modifier = modifier
             .border(
-                width = 4.pixelDp,
+                width = 2.pixelDp,
                 color = AppTheme.colors.BackgroundColorDarker
             )
             .clip(RectangleShape)
@@ -476,7 +476,7 @@ private fun AlphaBar(
 
     Canvas(
         modifier = modifier
-            .border(width = 4.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
+            .border(width = 2.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
     ) {
@@ -552,7 +552,7 @@ private fun ValueBar(
 
     Canvas(
         modifier = modifier
-            .border(width = 4.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
+            .border(width = 2.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
     ) {
@@ -621,7 +621,7 @@ private fun SatValPanel(
             .fillMaxWidth()
             .height(134.pixelDp)
             .border(
-                width = 4.pixelDp,
+                width = 2.pixelDp,
                 color = AppTheme.colors.BackgroundColorDarker,
                 shape = RectangleShape
             )

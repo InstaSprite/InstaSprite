@@ -410,7 +410,10 @@ private fun PostHeader(
                 modifier = Modifier.size(14.pixelDp)
             ) {
                 PixelIcon(
-                    icon = R.drawable.ic_follow,
+                    icon =  if (postAuthor?.isFollowing == true)
+                        R.drawable.ic_profile
+                    else
+                        R.drawable.ic_follow,
                     contentDescription = stringResource(R.string.follow),
                     tint = if (postAuthor?.isFollowing == true)
                         AppTheme.colors.AccentButtonColor

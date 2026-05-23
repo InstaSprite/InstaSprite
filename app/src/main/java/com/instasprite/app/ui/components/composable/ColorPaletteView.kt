@@ -27,16 +27,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.draw.clip
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 
 import com.instasprite.app.utils.drawCheckerboard
 
 @Immutable
 data class ColorPaletteConfig(
     val backgroundColor: Color = Color.Unspecified,
-    val itemSpacing: Dp = 1.pixelDp,
+    val itemSpacing: Dp = 0.pixelDp,
     val listHeight: Dp = 26.pixelDp,
-    val colorItemSize: Dp = 20.pixelDp,
+    val colorItemSize: Dp = 22.pixelDp,
     val isInteractive: Boolean = true,
     val isWrap: Boolean = false,
 ) {
@@ -68,7 +71,7 @@ fun ColorPaletteView(
             contentAlignment = Alignment.CenterStart,
             modifier = modifier
                 .then(if (isWrap) Modifier.fillMaxWidth() else Modifier.height(height = listHeight))
-                .background(resolvedBg),
+                .background(resolvedBg)
         ) {
             val effectiveColorItemSize = if (isWrap && colors.isNotEmpty()) {
                 val wAvailPx = maxOf(0f, (maxWidth - (listHeight - colorItemSize)).value)
@@ -202,22 +205,25 @@ fun ActiveColorItem(
 @Preview
 @Composable
 private fun Preview() {
-    ColorPaletteView(
-        colors = listOf(
-            Color.White,
-            Color.Green,
-            Color.Blue,
-            Color.Yellow,
-            Color.Magenta,
-            Color.Cyan,
-        ),
-        activeColor = Color.White,
-        config = ColorPaletteConfig(
-            itemSpacing = 1.pixelDp,
-            listHeight = 26.pixelDp,
-            colorItemSize = 20.pixelDp,
-            isInteractive = true,
-        ),
-        onColorSelected = {},
-    )
+    InstaSpriteTheme {
+        ColorPaletteView(
+            colors = listOf(
+                Color.White,
+                Color.Green,
+                Color.Blue,
+                Color.Yellow,
+                Color.Magenta,
+                Color.Cyan,
+            ),
+            activeColor = Color.White,
+            config = ColorPaletteConfig(
+                backgroundColor = Color.Red,
+                itemSpacing = 0.pixelDp,
+                listHeight = 26.pixelDp,
+                colorItemSize = 22.pixelDp,
+                isInteractive = true,
+            ),
+            onColorSelected = {},
+        )
+    }
 }

@@ -130,7 +130,10 @@ fun FeedPostItem(
                         modifier = Modifier.size(14.pixelDp)
                     ) {
                         PixelIcon(
-                            icon = R.drawable.ic_follow,
+                            icon =  if (post.isFollowing)
+                                R.drawable.ic_profile
+                            else
+                                R.drawable.ic_follow,
                             contentDescription = stringResource(R.string.follow),
                             tint = if (post.isFollowing)
                                 AppTheme.colors.AccentButtonColor

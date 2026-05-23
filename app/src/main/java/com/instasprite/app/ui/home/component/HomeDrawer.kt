@@ -194,6 +194,7 @@ private fun HomeDrawerItem(
                 Text(text = label)
             }
         },
+        shape = MaterialTheme.shapes.medium,
         selected = selected,
         onClick = onClick,
         colors = colors,

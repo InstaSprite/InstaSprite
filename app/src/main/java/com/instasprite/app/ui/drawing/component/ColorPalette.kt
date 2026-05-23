@@ -121,8 +121,8 @@ fun ColorPalette(
                         coroutineScope.launch {
                             colorPaletteListState.scrollItemToCenter(
                                 index = index,
-                                itemSizeDp = 20.pixelDp,
-                                itemSpacingDp = 1.pixelDp,
+                                itemSizeDp = 22.pixelDp,
+                                itemSpacingDp = 0.pixelDp,
                                 density = density
                             )
                         }
@@ -130,7 +130,7 @@ fun ColorPalette(
                 },
                 modifier = Modifier
                     .height(26.pixelDp)
-                    .width(58.pixelDp) //  ̶E̶q̶u̶a̶l̶ ̶t̶w̶o̶ ̶c̶o̶l̶o̶r̶ ̶i̶t̶e̶m̶ ̶i̶n̶ ̶p̶a̶l̶e̶t̶t̶e̶ ̶+̶ ̶s̶p̶a̶c̶i̶n̶g̶
+                    .width(64.pixelDp) //  ̶E̶q̶u̶a̶l̶ ̶t̶w̶o̶ ̶c̶o̶l̶o̶r̶ ̶i̶t̶e̶m̶ ̶i̶n̶ ̶p̶a̶l̶e̶t̶t̶e̶ ̶+̶ ̶s̶p̶a̶c̶i̶n̶g̶
             )
 
             IconButton(
@@ -200,7 +200,7 @@ private fun ActiveColor(
             )
             .background(activeColor)
             .border(
-                width = 4.pixelDp,
+                width = 2.pixelDp,
                 color = AppTheme.colors.BackgroundColorDarker
             )
             .clickable(
