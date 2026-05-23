@@ -76,6 +76,7 @@ fun HomeScreen(
     onNavigateToCreateCanvas: () -> Unit,
     onNavigateToLoadImage: () -> Unit,
     onNavigateToHashtag: (hashtag : String) -> Unit,
+    onNavigateToPalette: () -> Unit,
     onLoginClick: () -> Unit,
     onOpenComments: (postId: Long) -> Unit,
     onOpenProfile: (userId: String) -> Unit,
@@ -284,6 +285,7 @@ fun HomeScreen(
                                 drawerState.open()
                             }
                         },
+                        onPaletteClick = onNavigateToPalette,
                         modifier = Modifier.height(48.pixelDp)
                     )
                 },

@@ -247,7 +247,7 @@
     <string name="failed_to_update_follow_status">Cập nhật trạng thái theo dõi thất bại</string>
     <string name="unknown_error">Lỗi không xác định</string>
     <string name="failed_to_upload_image">Tải ảnh lên thất bại</string>
-    <string name="menu">Trình đơn</string>
+    <string name="menu">Menu</string>
     <string name="edit_avatar">Sửa Ảnh đại diện</string>
     <string name="no_bio_available">Không có tiểu sử</string>
 
@@ -340,6 +340,7 @@
     <string name="layout_list">Dạng danh sách</string>
     <string name="layout_staggered">Lưới</string>
     <string name="layout_square_grid">Lưới vuông</string>
+    <string name="sort">Sắp xếp</string>
     <string name="sort_by">Sắp xếp theo</string>
     <string name="sort_a_z">A - Z</string>
     <string name="sort_z_a">Z - A</string>
@@ -400,6 +401,7 @@
     <string name="palette_preview">Xem trước Bảng màu</string>
     <string name="no_colors_added_yet">Chưa có màu nào được thêm</string>
     <string name="palette_name">Tên Bảng màu</string>
+    <string name="palette">Bảng màu</string>
     <string name="author">Tác giả</string>
     <string name="colors_count">Màu sắc (%1$d)</string>
     <string name="tap_color_to_edit">Nhấn vào màu để chỉnh sửa</string>

@@ -341,6 +341,7 @@
     <string name="layout_list">List view</string>
     <string name="layout_staggered">Staggered grid</string>
     <string name="layout_square_grid">Square grid</string>
+    <string name="sort">Sort</string>
     <string name="sort_by">Sort by</string>
     <string name="sort_a_z">A - Z</string>
     <string name="sort_z_a">Z - A</string>
@@ -399,6 +400,7 @@
     <string name="palette_preview">Palette Preview</string>
     <string name="no_colors_added_yet">No colors added yet</string>
     <string name="palette_name">Palette Name</string>
+    <string name="palette">Palette</string>
     <string name="author">Author</string>
     <string name="colors_count">Colors (%1$d)</string>
     <string name="tap_color_to_edit">Tap color to edit</string>
