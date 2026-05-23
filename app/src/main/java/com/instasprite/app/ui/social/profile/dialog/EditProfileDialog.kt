@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.instasprite.app.ui.components.dialog.CustomDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,38 +29,28 @@ fun EditProfileDialog(
     var displayName by remember { mutableStateOf(userProfile.displayName) }
     var bio by remember { mutableStateOf(userProfile.bio) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.edit_profile)) },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = displayName,
-                    onValueChange = { displayName = it },
-                    label = { Text(stringResource(R.string.display_name)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = bio,
-                    onValueChange = { bio = it },
-                    label = { Text(stringResource(R.string.bio)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 3
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onSave(displayName, bio)
-            }) {
-                Text(stringResource(R.string.save))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
-            }
+    CustomDialog(
+        title = stringResource(R.string.edit_profile),
+        onDismiss = onDismiss,
+        onConfirm = { onSave(displayName, bio) },
+        confirmButtonText = stringResource(R.string.save),
+        dismissButtonText = stringResource(R.string.cancel),
+    ) {
+        Column {
+            OutlinedTextField(
+                value = displayName,
+                onValueChange = { displayName = it },
+                label = { Text(stringResource(R.string.display_name)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = bio,
+                onValueChange = { bio = it },
+                label = { Text(stringResource(R.string.bio)) },
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 3
+            )
         }
-    )
+    }
 }

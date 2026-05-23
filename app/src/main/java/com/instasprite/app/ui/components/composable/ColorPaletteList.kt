@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -77,7 +76,7 @@ private fun ListEntry(
 ) {
     val itemModifier = modifier
         .fillMaxWidth()
-        .clip(RoundedCornerShape(12.dp))
+        .clip(MaterialTheme.shapes.medium)
         .background(AppTheme.colors.BackgroundColor)
         .clickable(onClick = onClick)
         .padding(12.dp)

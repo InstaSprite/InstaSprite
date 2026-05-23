@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
+import com.instasprite.app.utils.Constants.PIXEL_DP
 import com.instasprite.app.utils.rememberPixelPainter
 
 @Composable
@@ -22,9 +23,8 @@ fun PixelIcon(
 
     val size = painter.intrinsicSize
 
-    // convert px -> target dp scale, 16px -> 24dp = 1.5x ratio
-    val width = (size.width * 1.5f * scale).dp
-    val height = (size.height * 1.5f * scale).dp
+    val width = (size.width * PIXEL_DP * scale).dp
+    val height = (size.height * PIXEL_DP * scale).dp
 
     Image(
         painter = painter,

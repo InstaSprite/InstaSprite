@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,7 +41,7 @@ fun SavedAccountItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(MaterialTheme.shapes.small)
             .background(AppTheme.colors.BackgroundColor)
             .clickable { onClick() }
             .padding(12.dp),
@@ -58,7 +57,7 @@ fun SavedAccountItem(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .clip(CircleShape)
+                        .clip(MaterialTheme.shapes.small)
                         .background(Color.White)
                         .align(Alignment.BottomEnd)
                         .size(18.dp)

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -154,7 +153,6 @@ fun LoginForm(
                 contentColor = AppTheme.colors.TextColorLight,
                 disabledContainerColor = AppTheme.colors.Foreground1Color,
             ),
-            shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .height(56.dp)

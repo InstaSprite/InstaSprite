@@ -12,15 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,115 +50,83 @@ fun OtpEnrollmentDialog(
         }
     }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = AppTheme.colors.DialogColor,
-        shape = RoundedCornerShape(16.dp),
-        title = {
+    CustomDialog(
+        title = context.getString(R.string.enable_two_factor_authentication),
+        onDismiss = onDismiss,
+        onConfirm = onGotIt,
+        confirmButtonText = context.getString(R.string.got_it),
+        dismissButtonText = context.getString(R.string.cancel),
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Text(
-                text = context.getString(R.string.enable_two_factor_authentication),
+                text = context.getString(R.string.scan_qr_code_instruction),
                 color = AppTheme.colors.TextColorLight,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
             )
-        },
-        text = {
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = context.getString(R.string.scan_qr_code_instruction),
-                    color = AppTheme.colors.TextColorLight,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
-                )
 
-                if (qrBitmap != null) {
-                    Image(
-                        bitmap = qrBitmap,
-                        contentDescription = context.getString(R.string.qr_code_for_otp),
-                        modifier = Modifier.size(250.dp)
-                    )
-                } else {
+            if (qrBitmap != null) {
+                Image(
+                    bitmap = qrBitmap,
+                    contentDescription = context.getString(R.string.qr_code_for_otp),
+                    modifier = Modifier.size(250.dp)
+                )
+            } else {
+                Text(
+                    text = context.getString(R.string.failed_to_load_qr_code),
+                    color = AppTheme.colors.DismissButtonColor,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            Text(
+                text = context.getString(R.string.or_enter_secret_manually),
+                color = AppTheme.colors.Subtext0Color,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center
+            )
+
+            SelectionContainer {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     Text(
-                        text = context.getString(R.string.failed_to_load_qr_code),
-                        color = AppTheme.colors.DismissButtonColor,
-                        style = MaterialTheme.typography.bodySmall
+                        text = secret,
+                        color = AppTheme.colors.AccentButtonColor,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = FontFamily.Monospace
                     )
                 }
-
-                Text(
-                    text = context.getString(R.string.or_enter_secret_manually),
-                    color = AppTheme.colors.Subtext0Color,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center
-                )
-
-                SelectionContainer {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = secret,
-                            color = AppTheme.colors.AccentButtonColor,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = context.getString(R.string.account_issuer_info, accountName, issuer),
-                    color = AppTheme.colors.Subtext0Color,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = context.getString(R.string.after_scanning_instruction),
-                    color = AppTheme.colors.TextColorLight,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    fontSize = 12.sp
-                )
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = onGotIt,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppTheme.colors.AccentButtonColor
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = context.getString(R.string.got_it),
-                    color = AppTheme.colors.TextColorDark
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss
-            ) {
-                Text(
-                    text = context.getString(R.string.cancel),
-                    color = AppTheme.colors.DismissButtonColor
-                )
-            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = context.getString(R.string.account_issuer_info, accountName, issuer),
+                color = AppTheme.colors.Subtext0Color,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = context.getString(R.string.after_scanning_instruction),
+                color = AppTheme.colors.TextColorLight,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                fontSize = 12.sp
+            )
         }
-    )
+    }
 }
-

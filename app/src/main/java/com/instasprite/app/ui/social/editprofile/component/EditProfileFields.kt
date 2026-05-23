@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -57,7 +57,6 @@ fun EditProfileFields(
             onValueChange = { if (it.length <= 50) onDisplayNameChange(it) },
             singleLine = true,
             colors = fieldColors,
-            shape = RoundedCornerShape(12.dp),
             supportingText = {
                 Text(
                     text = "${displayName.length}/50",
@@ -83,7 +82,6 @@ fun EditProfileFields(
             minLines = 3,
             maxLines = 5,
             colors = fieldColors,
-            shape = RoundedCornerShape(12.dp),
             supportingText = {
                 Text(
                     text = "${bio.length}/150",
@@ -109,7 +107,7 @@ fun EditProfileFields(
                 .fillMaxWidth()
                 .background(
                     AppTheme.colors.BackgroundColor,
-                    RoundedCornerShape(12.dp)
+                    MaterialTheme.shapes.small
                 )
                 .padding(horizontal = 16.dp, vertical = 14.dp)
         ) {

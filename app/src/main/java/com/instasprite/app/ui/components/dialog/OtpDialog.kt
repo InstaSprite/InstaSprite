@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -73,133 +71,123 @@ fun OtpDialog(
         focusRequesters[0].requestFocus()
     }
 
-    AlertDialog(
-        onDismissRequest = {
-            if (enabled) onDismiss()
-        },
-        containerColor = AppTheme.colors.DialogColor,
-        shape = RoundedCornerShape(16.dp),
-        title = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
+    CustomDialog(
+        title = defaultTitle,
+        onDismiss = { if (enabled) onDismiss() },
+        onConfirm = { if (enabled && currentOtp.length == otpLength) onOtpComplete(currentOtp) },
+        confirmButtonText = "",
+        dismissButtonText = "",
+    ) {
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            description?.let {
                 Text(
-                    text = defaultTitle,
-                    color = AppTheme.colors.TextColorLight,
-                    style = MaterialTheme.typography.titleMedium
+                    text = it,
+                    color = AppTheme.colors.Subtext0Color,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 24.dp)
                 )
             }
-        },
-        text = {
-            Column(
-                modifier = modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(3.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                description?.let {
-                    Text(
-                        text = it,
-                        color = AppTheme.colors.Subtext0Color,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 24.dp)
-                    )
-                }
+                otpValues.forEachIndexed { index, valueState ->
+                    var isFocused by remember { mutableStateOf(false) }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(3.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    otpValues.forEachIndexed { index, valueState ->
-                        var isFocused by remember { mutableStateOf(false) }
-                        
-                        OtpTextField(
-                            enabled = enabled,
-                            value = valueState.value,
-                            isFocused = isFocused,
-                            onValueChange = { newValue ->
-                                val oldText = valueState.value.text
-                                val digits = newValue.text.filter { it.isDigit() }
-                                
-                                // Detect paste operation (more than 1 character)
-                                if (digits.length > 1) {
-                                    // Fill all fields with pasted digits
-                                    val digitsToFill = digits.take(otpLength)
-                                    digitsToFill.forEachIndexed { fillIndex, char ->
-                                        if (fillIndex < otpLength) {
-                                            otpValues[fillIndex].value = TextFieldValue(
-                                                text = char.toString(),
-                                                selection = TextRange(1)
-                                            )
-                                        }
-                                    }
-                                    
-                                    // Move focus to the last filled field or the last field
-                                    val lastFilledIndex = (digitsToFill.length - 1).coerceAtMost(otpLength - 1)
-                                    focusRequesters[lastFilledIndex].requestFocus()
-                                } else {
-                                    // Single character input (normal typing)
-                                    val digit = digits.takeLast(1)
-                                    
-                                    if (digit.length <= 1) {
-                                        valueState.value = TextFieldValue(
-                                            text = digit,
-                                            selection = TextRange(digit.length)
+                    OtpTextField(
+                        enabled = enabled,
+                        value = valueState.value,
+                        isFocused = isFocused,
+                        onValueChange = { newValue ->
+                            val oldText = valueState.value.text
+                            val digits = newValue.text.filter { it.isDigit() }
+
+                            // Detect paste operation (more than 1 character)
+                            if (digits.length > 1) {
+                                // Fill all fields with pasted digits
+                                val digitsToFill = digits.take(otpLength)
+                                digitsToFill.forEachIndexed { fillIndex, char ->
+                                    if (fillIndex < otpLength) {
+                                        otpValues[fillIndex].value = TextFieldValue(
+                                            text = char.toString(),
+                                            selection = TextRange(1)
                                         )
-
-                                        if (digit.isNotEmpty() && index < otpLength - 1) {
-                                            focusRequesters[index + 1].requestFocus()
-                                        }
-
-                                        if (oldText.isNotEmpty() && digit.isEmpty() && index > 0) {
-                                            focusRequesters[index - 1].requestFocus()
-                                        }
                                     }
                                 }
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .focusRequester(focusRequesters[index])
-                                .onFocusChanged { isFocused = it.isFocused }
-                        )
-                    }
+
+                                // Move focus to the last filled field or the last field
+                                val lastFilledIndex = (digitsToFill.length - 1).coerceAtMost(otpLength - 1)
+                                focusRequesters[lastFilledIndex].requestFocus()
+                            } else {
+                                // Single character input (normal typing)
+                                val digit = digits.takeLast(1)
+
+                                if (digit.length <= 1) {
+                                    valueState.value = TextFieldValue(
+                                        text = digit,
+                                        selection = TextRange(digit.length)
+                                    )
+
+                                    if (digit.isNotEmpty() && index < otpLength - 1) {
+                                        focusRequesters[index + 1].requestFocus()
+                                    }
+
+                                    if (oldText.isNotEmpty() && digit.isEmpty() && index > 0) {
+                                        focusRequesters[index - 1].requestFocus()
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .focusRequester(focusRequesters[index])
+                            .onFocusChanged { isFocused = it.isFocused }
+                    )
                 }
             }
-        },
-        confirmButton = {
-            Button(
-                enabled = enabled && currentOtp.length == otpLength,
-                onClick = {
-                    onOtpComplete(currentOtp)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppTheme.colors.AccentButtonColor,
-                    disabledContainerColor = AppTheme.colors.Foreground1Color
-                ),
-                shape = RoundedCornerShape(12.dp)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.End
             ) {
-                Text(
-                    text = defaultConfirmText,
-                    color = if (enabled && currentOtp.length == otpLength) {
-                        AppTheme.colors.TextColorDark
-                    } else {
-                        AppTheme.colors.TextColorLight
-                    }
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(
-                enabled = enabled,
-                onClick = onDismiss
-            ) {
-                Text(
-                    text = defaultDismissText,
-                    color = AppTheme.colors.TextColorLight
-                )
+                TextButton(
+                    enabled = enabled,
+                    onClick = onDismiss
+                ) {
+                    Text(
+                        text = defaultDismissText,
+                        color = AppTheme.colors.TextColorLight
+                    )
+                }
+                Button(
+                    enabled = enabled && currentOtp.length == otpLength,
+                    onClick = {
+                        onOtpComplete(currentOtp)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppTheme.colors.AccentButtonColor,
+                        disabledContainerColor = AppTheme.colors.Foreground1Color
+                    ),
+                ) {
+                    Text(
+                        text = defaultConfirmText,
+                        color = if (enabled && currentOtp.length == otpLength) {
+                            AppTheme.colors.TextColorDark
+                        } else {
+                            AppTheme.colors.TextColorLight
+                        }
+                    )
+                }
             }
         }
-    )
+    }
 }
 
 @Composable
@@ -220,7 +208,7 @@ private fun OtpTextField(
                 } else {
                     AppTheme.colors.Foreground2Color
                 },
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.small
             ),
         contentAlignment = Alignment.Center
     ) {

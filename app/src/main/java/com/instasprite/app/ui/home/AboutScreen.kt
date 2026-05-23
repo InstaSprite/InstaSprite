@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -145,8 +144,7 @@ fun AboutScreen(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(6.dp)
-                            .clip(CircleShape)
+                            .size(6.dp)
                             .background(color)
                     )
                 }
@@ -180,7 +178,7 @@ fun AboutScreen(
                 HorizontalDivider(color = colors.Foreground1Color, thickness = 0.5.dp)
 
                 AboutInfoCard(
-                    icon = R.drawable.ic_notification,
+                    icon = R.drawable.ic_edit,
                     iconTint = colors.AccentButtonColor,
                     label = "Built with",
                     value = "Jetpack Compose"

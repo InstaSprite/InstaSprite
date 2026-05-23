@@ -18,7 +18,7 @@ import com.instasprite.app.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileHeader(
-    username: String,
+    title: String,
     isOwnProfile: Boolean,
     onBackClick: () -> Unit,
     onMenuClick: () -> Unit = {},
@@ -28,7 +28,7 @@ fun ProfileHeader(
     TopAppBar(
         title = {
             Text(
-                text = username,
+                text = title,
                 color = AppTheme.colors.TextColorLight,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -37,23 +37,14 @@ fun ProfileHeader(
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 PixelIcon(
-                    icon = R.drawable.ic_close,
+                    icon = R.drawable.ic_left_arrow,
                     contentDescription = stringResource(R.string.back),
-                    tint = AppTheme.colors.TextColorLight
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = onMenuClick) {
-                PixelIcon(
-                    icon = R.drawable.ic_menu,
-                    contentDescription = stringResource(R.string.menu),
-                    tint = AppTheme.colors.TextColorLight
+                    tint = AppTheme.colors.DismissButtonColor
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = AppTheme.colors.BackgroundColorDarker
+            containerColor = AppTheme.colors.BackgroundColor
         ),
         modifier = modifier
     )

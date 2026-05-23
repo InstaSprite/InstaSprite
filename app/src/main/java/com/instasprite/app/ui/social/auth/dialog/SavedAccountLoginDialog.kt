@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -76,7 +75,6 @@ fun SavedAccountLoginDialog(
         }
     ) {
         Card(
-            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = AppTheme.colors.BackgroundColor),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -153,7 +151,6 @@ fun SavedAccountLoginDialog(
                         contentColor = AppTheme.colors.TextColorLight,
                         disabledContainerColor = AppTheme.colors.Foreground1Color,
                     ),
-                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .height(56.dp)

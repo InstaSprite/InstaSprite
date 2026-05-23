@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import com.instasprite.app.ui.components.shape.PixelShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
@@ -74,11 +74,11 @@ fun AvatarSelectionComponent(
         Box(
             modifier = Modifier
                 .size(120.dp)
-                .clip(CircleShape)
+                .clip(PixelShape(3))
                 .border(
                     width = 3.dp,
                     color = AppTheme.colors.BottomBarColor,
-                    shape = CircleShape
+                    shape = PixelShape(3)
                 )
                 .background(AppTheme.colors.BackgroundColorDarker)
                 .clickable { showImagePicker = true },
@@ -90,7 +90,7 @@ fun AvatarSelectionComponent(
                     altText = "Selected Avatar",
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(CircleShape),
+                        .clip(PixelShape(3)),
                 )
             } else {
                 PixelIcon(

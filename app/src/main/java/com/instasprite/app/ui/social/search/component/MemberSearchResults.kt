@@ -18,8 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -77,7 +76,7 @@ fun MemberSearchItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(MaterialTheme.shapes.medium)
             .background(AppTheme.colors.BackgroundColor)
             .clickable(onClick = onClick)
             .padding(12.dp),
@@ -95,13 +94,13 @@ fun MemberSearchItem(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(CircleShape)
+                    .clip(MaterialTheme.shapes.medium)
             )
         } else {
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(CircleShape)
+                    .clip(MaterialTheme.shapes.medium)
                     .background(AppTheme.colors.Foreground1Color),
                 contentAlignment = Alignment.Center
             ) {

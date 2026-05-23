@@ -20,9 +20,12 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.instasprite.app.utils.Constants.PIXEL_DP
 
 object UiUtils {
     @Composable
@@ -46,6 +49,15 @@ object UiUtils {
         }
     }
 }
+
+inline val Float.pixelDp: Dp
+    get() = (this * PIXEL_DP).dp
+
+inline val Int.pixelDp: Dp
+    get() = (this * PIXEL_DP).dp
+
+inline val Double.pixelDp: Dp
+    get() = (this * PIXEL_DP).dp
 
 @Composable
 fun rememberIconBitmap(

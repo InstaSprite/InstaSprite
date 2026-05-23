@@ -61,6 +61,7 @@ import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
 import com.instasprite.app.domain.session.SocialSessionState
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.UiUtils
+import com.instasprite.app.utils.pixelDp
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -283,7 +284,7 @@ fun HomeScreen(
                                 drawerState.open()
                             }
                         },
-                        modifier = Modifier.height(56.dp)
+                        modifier = Modifier.height(48.pixelDp)
                     )
                 },
             ) { innerPadding ->
@@ -317,7 +318,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 21.dp)
+                    .padding(bottom = 8.pixelDp)
                     .background(Color.Transparent),
                 contentAlignment = Alignment.Center,
             ) {

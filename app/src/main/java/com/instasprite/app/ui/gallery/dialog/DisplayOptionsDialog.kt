@@ -1,26 +1,26 @@
 package com.instasprite.app.ui.gallery.dialog
 
-import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
+import com.instasprite.app.ui.components.dialog.CustomDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
+
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -57,67 +57,39 @@ fun DisplayOptionsDialog(
     )
     val currentLayoutLabel = layoutOptions.entries.firstOrNull { it.value == selectedLayoutMode }?.key ?: ""
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = AppTheme.colors.DialogColor,
-        title = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.display_options),
-                    color = AppTheme.colors.TextColorLight,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
+    CustomDialog(
+        title = stringResource(R.string.display_options),
+        onDismiss = onDismiss,
+        onConfirm = {
+            onSortOrderSelected(selectedSortOrder)
+            onLayoutModeSelected(selectedLayoutMode)
+            onDismiss()
         },
-        text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                DropdownField(
-                    label = stringResource(R.string.sort_by),
-                    options = sortOptions.keys.toList(),
-                    selectedOption = currentSortLabel,
-                    onOptionSelected = { label ->
-                        sortOptions[label]?.let { selectedSortOrder = it }
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                DropdownField(
-                    label = stringResource(R.string.layout_mode),
-                    options = layoutOptions.keys.toList(),
-                    selectedOption = currentLayoutLabel,
-                    onOptionSelected = { label ->
-                        layoutOptions[label]?.let { selectedLayoutMode = it }
-                    }
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onSortOrderSelected(selectedSortOrder)
-                    onLayoutModeSelected(selectedLayoutMode)
-                    onDismiss()
+        confirmButtonText = "Apply",
+        dismissButtonText = "Cancel",
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            DropdownField(
+                label = stringResource(R.string.sort_by),
+                options = sortOptions.keys.toList(),
+                selectedOption = currentSortLabel,
+                onOptionSelected = { label ->
+                    sortOptions[label]?.let { selectedSortOrder = it }
                 }
-            ) {
-                Text(
-                    text = "Apply",
-                    color = AppTheme.colors.AccentButtonColor
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = "Cancel",
-                    color = AppTheme.colors.TextColorLight
-                )
-            }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            DropdownField(
+                label = stringResource(R.string.layout_mode),
+                options = layoutOptions.keys.toList(),
+                selectedOption = currentLayoutLabel,
+                onOptionSelected = { label ->
+                    layoutOptions[label]?.let { selectedLayoutMode = it }
+                }
+            )
         }
-    )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

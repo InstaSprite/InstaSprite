@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,8 +47,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.instasprite.app.R
+import androidx.compose.material3.MaterialTheme
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.Constants.PIXEL_DP
+import com.instasprite.app.utils.noRippleClickable
+import com.instasprite.app.utils.pixelDp
 import kotlin.math.roundToInt
 
 enum class FabMenuAlignment {
@@ -93,13 +95,13 @@ fun ExpandableFabMenu(
     items: List<FabMenuItem>,
     modifier: Modifier = Modifier,
     alignment: FabMenuAlignment = FabMenuAlignment.Center,
-    itemWidth: Dp = 200.dp,
-    itemSpacing: Dp = 12.dp,
+    itemWidth: Dp = 150.pixelDp,
+    itemSpacing: Dp = 4.pixelDp,
     animationDurationMs: Int = 300,
     itemStaggerDelayMs: Int = 50,
-    mainFabSize: Dp = 70.dp,
+    mainFabSize: Dp = 32.pixelDp,
     mainFabIconSize: Dp = 30.dp,
-    miniFabSize: Dp = 48.dp,
+    miniFabSize: Dp = 32.pixelDp,
     colors: FabMenuColors = FabMenuColors.defaults(),
 ) {
     val density = LocalDensity.current
@@ -141,9 +143,9 @@ fun ExpandableFabMenu(
             val alignedY =
                 fabOffset.y.roundToInt() -
                         columnSize.height -
-                        itemSpacingPx * (items.size + 1)
+                        itemSpacingPx * (items.size + 1) * PIXEL_DP
 
-            IntOffset(alignedX, alignedY)
+            IntOffset(alignedX, alignedY.toInt())
         }
     }
 
@@ -216,7 +218,6 @@ fun ExpandableFabMenu(
 
     FloatingActionButton(
         onClick = { expanded = !expanded },
-        shape = CircleShape,
         containerColor = colors.fab,
         modifier = modifier
             .size(mainFabSize)
@@ -255,10 +256,9 @@ private fun FabItemView(
             .scale(0.4f + 0.6f * animProgress)
             .background(
                 color = colors.itemBackground,
-                shape = RoundedCornerShape(6.dp)
+                shape = MaterialTheme.shapes.small
             )
-            .clickable(
-                enabled = true,
+            .noRippleClickable(
                 onClick = {
                     onDismiss()
                     item.onClick()
@@ -271,7 +271,7 @@ private fun FabItemView(
             modifier = Modifier
                 .padding(6.dp)
                 .size(fabSize)
-                .background(shape = CircleShape, color = colors.itemIconBackground)
+                .background(shape = MaterialTheme.shapes.small, color = colors.itemIconBackground)
         ) {
             PixelIcon(
                 icon = item.icon,

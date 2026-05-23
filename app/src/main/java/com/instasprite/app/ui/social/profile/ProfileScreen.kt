@@ -16,7 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -173,7 +173,7 @@ fun ProfileContent(
             .background(AppTheme.colors.BackgroundColorDarker)
     ) {
         ProfileHeader(
-            username = state.userProfile.username,
+            title = stringResource(R.string.profile),
             isOwnProfile = isOwnProfile,
             onBackClick = event.onBackClick,
             onMenuClick = event.onMenuClick,
@@ -246,7 +246,7 @@ fun ProfileContent(
                                 altText = firstImage?.altText
                                     ?: stringResource(R.string.post_image),
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
+                                    .clip(MaterialTheme.shapes.small)
                                     .fillMaxWidth()
                                     .background(AppTheme.colors.Foreground2Color)
                                     .clickable { event.onPostClick(post.postId) },

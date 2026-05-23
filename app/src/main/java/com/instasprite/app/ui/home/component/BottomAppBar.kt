@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -27,6 +25,7 @@ import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun HomeBottomBar(
@@ -130,6 +129,7 @@ fun HomeFab(
     }
 
     ExpandableFabMenu(
+        itemWidth = 120.pixelDp,
         items = menuItems
     )
 
@@ -142,10 +142,9 @@ fun FeedFab(
 ) {
     FloatingActionButton(
         onClick = onCreatePost,
-        shape = CircleShape,
-        containerColor = AppTheme.colors.TextColorLight,
+        containerColor = colors.fab,
         modifier = Modifier
-            .size(70.dp)
+            .size(32.pixelDp)
     ) {
         PixelIcon(
             icon = R.drawable.ic_plus,

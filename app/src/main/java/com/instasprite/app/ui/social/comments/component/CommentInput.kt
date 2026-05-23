@@ -11,8 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import com.instasprite.app.ui.components.shape.PixelShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -49,10 +50,10 @@ fun CommentInput(
         modifier = Modifier
             .fillMaxWidth()
             .then(modifier),
+        shape = PixelShape(0),
         colors = CardDefaults.cardColors(
             containerColor = AppTheme.colors.BackgroundColorDarker
-        ),
-        shape = RoundedCornerShape(0.dp)
+        )
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             AnimatedVisibility(
@@ -92,7 +93,7 @@ fun CommentInput(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(MaterialTheme.shapes.small)
                         .background(AppTheme.colors.BackgroundColor)
                         .padding(horizontal = 16.dp, vertical = 10.dp),
                     contentAlignment = Alignment.CenterStart

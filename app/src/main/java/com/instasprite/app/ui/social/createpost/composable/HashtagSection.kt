@@ -15,7 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.CustomTextField
+import com.instasprite.app.data.model.InputField
+import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -31,7 +32,7 @@ fun HashtagSection(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        CustomTextField(
+        InputTextField(
             enabled = enabled,
             value = inputValue,
             onValueChange = {
@@ -41,7 +42,7 @@ fun HashtagSection(
                     onValueChange(it)
                 }
             },
-            label = "Add tags (space to separate)",
+            inputField = InputField(label = "Add tags (space to separate)"),
             maxLines = 1,
             modifier = Modifier.fillMaxWidth()
         )

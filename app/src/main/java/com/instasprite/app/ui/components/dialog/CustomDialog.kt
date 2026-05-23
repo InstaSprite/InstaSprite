@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -31,12 +30,12 @@ fun CustomDialog(
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
     confirmButtonColor: Color = AppTheme.colors.AccentButtonColor,
+    scrollable: Boolean = false,
     content: @Composable () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = AppTheme.colors.DialogColor,
-        shape = RoundedCornerShape(10.dp),
         title = {
             if (title != null)
             {
@@ -53,9 +52,13 @@ fun CustomDialog(
             }
         },
         text = {
+            val modifier = if (scrollable) {
+                Modifier.verticalScroll(rememberScrollState())
+            } else {
+                Modifier
+            }
             Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
+                modifier = modifier
             ) {
                 content()
             }

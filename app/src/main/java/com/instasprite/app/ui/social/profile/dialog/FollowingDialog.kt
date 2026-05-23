@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,12 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import com.instasprite.app.ui.components.shape.PixelShape
+import com.instasprite.app.ui.components.dialog.CustomDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,87 +43,63 @@ fun FollowingDialog(
 ) {
     LocalContext.current
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = AppTheme.colors.BackgroundColorDarker,
-        title = {
+    CustomDialog(
+        title = stringResource(R.string.following),
+        onDismiss = onDismiss,
+        onConfirm = onDismiss,
+        confirmButtonText = stringResource(R.string.close),
+        dismissButtonText = "",
+    ) {
+        if (isLoading) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        color = AppTheme.colors.BottomBarColor
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.loading_following),
+                        color = AppTheme.colors.Foreground2Color,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+        } else if (following.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.following),
-                    color = AppTheme.colors.TextColorLight,
-                    style = MaterialTheme.typography.titleMedium
+                    text = stringResource(R.string.no_following),
+                    color = AppTheme.colors.Foreground2Color,
+                    fontSize = 14.sp
                 )
             }
-        },
-        text = {
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            color = AppTheme.colors.BottomBarColor
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(R.string.loading_following),
-                            color = AppTheme.colors.Foreground2Color,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-            } else if (following.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.no_following),
-                        color = AppTheme.colors.Foreground2Color,
-                        fontSize = 14.sp
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            ) {
+                items(following) { user ->
+                    FollowingItem(
+                        user = user,
+                        onUnfollowClick = onUnfollowClick,
+                        onProfileClick = onProfileClick
                     )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                ) {
-                    items(following) { user ->
-                        FollowingItem(
-                            user = user,
-                            onUnfollowClick = onUnfollowClick,
-                            onProfileClick = onProfileClick
-                        )
-                    }
-                }
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppTheme.colors.BottomBarColor
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.close),
-                    color = AppTheme.colors.TextColorLight
-                )
-            }
-        },
-        dismissButton = {}
-    )
+        }
+    }
 }
 
 @Composable
@@ -175,7 +149,7 @@ private fun FollowingItem(
         Box(
             modifier = Modifier
                 .size(32.dp)
-                .clip(CircleShape)
+                .clip(PixelShape(3))
                 .clickable { onUnfollowClick(user.id) }
                 .background(AppTheme.colors.DismissButtonColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center

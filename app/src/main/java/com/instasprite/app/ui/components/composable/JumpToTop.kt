@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -44,7 +43,6 @@ fun JumpToTopButton(
                 listState.animateScrollToItem(0)
             }
         },
-        shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = AppTheme.colors.BackgroundColor
         ),

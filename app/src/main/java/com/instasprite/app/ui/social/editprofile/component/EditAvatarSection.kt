@@ -7,7 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import com.instasprite.app.ui.components.shape.PixelShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun EditAvatarSection(
@@ -42,14 +44,14 @@ fun EditAvatarSection(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(150.dp)
-                    .clip(CircleShape)
+                    .clip(MaterialTheme.shapes.medium)
                     .background(AppTheme.colors.Foreground2Color)
-                    .border(2.dp, AppTheme.colors.BackgroundColor, CircleShape)
+                    .border(1.pixelDp, AppTheme.colors.TextColorLight, PixelShape(3))
             )
             Box(
                 modifier = Modifier
                     .size(32.dp)
-                    .clip(CircleShape)
+                    .clip(MaterialTheme.shapes.medium)
                     .background(AppTheme.colors.TextColorLight)
                     .clickable(onClick = onOpenSheet)
                     .align(Alignment.BottomEnd),

@@ -18,11 +18,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import com.instasprite.app.ui.components.shape.PixelShape
+
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
+import com.instasprite.app.ui.components.dialog.CustomDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -61,6 +62,7 @@ import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.Catppuccin
 import com.instasprite.app.ui.theme.ThemeFlavour
 import com.instasprite.app.utils.UiUtils
+import com.instasprite.app.utils.pixelDp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -223,58 +225,43 @@ fun SettingScreen(
 
         // Language Selection Dialog
         if (uiState.showLanguageDialog) {
-            AlertDialog(
-                onDismissRequest = { viewModel.dismissLanguageDialog() },
-                title = {
-                    Text(
-                        text = context?.getString(R.string.change_language) ?: "Select Language",
-                        fontWeight = FontWeight.Bold,
-                        color = colors.TextColorLight
-                    )
-                },
-                text = {
-                    Column {
-                        uiState.languages.forEachIndexed { index, language ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        viewModel.selectLanguage(index)
-                                    }
-                                    .padding(vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = uiState.selectedLanguage == language,
-                                    onClick = {
-                                        viewModel.selectLanguage(index)
-                                    },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = colors.SelectedColor,
-                                        unselectedColor = colors.Subtext0Color
-                                    )
+            CustomDialog(
+                title = context?.getString(R.string.change_language) ?: "Select Language",
+                onDismiss = { viewModel.dismissLanguageDialog() },
+                onConfirm = { viewModel.dismissLanguageDialog() },
+                confirmButtonText = context?.getString(R.string.cancel) ?: "Cancel",
+                dismissButtonText = "",
+            ) {
+                Column {
+                    uiState.languages.forEachIndexed { index, language ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.selectLanguage(index)
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = uiState.selectedLanguage == language,
+                                onClick = {
+                                    viewModel.selectLanguage(index)
+                                },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = colors.SelectedColor,
+                                    unselectedColor = colors.Subtext0Color
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = language,
-                                    color = colors.TextColorLight
-                                )
-                            }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = language,
+                                color = colors.TextColorLight
+                            )
                         }
                     }
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = { viewModel.dismissLanguageDialog() }
-                    ) {
-                        Text(
-                            text = context?.getString(R.string.cancel) ?: "Cancel",
-                            color = colors.DismissButtonColor
-                        )
-                    }
-                },
-                containerColor = colors.DialogColor
-            )
+                }
+            }
         }
 
         if (uiState.showSetPasswordDialog) {
@@ -339,12 +326,11 @@ private fun FlavourCard(
 ) {
     val colors = AppTheme.colors
     val borderColor = if (isSelected) colors.SelectedColor else colors.Foreground1Color
-    val borderWidth = if (isSelected) 2.dp else 1.dp
 
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .border(borderWidth, borderColor, RoundedCornerShape(12.dp))
+            .clip(MaterialTheme.shapes.small)
+            .border(1.pixelDp, borderColor, MaterialTheme.shapes.small)
             .background(previewColors.BackgroundColor)
             .clickable(onClick = onClick)
             .padding(8.dp),
@@ -364,7 +350,7 @@ private fun FlavourCard(
                 Box(
                     modifier = Modifier
                         .size(10.dp)
-                        .clip(CircleShape)
+                        .clip(PixelShape(3))
                         .background(color)
                 )
             }

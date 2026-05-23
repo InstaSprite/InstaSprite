@@ -3,7 +3,6 @@ package com.instasprite.app.ui.drawing.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -28,7 +27,6 @@ fun ToolSizeOption(
     Box(modifier = modifier) {
         Button(
             onClick = { expanded = true },
-            shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = AppTheme.colors.BackgroundColorDarker,
                 contentColor = AppTheme.colors.TextColorLight

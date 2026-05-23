@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -57,6 +56,7 @@ import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.DummyData
 import com.instasprite.app.utils.drawCheckerboard
+import com.instasprite.app.utils.pixelDp
 import com.instasprite.app.utils.toHexString
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -352,7 +352,7 @@ private fun PaletteEditorContent(
                                     .fillMaxWidth()
                                     .background(AppTheme.colors.BackgroundColor)
                                     .padding(vertical = 4.dp, horizontal = 8.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(MaterialTheme.shapes.medium)
                             ) {
                                 IconButton(
                                     modifier = Modifier
@@ -400,9 +400,9 @@ private fun PaletteEditorContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 24.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(MaterialTheme.shapes.small)
                         .background(AppTheme.colors.BackgroundColor)
-                        .border(1.dp, AppTheme.colors.Foreground2Color, RoundedCornerShape(4.dp))
+                        .border(1.pixelDp, AppTheme.colors.Foreground2Color, MaterialTheme.shapes.small)
                         .clickable { onAddColorClick() }
                         .padding(vertical = 12.dp),
                     horizontalArrangement = Arrangement.Center,

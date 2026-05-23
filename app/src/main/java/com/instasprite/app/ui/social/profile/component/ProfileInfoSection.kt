@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -39,6 +38,7 @@ import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun ProfileInfoSection(
@@ -70,25 +70,10 @@ fun ProfileInfoSection(
                 modifier = Modifier.size(avatarContainerSize),
                 contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(avatarSize)
-                        .border(width = 2.dp, color = Color.White, shape = CircleShape)
-                        .padding(4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                            .background(AppTheme.colors.BackgroundColorDarker),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ProfileImage(
-                            imageUrl = userProfile.profileImageUrl,
-                            size = avatarSize
-                        )
-                    }
-                }
+                ProfileImage(
+                    imageUrl = userProfile.profileImageUrl,
+                    size = avatarSize
+                )
             }
 
             Spacer(modifier = Modifier.width(8.dp))

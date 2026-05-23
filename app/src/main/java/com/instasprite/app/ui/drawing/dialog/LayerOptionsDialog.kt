@@ -7,18 +7,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.instasprite.app.ui.components.dialog.CustomDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,123 +51,104 @@ fun LayerOptionsDialog(
     val blendModeOptions = BlendMode.entries
     val currentBlendMode = layer.blendMode
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = AppTheme.colors.DialogColor,
-        title = {
+    CustomDialog(
+        title = "Layer Options",
+        onDismiss = onDismiss,
+        onConfirm = onDismiss,
+        confirmButtonText = "Close",
+        dismissButtonText = "",
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Layer Preview
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Layer Options",
-                    color = AppTheme.colors.TextColorLight,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-        },
-        text = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Layer Preview
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (layerImage != null) {
-                        Image(
-                            bitmap = layerImage,
-                            contentDescription = "Layer Preview",
-                            contentScale = ContentScale.FillWidth,
-                            filterQuality = FilterQuality.None,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .drawCheckerboard(
-                                    canvasWidth = canvasWidth,
-                                    canvasHeight = canvasHeight
-                                )
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Blend Mode Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = currentBlendMode.name.lowercase()
-                            .replaceFirstChar { it.uppercase() },
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Blend Mode") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        colors = AppTheme.colors.outlineTextFieldColors(),
+                if (layerImage != null) {
+                    Image(
+                        bitmap = layerImage,
+                        contentDescription = "Layer Preview",
+                        contentScale = ContentScale.FillWidth,
+                        filterQuality = FilterQuality.None,
                         modifier = Modifier
-                            .menuAnchor()
                             .fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        containerColor = AppTheme.colors.DropDownMenuColor
-                    ) {
-                        blendModeOptions.forEach { mode ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        mode.name.lowercase().replaceFirstChar { it.uppercase() },
-                                        color = AppTheme.colors.TextColorLight
-                                    )
-                                },
-                                onClick = {
-                                    onBlendModeSelected(mode)
-                                    expanded = false
-                                }
+                            .drawCheckerboard(
+                                canvasWidth = canvasWidth,
+                                canvasHeight = canvasHeight
                             )
-                        }
-                    }
+                    )
                 }
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                // Merge Down Button
-                if (canMergeDown) {
-                    Button(
-                        onClick = {
-                            onMergeDown()
-                            onDismiss()
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AppTheme.colors.SelectedColor,
-                            contentColor = AppTheme.colors.TextColorDark
-                        ),
-                        modifier = Modifier
-                    ) {
-                        Text(
-                            text = "Merge Down",
-                            color = AppTheme.colors.TextColorDark,
+            // Blend Mode Dropdown
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = it }
+            ) {
+                OutlinedTextField(
+                    value = currentBlendMode.name.lowercase()
+                        .replaceFirstChar { it.uppercase() },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Blend Mode") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = AppTheme.colors.outlineTextFieldColors(),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    containerColor = AppTheme.colors.DropDownMenuColor
+                ) {
+                    blendModeOptions.forEach { mode ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    mode.name.lowercase().replaceFirstChar { it.uppercase() },
+                                    color = AppTheme.colors.TextColorLight
+                                )
+                            },
+                            onClick = {
+                                onBlendModeSelected(mode)
+                                expanded = false
+                            }
                         )
                     }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = "Close",
-                    color = AppTheme.colors.TextColorLight
-                )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Merge Down Button
+            if (canMergeDown) {
+                Button(
+                    onClick = {
+                        onMergeDown()
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppTheme.colors.SelectedColor,
+                        contentColor = AppTheme.colors.TextColorDark
+                    ),
+                    modifier = Modifier
+                ) {
+                    Text(
+                        text = "Merge Down",
+                        color = AppTheme.colors.TextColorDark,
+                    )
+                }
             }
         }
-    )
+    }
 }
 
 @Preview

@@ -13,9 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -89,7 +88,7 @@ fun CommentItem(
     ) {
         val avatarModifier = Modifier
             .size(if (isReply) 24.dp else 32.dp)
-            .clip(CircleShape)
+            .clip(MaterialTheme.shapes.medium)
             .clickable { onProfileClick(comment.username) }
 
         ProfileImage(
@@ -103,7 +102,7 @@ fun CommentItem(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clip(RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 12.dp))
+                .clip(MaterialTheme.shapes.medium)
                 .background(if (isReply) replyBackgroundColor else Color.Transparent)
                 .padding(if (isReply) 12.dp else 0.dp)
         ) {
@@ -142,7 +141,7 @@ fun CommentItem(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(MaterialTheme.shapes.small)
                         .clickable { onLikeClick(comment.id) }
                         .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
                 ) {
@@ -170,7 +169,7 @@ fun CommentItem(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(MaterialTheme.shapes.small)
                             .clickable { onReplyClick(comment.id) }
                             .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
                     ) {

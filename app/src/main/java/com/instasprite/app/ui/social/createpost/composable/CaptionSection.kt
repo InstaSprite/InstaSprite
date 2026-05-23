@@ -8,7 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.instasprite.app.ui.components.composable.CustomTextField
+import com.instasprite.app.data.model.InputField
+import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -20,12 +21,12 @@ fun CaptionSection(
     onValueChange: (String) -> Unit = {}
 ) {
     Column {
-        CustomTextField(
+        InputTextField(
             enabled = enabled,
             value = value,
             onValueChange = onValueChange,
             maxLines = maxLines,
-            label = "What's on your mind?",
+            inputField = InputField(label = "What's on your mind?"),
             modifier = modifier
         )
 

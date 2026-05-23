@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,7 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.CustomTextField
+import com.instasprite.app.data.model.InputField
+import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.completionprofile.contract.ProfileCompletionScreenEvent
 import com.instasprite.app.ui.social.completionprofile.contract.ProfileCompletionState
@@ -222,53 +222,49 @@ private fun ProfileCompletionForm(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        CustomTextField(
+        InputTextField(
             value = username,
             onValueChange = {
                 username = it
                 event.onErrorChanged("")
             },
-            label = stringResource(R.string.username),
-            keyboardType = KeyboardType.Text,
+            inputField = InputField(label = stringResource(R.string.username), keyboardType = KeyboardType.Text),
             imeAction = ImeAction.Next
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        CustomTextField(
+        InputTextField(
             value = name,
             onValueChange = {
                 name = it
                 event.onErrorChanged("")
             },
-            label = stringResource(R.string.full_name),
-            keyboardType = KeyboardType.Text,
+            inputField = InputField(label = stringResource(R.string.full_name), keyboardType = KeyboardType.Text),
             imeAction = ImeAction.Next
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        CustomTextField(
+        InputTextField(
             value = email,
             onValueChange = {
                 email = it
                 event.onErrorChanged("")
             },
-            label = stringResource(R.string.email),
-            keyboardType = KeyboardType.Email,
+            inputField = InputField(label = stringResource(R.string.email), keyboardType = KeyboardType.Email),
             imeAction = ImeAction.Next
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        CustomTextField(
+        InputTextField(
             value = introduce,
             onValueChange = {
                 introduce = it
                 event.onErrorChanged("")
             },
-            label = stringResource(R.string.introduction_optional),
-            keyboardType = KeyboardType.Text,
+            inputField = InputField(label = stringResource(R.string.introduction_optional), keyboardType = KeyboardType.Text),
             imeAction = ImeAction.Done,
             maxLines = 3
         )
@@ -314,7 +310,6 @@ private fun ProfileCompletionForm(
                 }
             },
             enabled = !state.isLoading && !state.isUploadingImage,
-            shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = AppTheme.colors.BottomBarColor,
                 contentColor = AppTheme.colors.TextColorLight
