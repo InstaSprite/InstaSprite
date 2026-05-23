@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import com.instasprite.app.ui.components.shape.PixelShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -78,7 +79,7 @@ fun AvatarSelectionComponent(
                 .border(
                     width = 3.dp,
                     color = AppTheme.colors.BottomBarColor,
-                    shape = PixelShape(3)
+                    shape = MaterialTheme.shapes.medium,
                 )
                 .background(AppTheme.colors.BackgroundColorDarker)
                 .clickable { showImagePicker = true },

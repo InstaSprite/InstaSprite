@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -66,6 +67,7 @@ fun CustomDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
+                shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor,)
             ) {
                 Text(confirmButtonText, color = AppTheme.colors.TextColorDark)

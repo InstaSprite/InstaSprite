@@ -26,6 +26,7 @@ import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.dialog.CustomDialog
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -132,6 +133,7 @@ fun LospecImportDialog(
                             }
                         }
                     },
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppTheme.colors.AccentButtonColor
                     ),

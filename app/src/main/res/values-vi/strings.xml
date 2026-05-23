@@ -216,7 +216,7 @@
     <string name="post">Đăng</string>
     <string name="back">Quay lại</string>
     <string name="profile_picture">Ảnh đại diện</string>
-    <string name="unfollow">Đang theo dõi</string>
+    <string name="unfollow">Hủy theo dõi</string>
     <string name="follow">Theo dõi</string>
     <string name="image_unavailable">Không có hình ảnh</string>
     <string name="replying_tap_to_cancel">Đang trả lời… chạm để hủy</string>

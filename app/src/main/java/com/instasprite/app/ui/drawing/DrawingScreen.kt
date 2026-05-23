@@ -332,6 +332,7 @@ private fun DrawingScreenContent(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
                             .height(60.dp)
+                            .padding(vertical = 4.dp)
                             .align(Alignment.CenterHorizontally)
                     )
                 }

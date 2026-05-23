@@ -23,6 +23,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ import com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay
 import com.instasprite.app.ui.components.composable.BackButton
 import com.instasprite.app.ui.components.composable.Bar
 import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.drawCheckerboard
@@ -207,6 +209,7 @@ private fun BottomBar(
             ) {
                 Button(
                     onClick = onSaveImageTap,
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppTheme.colors.SelectedColor
                     )
@@ -229,6 +232,7 @@ private fun BottomBar(
 
                 Button(
                     onClick = onEditButtonTap,
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppTheme.colors.AccentButtonColor
                     ),

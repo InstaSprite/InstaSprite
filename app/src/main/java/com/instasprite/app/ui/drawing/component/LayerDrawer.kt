@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +40,7 @@ import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.ui.components.composable.BackButton
 import com.instasprite.app.ui.components.composable.Bar
 import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -179,6 +181,7 @@ fun LayerDrawer(
             rightSlot = {
                 Button(
                     onClick = { onEvent(LayerEvent.AddLayer) },
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppTheme.colors.AccentButtonColor
                     )

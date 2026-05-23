@@ -197,9 +197,9 @@ fun EditProfileContent(
                 navigationIcon = {
                     IconButton(onClick = event.onBackClick) {
                         PixelIcon(
-                            icon = R.drawable.ic_heart,
+                            icon = R.drawable.ic_left_arrow,
                             contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.TextColorLight
+                            tint = AppTheme.colors.DismissButtonColor
                         )
                     }
                 },

@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -59,6 +60,7 @@ fun LoginRequiredScreen(
         Button(
             onClick = onLoginClick,
             colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.SelectedColor),
+            shape = MaterialTheme.shapes.small,
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(

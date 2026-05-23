@@ -57,6 +57,7 @@ import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorItem
 import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.dialog.CustomDialog
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -330,6 +331,7 @@ fun ColorWheelDialog(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AppTheme.colors.AccentButtonColor
                         ),
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(

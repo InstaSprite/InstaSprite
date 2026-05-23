@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import com.instasprite.app.domain.tool.selection.LassoSelectionTool
 import com.instasprite.app.domain.tool.selection.MagicWandTool
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -48,6 +50,7 @@ fun SelectionModeSelector(
                 containerColor = AppTheme.colors.BackgroundColorDarker,
                 contentColor = AppTheme.colors.TextColorLight
             ),
+            shape = MaterialTheme.shapes.small,
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
             modifier = Modifier.height(36.dp)
         ) {

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -38,6 +39,7 @@ fun GoogleSignInButton(
             containerColor = Color.White,
             contentColor = Color.Black
         ),
+        shape = MaterialTheme.shapes.small,
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)

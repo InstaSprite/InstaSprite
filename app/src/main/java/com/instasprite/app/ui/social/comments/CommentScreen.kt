@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.social.comments
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -63,6 +65,7 @@ import com.instasprite.app.ui.social.createpost.composable.TopBar
 import com.instasprite.app.ui.social.feed.dialog.VerifyEmailDialog
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.domain.session.SocialSessionState
+import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.home.SocialSessionViewModel
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -382,22 +385,35 @@ private fun PostHeader(
             )
         }
         if (isLoggedIn && !isOwnPost) {
-            OutlinedButton(
-                onClick = onToggleFollow,
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = AppTheme.colors.TextColorLight
-                ),
-                border = BorderStroke(
-                    width = 0.5.dp,
-                    color = AppTheme.colors.Foreground2Color
-                )
+            IconButton(
+                onClick = {
+                    if (postAuthor == null) return@IconButton
+                    if (postAuthor.isFollowing) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.follow) + " " + postAuthor.displayName,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.unfollow) + " " + postAuthor.displayName,
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                    }
+                    onToggleFollow()
+                },
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.size(20.dp)
             ) {
-                Text(
-                    text = if (postAuthor?.isFollowing == true) stringResource(R.string.unfollow) else stringResource(
-                        R.string.follow
-                    ),
-                    color = if (postAuthor?.isFollowing == true) AppTheme.colors.AccentButtonColor else AppTheme.colors.TextColorLight,
-                    fontSize = 12.sp
+                PixelIcon(
+                    icon = R.drawable.ic_follow,
+                    contentDescription = stringResource(R.string.follow),
+                    tint = if (postAuthor?.isFollowing == true)
+                        AppTheme.colors.AccentButtonColor
+                    else
+                        AppTheme.colors.Foreground2Color,
                 )
             }
         }

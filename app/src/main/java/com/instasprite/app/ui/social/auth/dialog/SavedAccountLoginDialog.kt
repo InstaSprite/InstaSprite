@@ -38,6 +38,7 @@ import com.instasprite.app.data.model.InputField
 import com.instasprite.app.domain.model.LoginRequest
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -151,6 +152,7 @@ fun SavedAccountLoginDialog(
                         contentColor = AppTheme.colors.TextColorLight,
                         disabledContainerColor = AppTheme.colors.Foreground1Color,
                     ),
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .height(56.dp)

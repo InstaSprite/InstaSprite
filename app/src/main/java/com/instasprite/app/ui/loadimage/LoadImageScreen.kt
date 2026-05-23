@@ -39,6 +39,7 @@ import com.instasprite.app.domain.image2pixel.PixelArtConfig
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.ui.components.composable.BackButton
 import com.instasprite.app.ui.components.composable.Bar
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.loadimage.component.ImageConfigView
 import com.instasprite.app.ui.loadimage.component.ProcessedImagePreview
 import com.instasprite.app.ui.loadimage.contract.ImageConfigEvent
@@ -149,6 +150,7 @@ fun LoadImageScreenContent(
                             containerColor = AppTheme.colors.AccentButtonColor,
                             disabledContainerColor = AppTheme.colors.Foreground0Color
                         ),
+                        shape = MaterialTheme.shapes.small,
                         enabled = isCreateButtonEnabled
                     ) {
                         val textColor = if (isCreateButtonEnabled) {

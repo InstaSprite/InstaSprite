@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -44,8 +46,9 @@ fun JumpToTopButton(
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = AppTheme.colors.BackgroundColor
+            containerColor = AppTheme.colors.BackgroundColorDarker
         ),
+        shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(0.dp),
         modifier = modifier.size(48.dp)
     ) {

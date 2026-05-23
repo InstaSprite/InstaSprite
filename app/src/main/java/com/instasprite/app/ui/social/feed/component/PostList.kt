@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -37,6 +38,7 @@ import androidx.paging.compose.itemKey
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.JumpToTopButton
 import com.instasprite.app.ui.components.composable.MaintenanceScreen
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
 import com.instasprite.app.ui.theme.AppTheme
@@ -241,6 +243,7 @@ fun PostList(
                             ) {
                                 Button(
                                     onClick = { pagedItems.retry() },
+                                    shape = MaterialTheme.shapes.small,
                                     colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.SelectedColor)
                                 ) {
                                     Text(stringResource(R.string.retry_1), color = AppTheme.colors.TextColorDark)

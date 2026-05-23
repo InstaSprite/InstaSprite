@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.profile.contract.UserProfileState
 import com.instasprite.app.ui.theme.AppTheme
@@ -139,36 +141,35 @@ fun ProfileInfoSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.Center
             ) {
                 if (userProfile.isOwnProfile) {
-                    OutlinedButton(
+                    Button(
                         onClick = onEditProfileClick,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = AppTheme.colors.TextColorLight
+                        modifier = Modifier.fillMaxWidth(0.5f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.AccentButtonColor
                         ),
-                        border = BorderStroke(
-                            width = 0.5.dp,
-                            color = AppTheme.colors.Foreground2Color
-                        )
+                        shape = MaterialTheme.shapes.small,
                     ) {
                         Text(
                             text = stringResource(R.string.edit_profile),
                             fontSize = 14.sp,
+                            color = AppTheme.colors.TextColorDark,
                             fontWeight = FontWeight.Medium
                         )
                     }
                 } else if (isLoggedIn) {
                     Button(
                         onClick = onFollowClick,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth(0.5f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (userProfile.isFollowing)
                                 AppTheme.colors.BackgroundColor
                             else
-                                AppTheme.colors.SelectedColor,
-                        )
+                                AppTheme.colors.LinkColor,
+                        ),
+                        shape = MaterialTheme.shapes.small,
                     ) {
                         Text(
                             text = if (userProfile.isFollowing)

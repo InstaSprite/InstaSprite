@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -171,6 +172,7 @@ fun OtpDialog(
                     onClick = {
                         onOtpComplete(currentOtp)
                     },
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppTheme.colors.AccentButtonColor,
                         disabledContainerColor = AppTheme.colors.Foreground1Color

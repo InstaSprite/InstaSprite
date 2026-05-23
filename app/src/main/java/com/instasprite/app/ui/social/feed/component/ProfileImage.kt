@@ -34,9 +34,9 @@ fun ProfileImage(
         onSuccess = { success ->
             Log.d("ProfileImage", "Successfully loaded image")
         },
-        fallback = rememberPixelPainter(R.drawable.ic_launcher),
-        error = rememberPixelPainter(R.drawable.ic_launcher),
-        placeHolder = rememberPixelPainter(R.drawable.ic_launcher)
+        fallback = rememberPixelPainter(R.drawable.ic_default_profile),
+        error = rememberPixelPainter(R.drawable.ic_default_profile),
+        placeHolder = rememberPixelPainter(R.drawable.ic_default_profile)
     )
 
 }

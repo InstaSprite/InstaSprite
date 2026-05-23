@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -50,7 +51,7 @@ fun CommentInput(
         modifier = Modifier
             .fillMaxWidth()
             .then(modifier),
-        shape = PixelShape(0),
+        shape = RectangleShape,
         colors = CardDefaults.cardColors(
             containerColor = AppTheme.colors.BackgroundColorDarker
         )

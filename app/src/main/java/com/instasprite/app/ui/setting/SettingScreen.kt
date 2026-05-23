@@ -350,7 +350,7 @@ private fun FlavourCard(
                 Box(
                     modifier = Modifier
                         .size(10.dp)
-                        .clip(PixelShape(3))
+                        .clip(PixelShape())
                         .background(color)
                 )
             }

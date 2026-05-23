@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Scaffold
@@ -41,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.social.createpost.composable.CaptionSection
 import com.instasprite.app.ui.social.createpost.composable.HashtagSection
 import com.instasprite.app.ui.social.createpost.composable.ImageSection
@@ -174,6 +176,7 @@ private fun CreatePostScreenContent(
                         containerColor = AppTheme.colors.SelectedColor,
                         contentColor = AppTheme.colors.TextColorLight
                     ),
+                    shape = MaterialTheme.shapes.small,
                     enabled = uiState.caption.isNotBlank() && uiState.selectedImage != null && !uiState.isPostInProgress,
                     modifier = Modifier.fillMaxWidth(0.5f)
                 ) {

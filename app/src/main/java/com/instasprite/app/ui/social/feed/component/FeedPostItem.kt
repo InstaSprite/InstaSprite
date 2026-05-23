@@ -1,8 +1,6 @@
 package com.instasprite.app.ui.social.feed.component
 
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,13 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -42,12 +37,10 @@ import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.ui.components.composable.AsyncImageView
 import com.instasprite.app.ui.components.composable.ParsedPostText
 import com.instasprite.app.ui.components.composable.PixelIcon
-
 import com.instasprite.app.ui.theme.AppTheme
-import com.instasprite.app.utils.toSuffixString
 import com.instasprite.app.utils.TimeUtils
 import com.instasprite.app.utils.noRippleClickable
-import java.time.LocalDateTime
+import com.instasprite.app.utils.toSuffixString
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -113,28 +106,34 @@ fun FeedPostItem(
                 }
 
                 if (showFollowButton) {
-                    OutlinedButton(
+                    IconButton(
                         onClick = {
-                            Log.d(
-                                "FeedPostItem",
-                                "Follow button clicked for user: ${post.member.memberUsername}, current state: ${post.isFollowing}, new state: ${!post.isFollowing}"
-                            )
+                            if (post.isFollowing) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.follow) + " " + post.member.memberName,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.unfollow) + " " + post.member.memberName,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                            }
                             onFollowClick(post.member.memberUsername, post.isFollowing)
                         },
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = AppTheme.colors.TextColorLight
-                        ),
-                        border = BorderStroke(
-                            width = 0.5.dp,
-                            color = AppTheme.colors.Foreground2Color
-                        )
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier.size(20.dp)
                     ) {
-                        Text(
-                            text = if (post.isFollowing) stringResource(R.string.unfollow) else stringResource(
-                                R.string.follow
-                            ),
-                            color = if (post.isFollowing) AppTheme.colors.AccentButtonColor else AppTheme.colors.TextColorLight,
-                            fontSize = 12.sp
+                        PixelIcon(
+                            icon = R.drawable.ic_follow,
+                            contentDescription = stringResource(R.string.follow),
+                            tint = if (post.isFollowing)
+                                AppTheme.colors.AccentButtonColor
+                            else
+                                AppTheme.colors.Foreground2Color,
                         )
                     }
                 }

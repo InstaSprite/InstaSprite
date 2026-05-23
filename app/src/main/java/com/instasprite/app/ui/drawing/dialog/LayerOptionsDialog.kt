@@ -13,6 +13,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import com.instasprite.app.ui.components.dialog.CustomDialog
@@ -30,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
@@ -139,6 +141,7 @@ fun LayerOptionsDialog(
                         containerColor = AppTheme.colors.SelectedColor,
                         contentColor = AppTheme.colors.TextColorDark
                     ),
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier
                 ) {
                     Text(
