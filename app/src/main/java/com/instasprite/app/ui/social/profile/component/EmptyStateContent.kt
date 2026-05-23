@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.profile.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +31,7 @@ fun EmptyStateContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(32.dp),
+            .padding(22.pixelDp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         PixelIcon(
@@ -38,7 +40,7 @@ fun EmptyStateContent(
             tint = AppTheme.colors.Foreground2Color,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         Text(
             text = title,
@@ -48,7 +50,7 @@ fun EmptyStateContent(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.pixelDp))
 
         Text(
             text = subtitle,

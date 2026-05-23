@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.gallery.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -118,8 +120,8 @@ fun SpriteList(
                 LazyVerticalStaggeredGrid(
                     columns = StaggeredGridCells.Fixed(2),
                     state = staggeredState,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalItemSpacing = 8.dp,
+                    horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
+                    verticalItemSpacing = 6.pixelDp,
                     modifier = modifier
                 ) {
                     items(
@@ -148,8 +150,8 @@ fun SpriteList(
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     state = gridState,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
+                    verticalArrangement = Arrangement.spacedBy(6.pixelDp),
                     modifier = modifier
                 ) {
                     items(
@@ -197,7 +199,7 @@ private fun SpriteCard(
                 containerColor = AppTheme.colors.BackgroundColor,
             ),
             modifier = Modifier
-                .padding(vertical = 8.dp)
+                .padding(vertical = 6.pixelDp)
                 .combinedClickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
@@ -208,7 +210,7 @@ private fun SpriteCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(10.pixelDp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -221,7 +223,7 @@ private fun SpriteCard(
                         onClick = { showDropdown = true },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
-                            .size(40.dp)
+                            .size(26.pixelDp)
                     ) {
                         PixelIcon(
                             icon =R.drawable.ic_three_dots,
@@ -259,7 +261,7 @@ private fun SpriteCard(
                 onClick = onClick
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.pixelDp))
         }
     }
 }

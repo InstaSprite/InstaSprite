@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -48,7 +50,7 @@ fun CanvasPreviewer(
     var modifier = modifier
 
     if (showBorder) {
-        modifier = modifier.border(5.dp, AppTheme.colors.BackgroundColorDarker)
+        modifier = modifier.border(4.pixelDp, AppTheme.colors.BackgroundColorDarker)
     }
 
     Image(

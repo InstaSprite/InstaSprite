@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth.component
 
+import com.instasprite.app.utils.pixelDp
+
 import android.annotation.SuppressLint
 import android.util.Patterns
 import androidx.compose.foundation.clickable
@@ -239,7 +241,7 @@ fun RegisterForm(
             shape = MaterialTheme.shapes.small,
             modifier = Modifier
                 .fillMaxWidth(0.8f)
-                .height(56.dp)
+                .height(38.pixelDp)
         ) {
             Text(
                 text = stringResource(R.string.sign_in),
@@ -248,7 +250,7 @@ fun RegisterForm(
             )
         }
 
-        Spacer(modifier.height(1.dp))
+        Spacer(modifier.height(1.pixelDp))
 
         Row(
             modifier = Modifier.clickable(true, onClick = onLoginClick),

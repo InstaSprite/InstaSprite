@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,8 +34,8 @@ fun ToolOptionMenu(
                 .fillMaxSize()
                 .background(AppTheme.colors.BackgroundColor),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
+            contentPadding = PaddingValues(horizontal = 6.pixelDp)
         ) {
             content()
         }

@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -58,5 +60,5 @@ fun AuthForm(
         }
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(10.pixelDp))
 }

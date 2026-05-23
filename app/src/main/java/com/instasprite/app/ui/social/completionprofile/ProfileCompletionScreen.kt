@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.completionprofile
 
+import com.instasprite.app.utils.pixelDp
+
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -142,7 +144,7 @@ fun ProfileCompletionContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 10.pixelDp),
             contentAlignment = Alignment.TopCenter
         ) {
             if (state.isLoading && state.profileData == null) {
@@ -197,7 +199,7 @@ private fun ProfileCompletionForm(
             textAlign = TextAlign.Center,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         AvatarSelectionComponent(
             selectedImageUri = state.selectedImageUri,
@@ -206,7 +208,7 @@ private fun ProfileCompletionForm(
                 event.onErrorChanged("")
                 event.onClearImageError()
             },
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 10.pixelDp)
         )
 
         if (state.imageUploadError != null) {
@@ -216,11 +218,11 @@ private fun ProfileCompletionForm(
                 fontSize = 14.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, start = 16.dp)
+                    .padding(top = 6.pixelDp, start = 10.pixelDp)
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.pixelDp))
 
         InputTextField(
             value = username,
@@ -232,7 +234,7 @@ private fun ProfileCompletionForm(
             imeAction = ImeAction.Next
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         InputTextField(
             value = name,
@@ -244,7 +246,7 @@ private fun ProfileCompletionForm(
             imeAction = ImeAction.Next
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         InputTextField(
             value = email,
@@ -256,7 +258,7 @@ private fun ProfileCompletionForm(
             imeAction = ImeAction.Next
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         InputTextField(
             value = introduce,
@@ -276,11 +278,11 @@ private fun ProfileCompletionForm(
                 fontSize = 14.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, start = 16.dp)
+                    .padding(top = 6.pixelDp, start = 10.pixelDp)
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(22.pixelDp))
 
         Button(
             onClick = {
@@ -316,13 +318,13 @@ private fun ProfileCompletionForm(
             ),
             modifier = Modifier
                 .fillMaxWidth(0.8f)
-                .height(56.dp)
+                .height(38.pixelDp)
         ) {
             if (state.isLoading || state.isUploadingImage) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(16.pixelDp),
                     color = AppTheme.colors.TextColorLight,
-                    strokeWidth = 2.dp
+                    strokeWidth = 2.pixelDp
                 )
             } else {
                 Text(
@@ -335,7 +337,7 @@ private fun ProfileCompletionForm(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(22.pixelDp))
     }
 }
 

@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
@@ -30,7 +32,7 @@ fun DrawerLayout(
     isOpen: Boolean,
     onDrawerClose: () -> Unit,
     side: DrawerSide = DrawerSide.End,
-    width: Dp = 300.dp,
+    width: Dp = 200.pixelDp,
     drawerContent: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {

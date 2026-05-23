@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.feed.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -153,8 +155,8 @@ fun PostList(
                     state = lazyListState,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 10.dp),
-                    contentPadding = PaddingValues(bottom = 96.dp)
+                        .padding(horizontal = 6.pixelDp, vertical = 4.pixelDp),
+                    contentPadding = PaddingValues(bottom = 64.pixelDp)
                 ) {
                     items(
                         count = pagedItems.itemCount,
@@ -213,7 +215,7 @@ fun PostList(
                                 },
                                 onCommentClick = { event.onOpenComments(rawPost.postId) },
                                 onDeleteClick = event.onDeleteClick,
-                                modifier = Modifier.padding(vertical = 8.dp),
+                                modifier = Modifier.padding(vertical = 6.pixelDp),
                                 showFollowButton = isLoggedIn && !isOwnPost,
                                 showDeleteButton = isOwnPost,
                             )
@@ -225,7 +227,7 @@ fun PostList(
                             Box(
                                 Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp),
+                                    .padding(10.pixelDp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
@@ -238,7 +240,7 @@ fun PostList(
                             Box(
                                 Modifier
                                     .fillMaxWidth()
-                                    .padding(8.dp),
+                                    .padding(6.pixelDp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Button(
@@ -261,7 +263,7 @@ fun PostList(
             exit = scaleOut(),
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 10.dp)
+                .padding(top = 6.pixelDp)
         ) {
             JumpToTopButton(
                 listState = lazyListState,

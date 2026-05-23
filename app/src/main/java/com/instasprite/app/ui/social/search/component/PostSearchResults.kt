@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.search.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -43,9 +45,9 @@ fun PostSearchResults(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(2.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        contentPadding = PaddingValues(2.pixelDp),
+        horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
+        verticalArrangement = Arrangement.spacedBy(2.pixelDp)
     ) {
         items(posts, key = { it.postId }) { post ->
             TrendingPostThumbnail(

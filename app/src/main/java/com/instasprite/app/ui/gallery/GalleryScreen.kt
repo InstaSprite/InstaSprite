@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.gallery
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.scaleIn
@@ -181,7 +183,7 @@ fun GalleryPageContent(
                 layoutMode = uiState.layoutMode,
                 onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier = Modifier.padding(horizontal = 6.pixelDp, vertical = 4.pixelDp)
             )
 
             AnimatedVisibility(
@@ -190,7 +192,7 @@ fun GalleryPageContent(
                 exit = scaleOut(),
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 10.dp)
+                    .padding(top = 6.pixelDp)
             ) {
                 JumpToTopButton(listState = lazyListState)
             }
@@ -221,14 +223,14 @@ private fun GalleryScreenContent(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .background(AppTheme.colors.TopBarColor)
-                        .height(56.dp)
+                        .height(38.pixelDp)
                 ) {
                     Text(
                         text = stringResource(R.string.home),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .weight(1f)
-                            .padding(10.dp)
+                            .padding(6.pixelDp)
                     )
                 }
 
@@ -238,7 +240,7 @@ private fun GalleryScreenContent(
                     exit = slideOutVertically(targetOffsetY = { -it }),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
+                        .height(38.pixelDp)
                 ) {
                     SearchBar(
                         onSearchBarEvent = event.onSearchBarEvent,
@@ -249,7 +251,7 @@ private fun GalleryScreenContent(
             bottomBar = {
                 HomeBottomBar(
                     onBottomBarEvent = event.onBottomBarEvent,
-                    modifier = Modifier.height(56.dp)
+                    modifier = Modifier.height(38.pixelDp)
                 )
             },
         ) { innerPadding ->
@@ -267,7 +269,7 @@ private fun GalleryScreenContent(
                     layoutMode = uiState.layoutMode,
                     onIsScrolledChange = { isScrolled = it },
                     lazyListState = lazyListState,
-                    modifier = Modifier.padding(horizontal = 10.dp)
+                    modifier = Modifier.padding(horizontal = 6.pixelDp)
                 )
             }
         }
@@ -278,7 +280,7 @@ private fun GalleryScreenContent(
             exit = scaleOut(),
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 64.dp)
+                .padding(top = 42.pixelDp)
         ) {
             JumpToTopButton(
                 listState = lazyListState
@@ -289,7 +291,7 @@ private fun GalleryScreenContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 21.dp)
+                .padding(bottom = 14.pixelDp)
                 .background(Color.Transparent),
             contentAlignment = Alignment.Center,
         ) {

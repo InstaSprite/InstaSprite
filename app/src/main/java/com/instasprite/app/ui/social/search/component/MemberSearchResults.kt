@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.search.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -56,8 +58,8 @@ fun MemberSearchResults(
     }
 
     LazyColumn(
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        contentPadding = PaddingValues(6.pixelDp),
+        verticalArrangement = Arrangement.spacedBy(2.pixelDp)
     ) {
         items(members, key = { it.memberId }) { member ->
             MemberSearchItem(
@@ -79,7 +81,7 @@ fun MemberSearchItem(
             .clip(MaterialTheme.shapes.medium)
             .background(AppTheme.colors.BackgroundColor)
             .clickable(onClick = onClick)
-            .padding(12.dp),
+            .padding(8.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val avatarUrl = member.memberImage?.imageUrl
@@ -93,13 +95,13 @@ fun MemberSearchItem(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(32.pixelDp)
                     .clip(MaterialTheme.shapes.medium)
             )
         } else {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(32.pixelDp)
                     .clip(MaterialTheme.shapes.medium)
                     .background(AppTheme.colors.Foreground1Color),
                 contentAlignment = Alignment.Center
@@ -113,7 +115,7 @@ fun MemberSearchItem(
             }
         }
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.pixelDp))
 
         Column {
             Text(

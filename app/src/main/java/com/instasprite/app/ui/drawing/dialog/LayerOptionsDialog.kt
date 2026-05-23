@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -87,7 +89,7 @@ fun LayerOptionsDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.pixelDp))
 
             // Blend Mode Dropdown
             ExposedDropdownMenuBox(
@@ -128,7 +130,7 @@ fun LayerOptionsDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.pixelDp))
 
             // Merge Down Button
             if (canMergeDown) {

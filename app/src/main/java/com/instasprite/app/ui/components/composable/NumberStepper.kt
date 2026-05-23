@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -73,7 +75,7 @@ fun NumberStepper(
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = AppTheme.colors.outlineTextFieldColors(),
-                modifier = Modifier.width(80.dp),
+                modifier = Modifier.width(54.pixelDp),
                 textStyle = MaterialTheme.typography.bodyMedium,
                 singleLine = true
             )

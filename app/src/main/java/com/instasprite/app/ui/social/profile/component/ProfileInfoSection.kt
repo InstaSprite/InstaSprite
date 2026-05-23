@@ -52,16 +52,16 @@ fun ProfileInfoSection(
     onFollowingClick: () -> Unit = {},
     isLoggedIn: Boolean = false
 ) {
-    val avatarContainerSize = lerp(120.dp, 64.dp, compressionProgress)
-    val avatarSize = lerp(100.dp, 52.dp, compressionProgress)
+    val avatarContainerSize = lerp(80.pixelDp, 42.pixelDp, compressionProgress)
+    val avatarSize = lerp(66.pixelDp, 34.pixelDp, compressionProgress)
     val fadeAlpha = lerp(1f, 0f, (compressionProgress * 2f).coerceAtMost(1f))
-    val bioBoxHeight = lerp(60.dp, 0.dp, compressionProgress)
-    val buttonBoxHeight = lerp(56.dp, 0.dp, compressionProgress)
+    val bioBoxHeight = lerp(40.pixelDp, 1.pixelDp, compressionProgress)
+    val buttonBoxHeight = lerp(38.pixelDp, 1.pixelDp, compressionProgress)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 10.pixelDp, vertical = 8.pixelDp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -78,7 +78,7 @@ fun ProfileInfoSection(
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.pixelDp))
 
             Column(
                 modifier = Modifier.weight(1f),
@@ -89,7 +89,7 @@ fun ProfileInfoSection(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = AppTheme.colors.TextColorLight,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 10.pixelDp)
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -118,14 +118,14 @@ fun ProfileInfoSection(
                 .graphicsLayer { alpha = fadeAlpha }
         ) {
             Column {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
                 Text(
                     text = if (userProfile.bio.isNotEmpty()) userProfile.bio
                     else stringResource(R.string.no_bio_available),
                     fontSize = 14.sp,
                     color = AppTheme.colors.TextColorLight,
                     lineHeight = 18.sp,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 10.pixelDp)
                 )
             }
         }
@@ -140,7 +140,7 @@ fun ProfileInfoSection(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp),
+                    .padding(top = 2.pixelDp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 if (userProfile.isOwnProfile) {

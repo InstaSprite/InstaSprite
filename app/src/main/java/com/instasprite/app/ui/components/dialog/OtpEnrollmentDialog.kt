@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
@@ -62,7 +64,7 @@ fun OtpEnrollmentDialog(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(10.pixelDp)
         ) {
             Text(
                 text = context.getString(R.string.scan_qr_code_instruction),
@@ -75,7 +77,7 @@ fun OtpEnrollmentDialog(
                 Image(
                     bitmap = qrBitmap,
                     contentDescription = context.getString(R.string.qr_code_for_otp),
-                    modifier = Modifier.size(250.dp)
+                    modifier = Modifier.size(166.pixelDp)
                 )
             } else {
                 Text(
@@ -96,7 +98,7 @@ fun OtpEnrollmentDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 10.pixelDp, vertical = 6.pixelDp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
@@ -109,7 +111,7 @@ fun OtpEnrollmentDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.pixelDp))
 
             Text(
                 text = context.getString(R.string.account_issuer_info, accountName, issuer),
@@ -118,7 +120,7 @@ fun OtpEnrollmentDialog(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.pixelDp))
 
             Text(
                 text = context.getString(R.string.after_scanning_instruction),

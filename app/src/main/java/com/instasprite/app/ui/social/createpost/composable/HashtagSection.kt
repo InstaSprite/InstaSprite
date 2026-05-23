@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.createpost.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,9 +53,9 @@ fun HashtagSection(
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                    .padding(top = 6.pixelDp),
+                horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
+                verticalArrangement = Arrangement.spacedBy(2.pixelDp)
             ) {
                 hashtags.forEach { tag ->
                     AssistChip(
@@ -71,7 +73,7 @@ fun HashtagSection(
                             labelColor = AppTheme.colors.TextColorLight,
                             trailingIconContentColor = AppTheme.colors.Subtext0Color
                         ),
-                        border = BorderStroke(1.dp, AppTheme.colors.Foreground1Color)
+                        border = BorderStroke(1.pixelDp, AppTheme.colors.Foreground1Color)
                     )
                 }
             }

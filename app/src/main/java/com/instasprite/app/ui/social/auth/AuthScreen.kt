@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth
 
+import com.instasprite.app.utils.pixelDp
+
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -250,17 +252,17 @@ fun AuthContent(
                 .fillMaxSize()
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(16.pixelDp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             PixelIcon(
                 icon = R.drawable.ic_launcher,
                 contentDescription = stringResource(R.string.app_logo),
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier.size(66.pixelDp),
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.pixelDp))
 
             if (state.uiState.authMode == AuthMode.LOGIN || state.currentScreenState == AuthContentScreenState.ACCOUNT_LIST) {
                 Text(
@@ -271,7 +273,7 @@ fun AuthContent(
                     textAlign = TextAlign.Center,
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
 
                 Text(
                     text = stringResource(R.string.create_pixel_art_with_ease),
@@ -280,7 +282,7 @@ fun AuthContent(
                     textAlign = TextAlign.Center,
                 )
 
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(32.pixelDp))
             }
 
             AnimatedContent(
@@ -304,7 +306,7 @@ fun AuthContent(
                             )
 
                             if (state.accounts.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(2.pixelDp))
 
                                 Text(
                                     text = stringResource(R.string.login_with_existed),
@@ -327,14 +329,14 @@ fun AuthContent(
             }
 
             if (state.uiState.authMode != AuthMode.REGISTER) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.pixelDp))
 
                 Text(
                     text = stringResource(R.string.or),
                     color = AppTheme.colors.TextColorLight,
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.pixelDp))
 
                 GoogleSignInButton(
                     onClick = {

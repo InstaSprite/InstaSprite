@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.feed.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,8 +48,8 @@ fun PostFilterDialog(
         title = stringResource(R.string.filter_posts),
         onDismiss = onDismiss,
         onConfirm = onDismiss,
-        confirmButtonText = "",
-        dismissButtonText = "",
+        confirmButtonText = stringResource(R.string.ok),
+        dismissButtonText = stringResource(R.string.cancel),
     ) {
         Column(
             modifier = Modifier
@@ -58,7 +60,7 @@ fun PostFilterDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(36.dp)
+                        .height(24.pixelDp)
                         .selectable(
                             selected = filter == selectedOption.value,
                             onClick = {
@@ -68,7 +70,7 @@ fun PostFilterDialog(
                             },
                             role = Role.RadioButton
                         )
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 10.pixelDp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
@@ -81,7 +83,7 @@ fun PostFilterDialog(
                     )
                     Text(
                         text = label,
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier.padding(start = 10.pixelDp)
                     )
                 }
             }

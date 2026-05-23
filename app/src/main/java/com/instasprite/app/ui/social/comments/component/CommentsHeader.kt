@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.comments.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,7 +25,7 @@ fun CommentsHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 10.pixelDp, vertical = 6.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

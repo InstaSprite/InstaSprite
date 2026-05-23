@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.notification
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -155,7 +157,7 @@ fun NotificationScreen(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp),
+                                        .padding(10.pixelDp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     CircularProgressIndicator(color = AppTheme.colors.SelectedColor)

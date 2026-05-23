@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.comments.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -66,7 +68,7 @@ fun CommentInput(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(AppTheme.colors.Foreground0Color.copy(alpha = 0.5f))
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 10.pixelDp, vertical = 6.pixelDp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -88,7 +90,7 @@ fun CommentInput(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 10.pixelDp, vertical = 8.pixelDp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -96,7 +98,7 @@ fun CommentInput(
                         .weight(1f)
                         .clip(MaterialTheme.shapes.small)
                         .background(AppTheme.colors.BackgroundColor)
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                        .padding(horizontal = 10.pixelDp, vertical = 6.pixelDp),
                     contentAlignment = Alignment.CenterStart
                 ) {
                     if (text.isEmpty()) {
@@ -120,7 +122,7 @@ fun CommentInput(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.pixelDp))
 
                 PixelIcon(
                     icon = R.drawable.ic_right_arrow,

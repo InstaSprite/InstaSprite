@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.comments
 
+import com.instasprite.app.utils.pixelDp
+
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -228,7 +230,7 @@ private fun CommentScreenContent(
                             .fillMaxWidth()
                             .background(AppTheme.colors.BackgroundColorDarker)
                             .clickable { onLoginClick() }
-                            .padding(16.dp),
+                            .padding(10.pixelDp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -267,9 +269,9 @@ private fun CommentScreenContent(
                                 fontSize = 14.sp,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
+                                    .padding(horizontal = 10.pixelDp)
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(6.pixelDp))
                         }
                     }
 
@@ -279,7 +281,7 @@ private fun CommentScreenContent(
                             altText = img.altText,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                                .padding(horizontal = 10.pixelDp, vertical = 2.pixelDp)
                                 .clip(MaterialTheme.shapes.medium)
                                 .clickable { event.onZoomImage(img.postImageUrl) }
                         )
@@ -300,8 +302,8 @@ private fun CommentScreenContent(
                 item {
                     CommentsHeader(commentsCount = uiState.comments.size)
                     HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 6.pixelDp),
+                        thickness = 1.pixelDp,
                         color = AppTheme.colors.Foreground2Color
                     )
                 }
@@ -322,7 +324,7 @@ private fun CommentScreenContent(
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.pixelDp))
                 }
             }
         }
@@ -357,15 +359,15 @@ private fun PostHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(10.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfileImage(
             imageUrl = detail.member.memberImage?.imageUrl,
-            modifier = Modifier.size(40.dp),
-            size = 40.dp
+            modifier = Modifier.size(26.pixelDp),
+            size = 26.pixelDp
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.pixelDp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = detail.member.memberName,
@@ -405,7 +407,7 @@ private fun PostHeader(
                     onToggleFollow()
                 },
                 shape = MaterialTheme.shapes.small,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(14.pixelDp)
             ) {
                 PixelIcon(
                     icon = R.drawable.ic_follow,

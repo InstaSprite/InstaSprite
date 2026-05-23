@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.comments.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -62,49 +64,49 @@ fun CommentItem(
             .fillMaxWidth()
             .drawBehind {
                 if (isReply) {
-                    val lineX = 16.dp.toPx() + 16.dp.toPx() // Parent avatar center approx
+                    val lineX = 10.pixelDp.toPx() + 10.pixelDp.toPx() // Parent avatar center approx
                     drawLine(
                         color = lineColor,
                         start = Offset(x = lineX, y = 0f),
                         end = Offset(x = lineX, y = size.height),
-                        strokeWidth = 1.dp.toPx()
+                        strokeWidth = 1.pixelDp.toPx()
                     )
                     
                     // Small horizontal branch
                     drawLine(
                         color = lineColor,
                         start = Offset(x = lineX, y = size.height / 2f),
-                        end = Offset(x = lineX + 16.dp.toPx(), y = size.height / 2f),
-                        strokeWidth = 1.dp.toPx()
+                        end = Offset(x = lineX + 10.pixelDp.toPx(), y = size.height / 2f),
+                        strokeWidth = 1.pixelDp.toPx()
                     )
                 }
             }
             .padding(
-                start = 16.dp + if (isReply) 36.dp else 0.dp,
-                end = 16.dp,
-                top = 8.dp,
-                bottom = 8.dp
+                start = 10.pixelDp + if (isReply) 24.pixelDp else 1.pixelDp,
+                end = 10.pixelDp,
+                top = 6.pixelDp,
+                bottom = 6.pixelDp
             )
     ) {
         val avatarModifier = Modifier
-            .size(if (isReply) 24.dp else 32.dp)
+            .size(if (isReply) 16.pixelDp else 22.pixelDp)
             .clip(MaterialTheme.shapes.medium)
             .clickable { onProfileClick(comment.username) }
 
         ProfileImage(
             imageUrl = comment.profileImageUrl,
             modifier = avatarModifier,
-            size = if (isReply) 24.dp else 32.dp
+            size = if (isReply) 16.pixelDp else 22.pixelDp
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.pixelDp))
 
         Column(
             modifier = Modifier
                 .weight(1f)
                 .clip(MaterialTheme.shapes.medium)
                 .background(if (isReply) replyBackgroundColor else Color.Transparent)
-                .padding(if (isReply) 12.dp else 0.dp)
+                .padding(if (isReply) 8.pixelDp else 1.pixelDp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -116,7 +118,7 @@ fun CommentItem(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { onProfileClick(comment.username) }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.pixelDp))
                 Text(
                     text = TimeUtils.formatTimeAgo(context, comment.createdAt),
                     color = AppTheme.colors.Foreground2Color,
@@ -124,7 +126,7 @@ fun CommentItem(
                 )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.pixelDp))
 
             Text(
                 text = comment.content,
@@ -135,7 +137,7 @@ fun CommentItem(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 6.pixelDp)
             ) {
                 // Like Button
                 Row(
@@ -143,7 +145,7 @@ fun CommentItem(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.small)
                         .clickable { onLikeClick(comment.id) }
-                        .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                        .padding(end = 6.pixelDp, top = 2.pixelDp, bottom = 2.pixelDp)
                 ) {
                     PixelIcon(
                         icon = R.drawable.ic_heart,
@@ -152,7 +154,7 @@ fun CommentItem(
                         modifier = Modifier
                             .scale(likeScale)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(2.pixelDp))
                     if (comment.likesCount > 0) {
                         Text(
                             text = "${comment.likesCount}",
@@ -163,7 +165,7 @@ fun CommentItem(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.pixelDp))
                 // Reply Button
                 if (!isReply) {
                     Row(
@@ -171,14 +173,14 @@ fun CommentItem(
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.small)
                             .clickable { onReplyClick(comment.id) }
-                            .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                            .padding(end = 6.pixelDp, top = 2.pixelDp, bottom = 2.pixelDp)
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_reply,
                             contentDescription = stringResource(R.string.reply),
                             tint = AppTheme.colors.TextColorLight,
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(2.pixelDp))
                         Text(
                             text = stringResource(R.string.reply),
                             color = AppTheme.colors.TextColorLight,
@@ -194,7 +196,7 @@ fun CommentItem(
         if (comment.isOwnComment) {
             IconButton(
                 onClick = { onDeleteClick(comment.id) },
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(22.pixelDp)
             ) {
                 PixelIcon(
                     icon = R.drawable.ic_trash,

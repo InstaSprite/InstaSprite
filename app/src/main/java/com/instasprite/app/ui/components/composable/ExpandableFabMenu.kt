@@ -100,7 +100,7 @@ fun ExpandableFabMenu(
     animationDurationMs: Int = 300,
     itemStaggerDelayMs: Int = 50,
     mainFabSize: Dp = 32.pixelDp,
-    mainFabIconSize: Dp = 30.dp,
+    mainFabIconSize: Dp = 20.pixelDp,
     miniFabSize: Dp = 32.pixelDp,
     colors: FabMenuColors = FabMenuColors.defaults(),
 ) {
@@ -245,7 +245,7 @@ private fun FabItemView(
     item: FabMenuItem,
     animProgress: Float,
     modifier: Modifier = Modifier,
-    fabSize: Dp = 48.dp,
+    fabSize: Dp = 32.pixelDp,
     colors: FabMenuColors,
     onDismiss: () -> Unit,
 ) {
@@ -269,7 +269,7 @@ private fun FabItemView(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(6.dp)
+                .padding(4.pixelDp)
                 .size(fabSize)
                 .background(shape = MaterialTheme.shapes.small, color = colors.itemIconBackground)
         ) {
@@ -285,7 +285,7 @@ private fun FabItemView(
             color = colors.label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+            modifier = Modifier.padding(horizontal = 6.pixelDp, vertical = 4.pixelDp)
         )
     }
 }
@@ -310,7 +310,7 @@ private fun Preview() {
     InstaSpriteTheme() {
         Box(
             modifier = Modifier
-                .size(250.dp, 350.dp)
+                .size(166.pixelDp, 234.pixelDp)
                 .background(AppTheme.colors.BackgroundColorDarker),
             contentAlignment = Alignment.BottomCenter
         ) {
@@ -320,7 +320,7 @@ private fun Preview() {
                     FabMenuItem(R.drawable.ic_edit, "Load Canvas") {},
                     FabMenuItem(R.drawable.ic_canvas, "Load Image") {},
                 ),
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(10.pixelDp)
             )
         }
     }

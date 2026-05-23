@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.palette.dialogs
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -66,7 +68,7 @@ fun LospecImportDialog(
         content = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(10.pixelDp)
             ) {
                 OutlinedTextField(
                     value = paletteUrl,

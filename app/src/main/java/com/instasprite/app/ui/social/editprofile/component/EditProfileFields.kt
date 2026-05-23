@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.editprofile.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,7 +52,7 @@ fun EditProfileFields(
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = AppTheme.colors.Subtext0Color,
-            modifier = Modifier.padding(bottom = 6.dp)
+            modifier = Modifier.padding(bottom = 4.pixelDp)
         )
         OutlinedTextField(
             value = displayName,
@@ -67,14 +69,14 @@ fun EditProfileFields(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         Text(
             text = stringResource(R.string.bio),
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = AppTheme.colors.Subtext0Color,
-            modifier = Modifier.padding(bottom = 6.dp)
+            modifier = Modifier.padding(bottom = 4.pixelDp)
         )
         OutlinedTextField(
             value = bio,
@@ -92,14 +94,14 @@ fun EditProfileFields(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.pixelDp))
 
         Text(
             text = stringResource(R.string.email),
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = AppTheme.colors.Subtext0Color,
-            modifier = Modifier.padding(bottom = 6.dp)
+            modifier = Modifier.padding(bottom = 4.pixelDp)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -109,21 +111,21 @@ fun EditProfileFields(
                     AppTheme.colors.BackgroundColor,
                     MaterialTheme.shapes.small
                 )
-                .padding(horizontal = 16.dp, vertical = 14.dp)
+                .padding(horizontal = 10.pixelDp, vertical = 10.pixelDp)
         ) {
             PixelIcon(
                 icon = R.drawable.ic_lock,
                 contentDescription = null,
                 tint = AppTheme.colors.Subtext0Color,
                 modifier = Modifier
-                    .size(16.dp)
-                    .padding(end = 0.dp)
+                    .size(10.pixelDp)
+                    .padding(end = 1.pixelDp)
             )
             Text(
                 text = email,
                 fontSize = 14.sp,
                 color = AppTheme.colors.Subtext0Color,
-                modifier = Modifier.padding(start = 10.dp)
+                modifier = Modifier.padding(start = 6.pixelDp)
             )
         }
     }
@@ -139,7 +141,7 @@ private fun EditProfileFieldsPreview() {
             email = "john@example.com",
             onDisplayNameChange = {},
             onBioChange = {},
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(10.pixelDp)
         )
     }
 }

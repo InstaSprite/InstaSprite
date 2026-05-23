@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.createpost.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,7 +27,7 @@ fun TopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(38.pixelDp)
             .background(AppTheme.colors.BackgroundColor)
     ) {
         Row(
@@ -33,7 +35,7 @@ fun TopBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 8.pixelDp)
                 .align(Alignment.CenterStart)
         ) {
             IconButton(

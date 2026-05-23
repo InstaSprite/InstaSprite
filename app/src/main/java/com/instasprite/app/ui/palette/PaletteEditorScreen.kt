@@ -179,9 +179,9 @@ private fun PaletteEditorContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 14.pixelDp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.pixelDp))
 
                 Text(
                     text = stringResource(R.string.palette_preview),
@@ -190,20 +190,20 @@ private fun PaletteEditorContent(
                     color = AppTheme.colors.Subtext0Color
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(AppTheme.colors.BackgroundColor)
-                        .padding(2.dp)
+                        .padding(2.pixelDp)
                 ) {
                     if (colors.isEmpty()) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(60.dp)
+                                .height(40.pixelDp)
                         ) {
                             Text(
                                 text = stringResource(R.string.no_colors_added_yet),
@@ -225,7 +225,7 @@ private fun PaletteEditorContent(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.pixelDp))
 
                 val lazyListState = rememberLazyListState()
 
@@ -273,8 +273,8 @@ private fun PaletteEditorContent(
 
                 LazyColumn(
                     state = lazyListState,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(bottom = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.pixelDp),
+                    contentPadding = PaddingValues(bottom = 6.pixelDp),
                     modifier = Modifier.weight(1f)
                 ) {
                     item {
@@ -312,7 +312,7 @@ private fun PaletteEditorContent(
                     }
 
                     item {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.pixelDp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -351,13 +351,13 @@ private fun PaletteEditorContent(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(AppTheme.colors.BackgroundColor)
-                                    .padding(vertical = 4.dp, horizontal = 8.dp)
+                                    .padding(vertical = 2.pixelDp, horizontal = 6.pixelDp)
                                     .clip(MaterialTheme.shapes.medium)
                             ) {
                                 IconButton(
                                     modifier = Modifier
                                         .draggableHandle()
-                                        .width(32.dp),
+                                        .width(22.pixelDp),
                                     onClick = {},
                                 ) {
                                     PixelIcon(
@@ -367,22 +367,22 @@ private fun PaletteEditorContent(
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.pixelDp))
 
                                 val itemIndex = uiColorsList.indexOf(item)
                                 ColorBlock(
                                     color = item.color,
                                     onClick = { onColorClick(itemIndex) },
                                     modifier = Modifier
-                                        .height(40.dp)
+                                        .height(26.pixelDp)
                                         .weight(9f)
                                 )
 
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.pixelDp))
 
                                 IconButton(
                                     onClick = { onColorDelete(itemIndex) },
-                                    modifier = Modifier.size(36.dp).weight(1f)
+                                    modifier = Modifier.size(24.pixelDp).weight(1f)
                                 ) {
                                     PixelIcon(
                                         icon = R.drawable.ic_trash,
@@ -395,16 +395,16 @@ private fun PaletteEditorContent(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                        .padding(bottom = 16.pixelDp)
                         .clip(MaterialTheme.shapes.small)
                         .background(AppTheme.colors.BackgroundColor)
                         .border(1.pixelDp, AppTheme.colors.Foreground2Color, MaterialTheme.shapes.small)
                         .clickable { onAddColorClick() }
-                        .padding(vertical = 12.dp),
+                        .padding(vertical = 8.pixelDp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -448,7 +448,7 @@ private fun ColorBlock(
             )
             .background(color)
             .border(
-                width = 2.dp,
+                width = 2.pixelDp,
                 color = AppTheme.colors.BackgroundColorDarker
             )
             .clickable(

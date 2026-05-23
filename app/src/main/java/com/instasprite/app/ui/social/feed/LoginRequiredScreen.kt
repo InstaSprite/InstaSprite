@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.feed
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -42,11 +44,11 @@ fun LoginRequiredScreen(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Login,
             contentDescription = stringResource(R.string.login_required_1),
-            modifier = Modifier.size(80.dp),
+            modifier = Modifier.size(54.pixelDp),
             tint = AppTheme.colors.Foreground2Color
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.pixelDp))
 
         Text(
             text = stringResource(R.string.login_required_1),
@@ -55,7 +57,7 @@ fun LoginRequiredScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.pixelDp))
 
         Button(
             onClick = onLoginClick,
@@ -66,9 +68,9 @@ fun LoginRequiredScreen(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Login,
                 contentDescription = stringResource(R.string.login),
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(14.pixelDp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.pixelDp))
             Text(stringResource(R.string.login), color = AppTheme.colors.TextColorDark)
         }
     }

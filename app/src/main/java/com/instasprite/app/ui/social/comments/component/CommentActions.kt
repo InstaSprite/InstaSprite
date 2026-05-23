@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.comments.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -48,7 +50,7 @@ fun CommentActions(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 10.pixelDp, vertical = 6.pixelDp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -63,9 +65,9 @@ fun CommentActions(
                 modifier = Modifier
                     .scale(likeScale)
             )
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(4.pixelDp))
             Box(
-                modifier = Modifier.width(32.dp),
+                modifier = Modifier.width(22.pixelDp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (likesCount > 0) {

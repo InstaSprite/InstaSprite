@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.feed.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -69,15 +71,15 @@ fun AvatarSelectionComponent(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         // Avatar display
         Box(
             modifier = Modifier
-                .size(120.dp)
+                .size(80.pixelDp)
                 .clip(PixelShape(3))
                 .border(
-                    width = 3.dp,
+                    width = 2.pixelDp,
                     color = AppTheme.colors.BottomBarColor,
                     shape = MaterialTheme.shapes.medium,
                 )
@@ -103,7 +105,7 @@ fun AvatarSelectionComponent(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
 
         // Gallery button
@@ -114,7 +116,7 @@ fun AvatarSelectionComponent(
                 contentColor = AppTheme.colors.TextColorLight
             ),
             border = BorderStroke(
-                1.dp,
+                1.pixelDp,
                 AppTheme.colors.BottomBarColor
             )
         ) {
@@ -122,14 +124,14 @@ fun AvatarSelectionComponent(
                 icon = R.drawable.ic_folder,
                 contentDescription = stringResource(R.string.gallery),
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.pixelDp))
             Text(stringResource(R.string.gallery))
         }
 
 
         // Remove image button (only show if image is selected)
         if (selectedImageUri != null) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.pixelDp))
             TextButton(
                 onClick = { onImageSelected(null) },
                 colors = ButtonDefaults.textButtonColors(

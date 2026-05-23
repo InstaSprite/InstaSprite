@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
@@ -37,7 +39,7 @@ fun CursorModeToggle(
             disabledContentColor = Color.Unspecified
         ),
         shape = MaterialTheme.shapes.small,
-        modifier = modifier.size(32.dp)
+        modifier = modifier.size(22.pixelDp)
     ) {
         PixelIcon(
             icon = R.drawable.ic_pencil_tool,

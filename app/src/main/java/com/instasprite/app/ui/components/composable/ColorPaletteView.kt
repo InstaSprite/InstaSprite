@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,9 +34,9 @@ import com.instasprite.app.utils.drawCheckerboard
 @Immutable
 data class ColorPaletteConfig(
     val backgroundColor: Color = Color.Unspecified,
-    val itemSpacing: Dp = 0.dp,
-    val listHeight: Dp = 40.dp,
-    val colorItemSize: Dp = 30.dp,
+    val itemSpacing: Dp = 1.pixelDp,
+    val listHeight: Dp = 26.pixelDp,
+    val colorItemSize: Dp = 20.pixelDp,
     val isInteractive: Boolean = true,
     val isWrap: Boolean = false,
 ) {
@@ -211,9 +213,9 @@ private fun Preview() {
         ),
         activeColor = Color.White,
         config = ColorPaletteConfig(
-            itemSpacing = 0.dp,
-            listHeight = 40.dp,
-            colorItemSize = 30.dp,
+            itemSpacing = 1.pixelDp,
+            listHeight = 26.pixelDp,
+            colorItemSize = 20.pixelDp,
             isInteractive = true,
         ),
         onColorSelected = {},

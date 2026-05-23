@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.feed.component
 
+import com.instasprite.app.utils.pixelDp
+
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -69,7 +71,7 @@ fun FeedPostItem(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(10.pixelDp)
         ) {
             // Post Header
             Row(
@@ -85,10 +87,10 @@ fun FeedPostItem(
                 ) {
                     ProfileImage(
                         imageUrl = post.member.memberImage?.imageUrl,
-                        size = 40.dp
+                        size = 26.pixelDp
                     )
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(8.pixelDp))
 
                     Column {
                         Text(
@@ -125,7 +127,7 @@ fun FeedPostItem(
                             onFollowClick(post.member.memberUsername, post.isFollowing)
                         },
                         shape = MaterialTheme.shapes.small,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(14.pixelDp)
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_follow,
@@ -141,7 +143,7 @@ fun FeedPostItem(
                 if (showDeleteButton) {
                     IconButton(
                         onClick = { onDeleteClick(post.postId) },
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(14.pixelDp)
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_trash,
@@ -152,7 +154,7 @@ fun FeedPostItem(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.pixelDp))
 
             if (post.postContent.isNotEmpty()) {
                 ParsedPostText(
@@ -164,14 +166,14 @@ fun FeedPostItem(
                     onTextClick = { onPostClick() },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
             }
 
             if (post.hashtags.isNotEmpty()) {
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
+                    verticalArrangement = Arrangement.spacedBy(2.pixelDp)
                 ) {
                     post.hashtags.forEach { tag ->
                         Text(
@@ -182,7 +184,7 @@ fun FeedPostItem(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.pixelDp))
             }
 
             if (post.postImages.isNotEmpty()) {
@@ -212,7 +214,7 @@ fun FeedPostItem(
                         modifier = imageModifier
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.pixelDp))
                 }
             }
 
@@ -224,7 +226,7 @@ fun FeedPostItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.pixelDp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
@@ -241,7 +243,7 @@ fun FeedPostItem(
                                 .align(Alignment.Bottom)
                                 .noRippleClickable { onLikeClick() }
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(2.pixelDp))
                         Box(
                             contentAlignment = Alignment.CenterStart
                         ) {
@@ -267,9 +269,9 @@ fun FeedPostItem(
                                 .align(Alignment.Bottom)
                                 .noRippleClickable { onCommentClick() }
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(2.pixelDp))
                         Box(
-                            modifier = Modifier.width(28.dp),
+                            modifier = Modifier.width(18.pixelDp),
                             contentAlignment = Alignment.CenterStart
                         ) {
                             if (post.postCommentsCount > 0) {
@@ -292,7 +294,7 @@ fun FeedPostItem(
                         else
                             AppTheme.colors.TextColorLight,
                         modifier = Modifier
-                            .size(20.dp)
+                            .size(14.pixelDp)
                             .noRippleClickable { onBookmarkClick() }
                     )
                 }

@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.search.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -64,7 +66,7 @@ fun TrendingSection(
             color = AppTheme.colors.TextColorLight,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            modifier = Modifier.padding(horizontal = 10.pixelDp, vertical = 8.pixelDp)
         )
 
         if (posts.isEmpty()) {
@@ -81,9 +83,9 @@ fun TrendingSection(
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(2.dp),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                contentPadding = PaddingValues(2.pixelDp),
+                horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
+                verticalArrangement = Arrangement.spacedBy(2.pixelDp)
             ) {
                 items(posts, key = { it.postId }) { post ->
                     TrendingPostThumbnail(
@@ -131,7 +133,7 @@ fun TrendingPostThumbnail(
                     fontSize = 10.sp,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(4.dp)
+                    modifier = Modifier.padding(2.pixelDp)
                 )
             }
         }
@@ -140,7 +142,7 @@ fun TrendingPostThumbnail(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .background(AppTheme.colors.BackgroundColorDarker.copy(alpha = 0.5f))
-                .padding(4.dp),
+                .padding(2.pixelDp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             PixelIcon(
@@ -148,7 +150,7 @@ fun TrendingPostThumbnail(
                 contentDescription = null,
                 tint = AppTheme.colors.DismissButtonColor,
             )
-            Spacer(modifier = Modifier.width(2.dp))
+            Spacer(modifier = Modifier.width(2.pixelDp))
             Text(
                 text = "${post.postLikesCount}",
                 color = AppTheme.colors.Foreground2Color,

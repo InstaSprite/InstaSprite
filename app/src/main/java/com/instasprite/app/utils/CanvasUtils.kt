@@ -1,5 +1,7 @@
 package com.instasprite.app.utils
 
+import com.instasprite.app.utils.pixelDp
+
 import android.graphics.BitmapShader
 import android.graphics.Matrix
 import android.graphics.Shader
@@ -82,7 +84,7 @@ fun DrawScope.drawCursorOverlay(
         )
     }
 
-    val iconSizePx = 32.dp.toPx() / scale
+    val iconSizePx = 22.pixelDp.toPx() / scale
 
     if (toolIconBitmap != null && cursorIconBitmap != null) {
         if (!useToolIcon) {
@@ -139,8 +141,8 @@ private fun DrawScope.drawCrosshair(
 
     val crosshairSize = iconSizePx * 0.4f
 
-    val strokeOuter = 5.dp.toPx() / scale
-    val strokeInner = 3.dp.toPx() / scale
+    val strokeOuter = 4.pixelDp.toPx() / scale
+    val strokeInner = 2.pixelDp.toPx() / scale
 
     drawLine(
         color = Color.Black,
@@ -225,8 +227,8 @@ fun DrawScope.drawSelectionOverlay(
         asAndroidPath().transform(matrix)
     }
 
-    val outlineWidth = 2.dp.toPx() / scale
-    val bgOutlineWidth = 3.dp.toPx() / scale
+    val outlineWidth = 2.pixelDp.toPx() / scale
+    val bgOutlineWidth = 2.pixelDp.toPx() / scale
 
     drawPath(
         path = scaledPath,
@@ -242,8 +244,8 @@ fun DrawScope.drawSelectionOverlay(
 
     if (showGrabHandle) {
         val b = selectionState.bounds
-        val handleSize = 16.dp.toPx() / scale
-        val strokeWidth = 1.dp.toPx() / scale
+        val handleSize = 10.pixelDp.toPx() / scale
+        val strokeWidth = 1.pixelDp.toPx() / scale
 
         val left = b.left * pxW
         val right = b.right * pxW

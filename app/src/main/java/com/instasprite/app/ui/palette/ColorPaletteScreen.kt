@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.palette
 
+import com.instasprite.app.utils.pixelDp
+
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -113,7 +115,7 @@ private fun ColorPaletteSelectionContent(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
+                        .height(38.pixelDp)
                 )
             },
             containerColor = AppTheme.colors.BackgroundColorDarker
@@ -132,15 +134,15 @@ private fun ColorPaletteSelectionContent(
                     optionSlot = { palette ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .padding(start = 8.dp)
+                                .padding(start = 6.pixelDp)
                         ) {
                             if (palette.id > 0) {
                                 IconButton(
                                     onClick = { onPaletteEdit(palette) },
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(16.pixelDp)
                                 ) {
                                     PixelIcon(
                                         icon = R.drawable.ic_edit,
@@ -150,7 +152,7 @@ private fun ColorPaletteSelectionContent(
                                 }
                                 IconButton(
                                     onClick = { onPaletteDeleteButton(palette) },
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(16.pixelDp)
                                 ) {
                                     PixelIcon(
                                         icon = R.drawable.ic_trash,
@@ -169,7 +171,7 @@ private fun ColorPaletteSelectionContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 21.dp)
+                    .padding(bottom = 14.pixelDp)
                     .background(Color.Transparent),
                 contentAlignment = Alignment.Center,
             ) {

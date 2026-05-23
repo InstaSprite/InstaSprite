@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -71,7 +73,7 @@ fun SetPasswordDialog(
                 color = colors.Subtext0Color
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.pixelDp))
 
             InputTextField(
                 enabled = enabled,

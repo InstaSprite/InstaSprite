@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.notification.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -47,14 +49,14 @@ fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
                     Color.Transparent
             )
             .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 10.pixelDp, vertical = 8.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfileImage(
             imageUrl = notification.senderAvatarUrl,
-            size = 48.dp
+            size = 32.pixelDp
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.pixelDp))
 
         // Notification content
         Column(
@@ -78,7 +80,7 @@ fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
                 lineHeight = 20.sp
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.pixelDp))
 
             Text(
                 text = TimeUtils.formatTimeAgo(context, notification.createdAt),
@@ -91,7 +93,7 @@ fun NotificationItem(notification: NotificationData, onClick: () -> Unit = {}) {
         if (!notification.isRead) {
             Box(
                 modifier = Modifier
-                    .size(8.dp)
+                    .size(6.pixelDp)
                     .background(MaterialTheme.colorScheme.primary)
             )
         }

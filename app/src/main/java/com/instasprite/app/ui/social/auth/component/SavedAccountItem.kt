@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,17 +42,17 @@ fun SavedAccountItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 2.pixelDp)
             .clip(MaterialTheme.shapes.small)
             .background(AppTheme.colors.BackgroundColor)
             .clickable { onClick() }
-            .padding(12.dp),
+            .padding(8.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box {
             ProfileImage(
                 imageUrl = account.avatarUrl,
-                size = 48.dp
+                size = 32.pixelDp
             )
 
             if (account.accountType == AccountType.GOOGLE) {
@@ -60,7 +62,7 @@ fun SavedAccountItem(
                         .clip(MaterialTheme.shapes.small)
                         .background(Color.White)
                         .align(Alignment.BottomEnd)
-                        .size(18.dp)
+                        .size(12.pixelDp)
                 ) {
                     PixelIcon(
                         icon = R.drawable.ic_google,
@@ -72,7 +74,7 @@ fun SavedAccountItem(
             }
         }
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.pixelDp))
 
         Column(modifier = Modifier.weight(1f)) {
             Row(
@@ -86,7 +88,7 @@ fun SavedAccountItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(2.pixelDp))
                 Text(
                     text = '@' + account.username,
                     color = AppTheme.colors.Subtext0Color,

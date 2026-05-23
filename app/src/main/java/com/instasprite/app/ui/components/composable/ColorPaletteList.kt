@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -46,8 +48,8 @@ fun ColorPaletteList(
         state = lazyListState,
         modifier = modifier
             .background(AppTheme.colors.BackgroundColorDarker),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(10.pixelDp),
+        verticalArrangement = Arrangement.spacedBy(8.pixelDp)
     ) {
         items(
             items = palettes,
@@ -79,7 +81,7 @@ private fun ListEntry(
         .clip(MaterialTheme.shapes.medium)
         .background(AppTheme.colors.BackgroundColor)
         .clickable(onClick = onClick)
-        .padding(12.dp)
+        .padding(8.pixelDp)
 
     Column(modifier = itemModifier) {
         Row(
@@ -103,7 +105,7 @@ private fun ListEntry(
             optionSlot(palette)
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.pixelDp))
 
         ColorPaletteView(
             colors = palette.colors,

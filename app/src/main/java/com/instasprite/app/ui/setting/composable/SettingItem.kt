@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.setting.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -34,7 +36,7 @@ fun SettingItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(10.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         PixelIcon(
@@ -43,7 +45,7 @@ fun SettingItem(
             tint = AppTheme.colors.TextColorLight,
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(10.pixelDp))
 
         Column(
             modifier = Modifier.weight(1f)
@@ -54,7 +56,7 @@ fun SettingItem(
                 fontWeight = FontWeight.Medium,
                 color = AppTheme.colors.TextColorLight
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.pixelDp))
             Text(
                 text = subtitle,
                 fontSize = 14.sp,

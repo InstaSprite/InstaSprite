@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -74,8 +76,8 @@ fun ColorPalette(
                 coroutineScope.launch {
                     colorPaletteListState.scrollItemToCenter(
                         index = index,
-                        itemSizeDp = 40.dp,
-                        itemSpacingDp = 6.dp,
+                        itemSizeDp = 26.pixelDp,
+                        itemSpacingDp = 4.pixelDp,
                         density = density
                     )
                 }
@@ -103,9 +105,9 @@ fun ColorPalette(
             lazyListState = colorPaletteListState,
         )
 
-        // ColorPaletteContent already has 4.dp padding; add 2.dp for consistency
+        // ColorPaletteContent already has 2.pixelDp padding; add 2.pixelDp for consistency
         Spacer(
-            modifier = Modifier.height(2.dp)
+            modifier = Modifier.height(2.pixelDp)
         )
 
         Row(
@@ -119,23 +121,23 @@ fun ColorPalette(
                         coroutineScope.launch {
                             colorPaletteListState.scrollItemToCenter(
                                 index = index,
-                                itemSizeDp = 30.dp,
-                                itemSpacingDp = 0.dp,
+                                itemSizeDp = 20.pixelDp,
+                                itemSpacingDp = 1.pixelDp,
                                 density = density
                             )
                         }
                     }
                 },
                 modifier = Modifier
-                    .height(40.dp)
-                    .width(86.dp) //  ̶E̶q̶u̶a̶l̶ ̶t̶w̶o̶ ̶c̶o̶l̶o̶r̶ ̶i̶t̶e̶m̶ ̶i̶n̶ ̶p̶a̶l̶e̶t̶t̶e̶ ̶+̶ ̶s̶p̶a̶c̶i̶n̶g̶
+                    .height(26.pixelDp)
+                    .width(58.pixelDp) //  ̶E̶q̶u̶a̶l̶ ̶t̶w̶o̶ ̶c̶o̶l̶o̶r̶ ̶i̶t̶e̶m̶ ̶i̶n̶ ̶p̶a̶l̶e̶t̶t̶e̶ ̶+̶ ̶s̶p̶a̶c̶i̶n̶g̶
             )
 
             IconButton(
                 onClick = { onColorPaletteEvent(ColorPaletteEvent.OpenColorWheelDialog) },
                 modifier = Modifier
-                    .size(45.dp)
-                    .padding(horizontal = 2.dp)
+                    .size(30.pixelDp)
+                    .padding(horizontal = 2.pixelDp)
             ) {
                 PixelIcon(
                     icon = R.drawable.ic_plus,
@@ -147,7 +149,7 @@ fun ColorPalette(
             // Recent Colors section
             ColorPaletteView(
                 colors = recentColors.toList(),
-                config = ColorPaletteConfig(listHeight = 40.dp),
+                config = ColorPaletteConfig(listHeight = 26.pixelDp),
                 onColorSelected = { color ->
                     onColorPaletteEvent(ColorPaletteEvent.SelectColor(color))
                 },
@@ -160,7 +162,7 @@ fun ColorPalette(
                 IconButton(
                     onClick = { showCanvasMenu = true },
                     modifier = Modifier
-                        .size(45.dp)
+                        .size(30.pixelDp)
                 ) {
                     PixelIcon(
                         icon = R.drawable.ic_three_dots,
@@ -198,7 +200,7 @@ private fun ActiveColor(
             )
             .background(activeColor)
             .border(
-                width = 5.dp,
+                width = 4.pixelDp,
                 color = AppTheme.colors.BackgroundColorDarker
             )
             .clickable(

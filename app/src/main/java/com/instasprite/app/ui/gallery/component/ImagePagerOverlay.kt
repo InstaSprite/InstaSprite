@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.gallery.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -119,7 +121,7 @@ fun ImagePagerOverlay(
                     },
                     spriteWithMetaData = currentSprite,
                     modifier = Modifier
-                        .height(180.dp)
+                        .height(120.pixelDp)
                         .background(AppTheme.colors.BackgroundColor)
                 )
             }
@@ -189,7 +191,7 @@ private fun BottomBar(
         Column(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(12.dp)
+                .padding(8.pixelDp)
         ) {
             Text(text = "Name: $spriteName")
 
@@ -199,7 +201,7 @@ private fun BottomBar(
 
             Text(text = "Dimensions: $spriteWidth x $spriteHeight")
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.pixelDp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -222,7 +224,7 @@ private fun BottomBar(
                             contentDescription = stringResource(R.string.save_as_image_1),
                             tint = AppTheme.colors.TextColorDark,
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(6.pixelDp))
                         Text(
                             text = stringResource(R.string.save_as_image),
                             color = AppTheme.colors.TextColorDark
@@ -245,7 +247,7 @@ private fun BottomBar(
                             contentDescription = stringResource(R.string.edit_sprite),
                             tint = AppTheme.colors.TextColorDark,
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(6.pixelDp))
                         Text(
                             text = stringResource(R.string.edit),
                             color = AppTheme.colors.TextColorDark

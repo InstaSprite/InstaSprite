@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -89,13 +91,13 @@ fun LayerView(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(6.pixelDp)
                 .clickable(enabled = true, onClick = onClick),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .height(100.dp)
+                    .height(66.pixelDp)
                     .aspectRatio(1f),
                 contentAlignment = Alignment.Center
             ) {
@@ -115,11 +117,11 @@ fun LayerView(
                 }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.pixelDp))
 
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth().height(100.dp)
+                modifier = Modifier.fillMaxWidth().height(66.pixelDp)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -134,7 +136,7 @@ fun LayerView(
 
                     IconButton(
                         onClick = { showDeleteConfirm = true },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(22.pixelDp)
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_trash,
@@ -170,12 +172,12 @@ fun LayerView(
                 )
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     IconButton(
                         onClick = onVisibilityToggle,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(22.pixelDp)
                     ) {
                         PixelIcon(
                             icon = if (layer.isVisible) R.drawable.ic_visible_on else R.drawable.ic_visible_off,
@@ -185,20 +187,20 @@ fun LayerView(
                     }
                     IconButton(
                         onClick = onLockToggle,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(22.pixelDp)
                     ) {
                         PixelIcon(
                             icon = if (layer.isLocked) R.drawable.ic_lock else R.drawable.ic_lock_unlock,
                             contentDescription = stringResource(R.string.toggle_lock),
                             tint = AppTheme.colors.TextColorLight,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(14.pixelDp)
                         )
                     }
                     var showOptionsDialog by remember { mutableStateOf(false) }
 
                     IconButton(
                         onClick = { showOptionsDialog = true },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(22.pixelDp)
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_three_dots,
@@ -236,13 +238,13 @@ fun LayerView(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 6.pixelDp)
         ) {
             Text(
                 text = "${(localOpacity * 100).toInt()}%",
                 color = AppTheme.colors.TextColorLight,
                 fontSize = 11.sp,
-                modifier = Modifier.width(36.dp)
+                modifier = Modifier.width(24.pixelDp)
             )
             Slider(
                 value = localOpacity,
@@ -256,12 +258,12 @@ fun LayerView(
                     SliderDefaults.Track(
                         sliderState = sliderState,
                         colors = AppTheme.colors.sliderColors(),
-                        modifier = Modifier.height(8.dp)
+                        modifier = Modifier.height(6.pixelDp)
                     )
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .height(24.dp)
+                    .height(16.pixelDp)
             )
         }
     }

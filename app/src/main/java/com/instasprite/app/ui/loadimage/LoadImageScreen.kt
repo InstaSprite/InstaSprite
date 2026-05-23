@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.loadimage
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -172,7 +174,7 @@ fun LoadImageScreenContent(
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.pixelDp))
 
             ProcessedImagePreview(
                 processedBitmap = uiState.processedBitmap,
@@ -186,7 +188,7 @@ fun LoadImageScreenContent(
                     .weight(1f)
                     .fillMaxSize()
                     .background(AppTheme.colors.BackgroundColor)
-                    .padding(12.dp),
+                    .padding(8.pixelDp),
             ) {
                 ImageConfigView(
                     uiState = uiState,

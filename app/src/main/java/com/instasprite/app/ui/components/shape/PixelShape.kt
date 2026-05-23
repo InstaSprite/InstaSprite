@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.shape
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -98,19 +100,19 @@ private fun Preview() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(10.pixelDp),
+            verticalArrangement = Arrangement.spacedBy(10.pixelDp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(width = 200.dp, height = 60.dp)
+                    .size(width = 134.pixelDp, height = 40.pixelDp)
                     .clip(PixelShape(3))
                     .background(AppTheme.colors.LinkColor)
             )
             Box(
                 modifier = Modifier
-                    .size(width = 200.dp, height = 60.dp)
-                    .border(width = 1.5.dp, AppTheme.colors.LinkColor, PixelShape(2))
+                    .size(width = 134.pixelDp, height = 40.pixelDp)
+                    .border(width = 2.pixelDp, AppTheme.colors.LinkColor, PixelShape(2))
                     .clip(PixelShape(2))
                     .background(AppTheme.colors.BackgroundColor)
             )

@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.createpost.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +38,7 @@ fun CaptionSection(
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(end = 16.dp)
+                .padding(end = 10.pixelDp)
         )
     }
 }

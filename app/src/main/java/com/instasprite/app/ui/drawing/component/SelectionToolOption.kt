@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -41,16 +43,16 @@ fun SelectionToolOption(
         ) {
             Row(
                 modifier = Modifier
-                    .height(36.dp)
+                    .height(24.pixelDp)
                     .clip(MaterialTheme.shapes.small)
                     .background(AppTheme.colors.BackgroundColor)
-                    .padding(horizontal = 4.dp),
+                    .padding(horizontal = 2.pixelDp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(2.pixelDp)
             ) {
                 TextButton(
                     onClick = onClearSelect,
-                    contentPadding = PaddingValues(horizontal = 8.dp)
+                    contentPadding = PaddingValues(horizontal = 6.pixelDp)
                 ) {
                     Text(
                         text = stringResource(R.string.clear),
@@ -60,7 +62,7 @@ fun SelectionToolOption(
 
                 TextButton(
                     onClick = onInvertSelect,
-                    contentPadding = PaddingValues(horizontal = 8.dp)
+                    contentPadding = PaddingValues(horizontal = 6.pixelDp)
                 ) {
                     Text(
                         text = stringResource(R.string.invert),
@@ -70,12 +72,12 @@ fun SelectionToolOption(
 
                 TextButton(
                     onClick = { onAppendModeToggle(!isAppendMode) },
-                    contentPadding = PaddingValues(horizontal = 8.dp)
+                    contentPadding = PaddingValues(horizontal = 6.pixelDp)
                 ) {
                     Checkbox(
                         checked = isAppendMode,
                         onCheckedChange = onAppendModeToggle,
-                        modifier = Modifier.width(35.dp)
+                        modifier = Modifier.width(24.pixelDp)
                     )
                     Text(
                         text = stringResource(R.string.append),

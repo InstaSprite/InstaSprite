@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -178,8 +180,8 @@ fun ToolItem(
             containerColor = if (selected) AppTheme.colors.Foreground0Color else Color.Transparent
         ),
         shape = MaterialTheme.shapes.medium,
-        contentPadding = PaddingValues(0.dp),
-        modifier = modifier.size(56.dp),
+        contentPadding = PaddingValues(1.pixelDp),
+        modifier = modifier.size(38.pixelDp),
         onClick = onClick,
     ) {
         PixelIcon(

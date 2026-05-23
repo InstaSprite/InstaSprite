@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import android.annotation.SuppressLint
 import android.util.Patterns
 import android.widget.Toast
@@ -147,11 +149,11 @@ fun ForgotPasswordDialog(
         ) {
             if (isSendingEmail || isResettingPassword) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(64.dp),
+                    modifier = Modifier.size(42.pixelDp),
                     color = AppTheme.colors.WarningColor,
-                    strokeWidth = 4.dp
+                    strokeWidth = 2.pixelDp
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.pixelDp))
                 Text(
                     text = if (isSendingEmail) stringResource(R.string.sending_email) else "Resetting password…",
                     style = MaterialTheme.typography.bodyMedium
@@ -186,7 +188,7 @@ fun ForgotPasswordDialog(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
 
                 InputTextField(
                     enabled = true,
@@ -217,7 +219,7 @@ fun ForgotPasswordDialog(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
 
                 InputTextField(
                     enabled = true,
@@ -258,7 +260,7 @@ fun ForgotPasswordDialog(
             }
 
             if (errorMessage != null) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
                 Text(
                     text = errorMessage,
                     color = AppTheme.colors.DismissButtonColor,

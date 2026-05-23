@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -45,11 +47,11 @@ fun ToolSizeWheelPopup(
     ) {
         Surface(
             modifier = Modifier
-                .width(70.dp)
+                .width(46.pixelDp)
                 .height(wheelHeight),
             color = AppTheme.colors.BackgroundColor,
             shape = MaterialTheme.shapes.medium,
-            shadowElevation = 12.dp
+            shadowElevation = 8.pixelDp
         ) {
             ToolSizeWheelPicker(
                 toolSizeValue = toolSize,
@@ -98,7 +100,7 @@ fun ToolSizeWheelPicker(
 
     Box(
         modifier = modifier
-            .width(70.dp)
+            .width(46.pixelDp)
             .height(wheelHeight)
     ) {
 
@@ -154,7 +156,7 @@ private fun PreviewWheel() {
     InstaSpriteTheme() {
         ToolSizeWheelPopup(
             toolSize = 1,
-            itemHeight = 36.dp,
+            itemHeight = 24.pixelDp,
             onDismiss = {},
             onValueChange = {}
         )

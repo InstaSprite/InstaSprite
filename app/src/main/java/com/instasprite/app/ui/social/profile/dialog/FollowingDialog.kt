@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.profile.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -54,7 +56,7 @@ fun FollowingDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(134.pixelDp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -63,7 +65,7 @@ fun FollowingDialog(
                     CircularProgressIndicator(
                         color = AppTheme.colors.BottomBarColor
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.pixelDp))
                     Text(
                         text = stringResource(R.string.loading_following),
                         color = AppTheme.colors.Foreground2Color,
@@ -75,7 +77,7 @@ fun FollowingDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(134.pixelDp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -88,7 +90,7 @@ fun FollowingDialog(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(200.pixelDp)
             ) {
                 items(following) { user ->
                     FollowingItem(
@@ -113,16 +115,16 @@ private fun FollowingItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+            .padding(vertical = 6.pixelDp, horizontal = 10.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfileImage(
             imageUrl = user.profileImageUrl,
             modifier = Modifier.clickable { onProfileClick(user.username) },
-            size = 50.dp
+            size = 34.pixelDp
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(10.pixelDp))
 
         Column(
             modifier = Modifier
@@ -144,11 +146,11 @@ private fun FollowingItem(
             }
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(10.pixelDp))
 
         Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(22.pixelDp)
                 .clip(PixelShape(3))
                 .clickable { onUnfollowClick(user.id) }
                 .background(AppTheme.colors.DismissButtonColor.copy(alpha = 0.1f)),

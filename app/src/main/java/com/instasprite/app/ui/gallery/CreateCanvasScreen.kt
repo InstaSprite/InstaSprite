@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.gallery
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -127,9 +129,10 @@ fun CreateCanvasScreen(
                         onClick = ::tryConfirm,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AppTheme.colors.AccentButtonColor
-                        )
+                        ),
+                        shape = MaterialTheme.shapes.small,
                     ) {
-                        Text(stringResource(R.string.create), color = AppTheme.colors.TextColorDark)
+                        Text(stringResource(R.string.create_canvas), color = AppTheme.colors.TextColorDark)
                     }
                 }
             )
@@ -140,10 +143,10 @@ fun CreateCanvasScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 10.pixelDp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.pixelDp))
 
             fields.forEachIndexed { index, field ->
                 OutlinedTextField(
@@ -163,7 +166,7 @@ fun CreateCanvasScreen(
                             Text(
                                 it,
                                 color = AppTheme.colors.LinkColor,
-                                modifier = Modifier.padding(horizontal = 14.dp)
+                                modifier = Modifier.padding(horizontal = 10.pixelDp)
                             )
                         }
                     },
@@ -181,7 +184,7 @@ fun CreateCanvasScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.pixelDp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically

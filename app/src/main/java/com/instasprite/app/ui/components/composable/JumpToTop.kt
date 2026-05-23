@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 
 import androidx.compose.animation.core.Animatable
@@ -49,8 +51,8 @@ fun JumpToTopButton(
             containerColor = AppTheme.colors.BackgroundColorDarker
         ),
         shape = MaterialTheme.shapes.medium,
-        contentPadding = PaddingValues(0.dp),
-        modifier = modifier.size(48.dp)
+        contentPadding = PaddingValues(1.pixelDp),
+        modifier = modifier.size(32.pixelDp)
     ) {
         PixelIcon(
             icon = R.drawable.ic_up_arrow,

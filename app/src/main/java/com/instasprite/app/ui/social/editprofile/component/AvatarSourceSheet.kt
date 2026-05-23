@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.editprofile.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,7 +42,7 @@ fun AvatarSourceSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = AppTheme.colors.BackgroundColor,
-        tonalElevation = 0.dp,
+        tonalElevation = 1.pixelDp,
     ) {
         AvatarSourceSheetContent(
             onDismiss = onDismiss,
@@ -59,7 +61,7 @@ private fun AvatarSourceSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 32.dp)
+            .padding(bottom = 22.pixelDp)
     ) {
         Text(
             text = stringResource(R.string.change_profile_photo),
@@ -68,7 +70,7 @@ private fun AvatarSourceSheetContent(
             color = AppTheme.colors.TextColorLight,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 12.dp)
+                .padding(bottom = 8.pixelDp)
         )
         HorizontalDivider(color = AppTheme.colors.Subtext0Color.copy(alpha = 0.15f))
         Row(
@@ -79,15 +81,15 @@ private fun AvatarSourceSheetContent(
                     onDismiss()
                     onPickFromSprite()
                 }
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(horizontal = 16.pixelDp, vertical = 10.pixelDp)
         ) {
             PixelIcon(
                 icon = R.drawable.ic_canvas,
                 contentDescription = null,
                 tint = AppTheme.colors.SelectedColor,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(16.pixelDp)
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(10.pixelDp))
             Text(
                 text = stringResource(R.string.pick_from_sprite),
                 fontSize = 15.sp,
@@ -103,14 +105,14 @@ private fun AvatarSourceSheetContent(
                     onDismiss()
                     onPickFromDevice()
                 }
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(horizontal = 16.pixelDp, vertical = 10.pixelDp)
         ) {
             PixelIcon(
                 icon = R.drawable.ic_folder,
                 contentDescription = null,
                 tint = AppTheme.colors.LinkColor,
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(10.pixelDp))
             Text(
                 text = stringResource(R.string.pick_from_device),
                 fontSize = 15.sp,

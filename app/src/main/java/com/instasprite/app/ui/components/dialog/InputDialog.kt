@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -80,7 +82,7 @@ fun InputDialog(
                     )
                 }
             } else {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.pixelDp))
                 Column {
                     extraTopContent()
 
@@ -101,7 +103,7 @@ fun InputDialog(
                                     Text(
                                         it,
                                         color = AppTheme.colors.LinkColor,
-                                        modifier = Modifier.padding(horizontal = 14.dp)
+                                        modifier = Modifier.padding(horizontal = 10.pixelDp)
                                     )
                                 }
                             },

@@ -38,13 +38,13 @@ fun HomeBottomBar(
         modifier = modifier
 //            .clip(
 //                BottomNavShape(
-//                    dockRadius = with(LocalDensity.current) { 40.dp.toPx() },
+//                    dockRadius = with(LocalDensity.current) { 26.pixelDp.toPx() },
 //                ),
 //            )
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 3.dp, vertical = 2.dp)
+                .padding(horizontal = 2.pixelDp, vertical = 2.pixelDp)
                 .weight(1f)
 
         ) {
@@ -60,7 +60,7 @@ fun HomeBottomBar(
 
         Row(
             modifier = Modifier
-                .padding(horizontal = 3.dp, vertical = 2.dp)
+                .padding(horizontal = 2.pixelDp, vertical = 2.pixelDp)
                 .weight(1f),
             horizontalArrangement = Arrangement.End
         ) {
@@ -90,7 +90,7 @@ fun BottomBarItem(
 ) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier.padding(horizontal = 2.dp)
+        modifier = Modifier.padding(horizontal = 2.pixelDp)
     ) {
         PixelIcon(
             icon = icon,

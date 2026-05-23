@@ -19,7 +19,7 @@ import com.instasprite.app.utils.rememberPixelPainter
 fun ProfileImage(
     imageUrl: String?,
     modifier: Modifier = Modifier,
-    size: Dp = 100.dp,
+    size: Dp = 66.pixelDp,
 ) {
     Log.d("ProfileImage", "Displaying image: $imageUrl")
     AsyncImageView(

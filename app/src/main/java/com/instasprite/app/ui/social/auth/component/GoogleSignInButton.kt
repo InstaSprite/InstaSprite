@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -42,18 +44,18 @@ fun GoogleSignInButton(
         shape = MaterialTheme.shapes.small,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(38.pixelDp)
             .border(
-                width = 1.dp,
+                width = 1.pixelDp,
                 color = AppTheme.colors.Foreground2Color,
                 shape = ButtonDefaults.shape
             )
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(16.pixelDp),
                 color = Color.Black,
-                strokeWidth = 2.dp
+                strokeWidth = 2.pixelDp
             )
         } else {
             Row(
@@ -64,7 +66,7 @@ fun GoogleSignInButton(
                     icon = R.drawable.ic_google,
                 )
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(8.pixelDp))
 
                 Text(
                     text = stringResource(R.string.continue_with_google),

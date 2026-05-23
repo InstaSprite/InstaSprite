@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.loadimage.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -72,7 +74,7 @@ fun ImageConfigView(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.pixelDp))
 
         if (uiState.selectedTabIndex == 0) {
             BasicSettingTab(uiState, event)
@@ -99,7 +101,7 @@ private fun BasicSettingTab(
             range = 1..512
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.pixelDp))
 
         NumberStepper(
             value = uiState.config.colorCount,
@@ -138,7 +140,7 @@ private fun AdvancedSettingTab(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.pixelDp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -162,7 +164,7 @@ private fun AdvancedSettingTab(
 
         AnimatedVisibility(visible = uiState.applyPalette) {
             Column {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.pixelDp))
                 val context = LocalContext.current
                 val paletteToUse =
                     uiState.selectedPalette?.colors ?: loadDefaultColorPalette(context)

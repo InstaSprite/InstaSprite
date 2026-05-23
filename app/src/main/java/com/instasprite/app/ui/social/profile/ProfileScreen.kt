@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.profile
 
+import com.instasprite.app.utils.pixelDp
+
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -153,7 +155,7 @@ fun ProfileContent(
 
     val lazyListState = rememberLazyListState()
 
-    val profileHeaderHeightPx = with(LocalDensity.current) { 220.dp.toPx() }
+    val profileHeaderHeightPx = with(LocalDensity.current) { 146.pixelDp.toPx() }
 
     val isOwnProfile = state.userProfile.isOwnProfile
     val displayedTabs = if (isOwnProfile) ProfileTab.values() else arrayOf(ProfileTab.POSTS)
@@ -227,13 +229,13 @@ fun ProfileContent(
                     )
                 } else {
                     LazyVerticalStaggeredGrid(
-                        columns = StaggeredGridCells.Adaptive(minSize = 160.dp),
+                        columns = StaggeredGridCells.Adaptive(minSize = 106.pixelDp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(gridHeight)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalItemSpacing = 8.dp,
+                            .padding(horizontal = 8.pixelDp, vertical = 6.pixelDp),
+                        horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
+                        verticalItemSpacing = 6.pixelDp,
                         userScrollEnabled = false
                     ) {
                         items(

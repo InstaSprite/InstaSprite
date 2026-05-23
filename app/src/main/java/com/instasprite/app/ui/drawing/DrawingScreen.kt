@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing
 
+import com.instasprite.app.utils.pixelDp
+
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.widget.Toast
@@ -209,7 +211,7 @@ private fun DrawingScreenContent(
                 ColorPalette(
                     modifier = Modifier
                         .background(AppTheme.colors.BackgroundColor)
-                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                        .padding(horizontal = 6.pixelDp, vertical = 2.pixelDp),
                     colorPaletteState = colorPaletteState,
                     onColorPaletteEvent = event.onColorPaletteEvent,
                     onCanvasMenuEvent = event.onCanvasMenuEvent
@@ -226,8 +228,8 @@ private fun DrawingScreenContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .height(65.dp)
-                        .padding(horizontal = 5.dp)
+                        .height(44.pixelDp)
+                        .padding(horizontal = 4.pixelDp)
                 ) {
                     ToolOptionMenu(
                         selectedTool = uiState.selectedTool,
@@ -280,7 +282,7 @@ private fun DrawingScreenContent(
                                         toolSizeValue = it
                                         event.onToolSizeChange(it)
                                     },
-                                    modifier = Modifier.padding(end = 8.dp)
+                                    modifier = Modifier.padding(end = 6.pixelDp)
                                 )
                             }
                         }
@@ -318,8 +320,8 @@ private fun DrawingScreenContent(
 
                 ToolSelector(
                     modifier = Modifier
-                        .height(66.dp)
-                        .padding(horizontal = 5.dp, vertical = 5.dp),
+                        .height(44.pixelDp)
+                        .padding(horizontal = 4.pixelDp, vertical = 4.pixelDp),
                     selectedTool = uiState.selectedTool,
                     onToolSelectorEvent = event.onToolSelectorEvent
                 )
@@ -331,8 +333,8 @@ private fun DrawingScreenContent(
                         onReleased = { event.onCursorDrawEvent(CursorDrawEvent.DrawButtonReleased) },
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
-                            .height(60.dp)
-                            .padding(vertical = 4.dp)
+                            .height(40.pixelDp)
+                            .padding(vertical = 2.pixelDp)
                             .align(Alignment.CenterHorizontally)
                     )
                 }
@@ -365,13 +367,13 @@ private fun DrawingScreenContent(
                         onClearSelect = { event.onCanvasEvent(PixelCanvasEvent.ClearSelection) },
                         onInvertSelect = { event.onCanvasEvent(PixelCanvasEvent.InvertSelection) },
                         modifier = Modifier
-                            .padding(bottom = 24.dp)
+                            .padding(bottom = 16.pixelDp)
                             .align(Alignment.BottomCenter),
                     )
                 }
                 PixelCanvas(
                     modifier = Modifier
-                        .padding(5.dp)
+                        .padding(4.pixelDp)
                         .fillMaxSize()
                         .fillMaxHeight(0.7f)
                         .clipToBounds(),

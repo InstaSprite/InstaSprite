@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.profile.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -58,7 +60,7 @@ fun FollowersDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(134.pixelDp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -67,7 +69,7 @@ fun FollowersDialog(
                     CircularProgressIndicator(
                         color = AppTheme.colors.BottomBarColor
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.pixelDp))
                     Text(
                         text = stringResource(R.string.loading_followers),
                         color = AppTheme.colors.Foreground2Color,
@@ -79,7 +81,7 @@ fun FollowersDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(134.pixelDp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -92,7 +94,7 @@ fun FollowersDialog(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(200.pixelDp)
             ) {
                 items(followers) { follower ->
                     FollowerItem(
@@ -117,16 +119,16 @@ private fun FollowerItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+            .padding(vertical = 6.pixelDp, horizontal = 10.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfileImage(
             imageUrl = follower.profileImageUrl,
             modifier = Modifier.clickable { onProfileClick(follower.username) },
-            size = 50.dp
+            size = 34.pixelDp
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(10.pixelDp))
 
         Column(
             modifier = Modifier
@@ -148,7 +150,7 @@ private fun FollowerItem(
             }
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(10.pixelDp))
 
         if (!follower.isFollowing) {
             OutlinedButton(
@@ -157,7 +159,7 @@ private fun FollowerItem(
                     contentColor = AppTheme.colors.TextColorLight
                 ),
                 border = androidx.compose.foundation.BorderStroke(
-                    width = 0.5.dp,
+                    width = 1.pixelDp,
                     color = AppTheme.colors.Foreground2Color
                 )
             ) {

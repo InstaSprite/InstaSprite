@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -28,12 +30,12 @@ fun TitledBox(
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
-        modifier = modifier.padding(top = 8.dp)
+        modifier = modifier.padding(top = 6.pixelDp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-//                .padding(16.dp)
+//                .padding(10.pixelDp)
         ) {
             content()
         }
@@ -44,9 +46,9 @@ fun TitledBox(
             fontSize = 10.sp,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .offset(x = 12.dp, y = (-16).dp)
+                .offset(x = 8.pixelDp, y = (-16).dp)
                 .background(titleBackgroundColor)
-                .padding(horizontal = 6.dp)
+                .padding(horizontal = 4.pixelDp)
         )
     }
 }

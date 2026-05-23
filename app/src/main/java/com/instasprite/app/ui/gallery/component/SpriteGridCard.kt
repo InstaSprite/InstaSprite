@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.gallery.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -84,7 +86,7 @@ fun SpriteGridCard(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                        .padding(horizontal = 6.pixelDp, vertical = 2.pixelDp)
                 ) {
                     Text(
                         text = meta?.spriteName ?: stringResource(R.string.untitled),
@@ -99,7 +101,7 @@ fun SpriteGridCard(
                 Box {
                     IconButton(
                         onClick = { showDropdown = true },
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(24.pixelDp),
                         ) {
                         PixelIcon(
                             icon = R.drawable.ic_three_dots,

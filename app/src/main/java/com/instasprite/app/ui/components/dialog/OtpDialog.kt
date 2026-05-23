@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -89,12 +91,12 @@ fun OtpDialog(
                     color = AppTheme.colors.Subtext0Color,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    modifier = Modifier.padding(bottom = 16.pixelDp)
                 )
             }
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(3.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 otpValues.forEachIndexed { index, valueState ->
@@ -155,7 +157,7 @@ fun OtpDialog(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .padding(top = 10.pixelDp),
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(
@@ -202,9 +204,9 @@ private fun OtpTextField(
 ) {
     Box(
         modifier = modifier
-            .size(56.dp)
+            .size(38.pixelDp)
             .border(
-                width = 2.dp,
+                width = 2.pixelDp,
                 color = if (isFocused || value.text.isNotEmpty()) {
                     AppTheme.colors.AccentButtonColor
                 } else {

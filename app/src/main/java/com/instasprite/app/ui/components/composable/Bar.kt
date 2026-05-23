@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -33,9 +35,9 @@ fun Bar(
     leftSlot: (@Composable () -> Unit)? = null,
     middleSlot: (@Composable () -> Unit)? = null,
     rightSlot: (@Composable () -> Unit)? = null,
-    height: Dp = 56.dp,
+    height: Dp = 38.pixelDp,
     backgroundColor: Color = AppTheme.colors.BackgroundColor,
-    space: Dp = 16.dp
+    space: Dp = 10.pixelDp
 ) {
     Box(
         modifier = modifier
@@ -48,7 +50,7 @@ fun Bar(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 8.pixelDp)
                 .align(Alignment.CenterStart)
         ) {
             leftSlot?.invoke()

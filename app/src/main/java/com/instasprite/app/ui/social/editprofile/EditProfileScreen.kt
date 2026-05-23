@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.editprofile
 
+import com.instasprite.app.utils.pixelDp
+
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -243,9 +245,9 @@ fun EditProfileContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp)
+                        .padding(horizontal = 14.pixelDp)
                 ) {
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.pixelDp))
 
                     EditAvatarSection(
                         avatarUrl = state.avatarUrl,
@@ -253,7 +255,7 @@ fun EditProfileContent(
                         onOpenSheet = event.onOpenAvatarSourceSheet
                     )
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(22.pixelDp))
 
                     EditProfileFields(
                         displayName = state.displayName,
@@ -264,7 +266,7 @@ fun EditProfileContent(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(22.pixelDp))
                 }
             }
 
@@ -277,7 +279,7 @@ fun EditProfileContent(
                 ) {
                     CircularProgressIndicator(
                         color = AppTheme.colors.SelectedColor,
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(32.pixelDp)
                     )
                 }
             }
@@ -294,14 +296,14 @@ fun EditProfileContent(
                     columns = GridCells.Fixed(3),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(6.pixelDp)
                 ) {
                     items(state.userSprites) { spriteWithMeta ->
                         val file = File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .padding(4.dp)
+                                .padding(2.pixelDp)
                                 .clickable {
                                     event.onSpriteSelected(spriteWithMeta.sprite.id)
                                 }
@@ -313,14 +315,14 @@ fun EditProfileContent(
                                     .fillMaxWidth()
                                     .aspectRatio(1f)
                                     .background(AppTheme.colors.BackgroundColor)
-                                    .padding(4.dp),
+                                    .padding(2.pixelDp),
                                 contentScale = ContentScale.FillHeight,
                                 filterQuality = FilterQuality.None
                             )
                             Text(
                                 text = spriteWithMeta.meta?.spriteName ?: stringResource(R.string.no_sprite),
                                 color = AppTheme.colors.TextColorLight,
-                                modifier = Modifier.padding(top = 4.dp),
+                                modifier = Modifier.padding(top = 2.pixelDp),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 fontSize = 12.sp

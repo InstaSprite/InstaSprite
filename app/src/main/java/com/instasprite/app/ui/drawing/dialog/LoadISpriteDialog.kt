@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -95,7 +97,7 @@ fun LoadISpriteDialog(
                 )
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.pixelDp))
 
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -106,7 +108,7 @@ fun LoadISpriteDialog(
             }
 
             spriteData?.let {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.pixelDp))
 
                 var showOverlay by remember { mutableStateOf(false) }
 

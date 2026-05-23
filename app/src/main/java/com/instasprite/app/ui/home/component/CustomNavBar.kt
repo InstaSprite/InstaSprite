@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.home.component
 
+import com.instasprite.app.utils.pixelDp
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,10 +54,10 @@ fun BoxScope.BottomNavPanelWithCutOut() {
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .fillMaxWidth()
-            .height(64.dp)
+            .height(42.pixelDp)
             .clip(
                 BottomNavShape(
-                    dockRadius = with(LocalDensity.current) { 45.dp.toPx() },
+                    dockRadius = with(LocalDensity.current) { 30.pixelDp.toPx() },
                 ),
             ) // Apply the custom shape
             .background(Color.Blue)
@@ -63,7 +65,7 @@ fun BoxScope.BottomNavPanelWithCutOut() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 56.dp),
+                .padding(horizontal = 38.pixelDp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Navigation icons (left and right of the cutout)

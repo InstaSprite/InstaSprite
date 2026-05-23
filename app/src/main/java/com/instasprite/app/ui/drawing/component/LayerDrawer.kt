@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -81,13 +83,13 @@ fun LayerDrawer(
         modifier = modifier
             .fillMaxHeight()
             .background(AppTheme.colors.BackgroundColorDarker)
-            .padding(12.dp)
+            .padding(8.pixelDp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp)
+                .padding(bottom = 6.pixelDp)
         ) {
             Text(
                 text = stringResource(R.string.layers),
@@ -142,7 +144,7 @@ fun LayerDrawer(
                         IconButton(
                             modifier = Modifier
                                 .draggableHandle()
-                                .width(32.dp),
+                                .width(22.pixelDp),
                             onClick = {},
                         ) {
                             PixelIcon(
@@ -168,7 +170,7 @@ fun LayerDrawer(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(6.pixelDp))
         HorizontalDivider(color = AppTheme.colors.SelectedColor)
 
         Bar(

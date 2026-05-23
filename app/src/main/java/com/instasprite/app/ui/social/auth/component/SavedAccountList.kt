@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +44,7 @@ fun SavedAccountList(
             fontWeight = FontWeight.Bold,
             color = AppTheme.colors.TextColorLight
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.pixelDp))
 
         Column(
             modifier = Modifier
@@ -61,12 +63,12 @@ fun SavedAccountList(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.pixelDp))
 
         Row(
             modifier = Modifier
                 .clickable { onAddAccountClick() }
-                .padding(8.dp),
+                .padding(6.pixelDp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             PixelIcon(
@@ -74,7 +76,7 @@ fun SavedAccountList(
                 contentDescription = null,
                 tint = AppTheme.colors.InfoColor
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.pixelDp))
             Text(
                 text = stringResource(R.string.log_into_another_account),
                 color = AppTheme.colors.SelectedColor,

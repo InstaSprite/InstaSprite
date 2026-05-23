@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,7 +23,7 @@ fun ToolSizeSlider(
     toolSizeValue: Int,
     onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    height: Dp = 32.dp
+    height: Dp = 22.pixelDp
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,

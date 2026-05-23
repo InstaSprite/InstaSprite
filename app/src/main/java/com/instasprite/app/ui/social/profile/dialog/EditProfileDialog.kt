@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.profile.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +45,7 @@ fun EditProfileDialog(
                 label = { Text(stringResource(R.string.display_name)) },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.pixelDp))
             OutlinedTextField(
                 value = bio,
                 onValueChange = { bio = it },

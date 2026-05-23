@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.createpost
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -139,16 +141,16 @@ private fun CreatePostScreenContent(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 400.dp)
-                        .padding(16.dp)
+                        .heightIn(max = 266.pixelDp)
+                        .padding(10.pixelDp)
                 )
                 CaptionSection(
                     enabled = !uiState.isPostInProgress,
                     value = uiState.caption,
                     onValueChange = event.onCaptionChange,
                     modifier = Modifier
-                        .padding(top = 10.dp)
-                        .padding(horizontal = 16.dp)
+                        .padding(top = 6.pixelDp)
+                        .padding(horizontal = 10.pixelDp)
                         .fillMaxWidth()
                 )
                 HashtagSection(
@@ -159,7 +161,7 @@ private fun CreatePostScreenContent(
                     onAddHashtag = event.onAddHashtag,
                     onRemoveHashtag = event.onRemoveHashtag,
                     modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(horizontal = 10.pixelDp, vertical = 6.pixelDp)
                         .fillMaxWidth()
                 )
 //                OptionSection(
@@ -167,7 +169,7 @@ private fun CreatePostScreenContent(
 //                    onEnableCommentChange = event.onCommentEnabledChange,
 //                    modifier = Modifier
 //                        .fillMaxWidth()
-//                        .padding(horizontal = 16.dp)
+//                        .padding(horizontal = 10.pixelDp)
 //                )
 
                 Button(
@@ -197,7 +199,7 @@ private fun CreatePostScreenContent(
                     columns = GridCells.Fixed(3),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(6.pixelDp)
                 ) {
                     items(uiState.userSprites) { spriteWithMeta ->
                         val file =
@@ -205,7 +207,7 @@ private fun CreatePostScreenContent(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .padding(4.dp)
+                                .padding(2.pixelDp)
                                 .clickable {
                                     event.onSpriteSelected(spriteWithMeta.sprite.id)
                                 }
@@ -217,14 +219,14 @@ private fun CreatePostScreenContent(
                                     .fillMaxWidth()
                                     .aspectRatio(1f)
                                     .background(AppTheme.colors.BackgroundColor)
-                                    .padding(4.dp),
+                                    .padding(2.pixelDp),
                                 contentScale = ContentScale.FillHeight,
                                 filterQuality = FilterQuality.None
                             )
                             Text(
                                 text = spriteWithMeta.meta?.spriteName ?: "Untitled",
                                 color = AppTheme.colors.TextColorLight,
-                                modifier = Modifier.padding(top = 4.dp),
+                                modifier = Modifier.padding(top = 2.pixelDp),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )

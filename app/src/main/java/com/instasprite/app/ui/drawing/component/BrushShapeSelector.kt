@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,12 +43,12 @@ fun BrushShapeSelector(
                 contentColor = AppTheme.colors.TextColorLight
             ),
             shape = MaterialTheme.shapes.small,
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-            modifier = Modifier.height(36.dp)
+            contentPadding = PaddingValues(horizontal = 8.pixelDp, vertical = 1.pixelDp),
+            modifier = Modifier.height(24.pixelDp)
         ) {
             Text(text = "Shape", fontSize = 12.sp)
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.pixelDp))
 
             PixelIcon(
                 icon = selectedShape.icon,

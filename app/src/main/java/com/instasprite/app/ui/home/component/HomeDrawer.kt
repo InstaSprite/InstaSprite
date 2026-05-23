@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.home.component
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,9 +69,9 @@ fun HomeDrawer(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 10.pixelDp)
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.pixelDp))
 
             if (isLoggedIn) {
                 Box(
@@ -78,11 +80,11 @@ fun HomeDrawer(
                 ) {
                     ProfileImage(
                         imageUrl = currentUser?.avatarUrl,
-                        size = 96.dp
+                        size = 64.pixelDp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.pixelDp))
 
                 Text(
                     text = memberName,
@@ -100,7 +102,7 @@ fun HomeDrawer(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.pixelDp))
             }
 
             HomeDrawerItem(
@@ -147,7 +149,7 @@ fun HomeDrawer(
 
             HorizontalDivider(
                 color = AppTheme.colors.Foreground2Color,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 6.pixelDp)
             )
 
             HomeDrawerItem(
@@ -168,7 +170,7 @@ fun HomeDrawer(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.pixelDp))
         }
     }
 }
@@ -188,7 +190,7 @@ private fun HomeDrawerItem(
                     icon = icon,
                     tint = AppTheme.colors.TextColorLight,
                 )
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(8.pixelDp))
                 Text(text = label)
             }
         },

@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.feed.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,9 +46,9 @@ fun VerifyEmailDialog(
         ) {
             if (verifyEmailState.isSending) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(64.dp),
+                    modifier = Modifier.size(42.pixelDp),
                     color = AppTheme.colors.WarningColor,
-                    strokeWidth = 4.dp
+                    strokeWidth = 2.pixelDp
                 )
 
                 Text(

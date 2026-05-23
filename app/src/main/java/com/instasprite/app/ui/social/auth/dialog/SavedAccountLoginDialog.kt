@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.social.auth.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -80,15 +82,15 @@ fun SavedAccountLoginDialog(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(16.pixelDp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ProfileImage(
                     imageUrl = account.avatarUrl,
-                    size = 72.dp
+                    size = 48.pixelDp
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.pixelDp))
 
                 Text(
                     text = stringResource(R.string.welcome_back) + ", ${account.name ?: account.username}",
@@ -103,7 +105,7 @@ fun SavedAccountLoginDialog(
                     style = MaterialTheme.typography.labelMedium
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.pixelDp))
 
                 InputTextField(
                     enabled = enabled,
@@ -134,7 +136,7 @@ fun SavedAccountLoginDialog(
                     visualTransformation = visualTransformation
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.pixelDp))
 
                 Button(
                     enabled = enabled
@@ -155,7 +157,7 @@ fun SavedAccountLoginDialog(
                     shape = MaterialTheme.shapes.small,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
-                        .height(56.dp)
+                        .height(38.pixelDp)
                 ) {
                     Text(
                         text = stringResource(R.string.login),

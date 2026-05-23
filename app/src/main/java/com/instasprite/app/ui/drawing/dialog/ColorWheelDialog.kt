@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -165,7 +167,7 @@ fun ColorWheelDialog(
         content = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(6.pixelDp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 SatValPanel(
@@ -181,7 +183,7 @@ fun ColorWheelDialog(
                     HueBar(
                         hue = hsv.value.first,
                         modifier = Modifier
-                            .height(40.dp)
+                            .height(26.pixelDp)
                             .weight(0.7f)
                     ) { hue ->
                         hsv.value = Triple(hue, hsv.value.second, hsv.value.third)
@@ -191,9 +193,9 @@ fun ColorWheelDialog(
                     ColorItem(
                         color = selectedColor.value,
                         modifier = Modifier
-                            .padding(start = 8.dp)
-                            .size(40.dp)
-                            .border(width = 5.dp, color = AppTheme.colors.BackgroundColorDarker)
+                            .padding(start = 6.pixelDp)
+                            .size(26.pixelDp)
+                            .border(width = 4.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
                     )
                 }
 
@@ -204,7 +206,7 @@ fun ColorWheelDialog(
                     saturation = hsv.value.second,
                     value = hsv.value.third,
                     modifier = Modifier
-                        .height(32.dp)
+                        .height(22.pixelDp)
                         .fillMaxWidth()
                 ) { newAlpha ->
                     alphaValue.value = newAlpha
@@ -217,7 +219,7 @@ fun ColorWheelDialog(
                     saturation = hsv.value.second,
                     value = hsv.value.third,
                     modifier = Modifier
-                        .height(32.dp)
+                        .height(22.pixelDp)
                         .fillMaxWidth()
                 ) { newValue ->
                     hsv.value = Triple(hsv.value.first, hsv.value.second, newValue)
@@ -237,7 +239,7 @@ fun ColorWheelDialog(
                     )
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.pixelDp)) {
                     ColorInputTextField(
                         value = hexValue.value,
                         onValueChange = { newText ->
@@ -252,7 +254,7 @@ fun ColorWheelDialog(
                     )
 
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         ColorInputTextField(
@@ -392,7 +394,7 @@ private fun HueBar(
     Canvas(
         modifier = modifier
             .border(
-                width = 5.dp,
+                width = 4.pixelDp,
                 color = AppTheme.colors.BackgroundColorDarker
             )
             .clip(RectangleShape)
@@ -450,10 +452,10 @@ private fun HueBar(
 
         drawCircle(
             Color.White,
-            radius = 5.dp.toPx(),
+            radius = 4.pixelDp.toPx(),
             center = pressOffset.value,
             style = Stroke(
-                width = 2.dp.toPx()
+                width = 2.pixelDp.toPx()
             )
         )
     }
@@ -474,7 +476,7 @@ private fun AlphaBar(
 
     Canvas(
         modifier = modifier
-            .border(width = 5.dp, color = AppTheme.colors.BackgroundColorDarker)
+            .border(width = 4.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
     ) {
@@ -529,9 +531,9 @@ private fun AlphaBar(
 
         drawCircle(
             Color.White,
-            radius = 5.dp.toPx(),
+            radius = 4.pixelDp.toPx(),
             center = pressOffset.value,
-            style = Stroke(width = 2.dp.toPx())
+            style = Stroke(width = 2.pixelDp.toPx())
         )
     }
 }
@@ -550,7 +552,7 @@ private fun ValueBar(
 
     Canvas(
         modifier = modifier
-            .border(width = 5.dp, color = AppTheme.colors.BackgroundColorDarker)
+            .border(width = 4.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
     ) {
@@ -589,9 +591,9 @@ private fun ValueBar(
 
         drawCircle(
             Color.White,
-            radius = 5.dp.toPx(),
+            radius = 4.pixelDp.toPx(),
             center = pressOffset.value,
-            style = Stroke(width = 2.dp.toPx())
+            style = Stroke(width = 2.pixelDp.toPx())
         )
     }
 }
@@ -617,16 +619,16 @@ private fun SatValPanel(
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(134.pixelDp)
             .border(
-                width = 5.dp,
+                width = 4.pixelDp,
                 color = AppTheme.colors.BackgroundColorDarker,
                 shape = RectangleShape
             )
             .emitDragGesture(interactionSource)
             .clip(RectangleShape)
     ) {
-        val cornerRadius = 12.dp.toPx()
+        val cornerRadius = 8.pixelDp.toPx()
         val satValSize = size
 
         val bitmap = createBitmap(size.width.toInt(), size.height.toInt())
@@ -721,16 +723,16 @@ private fun SatValPanel(
 
         drawCircle(
             color = indicatorColor,
-            radius = 8.dp.toPx(),
+            radius = 6.pixelDp.toPx(),
             center = pressOffset.value,
             style = Stroke(
-                width = 2.dp.toPx()
+                width = 2.pixelDp.toPx()
             )
         )
 
         drawCircle(
             color = indicatorColor,
-            radius = 2.dp.toPx(),
+            radius = 2.pixelDp.toPx(),
             center = pressOffset.value,
         )
     }

@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 
@@ -72,8 +74,8 @@ fun InputTextField(
         },
         trailingIcon = {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp, alignment = Alignment.End),
-                modifier = Modifier.padding(horizontal = 8.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.pixelDp, alignment = Alignment.End),
+                modifier = Modifier.padding(horizontal = 6.pixelDp)
             ) {
                 inputField.suffix?.let {
                     Text(

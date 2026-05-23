@@ -123,13 +123,13 @@ fun SettingScreen(
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 color = colors.Subtext0Color,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+                modifier = Modifier.padding(start = 10.pixelDp, top = 10.pixelDp, bottom = 6.pixelDp)
             )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 8.pixelDp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 ThemeFlavour.entries.forEach { flavour ->
@@ -140,16 +140,16 @@ fun SettingScreen(
                         previewColors = previewColors,
                         isSelected = isSelected,
                         onClick = { viewModel.setThemeFlavour(flavour) },
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                        modifier = Modifier.weight(1f).padding(horizontal = 2.pixelDp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.pixelDp))
 
             HorizontalDivider(
                 color = colors.Foreground1Color,
-                thickness = 1.dp
+                thickness = 1.pixelDp
             )
 
             // Language Setting
@@ -169,7 +169,7 @@ fun SettingScreen(
 
             HorizontalDivider(
                 color = colors.Foreground1Color,
-                thickness = 1.dp
+                thickness = 1.pixelDp
             )
 
             if (!uiState.hasPassword) {
@@ -189,7 +189,7 @@ fun SettingScreen(
 
                 HorizontalDivider(
                     color = colors.Foreground1Color,
-                    thickness = 1.dp
+                    thickness = 1.pixelDp
                 )
             }
 
@@ -219,7 +219,7 @@ fun SettingScreen(
 
             HorizontalDivider(
                 color = colors.Foreground1Color,
-                thickness = 1.dp
+                thickness = 1.pixelDp
             )
         }
 
@@ -240,7 +240,7 @@ fun SettingScreen(
                                 .clickable {
                                     viewModel.selectLanguage(index)
                                 }
-                                .padding(vertical = 12.dp),
+                                .padding(vertical = 8.pixelDp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -253,7 +253,7 @@ fun SettingScreen(
                                     unselectedColor = colors.Subtext0Color
                                 )
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(6.pixelDp))
                             Text(
                                 text = language,
                                 color = colors.TextColorLight
@@ -333,13 +333,13 @@ private fun FlavourCard(
             .border(1.pixelDp, borderColor, MaterialTheme.shapes.small)
             .background(previewColors.BackgroundColor)
             .clickable(onClick = onClick)
-            .padding(8.dp),
+            .padding(6.pixelDp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Swatch row — key semantic colors from the theme
         Row(
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
-            modifier = Modifier.padding(vertical = 4.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
+            modifier = Modifier.padding(vertical = 2.pixelDp)
         ) {
             listOf(
                 previewColors.SelectedColor,
@@ -349,14 +349,14 @@ private fun FlavourCard(
             ).forEach { color ->
                 Box(
                     modifier = Modifier
-                        .size(10.dp)
+                        .size(6.pixelDp)
                         .clip(PixelShape())
                         .background(color)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.pixelDp))
 
         Text(
             text = label,

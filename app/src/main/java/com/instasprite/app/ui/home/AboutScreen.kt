@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.home
 
+import com.instasprite.app.utils.pixelDp
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -90,17 +92,17 @@ fun AboutScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(22.pixelDp))
 
             // App Icon
             PixelIcon(
                 icon = R.drawable.ic_launcher,
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier
-                    .size(88.dp)
+                    .size(58.pixelDp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.pixelDp))
 
             // App Name
             Text(
@@ -117,7 +119,7 @@ fun AboutScreen(
                 color = colors.Subtext0Color
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.pixelDp))
 
             // Tagline
             Text(
@@ -125,15 +127,15 @@ fun AboutScreen(
                 fontSize = 14.sp,
                 color = colors.Subtext1Color,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 48.dp)
+                modifier = Modifier.padding(horizontal = 32.pixelDp)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.pixelDp))
 
             // Decos
             Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(horizontal = 48.dp)
+                horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
+                modifier = Modifier.padding(horizontal = 32.pixelDp)
             ) {
                 val palette = Catppuccin.Mocha
                 listOf(
@@ -144,20 +146,20 @@ fun AboutScreen(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .size(6.dp)
+                            .size(4.pixelDp)
                             .background(color)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(22.pixelDp))
 
             // Info
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                    .padding(horizontal = 10.pixelDp),
+                verticalArrangement = Arrangement.spacedBy(2.pixelDp)
             ) {
                 AboutInfoCard(
                     icon = R.drawable.ic_profile,
@@ -166,7 +168,7 @@ fun AboutScreen(
                     value = "pBuoc"
                 )
 
-                HorizontalDivider(color = colors.Foreground1Color, thickness = 0.5.dp)
+                HorizontalDivider(color = colors.Foreground1Color, thickness = 1.pixelDp)
 
                 AboutInfoCard(
                     icon = R.drawable.ic_palette,
@@ -175,7 +177,7 @@ fun AboutScreen(
                     value = "Catppuccin"
                 )
 
-                HorizontalDivider(color = colors.Foreground1Color, thickness = 0.5.dp)
+                HorizontalDivider(color = colors.Foreground1Color, thickness = 1.pixelDp)
 
                 AboutInfoCard(
                     icon = R.drawable.ic_edit,
@@ -184,7 +186,7 @@ fun AboutScreen(
                     value = "Jetpack Compose"
                 )
             }
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(22.pixelDp))
 
             // Footer
             Text(
@@ -193,7 +195,7 @@ fun AboutScreen(
                 color = colors.Subtext0Color,
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.pixelDp))
         }
     }
 }
@@ -210,7 +212,7 @@ private fun AboutInfoCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 14.dp, horizontal = 4.dp),
+            .padding(vertical = 10.pixelDp, horizontal = 2.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         PixelIcon(
@@ -219,7 +221,7 @@ private fun AboutInfoCard(
             tint = iconTint,
         )
 
-        Spacer(modifier = Modifier.width(14.dp))
+        Spacer(modifier = Modifier.width(10.pixelDp))
 
         Text(
             text = label,
@@ -250,7 +252,7 @@ private fun AboutLinkCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 14.dp, horizontal = 4.dp),
+            .padding(vertical = 10.pixelDp, horizontal = 2.pixelDp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

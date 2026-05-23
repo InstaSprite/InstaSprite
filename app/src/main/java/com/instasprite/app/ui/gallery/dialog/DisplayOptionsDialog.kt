@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.gallery.dialog
 
+import com.instasprite.app.utils.pixelDp
+
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -78,7 +80,7 @@ fun DisplayOptionsDialog(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.pixelDp))
 
             DropdownField(
                 label = stringResource(R.string.layout_mode),
