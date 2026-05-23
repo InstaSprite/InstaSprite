@@ -227,173 +227,17 @@ private fun PaletteEditorContent(
 
                 Spacer(modifier = Modifier.height(10.pixelDp))
 
-                val lazyListState = rememberLazyListState()
-
-                var uiColorsList by remember {
-                    mutableStateOf(colors.mapIndexed { index, color ->
-                        ColorItemWithId(id = java.util.UUID.randomUUID().toString(), color = color)
-                    })
-                }
-
-                LaunchedEffect(colors) {
-                    val currentColors = uiColorsList.map { it.color }
-                    if (currentColors != colors) {
-                        if (uiColorsList.size == colors.size) {
-                            uiColorsList = uiColorsList.mapIndexed { index, item ->
-                                if (item.color != colors[index]) {
-                                    item.copy(color = colors[index])
-                                } else {
-                                    item
-                                }
-                            }
-                        } else {
-                            val oldItems = uiColorsList.toMutableList()
-                            val newItems = colors.map { newColor ->
-                                val matchIndex = oldItems.indexOfFirst { it.color == newColor }
-                                if (matchIndex != -1) {
-                                    oldItems.removeAt(matchIndex)
-                                } else {
-                                    ColorItemWithId(id = java.util.UUID.randomUUID().toString(), color = newColor)
-                                }
-                            }
-                            uiColorsList = newItems
-                        }
-                    }
-                }
-
-                val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-                    val fromIdx = from.index - 3
-                    val toIdx = to.index - 3
-                    if (fromIdx in uiColorsList.indices && toIdx in uiColorsList.indices) {
-                        uiColorsList = uiColorsList.toMutableList().apply {
-                            add(toIdx, removeAt(fromIdx))
-                        }
-                    }
-                }
-
-                LazyColumn(
-                    state = lazyListState,
-                    verticalArrangement = Arrangement.spacedBy(6.pixelDp),
-                    contentPadding = PaddingValues(bottom = 6.pixelDp),
+                ReorderableColorsList(
+                    colors = colors,
+                    name = name,
+                    author = author,
+                    onNameChange = onNameChange,
+                    onAuthorChange = onAuthorChange,
+                    onColorClick = onColorClick,
+                    onColorDelete = onColorDelete,
+                    onColorsReordered = onColorsReordered,
                     modifier = Modifier.weight(1f)
-                ) {
-                    item {
-                        val paletteNameLabel = stringResource(R.string.palette_name)
-                        val paletteNameField = remember(paletteNameLabel) {
-                            InputField(
-                                label = paletteNameLabel,
-                                validator = { true }
-                            )
-                        }
-                        InputTextField(
-                            value = name,
-                            onValueChange = onNameChange,
-                            inputField = paletteNameField,
-                            imeAction = ImeAction.Next,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    item {
-                        val authorLabel = stringResource(R.string.author)
-                        val authorField = remember(authorLabel) {
-                            InputField(
-                                label = authorLabel,
-                                validator = { true }
-                            )
-                        }
-                        InputTextField(
-                            value = author,
-                            onValueChange = onAuthorChange,
-                            inputField = authorField,
-                            imeAction = ImeAction.Done,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(6.pixelDp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(R.string.colors_count, colors.size),
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AppTheme.colors.TextColorLight
-                            )
-                            Text(
-                                text = stringResource(R.string.tap_color_to_edit),
-                                fontSize = 12.sp,
-                                color = AppTheme.colors.Subtext0Color
-                            )
-                        }
-                    }
-
-                    items(uiColorsList, key = { it.id }) { item ->
-                        ReorderableItem(
-                            state = reorderableLazyListState,
-                            key = item.id
-                        ) { isDragging ->
-                            LaunchedEffect(isDragging) {
-                                if (!isDragging) {
-                                    val newColors = uiColorsList.map { it.color }
-                                    if (newColors != colors) {
-                                        onColorsReordered(newColors)
-                                    }
-                                }
-                            }
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(AppTheme.colors.BackgroundColor)
-                                    .padding(vertical = 2.pixelDp, horizontal = 6.pixelDp)
-                                    .clip(MaterialTheme.shapes.medium)
-                            ) {
-                                IconButton(
-                                    modifier = Modifier
-                                        .draggableHandle()
-                                        .width(22.pixelDp),
-                                    onClick = {},
-                                ) {
-                                    PixelIcon(
-                                        icon = R.drawable.ic_grab_handle,
-                                        tint = AppTheme.colors.TextColorLight,
-                                        contentDescription = stringResource(R.string.reorder)
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.width(6.pixelDp))
-
-                                val itemIndex = uiColorsList.indexOf(item)
-                                ColorBlock(
-                                    color = item.color,
-                                    onClick = { onColorClick(itemIndex) },
-                                    modifier = Modifier
-                                        .height(26.pixelDp)
-                                        .weight(9f)
-                                )
-
-                                Spacer(modifier = Modifier.width(6.pixelDp))
-
-                                IconButton(
-                                    onClick = { onColorDelete(itemIndex) },
-                                    modifier = Modifier.size(24.pixelDp).weight(1f)
-                                ) {
-                                    PixelIcon(
-                                        icon = R.drawable.ic_trash,
-                                        contentDescription = stringResource(R.string.delete_color),
-                                        tint = AppTheme.colors.ErrorDarkColor
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+                )
 
                 Spacer(modifier = Modifier.height(6.pixelDp))
                 Row(
@@ -425,6 +269,187 @@ private fun PaletteEditorContent(
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReorderableColorsList(
+    colors: List<Color>,
+    name: String,
+    author: String,
+    onNameChange: (String) -> Unit,
+    onAuthorChange: (String) -> Unit,
+    onColorClick: (Int) -> Unit,
+    onColorDelete: (Int) -> Unit,
+    onColorsReordered: (List<Color>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val lazyListState = rememberLazyListState()
+
+    var uiColorsList by remember {
+        mutableStateOf(colors.mapIndexed { index, color ->
+            ColorItemWithId(id = java.util.UUID.randomUUID().toString(), color = color)
+        })
+    }
+
+    LaunchedEffect(colors) {
+        val currentColors = uiColorsList.map { it.color }
+        if (currentColors != colors) {
+            if (uiColorsList.size == colors.size) {
+                uiColorsList = uiColorsList.mapIndexed { index, item ->
+                    if (item.color != colors[index]) {
+                        item.copy(color = colors[index])
+                    } else {
+                        item
+                    }
+                }
+            } else {
+                val oldItems = uiColorsList.toMutableList()
+                val newItems = colors.map { newColor ->
+                    val matchIndex = oldItems.indexOfFirst { it.color == newColor }
+                    if (matchIndex != -1) {
+                        oldItems.removeAt(matchIndex)
+                    } else {
+                        ColorItemWithId(id = java.util.UUID.randomUUID().toString(), color = newColor)
+                    }
+                }
+                uiColorsList = newItems
+            }
+        }
+    }
+
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        val fromIdx = from.index - 3
+        val toIdx = to.index - 3
+        if (fromIdx in uiColorsList.indices && toIdx in uiColorsList.indices) {
+            uiColorsList = uiColorsList.toMutableList().apply {
+                add(toIdx, removeAt(fromIdx))
+            }
+        }
+    }
+
+    LazyColumn(
+        state = lazyListState,
+        verticalArrangement = Arrangement.spacedBy(6.pixelDp),
+        contentPadding = PaddingValues(bottom = 6.pixelDp),
+        modifier = modifier
+    ) {
+        item {
+            val paletteNameLabel = stringResource(R.string.palette_name)
+            val paletteNameField = remember(paletteNameLabel) {
+                InputField(
+                    label = paletteNameLabel,
+                    validator = { true }
+                )
+            }
+            InputTextField(
+                value = name,
+                onValueChange = onNameChange,
+                inputField = paletteNameField,
+                imeAction = ImeAction.Next,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            val authorLabel = stringResource(R.string.author)
+            val authorField = remember(authorLabel) {
+                InputField(
+                    label = authorLabel,
+                    validator = { true }
+                )
+            }
+            InputTextField(
+                value = author,
+                onValueChange = onAuthorChange,
+                inputField = authorField,
+                imeAction = ImeAction.Done,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(6.pixelDp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.colors_count, colors.size),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AppTheme.colors.TextColorLight
+                )
+                Text(
+                    text = stringResource(R.string.tap_color_to_edit),
+                    fontSize = 12.sp,
+                    color = AppTheme.colors.Subtext0Color
+                )
+            }
+        }
+
+        items(uiColorsList, key = { it.id }) { item ->
+            ReorderableItem(
+                state = reorderableLazyListState,
+                key = item.id
+            ) { isDragging ->
+                LaunchedEffect(isDragging) {
+                    if (!isDragging) {
+                        val newColors = uiColorsList.map { it.color }
+                        if (newColors != colors) {
+                            onColorsReordered(newColors)
+                        }
+                    }
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(AppTheme.colors.BackgroundColor)
+                        .padding(vertical = 2.pixelDp, horizontal = 6.pixelDp)
+                        .clip(MaterialTheme.shapes.medium)
+                ) {
+                    IconButton(
+                        modifier = Modifier
+                            .draggableHandle()
+                            .width(22.pixelDp),
+                        onClick = {},
+                    ) {
+                        PixelIcon(
+                            icon = R.drawable.ic_grab_handle,
+                            tint = AppTheme.colors.TextColorLight,
+                            contentDescription = stringResource(R.string.reorder)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(6.pixelDp))
+
+                    val itemIndex = uiColorsList.indexOf(item)
+                    ColorBlock(
+                        color = item.color,
+                        onClick = { onColorClick(itemIndex) },
+                        modifier = Modifier
+                            .height(26.pixelDp)
+                            .weight(9f)
+                    )
+
+                    Spacer(modifier = Modifier.width(6.pixelDp))
+
+                    IconButton(
+                        onClick = { onColorDelete(itemIndex) },
+                        modifier = Modifier.size(24.pixelDp).weight(1f)
+                    ) {
+                        PixelIcon(
+                            icon = R.drawable.ic_trash,
+                            contentDescription = stringResource(R.string.delete_color),
+                            tint = AppTheme.colors.ErrorDarkColor
+                        )
+                    }
                 }
             }
         }

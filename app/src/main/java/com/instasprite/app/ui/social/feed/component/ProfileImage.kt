@@ -21,7 +21,6 @@ fun ProfileImage(
     modifier: Modifier = Modifier,
     size: Dp = 66.pixelDp,
 ) {
-    Log.d("ProfileImage", "Displaying image: $imageUrl")
     AsyncImageView(
         imageUrl = imageUrl,
         altText = "Profile Image",
@@ -30,9 +29,6 @@ fun ProfileImage(
             .clip(MaterialTheme.shapes.small),
         onError = { error ->
             Log.e("ProfileImage", "Error loading image: ${error}")
-        },
-        onSuccess = { success ->
-            Log.d("ProfileImage", "Successfully loaded image")
         },
         fallback = rememberPixelPainter(R.drawable.ic_default_profile),
         error = rememberPixelPainter(R.drawable.ic_default_profile),

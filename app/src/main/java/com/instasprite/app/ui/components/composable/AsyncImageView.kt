@@ -1,6 +1,7 @@
 package com.instasprite.app.ui.components.composable
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.painter.Painter
@@ -26,15 +27,20 @@ fun AsyncImageView(
     onSuccess: ((AsyncImagePainter.State.Success) -> Unit)? = null,
     onError: ((AsyncImagePainter.State.Error) -> Unit)? = null
 ) {
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
+    val context = LocalContext.current
+    val imageRequest = remember(imageUrl, context) {
+        ImageRequest.Builder(context)
             .data(imageUrl)
             .crossfade(true)
-            .allowHardware(false)
+            .allowHardware(true)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.ENABLED)
             .networkCachePolicy(CachePolicy.ENABLED)
-            .build(),
+            .build()
+    }
+
+    AsyncImage(
+        model = imageRequest,
         contentDescription = altText,
         filterQuality = FilterQuality.None,
         contentScale = contentScale,

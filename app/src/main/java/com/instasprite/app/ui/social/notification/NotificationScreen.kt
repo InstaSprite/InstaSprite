@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -116,11 +118,24 @@ fun NotificationScreen(
                         )
                     }
                 ) {
+                    val shouldLoadMore = remember {
+                        derivedStateOf {
+                            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                            lastVisibleItem != null && lastVisibleItem.index >= uiState.notifications.size - 5
+                        }
+                    }
+
+                    LaunchedEffect(shouldLoadMore.value) {
+                        if (shouldLoadMore.value) {
+                            viewModel.loadNotifications()
+                        }
+                    }
+
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(uiState.notifications) { notification ->
+                        items(uiState.notifications, key = { it.id }) { notification ->
                             NotificationItem(
                                 notification = notification,
                                 onClick = {
@@ -164,14 +179,6 @@ fun NotificationScreen(
                                 }
                             }
                         }
-                    }
-                }
-
-                // Simple infinite scroll trigger
-                LaunchedEffect(listState.firstVisibleItemIndex) {
-                    val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-                    if (lastVisibleItem != null && lastVisibleItem.index >= uiState.notifications.size - 5) {
-                        viewModel.loadNotifications()
                     }
                 }
             }
