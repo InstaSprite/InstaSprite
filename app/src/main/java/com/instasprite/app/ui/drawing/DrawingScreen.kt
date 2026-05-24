@@ -107,12 +107,21 @@ fun DrawingScreen(
     val context = LocalContext.current
     LaunchedEffect(fatalError) {
         fatalError?.let { throwable ->
-            val message = if (throwable is OutOfMemoryError) {
-                "Out of memory: canvas size is too large or system memory is low."
+            val isOom = throwable is OutOfMemoryError
+            val message = if (isOom) {
+                "Out of memory"
             } else {
-                "A critical error occurred: ${throwable.localizedMessage ?: "Unknown error"}"
+                "A critical error occurred: ${throwable.localizedMessage ?: "Unknown error"}. Attempting recovery save..."
             }
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+
+            try {
+                viewModel.saveToDB()
+                Toast.makeText(context, "Recovery save successful!", Toast.LENGTH_SHORT).show()
+            } catch (e: Throwable) {
+                Toast.makeText(context, "Recovery save failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+
             onNavigateBackDirectly()
         }
     }

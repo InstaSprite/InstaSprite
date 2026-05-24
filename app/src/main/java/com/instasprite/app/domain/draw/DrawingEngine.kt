@@ -36,6 +36,7 @@ class DrawingEngine(
 ) {
     private val canvasHistoryManager = CanvasHistoryManager()
     private var activeHistoryTracker: TileChangeTracker? = null
+    private var isProcessingTool = false
 
     val bitmapManager = BitmapManager(pixelCanvasUseCase)
     private val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope) { sel ->
@@ -62,6 +63,7 @@ class DrawingEngine(
         brushShape: BrushShape,
         zoomScale: Float
     ) {
+        if (isProcessingTool) return
         if (tool !is SelectionTool) {
             saveState()
         }
@@ -133,6 +135,8 @@ class DrawingEngine(
 
     // Tap
     fun onTapAt(tool: Tool, row: Int, col: Int, color: Color, size: Int): TapResult {
+        if (isProcessingTool) return TapResult.HandledSync
+
         if (tool is SelectionTool) {
             tool.apply(pixelCanvasUseCase, row, col, color)
             val sel = tool.currentSelection
@@ -146,24 +150,29 @@ class DrawingEngine(
         }
 
         if (tool is FillTool) {
+            isProcessingTool = true
             saveState()
             scope.launch {
-                val result = withContext(Dispatchers.Default) {
-                    FillTool.fillDirect(pixelCanvasUseCase, row, col, color)
-                }
+                try {
+                    val result = withContext(Dispatchers.Default) {
+                        FillTool.fillDirect(pixelCanvasUseCase, row, col, color)
+                    }
 
-                if (result != null) {
-                    bitmapManager.refreshBitmapRegion(
-                        result.dirtyMinRow, result.dirtyMinCol,
-                        result.dirtyMaxRow, result.dirtyMaxCol
-                    )
-                    _canvasState.value = _canvasState.value.copy(
-                        drawVersion = bitmapManager.drawVersion,
-                        layers = pixelCanvasUseCase.getLayers().toList()
-                    )
-                    updateHistoryCurrentState()
-                } else {
-                    discardHistoryCapture()
+                    if (result != null) {
+                        bitmapManager.refreshBitmapRegion(
+                            result.dirtyMinRow, result.dirtyMinCol,
+                            result.dirtyMaxRow, result.dirtyMaxCol
+                        )
+                        _canvasState.value = _canvasState.value.copy(
+                            drawVersion = bitmapManager.drawVersion,
+                            layers = pixelCanvasUseCase.getLayers().toList()
+                        )
+                        updateHistoryCurrentState()
+                    } else {
+                        discardHistoryCapture()
+                    }
+                } finally {
+                    isProcessingTool = false
                 }
             }
             return TapResult.FillStarted

@@ -95,15 +95,22 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun handleFatalError(t: Throwable) {
         if (_fatalError.value != null) return
-        _fatalError.value = t
-        if (t is OutOfMemoryError) {
-            System.gc()
+
+        try {
+            drawingEngine.resetHistory()
+        } catch (e: Throwable) {
+            // ignore
         }
         try {
             drawingEngine.release()
         } catch (e: Throwable) {
             // ignore
         }
+        if (t is OutOfMemoryError) {
+            System.gc()
+        }
+
+        _fatalError.value = t
     }
 
     private val initialCanvasWidth: Int = if (width > 0) width else pixelCanvasRepository.width

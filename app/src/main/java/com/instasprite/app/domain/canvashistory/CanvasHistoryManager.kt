@@ -14,10 +14,17 @@ class CanvasHistoryManager {
 
     private val transparentTile = IntArray(TILE_SIZE * TILE_SIZE)
 
+    companion object {
+        private const val MAX_HISTORY_SIZE = 100
+    }
+
     fun push(entry: HistoryEntry) {
         if (entry.isEmpty()) return
 
         undoStack.addLast(entry)
+        while (undoStack.size > MAX_HISTORY_SIZE) {
+            undoStack.removeFirst()
+        }
         redoStack.clear()
     }
 
