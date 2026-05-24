@@ -29,7 +29,7 @@ android {
         targetSdk = 36
         val ciVersionCode = project.findProperty("ciVersionCode")?.toString()?.toIntOrNull()
         versionCode = ciVersionCode ?: 3
-        versionName = "0.7.5"
+        versionName = "0.7.6"
 
         buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL", "\"\""))
         buildConfigField("String", "IMG_URL", localProperties.getProperty("IMG_URL", "\"\""))
