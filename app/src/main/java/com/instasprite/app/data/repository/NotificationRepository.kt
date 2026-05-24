@@ -5,6 +5,8 @@ import com.instasprite.app.di.RetrofitModule
 import com.instasprite.app.data.network.api.NotificationApi
 import com.instasprite.app.data.network.getBodyOrError
 import com.instasprite.app.data.network.model.FcmTokenRequestDto
+import com.instasprite.app.data.network.model.GroupedNotificationDto
+import com.instasprite.app.data.network.model.SpringPageDto
 import kotlin.coroutines.cancellation.CancellationException
 
 import javax.inject.Inject
@@ -76,6 +78,60 @@ class NotificationRepository @Inject constructor(
     suspend fun markAsRead(notificationId: String): Result<Unit> {
         return try {
             val response = notificationApi.markAsRead(notificationId)
+            val body = response.getBodyOrError(RetrofitModule.gson)
+            if (body != null && body.status == 200) {
+                Result.success(Unit)
+            } else {
+                val errorMessage = body?.message ?: "Unknown error"
+                val errorCode = body?.code ?: response.code().toString()
+                Result.failure(Exception("$errorCode: $errorMessage"))
+            }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            if (e is CancellationException) throw e
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getGroupedNotifications(page: Int, size: Int = 20): Result<SpringPageDto<GroupedNotificationDto>> {
+        return try {
+            val response = notificationApi.getGroupedNotifications(page, size)
+            val body = response.getBodyOrError(RetrofitModule.gson)
+            if (body != null && body.status == 200 && body.data != null) {
+                Result.success(body.data)
+            } else {
+                val errorMessage = body?.message ?: "Unknown error"
+                val errorCode = body?.code ?: response.code().toString()
+                Result.failure(Exception("$errorCode: $errorMessage"))
+            }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            if (e is CancellationException) throw e
+            Result.failure(e)
+        }
+    }
+
+    suspend fun markGroupAsRead(type: String, relatedEntityId: String): Result<Unit> {
+        return try {
+            val response = notificationApi.markGroupAsRead(type, relatedEntityId)
+            val body = response.getBodyOrError(RetrofitModule.gson)
+            if (body != null && body.status == 200) {
+                Result.success(Unit)
+            } else {
+                val errorMessage = body?.message ?: "Unknown error"
+                val errorCode = body?.code ?: response.code().toString()
+                Result.failure(Exception("$errorCode: $errorMessage"))
+            }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            if (e is CancellationException) throw e
+            Result.failure(e)
+        }
+    }
+
+    suspend fun markAllAsRead(): Result<Unit> {
+        return try {
+            val response = notificationApi.markAllAsRead()
             val body = response.getBodyOrError(RetrofitModule.gson)
             if (body != null && body.status == 200) {
                 Result.success(Unit)

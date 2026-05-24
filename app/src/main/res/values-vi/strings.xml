@@ -412,4 +412,18 @@
     <string name="importing">Đang nhập…</string>
     <string name="import_success">Đã nhập \"%1$s\" thành công!</string>
     <string name="import_failed">Nhập tệp GPL thất bại</string>
+    <string name="notification_action_like">đã thích bài viết của bạn.</string>
+    <string name="notification_action_comment">đã bình luận về bài viết của bạn.</string>
+    <string name="notification_action_follow">đã bắt đầu theo dõi bạn.</string>
+    <string name="notification_action_mention">đã nhắc đến bạn.</string>
+    <string name="notification_action_unknown">đã tương tác với hồ sơ của bạn.</string>
+    <string name="notification_someone">Ai đó</string>
+    <string name="mark_all_as_read">Đánh dấu tất cả là đã đọc</string>
+
+    <string name="notification_format_single">%1$s %2$s</string>
+    <string name="notification_format_double">%1$s và %2$s %3$s</string>
+
+    <plurals name="notification_format_multiple">
+        <item quantity="other">%1$s và %2$d người khác %3$s</item>
+    </plurals>
 </resources>

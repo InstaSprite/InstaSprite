@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.instasprite.app.domain.model.NotificationData
 import com.instasprite.app.data.network.model.toDomain
 import com.instasprite.app.data.repository.NotificationRepository
+import com.instasprite.app.domain.model.GroupedNotificationData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class NotificationUiState(
-    val notifications: List<NotificationData> = emptyList(),
+    val notifications: List<GroupedNotificationData> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val page: Int = 0,
@@ -42,7 +43,7 @@ class NotificationViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
-            notificationRepository.getNotifications(page = nextPage, size = 20)
+            notificationRepository.getGroupedNotifications(page = nextPage, size = 20)
                 .onSuccess { pageDto ->
                     _uiState.update { state ->
                         val currentList = if (refresh) emptyList() else state.notifications
@@ -60,13 +61,34 @@ class NotificationViewModel @Inject constructor(
         }
     }
 
-    fun markAsRead(notificationId: String) {
+    fun markAsRead(notification: GroupedNotificationData) {
+        if (notification.isRead) return
+        
         viewModelScope.launch {
-            notificationRepository.markAsRead(notificationId).onSuccess {
+            val result = if (notification.relatedEntityId != null) {
+                notificationRepository.markGroupAsRead(notification.type.name, notification.relatedEntityId)
+            } else {
+                // Fallback for non-groupable types without entity ID
+                notificationRepository.markAsRead(notification.id)
+            }
+            
+            result.onSuccess {
                 _uiState.update { state ->
                     val updatedList = state.notifications.map { notif ->
-                        if (notif.id == notificationId) notif.copy(isRead = true) else notif
+                        if (notif.id == notification.id) notif.copy(isRead = true) else notif
                     }
+                    state.copy(notifications = updatedList)
+                }
+            }
+        }
+    }
+
+    fun markAllAsRead() {
+        viewModelScope.launch {
+            val result = notificationRepository.markAllAsRead()
+            result.onSuccess {
+                _uiState.update { state ->
+                    val updatedList = state.notifications.map { it.copy(isRead = true) }
                     state.copy(notifications = updatedList)
                 }
             }

@@ -410,4 +410,19 @@
     <string name="importing">Importing…</string>
     <string name="import_success">Imported \"%1$s\" successfully!</string>
     <string name="import_failed">Failed to import GPL file</string>
+    <string name="notification_action_like">liked your post.</string>
+    <string name="notification_action_comment">commented on your post.</string>
+    <string name="notification_action_follow">started following you.</string>
+    <string name="notification_action_mention">mentioned you.</string>
+    <string name="notification_action_unknown">interacted with your profile.</string>
+    <string name="notification_someone">Someone</string>
+    <string name="mark_all_as_read">Mark all as read</string>
+
+    <string name="notification_format_single">%1$s %2$s</string>
+    <string name="notification_format_double">%1$s and %2$s %3$s</string>
+
+    <plurals name="notification_format_multiple">
+        <item quantity="one">%1$s and %2$d other %3$s</item>
+        <item quantity="other">%1$s and %2$d others %3$s</item>
+    </plurals>
 </resources>

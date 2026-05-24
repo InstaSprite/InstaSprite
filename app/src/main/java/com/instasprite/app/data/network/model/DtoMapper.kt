@@ -2,17 +2,17 @@ package com.instasprite.app.data.network.model
 
 import androidx.core.graphics.toColorInt
 import com.instasprite.app.domain.model.CommentData
+import com.instasprite.app.domain.model.GroupedNotificationData
 import com.instasprite.app.domain.model.Jwt
 import com.instasprite.app.domain.model.MemberData
 import com.instasprite.app.domain.model.MemberImageData
+import com.instasprite.app.domain.model.NotificationData
+import com.instasprite.app.domain.model.NotificationType
 import com.instasprite.app.domain.model.PageData
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.domain.model.PostImageData
 import com.instasprite.app.domain.model.PostTagData
 import com.instasprite.app.utils.Constants
-import com.instasprite.app.domain.model.NotificationData
-import com.instasprite.app.domain.model.NotificationType
-import com.instasprite.app.data.network.model.NotificationDto
 import java.time.LocalDateTime
 
 /**
@@ -66,13 +66,13 @@ fun MemberDto.toDomain(): MemberData {
 fun MemberImageDto.toDomain(): MemberImageData? {
     val imageUrl = imageUrl ?: return null
     val fullImageUrl = if (imageUrl.startsWith("http")) imageUrl
-        else "${Constants.IMG_URL}/$imageUrl"
+    else "${Constants.IMG_URL}/$imageUrl"
     return MemberImageData(fullImageUrl)
 }
 
 fun PostImageDto.toDomain(): PostImageData {
     val fullImageUrl = if (postImageUrl.startsWith("http")) postImageUrl
-        else "${Constants.IMG_URL}/$postImageUrl"
+    else "${Constants.IMG_URL}/$postImageUrl"
     return PostImageData(
         id = id,
         postImageUrl = fullImageUrl,
@@ -169,5 +169,33 @@ private fun parseDateTime(dateString: String?): LocalDateTime {
     } catch (e: Exception) {
         LocalDateTime.now()
     }
+}
+
+fun GroupedNotificationDto.toDomain(): GroupedNotificationData {
+    return GroupedNotificationData(
+        id = id,
+        groupKey = groupKey,
+        type = NotificationType.fromString(type),
+        relatedEntityId = relatedEntityId,
+        actorCount = actorCount,
+        isRead = isRead,
+        updatedAt = parseDateTime(updatedAt),
+        recentActors = recentActors.map { actor ->
+            val fullImageUrl = if (actor.avatarUrl?.startsWith("http") == true) {
+                actor.avatarUrl
+            } else if (!actor.avatarUrl.isNullOrEmpty()) {
+                "${Constants.IMG_URL}/${actor.avatarUrl}"
+            } else {
+                null
+            }
+            GroupedNotificationData.ActorSummary(
+                name = actor.name,
+                username = actor.username,
+                avatarUrl = fullImageUrl
+            )
+        },
+        title = title,
+        body = body
+    )
 }
 
