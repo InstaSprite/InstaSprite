@@ -4,6 +4,7 @@ import android.content.Context
 import com.instasprite.app.ui.theme.ThemeFlavour
 import android.content.res.Configuration
 import com.instasprite.app.data.model.DrawSetting
+import com.instasprite.app.ui.theme.AppFont
 import com.instasprite.app.data.model.GallerySettings
 import com.instasprite.app.data.model.SettingPreferences
 import com.instasprite.app.di.settingsDataStore
@@ -26,6 +27,10 @@ object AppSettings {
 
     fun getThemeFlavour(context: Context): ThemeFlavour {
         return getPersistedSettings(context).themeFlavour
+    }
+
+    fun getAppFont(context: Context): AppFont {
+        return getPersistedSettings(context).appFont
     }
 
     fun getDrawSetting(context: Context): DrawSetting {
@@ -51,6 +56,10 @@ object AppSettings {
 
     fun setThemeFlavour(context: Context, flavour: ThemeFlavour) {
         persist(context) { it.copy(themeFlavour = flavour) }
+    }
+
+    fun setAppFont(context: Context, font: AppFont) {
+        persist(context) { it.copy(appFont = font) }
     }
 
     fun setDrawSetting(context: Context, setting: DrawSetting) {

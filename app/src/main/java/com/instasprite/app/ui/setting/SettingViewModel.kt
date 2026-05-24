@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.instasprite.app.data.repository.AuthRepository
 import com.instasprite.app.domain.session.SocialSessionManager
 import com.instasprite.app.ui.theme.ThemeFlavour
+import com.instasprite.app.ui.theme.AppFont
 import com.instasprite.app.utils.AppSettings
 import com.instasprite.app.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 data class SettingUiState(
     val themeFlavour: ThemeFlavour = ThemeFlavour.MOCHA,
+    val appFont: AppFont = AppFont.DETERMINATION,
     val is2FAEnabled: Boolean = false,
     val isLoading2FAStatus: Boolean = true,
     val showLanguageDialog: Boolean = false,
@@ -74,6 +76,7 @@ class SettingViewModel @Inject constructor(
         
         _uiState.value = _uiState.value.copy(
             themeFlavour = AppSettings.getThemeFlavour(context),
+            appFont = AppSettings.getAppFont(context),
             supportedLocales = supportedLocales,
             languages = languages,
             languageCodes = languageCodes,
@@ -104,6 +107,11 @@ class SettingViewModel @Inject constructor(
     fun setThemeFlavour(flavour: ThemeFlavour) {
         _uiState.value = _uiState.value.copy(themeFlavour = flavour)
         AppSettings.setThemeFlavour(context, flavour)
+    }
+
+    fun setAppFont(font: AppFont) {
+        _uiState.value = _uiState.value.copy(appFont = font)
+        AppSettings.setAppFont(context, font)
     }
 
     fun toggle2FA(enabled: Boolean) {

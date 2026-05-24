@@ -2,105 +2,74 @@ package com.instasprite.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import kotlinx.serialization.Serializable
+
+
+@Serializable
+enum class AppFont(val label: String) {
+    DETERMINATION("Determination"),
+    RETRON("Retron"),
+    SYSTEM("System")
+}
 
 val RetronFont = FontFamily(
     Font(R.font.svn_retron, FontWeight.Normal)
 )
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    displayLarge = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 57.sp
-    ),
-    displayMedium = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 45.sp
-    ),
-    displaySmall = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 36.sp
-    ),
-    headlineLarge = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 32.sp
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 28.sp
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 24.sp
-    ),
-    titleLarge = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 22.sp
-    ),
-    titleMedium = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 16.sp
-    ),
-    titleSmall = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 14.sp
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 16.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 14.sp
-    ),
-    bodySmall = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 12.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 14.sp
-    ),
-    labelMedium = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 12.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = RetronFont,
-        fontSize = 11.sp
-    )
+val DeterminationFont = FontFamily(
+    Font(R.font.svn_determination, FontWeight.Normal)
 )
 
-fun buildCatppuccinTypography(colors: AppColors): Typography = Typography().run {
-    copy(
-        displayLarge = displayLarge.withFontAndColor(RetronFont, colors.TextColorLight),
-        displayMedium = displayMedium.withFontAndColor(RetronFont, colors.TextColorLight),
-        displaySmall = displaySmall.withFontAndColor(RetronFont, colors.TextColorLight),
+fun buildCatppuccinTypography(colors: AppColors, appFont: AppFont = AppFont.DETERMINATION): Typography {
+    val selectedFont = when (appFont) {
+        AppFont.DETERMINATION -> DeterminationFont
+        AppFont.RETRON -> RetronFont
+        AppFont.SYSTEM -> FontFamily.Default
+    }
 
-        headlineLarge = headlineLarge.withFontAndColor(RetronFont, colors.TextColorLight),
-        headlineMedium = headlineMedium.withFontAndColor(RetronFont, colors.TextColorLight),
-        headlineSmall = headlineSmall.withFontAndColor(RetronFont, colors.TextColorLight),
+    return Typography().run {
+        copy(
+            displayLarge = displayLarge.withPixelFont(selectedFont, colors.TextColorLight),
+            displayMedium = displayMedium.withPixelFont(selectedFont, colors.TextColorLight),
+            displaySmall = displaySmall.withPixelFont(selectedFont, colors.TextColorLight),
 
-        titleLarge = titleLarge.withFontAndColor(RetronFont, colors.Subtext1Color),
-        titleMedium = titleMedium.withFontAndColor(RetronFont, colors.Subtext1Color),
-        titleSmall = titleSmall.withFontAndColor(RetronFont, colors.Subtext1Color),
+            headlineLarge = headlineLarge.withPixelFont(selectedFont, colors.TextColorLight),
+            headlineMedium = headlineMedium.withPixelFont(selectedFont, colors.TextColorLight),
+            headlineSmall = headlineSmall.withPixelFont(selectedFont, colors.TextColorLight),
 
-        bodyLarge = bodyLarge.withFontAndColor(RetronFont, colors.TextColorLight),
-        bodyMedium = bodyMedium.withFontAndColor(RetronFont, colors.TextColorLight),
-        bodySmall = bodySmall.withFontAndColor(RetronFont, colors.TextColorLight),
+            titleLarge = titleLarge.withPixelFont(selectedFont, colors.Subtext1Color),
+            titleMedium = titleMedium.withPixelFont(selectedFont, colors.Subtext1Color),
+            titleSmall = titleSmall.withPixelFont(selectedFont, colors.Subtext1Color),
 
-        labelLarge = labelLarge.withFontAndColor(RetronFont, colors.TextColorLight),
-        labelMedium = labelMedium.withFontAndColor(RetronFont, colors.TextColorLight),
-        labelSmall = labelSmall.withFontAndColor(RetronFont, colors.TextColorLight),
-    )
+            bodyLarge = bodyLarge.withPixelFont(selectedFont, colors.TextColorLight),
+            bodyMedium = bodyMedium.withPixelFont(selectedFont, colors.TextColorLight),
+            bodySmall = bodySmall.withPixelFont(selectedFont, colors.TextColorLight),
+
+            labelLarge = labelLarge.withPixelFont(selectedFont, colors.TextColorLight),
+            labelMedium = labelMedium.withPixelFont(selectedFont, colors.TextColorLight),
+            labelSmall = labelSmall.withPixelFont(selectedFont, colors.TextColorLight),
+        )
+    }
 }
 
-private fun TextStyle.withFontAndColor(font: FontFamily, color: Color): TextStyle {
-    return this.copy(fontFamily = font, color = color)
+private fun TextStyle.withPixelFont(
+    font: FontFamily,
+    color: Color,
+    scale: Float = 1f
+): TextStyle {
+    return copy(
+        fontFamily = font,
+        color = color,
+        fontSize = fontSize * scale,
+        lineHeight = lineHeight * scale,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
+    )
 }

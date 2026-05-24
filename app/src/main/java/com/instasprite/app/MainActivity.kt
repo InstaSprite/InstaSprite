@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
                 initial = SettingPreferences()
             )
 
-            InstaSpriteTheme(flavour = settings.themeFlavour) {
+            InstaSpriteTheme(flavour = settings.themeFlavour, appFont = settings.appFont) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

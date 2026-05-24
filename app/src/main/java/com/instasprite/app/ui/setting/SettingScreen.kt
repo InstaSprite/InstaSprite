@@ -60,6 +60,8 @@ import com.instasprite.app.ui.theme.AppColors
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.Catppuccin
 import com.instasprite.app.ui.theme.ThemeFlavour
+import com.instasprite.app.ui.theme.AppFont
+import com.instasprite.app.ui.theme.buildCatppuccinTypography
 import com.instasprite.app.utils.UiUtils
 import com.instasprite.app.utils.pixelDp
 
@@ -98,13 +100,57 @@ fun SettingScreen(
                 .background(colors.BackgroundColor)
                 .verticalScroll(rememberScrollState())
         ) {
+            // Font Selection Section
+            Text(
+                text = "Font",
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = colors.Subtext0Color,
+                modifier = Modifier.padding(
+                    start = 10.pixelDp,
+                    top = 10.pixelDp,
+                    bottom = 6.pixelDp
+                )
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.pixelDp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                AppFont.entries.forEach { font ->
+                    val isSelected = uiState.appFont == font
+                    FontCard(
+                        font = font,
+                        isSelected = isSelected,
+                        onClick = { viewModel.setAppFont(font) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 2.pixelDp)
+                            .height(64.pixelDp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.pixelDp))
+
+            HorizontalDivider(
+                color = colors.Foreground1Color,
+                thickness = 1.pixelDp
+            )
+
             // Theme Flavour Section
             Text(
                 text = stringResource(R.string.theme),
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 color = colors.Subtext0Color,
-                modifier = Modifier.padding(start = 10.pixelDp, top = 10.pixelDp, bottom = 6.pixelDp)
+                modifier = Modifier.padding(
+                    start = 10.pixelDp,
+                    top = 10.pixelDp,
+                    bottom = 6.pixelDp
+                )
             )
 
             Row(
@@ -121,7 +167,9 @@ fun SettingScreen(
                         previewColors = previewColors,
                         isSelected = isSelected,
                         onClick = { viewModel.setThemeFlavour(flavour) },
-                        modifier = Modifier.weight(1f).padding(horizontal = 2.pixelDp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 2.pixelDp)
                     )
                 }
             }
@@ -270,8 +318,11 @@ fun SettingScreen(
             OtpDialog(
                 enabled = !uiState.isEnabling2FA,
                 title = context.getString(R.string.enter_verification_code),
-                description = uiState.enable2FAError ?: context.getString(R.string.enter_6_digit_code),
-                confirmButtonText = if (uiState.isEnabling2FA) context.getString(R.string.verifying) else context.getString(R.string.verify),
+                description = uiState.enable2FAError
+                    ?: context.getString(R.string.enter_6_digit_code),
+                confirmButtonText = if (uiState.isEnabling2FA) context.getString(R.string.verifying) else context.getString(
+                    R.string.verify
+                ),
                 dismissButtonText = context.getString(R.string.cancel),
                 onDismiss = { viewModel.dismissOtpInputDialog() },
                 onOtpComplete = { otpCode ->
@@ -285,8 +336,11 @@ fun SettingScreen(
             OtpDialog(
                 enabled = !uiState.isDisabling2FA,
                 title = context.getString(R.string.disable_two_factor_authentication),
-                description = uiState.disable2FAError ?: context.getString(R.string.enter_6_digit_code_to_disable),
-                confirmButtonText = if (uiState.isDisabling2FA) context.getString(R.string.disabling) else context.getString(R.string.disable),
+                description = uiState.disable2FAError
+                    ?: context.getString(R.string.enter_6_digit_code_to_disable),
+                confirmButtonText = if (uiState.isDisabling2FA) context.getString(R.string.disabling) else context.getString(
+                    R.string.disable
+                ),
                 dismissButtonText = context.getString(R.string.cancel),
                 onDismiss = { viewModel.dismissDisableOtpDialog() },
                 onOtpComplete = { otpCode ->
@@ -344,6 +398,46 @@ private fun FlavourCard(
             fontSize = 11.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = previewColors.TextColorLight,
+        )
+    }
+}
+
+
+@Composable
+private fun FontCard(
+    font: AppFont,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = AppTheme.colors
+    val borderColor = if (isSelected) colors.SelectedColor else colors.Foreground1Color
+
+    val typography = buildCatppuccinTypography(colors, font)
+
+    Column(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.small)
+            .border(1.pixelDp, borderColor, MaterialTheme.shapes.small)
+            .background(colors.BackgroundColorDarker)
+            .clickable(onClick = onClick)
+            .padding(6.pixelDp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Aa",
+            style = typography.titleLarge,
+            color = if (isSelected) colors.SelectedColor else colors.TextColorLight,
+        )
+
+        Spacer(modifier = Modifier.height(4.pixelDp))
+
+        Text(
+            text = font.label,
+            style = typography.bodyMedium,
+            fontSize = 11.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            color = colors.TextColorLight,
         )
     }
 }

@@ -10,11 +10,12 @@ import com.instasprite.app.ui.components.shape.PixelShape
 @Composable
 fun InstaSpriteTheme(
     flavour: ThemeFlavour = ThemeFlavour.MOCHA,
+    appFont: AppFont = AppFont.DETERMINATION,
     content: @Composable () -> Unit
 ) {
     val palette = Catppuccin.fromFlavour(flavour)
     val appColors = Catppuccin.toAppColors(palette)
-    val typography = buildCatppuccinTypography(appColors)
+    val typography = buildCatppuccinTypography(appColors, appFont)
 
     val colorScheme = darkColorScheme(
         primary = appColors.SelectedColor,
