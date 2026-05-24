@@ -9,6 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.dialog.SaveFileDialog
 
@@ -24,24 +26,24 @@ fun SaveImageDialog(
     var scalePercent by remember { mutableStateOf("100") }
 
     SaveFileDialog(
-        title = "Export Image",
+        title = stringResource(R.string.export_image),
         fields = listOf(
             InputField(
-                label = "Name",
+                label = stringResource(R.string.filename),
                 placeholder = "Sprite",
                 keyboardType = KeyboardType.Text,
                 suffix = ".png",
                 validator = { it.isNotBlank() },
-                errorMessage = "Name cannot be blank",
+                errorMessage = stringResource(R.string.must_not_be_empty),
                 defaultValue = "Sprite"
             ),
             InputField(
-                label = "Scale",
+                label = stringResource(R.string.scale),
                 placeholder = "100",
                 keyboardType = KeyboardType.Number,
                 suffix = "%",
                 validator = { it.toIntOrNull() != null && it.toInt() in 25..20000 },
-                errorMessage = "Must be a number between 25 and 20000",
+                errorMessage = stringResource(R.string.must_be_between_25_and_20000),
                 defaultValue = "100"
             )
         ),

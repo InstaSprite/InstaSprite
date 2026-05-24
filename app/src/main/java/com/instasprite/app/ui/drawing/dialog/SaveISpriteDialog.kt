@@ -10,6 +10,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.dialog.SaveFileDialog
 import kotlinx.coroutines.launch
@@ -27,16 +29,16 @@ fun SaveISpriteDialog(
     var fileName by remember { mutableStateOf("Sprite") }
 
     SaveFileDialog(
-        title = "Save ISprite",
+        title = stringResource(R.string.save_isprite),
         fields = listOf(
             InputField(
-                label = "Name",
-                placeholder = "Sprite",
+                label = stringResource(R.string.filename),
+                placeholder = stringResource(R.string.filename),
+                defaultValue = fileName,
                 keyboardType = KeyboardType.Text,
                 suffix = ".isprite",
                 validator = { it.isNotBlank() },
-                errorMessage = "Name cannot be blank",
-                defaultValue = "Sprite"
+                errorMessage = stringResource(R.string.must_not_be_empty)
             ),
         ),
         isSaving = isSaving,

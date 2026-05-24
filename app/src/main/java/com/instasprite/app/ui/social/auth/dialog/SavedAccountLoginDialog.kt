@@ -36,7 +36,7 @@ import androidx.compose.ui.window.Dialog
 import com.instasprite.app.R
 import com.instasprite.app.data.model.AccountPreferences
 import com.instasprite.app.data.model.AccountType
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.domain.model.LoginRequest
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon

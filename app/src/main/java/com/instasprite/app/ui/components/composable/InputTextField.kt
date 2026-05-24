@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -44,6 +44,7 @@ fun InputTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     maxLines: Int = 1,
     imeAction: ImeAction = ImeAction.Default,
+    onImeAction: (() -> Unit)? = null,
     imeOptions: ImeOptions = ImeOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     modifier: Modifier = Modifier.fillMaxWidth(),
@@ -94,12 +95,14 @@ fun InputTextField(
         ),
         keyboardActions = KeyboardActions(
             onNext = {
-                if (imeAction == ImeAction.Next) {
+                if (onImeAction != null) onImeAction()
+                else if (imeAction == ImeAction.Next) {
                     focusManager.moveFocus(FocusDirection.Down)
                 }
             },
             onDone = {
-                if (imeAction == ImeAction.Done) {
+                if (onImeAction != null) onImeAction()
+                else if (imeAction == ImeAction.Done) {
                     focusManager.clearFocus()
                 }
             }

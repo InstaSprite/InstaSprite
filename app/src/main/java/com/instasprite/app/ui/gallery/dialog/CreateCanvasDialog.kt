@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.InputField
@@ -29,37 +31,37 @@ fun CreateCanvasDialog(
     val context = LocalContext.current
 
     InputDialog(
-        title = "New canvas",
+        title = stringResource(R.string.new_canvas),
         fields = listOf(
             InputField(
-                label = "Name",
-                placeholder = "Untitled",
-                defaultValue = "Untitled",
+                label = stringResource(R.string.name),
+                placeholder = stringResource(R.string.untitled),
+                defaultValue = stringResource(R.string.untitled),
                 keyboardType = KeyboardType.Text,
                 validator = { it.length <= 20 },
-                errorMessage = "Must be less than 20 characters"
+                errorMessage = stringResource(R.string.must_be_less_than_20_chars)
             ),
             InputField(
-                label = "Width",
+                label = stringResource(R.string.width),
                 placeholder = "16",
                 defaultValue = "16",
-                suffix = "px",
+                suffix = stringResource(R.string.px),
                 keyboardType = KeyboardType.Number,
-                validator = { it.toIntOrNull() != null && it.toIntOrNull() != 0 },
-                errorMessage = "Must be a number greater than 0"
+                validator = { it.toIntOrNull() != null && it.toInt() > 0 && it.toInt() <= 1024 },
+                errorMessage = stringResource(R.string.must_be_between_1_and_1024)
             ),
             InputField(
-                label = "Height",
+                label = stringResource(R.string.height),
                 placeholder = "16",
                 defaultValue = "16",
-                suffix = "px",
+                suffix = stringResource(R.string.px),
                 keyboardType = KeyboardType.Number,
-                validator = { it.toIntOrNull() != null && it.toIntOrNull() != 0 },
-                errorMessage = "Must be a number greater than 0"
+                validator = { it.toIntOrNull() != null && it.toInt() > 0 && it.toInt() <= 1024 },
+                errorMessage = stringResource(R.string.must_be_between_1_and_1024)
             )
         ),
         onDismiss = onDismiss,
-        confirmButtonText = "Create",
+        confirmButtonText = stringResource(R.string.create),
         onConfirm = { values ->
             val name = values[0]
             val width = values[1].toInt()

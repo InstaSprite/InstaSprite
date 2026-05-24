@@ -23,7 +23,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme

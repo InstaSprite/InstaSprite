@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.domain.model.LoginRequest
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
@@ -64,7 +64,7 @@ fun LoginForm(
     val emailInputTextField = remember {
         InputField(
             label = context.getString(R.string.email),
-            placeholder = "exampl@domain.com",
+            placeholder = context.getString(R.string.example_email),
             keyboardType = KeyboardType.Email,
             validator = { string ->
                 Patterns.EMAIL_ADDRESS.matcher(string).matches()

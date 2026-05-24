@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.completionprofile.contract.ProfileCompletionScreenEvent

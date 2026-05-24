@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.instasprite.app.data.model.InputField
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.theme.AppTheme
 
@@ -28,7 +30,7 @@ fun CaptionSection(
             value = value,
             onValueChange = onValueChange,
             maxLines = maxLines,
-            inputField = InputField(label = "What's on your mind?"),
+            inputField = InputField(label = stringResource(R.string.whats_on_your_mind)),
             modifier = modifier
         )
 

@@ -9,18 +9,23 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
+import androidx.compose.ui.text.input.ImeAction
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -44,8 +49,15 @@ fun HashtagSection(
                     onValueChange(it)
                 }
             },
-            inputField = InputField(label = "Add tags (space to separate)"),
+            inputField = InputField(label = stringResource(R.string.add_tags)),
             maxLines = 1,
+            imeAction = ImeAction.Done,
+            onImeAction = onAddHashtag,
+            trailingIcon = {
+                IconButton(onClick = onAddHashtag) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.add_tag), tint = AppTheme.colors.LinkColor)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -66,14 +78,15 @@ fun HashtagSection(
                                 icon = R.drawable.ic_close,
                                 contentDescription = stringResource(R.string.remove_tag),
                                 tint = AppTheme.colors.DismissButtonColor,
+                                scale = 0.5f
                             )
                         },
                         colors = AssistChipDefaults.assistChipColors(
-                            containerColor = AppTheme.colors.Foreground2Color,
-                            labelColor = AppTheme.colors.TextColorLight,
+                            containerColor = AppTheme.colors.BackgroundColor,
+                            labelColor = AppTheme.colors.SelectedColor,
                             trailingIconContentColor = AppTheme.colors.Subtext0Color
                         ),
-                        border = BorderStroke(1.pixelDp, AppTheme.colors.Foreground1Color)
+                        border = BorderStroke(1.pixelDp, AppTheme.colors.TextColorLight)
                     )
                 }
             }

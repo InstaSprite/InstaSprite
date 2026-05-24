@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.CustomDialog
@@ -78,7 +78,7 @@ fun ForgotPasswordDialog(
     val emailInputTextField = remember {
         InputField(
             label = context.getString(R.string.email),
-            placeholder = "exampl@domain.com",
+            placeholder = context.getString(R.string.example_email),
             keyboardType = KeyboardType.Email,
             validator = { string ->
                 Patterns.EMAIL_ADDRESS.matcher(string).matches()
@@ -89,10 +89,10 @@ fun ForgotPasswordDialog(
 
     val temporaryPasswordInputTextField = remember {
         InputField(
-            label = "Temporary Password",
+            label = context.getString(R.string.temporary_password),
             keyboardType = KeyboardType.Password,
             validator = { string -> string.isNotBlank() },
-            errorMessage = "Please enter temporary password"
+            errorMessage = context.getString(R.string.please_enter_temporary_password)
         )
     }
 

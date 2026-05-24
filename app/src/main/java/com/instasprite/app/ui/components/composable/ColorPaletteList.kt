@@ -59,60 +59,13 @@ fun ColorPaletteList(
             },
             contentType = { "palette" }
         ) { palette ->
-            ListEntry(
+            PaletteListEntry(
                 palette = palette,
                 optionSlot = optionSlot,
                 colorPaletteConfig = colorPaletteConfig,
                 onClick = { onPaletteSelected(palette) }
             )
         }
-    }
-}
-
-@Composable
-private fun ListEntry(
-    palette: ColorPalette,
-    onClick: () -> Unit,
-    colorPaletteConfig: ColorPaletteConfig,
-    modifier: Modifier = Modifier,
-    optionSlot: @Composable (ColorPalette) -> Unit = {}
-) {
-    val itemModifier = modifier
-        .fillMaxWidth()
-        .clip(MaterialTheme.shapes.medium)
-        .background(AppTheme.colors.BackgroundColor)
-        .clickable(onClick = onClick)
-        .padding(8.pixelDp)
-
-    Column(modifier = itemModifier) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = palette.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = AppTheme.colors.TextColorLight
-                )
-                Text(
-                    text = "by ${palette.author}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = AppTheme.colors.Subtext0Color
-                )
-            }
-
-            optionSlot(palette)
-        }
-
-        Spacer(modifier = Modifier.height(6.pixelDp))
-
-        PalettePreview(
-            colors = palette.colors,
-            config = colorPaletteConfig,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 

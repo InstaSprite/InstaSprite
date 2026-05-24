@@ -2,6 +2,8 @@ package com.instasprite.app.ui.gallery.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.dialog.InputDialog
 
@@ -12,14 +14,14 @@ fun RenameDialog(
     onDismiss: () -> Unit,
 ) {
     InputDialog(
-        title = "Rename",
+        title = stringResource(R.string.rename),
         fields = listOf(
             InputField(
-                label = "Name",
-                placeholder = "Enter name",
+                label = stringResource(R.string.name),
+                placeholder = stringResource(R.string.name),
                 keyboardType = KeyboardType.Text,
                 validator = { it.isNotBlank() },
-                errorMessage = "Name cannot be blank"
+                errorMessage = stringResource(R.string.must_not_be_empty)
             )
         ),
         onDismiss = onDismiss,

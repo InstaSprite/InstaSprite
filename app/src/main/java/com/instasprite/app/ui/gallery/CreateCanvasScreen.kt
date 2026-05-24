@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -36,12 +37,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
+import com.instasprite.app.ui.components.composable.PaletteListEntry
 import com.instasprite.app.ui.components.composable.PalettePreview
+import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -60,33 +64,50 @@ fun CreateCanvasScreen(
         if (selectedPalette != null) currentPalette = selectedPalette
     }
 
-    val fields = remember {
+    val nameLabel = stringResource(R.string.name)
+    val untitledLabel = stringResource(R.string.untitled)
+    val mustBeLessLabel = stringResource(R.string.must_be_less_than_20_chars)
+    val widthLabel = stringResource(R.string.width)
+    val pxLabel = stringResource(R.string.px)
+    val heightLabel = stringResource(R.string.height)
+    val mustBeBetweenLabel = stringResource(R.string.must_be_between_1_and_1024)
+    val tapToChange = stringResource(R.string.tap_to_change)
+
+    val fields = remember(
+        nameLabel,
+        untitledLabel,
+        mustBeLessLabel,
+        widthLabel,
+        pxLabel,
+        heightLabel,
+        mustBeBetweenLabel
+    ) {
         listOf(
             InputField(
-                label = "Name",
-                placeholder = "Untitled",
-                defaultValue = "Untitled",
+                label = nameLabel,
+                placeholder = untitledLabel,
+                defaultValue = untitledLabel,
                 keyboardType = KeyboardType.Text,
                 validator = { it.length <= 20 },
-                errorMessage = "Must be less than 20 characters"
+                errorMessage = mustBeLessLabel
             ),
             InputField(
-                label = "Width",
-                placeholder = "16",
-                defaultValue = "16",
-                suffix = "px",
+                label = widthLabel,
+                placeholder = "32",
+                defaultValue = "32",
+                suffix = pxLabel,
                 keyboardType = KeyboardType.Number,
-                validator = { it.toIntOrNull() != null && it.toIntOrNull() != 0 },
-                errorMessage = "Must be a number greater than 0"
+                validator = { it.toIntOrNull() != null && it.toInt() > 0 && it.toInt() <= 1024 },
+                errorMessage = mustBeBetweenLabel
             ),
             InputField(
-                label = "Height",
-                placeholder = "16",
-                defaultValue = "16",
-                suffix = "px",
+                label = heightLabel,
+                placeholder = "32",
+                defaultValue = "32",
+                suffix = pxLabel,
                 keyboardType = KeyboardType.Number,
-                validator = { it.toIntOrNull() != null && it.toIntOrNull() != 0 },
-                errorMessage = "Must be a number greater than 0"
+                validator = { it.toIntOrNull() != null && it.toInt() > 0 && it.toInt() <= 1024 },
+                errorMessage = mustBeBetweenLabel
             )
         )
     }
@@ -95,18 +116,9 @@ fun CreateCanvasScreen(
         fields.map { mutableStateOf(it.defaultValue) }
     }
 
-    fun tryConfirm() {
-        val allValid = fields.withIndex().all { (i, field) ->
+    fun isInputValid() : Boolean {
+        return  fields.withIndex().all { (i, field) ->
             field.validator(inputStates[i].value)
-        }
-        if (allValid) {
-            onConfirm(
-                inputStates[0].value,
-                inputStates[1].value.toInt(),
-                inputStates[2].value.toInt()
-            )
-        } else {
-            Toast.makeText(context, "Input errors", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -117,18 +129,30 @@ fun CreateCanvasScreen(
                 onBackClick = onDismiss,
                 actions = {
                     Button(
-                        onClick = ::tryConfirm,
+                        onClick = {
+                            onConfirm(
+                                inputStates[0].value,
+                                inputStates[1].value.toInt(),
+                                inputStates[2].value.toInt()
+                            )
+                        },
+                        enabled = isInputValid(),
+                        modifier = Modifier.padding(end = 8.pixelDp
+                        ),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AppTheme.colors.AccentButtonColor
                         ),
                         shape = MaterialTheme.shapes.small,
                     ) {
-                        Text(stringResource(R.string.create_canvas), color = AppTheme.colors.TextColorDark)
+                        Text(
+                            stringResource(R.string.create_canvas),
+                            color = AppTheme.colors.TextColorDark
+                        )
                     }
                 }
             )
         },
-        containerColor = AppTheme.colors.BackgroundColor
+        containerColor = AppTheme.colors.BackgroundColorDarker
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -140,38 +164,12 @@ fun CreateCanvasScreen(
             Spacer(modifier = Modifier.height(8.pixelDp))
 
             fields.forEachIndexed { index, field ->
-                OutlinedTextField(
+                InputTextField(
+                    enabled = true,
                     value = inputStates[index].value,
                     onValueChange = { inputStates[index].value = it },
-                    label = { Text(field.label, color = AppTheme.colors.SelectedColor) },
-                    placeholder = {
-                        if (field.placeholder.isNotBlank())
-                            Text(
-                                field.placeholder,
-                                color = AppTheme.colors.Subtext0Color,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                    },
-                    trailingIcon = {
-                        field.suffix?.let {
-                            Text(
-                                it,
-                                color = AppTheme.colors.LinkColor,
-                                modifier = Modifier.padding(horizontal = 10.pixelDp)
-                            )
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = field.keyboardType),
-                    singleLine = true,
-                    isError = !field.validator(inputStates[index].value),
-                    supportingText = {
-                        if (!field.validator(inputStates[index].value)) {
-                            Text(field.errorMessage, color = AppTheme.colors.DismissButtonColor)
-                        }
-                    },
-                    colors = AppTheme.colors.outlineTextFieldColors(),
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = MaterialTheme.typography.bodyMedium
+                    inputField = field,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -180,13 +178,27 @@ fun CreateCanvasScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val palette = currentPalette?.colors ?: loadDefaultColorPalette(context)
-                PalettePreview(
-                    colors = palette,
-                    config = ColorPaletteConfig(isInteractive = false),
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(onClick = onPaletteViewClick)
+                var palette = currentPalette
+
+                if (palette == null) {
+                    palette = ColorPalette(
+                        id = -1,
+                        name = "SAGE57",
+                        author = "strawbrysage",
+                        colors = loadDefaultColorPalette(context)
+                    )
+                }
+                PaletteListEntry(
+                    palette = palette,
+                    onClick = onPaletteViewClick,
+                    colorPaletteConfig = ColorPaletteConfig(isInteractive = false),
+                    optionSlot = {
+                        Text(
+                            text = stringResource(R.string.tap_to_change),
+                            fontSize = 12.sp,
+                            color = AppTheme.colors.Subtext0Color
+                        )
+                    },
                 )
             }
         }

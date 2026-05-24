@@ -34,7 +34,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.domain.model.RegisterRequest
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
@@ -72,7 +72,7 @@ fun RegisterForm(
     val nameInputTextField = remember {
         InputField(
             label = context.getString(R.string.full_name),
-            placeholder = "Instasprite",
+            placeholder = context.getString(R.string.example_name),
             validator = { string ->
                 string.isNotBlank()
             },
@@ -83,7 +83,7 @@ fun RegisterForm(
     val usernameInputTextField = remember {
         InputField(
             label = context.getString(R.string.username),
-            placeholder = "instasprite789",
+            placeholder = context.getString(R.string.example_username),
             validator = { string ->
                 string.isNotBlank()
             },
@@ -94,7 +94,7 @@ fun RegisterForm(
     val emailInputTextField = remember {
         InputField(
             label = context.getString(R.string.email),
-            placeholder = "exampl@domain.com",
+            placeholder = context.getString(R.string.example_email),
             keyboardType = KeyboardType.Email,
             validator = { string ->
                 Patterns.EMAIL_ADDRESS.matcher(string).matches()
@@ -116,7 +116,7 @@ fun RegisterForm(
 
     val confirmPasswordInputTextField = remember {
         InputField(
-            label = "Confirm Password",
+            label = context.getString(R.string.confirm_password),
             validator = { password -> password == confirmPassword },
             keyboardType = KeyboardType.Password,
             errorMessage = context.getString(R.string.confirm_password_validation_error)

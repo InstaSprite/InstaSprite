@@ -426,4 +426,32 @@
     <plurals name="notification_format_multiple">
         <item quantity="other">%1$s và %2$d người khác %3$s</item>
     </plurals>
+    <!-- InputField Strings -->
+    <string name="must_be_less_than_20_chars">Phải ít hơn 20 ký tự</string>
+    <string name="width">Chiều rộng</string>
+    <string name="height">Chiều cao</string>
+    <string name="px">px</string>
+    <string name="must_be_between_1_and_1024">Phải từ 1 đến 1024</string>
+    <string name="must_be_greater_than_0">Phải là số lớn hơn 0</string>
+    <string name="new_name">Tên mới</string>
+    <string name="must_not_be_empty">Không được để trống</string>
+    <string name="filename">Tên tệp</string>
+    <string name="scale">Tỷ lệ</string>
+    <string name="palette_name_label">Tên bảng màu</string>
+    <string name="my_palette">Bảng màu của tôi</string>
+    <string name="email_or_username">Email / Tên người dùng</string>
+    <string name="otp">OTP</string>
+    <string name="otp_must_be_6_digits">OTP phải có 6 chữ số</string>
+    <string name="enter_your_new_password">Nhập mật khẩu mới của bạn</string>
+    <string name="whats_on_your_mind">Bạn đang nghĩ gì?</string>
+    <string name="add_tags">Thêm thẻ</string>
+    <string name="temporary_password">Mật khẩu tạm thời</string>
+    <string name="please_enter_temporary_password">Vui lòng nhập mật khẩu tạm thời</string>
+    <string name="add_tag">Thêm thẻ</string>
+    <string name="example_email">vidu@domain.com</string>
+    <string name="example_name">Instasprite</string>
+    <string name="example_username">instasprite789</string>
+    <string name="save_isprite">Lưu ISprite</string>
+    <string name="must_be_between_25_and_20000">Phải là số từ 25 đến 20000</string>
+    <string name="tap_to_change">Nhấn để đổi</string>
 </resources>

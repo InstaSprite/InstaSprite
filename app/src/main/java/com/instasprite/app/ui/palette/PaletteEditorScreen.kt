@@ -51,7 +51,7 @@ import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.components.composable.TopBar
-import com.instasprite.app.data.model.InputField
+import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.drawing.dialog.ColorWheelDialog

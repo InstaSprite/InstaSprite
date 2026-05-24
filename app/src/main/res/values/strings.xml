@@ -425,4 +425,31 @@
         <item quantity="one">%1$s and %2$d other %3$s</item>
         <item quantity="other">%1$s and %2$d others %3$s</item>
     </plurals>
+    <string name="must_be_less_than_20_chars">Must be less than 20 characters</string>
+    <string name="width">Width</string>
+    <string name="height">Height</string>
+    <string name="px">px</string>
+    <string name="must_be_between_1_and_1024">Must be between 1 and 1024</string>
+    <string name="must_be_greater_than_0">Must be a number greater than 0</string>
+    <string name="new_name">New Name</string>
+    <string name="must_not_be_empty">Must not be empty</string>
+    <string name="filename">Filename</string>
+    <string name="scale">Scale</string>
+    <string name="palette_name_label">Palette name</string>
+    <string name="my_palette">My Palette</string>
+    <string name="email_or_username">Email / Username</string>
+    <string name="otp">OTP</string>
+    <string name="otp_must_be_6_digits">OTP must be 6 digits</string>
+    <string name="enter_your_new_password">Enter your new password</string>
+    <string name="whats_on_your_mind">What\'s on your mind?</string>
+    <string name="add_tags">Add tags</string>
+    <string name="temporary_password">Temporary Password</string>
+    <string name="please_enter_temporary_password">Please enter temporary password</string>
+    <string name="add_tag">Add tag</string>
+    <string name="example_email">exampl@domain.com</string>
+    <string name="example_name">Instasprite</string>
+    <string name="example_username">instasprite789</string>
+    <string name="save_isprite">Save ISprite</string>
+    <string name="tap_to_change">Tap to change</string>
+    <string name="must_be_between_25_and_20000">Must be between 25 and 20000</string>
 </resources>
