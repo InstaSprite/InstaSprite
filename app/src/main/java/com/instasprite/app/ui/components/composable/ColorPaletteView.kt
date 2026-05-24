@@ -1,16 +1,14 @@
 package com.instasprite.app.ui.components.composable
 
-import com.instasprite.app.utils.pixelDp
-
+import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,23 +17,31 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.draw.clip
+import androidx.core.graphics.createBitmap
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
-
 import com.instasprite.app.utils.drawCheckerboard
+import com.instasprite.app.utils.pixelDp
 
 @Immutable
 data class ColorPaletteConfig(
@@ -44,7 +50,6 @@ data class ColorPaletteConfig(
     val listHeight: Dp = 26.pixelDp,
     val colorItemSize: Dp = 22.pixelDp,
     val isInteractive: Boolean = true,
-    val isWrap: Boolean = false,
 ) {
     init {
         require(listHeight >= colorItemSize) {
@@ -70,102 +75,34 @@ fun ColorPaletteView(
     with(config) {
         val resolvedBg =
             if (backgroundColor == Color.Unspecified) AppTheme.colors.BackgroundColorDarker else backgroundColor
-        BoxWithConstraints(
+        Box(
             contentAlignment = Alignment.CenterStart,
             modifier = modifier
-                .then(if (isWrap) Modifier.fillMaxWidth() else Modifier.height(height = listHeight))
-                .background(resolvedBg)
+                .height(height = listHeight)
+                .fillMaxWidth()
+                .background(resolvedBg),
         ) {
-            val effectiveColorItemSize = if (isWrap && colors.isNotEmpty()) {
-                val wAvailPx = maxOf(0f, (maxWidth - (listHeight - colorItemSize)).value)
-                val dPx = colorItemSize.value
-                val sPx = itemSpacing.value
-                val n = if (dPx + sPx > 0) {
-                    Math.floor(((wAvailPx + sPx) / (dPx + sPx)).toDouble()).toInt()
-                } else {
-                    1
-                }
-                val lines = if (n > 0) Math.ceil(colors.size.toDouble() / n).toInt() else 1
-                if (lines >= 3) {
-                    val nNew = Math.ceil(colors.size.toDouble() / 2.0).toInt()
-                    if (nNew > 0) {
-                        val calculatedSize = (wAvailPx + sPx) / nNew - sPx
-                        maxOf(12f, calculatedSize).dp
+            LazyRow(
+                state = lazyListState,
+                horizontalArrangement = Arrangement.spacedBy(itemSpacing),
+                modifier = Modifier.padding(horizontal = (listHeight - colorItemSize) / 2)
+            ) {
+                items(colors) { color ->
+
+                    val modifier = (itemColorModifier ?: Modifier).size(colorItemSize)
+
+                    if (isInteractive && color == activeColor) {
+                        ActiveColorItem(
+                            color = color,
+                            modifier = modifier,
+                            onClick = { onColorSelected?.invoke(color) }
+                        )
                     } else {
-                        colorItemSize
-                    }
-                } else {
-                    colorItemSize
-                }
-            } else {
-                colorItemSize
-            }
-
-            if (isWrap) {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(itemSpacing),
-                    verticalArrangement = Arrangement.spacedBy(itemSpacing),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = (listHeight - effectiveColorItemSize) / 2, vertical = (listHeight - effectiveColorItemSize) / 2)
-                ) {
-                    colors.forEach { color ->
-                        val modifier = (itemColorModifier ?: Modifier).size(effectiveColorItemSize)
-
-                        if (isInteractive && color == activeColor) {
-                            ActiveColorItem(
-                                color = color,
-                                modifier = modifier,
-                                onClick = { onColorSelected?.invoke(color) }
-                            )
-                        } else {
-                            ColorItem(
-                                color = color,
-                                onColorSelected = onColorSelected,
-                                modifier = modifier
-                            )
-                        }
-                    }
-                }
-            } else {
-                if (isInteractive) {
-                    LazyRow(
-                        state = lazyListState,
-                        horizontalArrangement = Arrangement.spacedBy(itemSpacing),
-                        modifier = Modifier.padding(horizontal = (listHeight - colorItemSize) / 2)
-                    ) {
-                        items(colors) { color ->
-                            val modifier = (itemColorModifier ?: Modifier).size(colorItemSize)
-                            if (color == activeColor) {
-                                ActiveColorItem(
-                                    color = color,
-                                    modifier = modifier,
-                                    onClick = { onColorSelected?.invoke(color) }
-                                )
-                            } else {
-                                ColorItem(
-                                    color = color,
-                                    onColorSelected = onColorSelected,
-                                    modifier = modifier
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = (listHeight - colorItemSize) / 2)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(itemSpacing)
-                    ) {
-                        colors.forEach { color ->
-                            val modifier = (itemColorModifier ?: Modifier).size(colorItemSize)
-                            ColorItem(
-                                color = color,
-                                onColorSelected = onColorSelected,
-                                modifier = modifier
-                            )
-                        }
+                        ColorItem(
+                            color = color,
+                            onColorSelected = onColorSelected,
+                            modifier = modifier
+                        )
                     }
                 }
             }
@@ -173,6 +110,189 @@ fun ColorPaletteView(
     }
 }
 
+
+@Composable
+fun PalettePreview(
+    colors: List<Color>,
+    modifier: Modifier = Modifier,
+    lines: Int = 1,
+    config: ColorPaletteConfig = ColorPaletteConfig.Default
+) {
+    val colorCount = colors.size
+    if (colorCount == 0) return
+
+    val resolvedBg = if (config.backgroundColor == Color.Unspecified) {
+        AppTheme.colors.BackgroundColorDarker
+    } else {
+        config.backgroundColor
+    }
+
+    if (lines <= 1) {
+        SingleLinePalettePreview(
+            colors = colors,
+            colorCount = colorCount,
+            resolvedBg = resolvedBg,
+            config = config,
+            modifier = modifier
+        )
+    } else {
+        val minColorsPerLine = 8
+        val effectiveLines = (colorCount / minColorsPerLine).coerceIn(1, lines)
+        MultiLinePalettePreview(
+            colors = colors,
+            colorCount = colorCount,
+            lines = effectiveLines,
+            resolvedBg = resolvedBg,
+            config = config,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun SingleLinePalettePreview(
+    colors: List<Color>,
+    colorCount: Int,
+    resolvedBg: Color,
+    config: ColorPaletteConfig,
+    modifier: Modifier = Modifier
+) {
+    val density = LocalDensity.current
+
+    val paletteBitmap = remember(colors, config.colorItemSize, config.itemSpacing) {
+        val itemPx = with(density) { config.colorItemSize.toPx() }
+        val spacingPx = with(density) { config.itemSpacing.toPx() }
+        val checkerPx = with(density) { 4.dp.toPx() }
+        val totalW = (itemPx * colorCount + spacingPx * (colorCount - 1).coerceAtLeast(0))
+            .toInt().coerceAtLeast(1)
+        val h = itemPx.toInt().coerceAtLeast(1)
+
+        renderPaletteBitmap(colors, totalW, h, itemPx, spacingPx, checkerPx) { index, itemPx, spacingPx ->
+            val x = index * (itemPx + spacingPx)
+            Offset(x, 0f)
+        }
+    }
+
+    val contentPadding = (config.listHeight - config.colorItemSize) / 2
+
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(config.listHeight)
+            .background(resolvedBg)
+            .clipToBounds()
+    ) {
+        Image(
+            bitmap = paletteBitmap,
+            contentDescription = null,
+            contentScale = ContentScale.FillHeight,
+            filterQuality = FilterQuality.None,
+            modifier = Modifier
+                .padding(horizontal = contentPadding)
+                .height(config.colorItemSize)
+                .horizontalScroll(rememberScrollState())
+        )
+    }
+}
+
+@Composable
+private fun MultiLinePalettePreview(
+    colors: List<Color>,
+    colorCount: Int,
+    lines: Int,
+    resolvedBg: Color,
+    config: ColorPaletteConfig,
+    modifier: Modifier = Modifier
+) {
+    val density = LocalDensity.current
+    val colorsPerLine = kotlin.math.ceil(colorCount.toFloat() / lines).toInt()
+    val contentPadding = (config.listHeight - config.colorItemSize) / 2
+
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(resolvedBg)
+            .clipToBounds()
+            .padding(contentPadding)
+    ) {
+        val availableWidthPx = with(density) { maxWidth.toPx() }
+
+        val spacingPx = with(density) { config.itemSpacing.toPx() }
+        val itemPx = (availableWidthPx - spacingPx * (colorsPerLine - 1).coerceAtLeast(0)) / colorsPerLine
+        val checkerPx = with(density) { 4.pixelDp.toPx() }
+
+        val totalW = availableWidthPx.toInt().coerceAtLeast(1)
+        val totalH = (itemPx * lines + spacingPx * (lines - 1).coerceAtLeast(0))
+            .toInt().coerceAtLeast(1)
+
+        val paletteBitmap = remember(colors, lines, totalW, totalH) {
+            renderPaletteBitmap(colors, totalW, totalH, itemPx, spacingPx, checkerPx) { index, itemPx, spacingPx ->
+                val col = index % colorsPerLine
+                val row = index / colorsPerLine
+                val x = col * (itemPx + spacingPx)
+                val y = row * (itemPx + spacingPx)
+                Offset(x, y)
+            }
+        }
+
+        val totalHeight = with(density) {
+            (itemPx * lines + spacingPx * (lines - 1).coerceAtLeast(0)).toDp()
+        }
+
+        Image(
+            bitmap = paletteBitmap,
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+            filterQuality = FilterQuality.None,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(totalHeight)
+        )
+    }
+}
+
+private fun renderPaletteBitmap(
+    colors: List<Color>,
+    width: Int,
+    height: Int,
+    itemPx: Float,
+    spacingPx: Float,
+    checkerPx: Float,
+    positionForIndex: (index: Int, itemPx: Float, spacingPx: Float) -> Offset
+): ImageBitmap {
+    val bmp = createBitmap(width, height)
+    val canvas = android.graphics.Canvas(bmp)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    colors.forEachIndexed { index, color ->
+        val pos = positionForIndex(index, itemPx, spacingPx)
+        val x = pos.x
+        val y = pos.y
+
+        if (color.alpha < 1f) {
+            val cols = (itemPx / checkerPx).toInt() + 1
+            val rows = (itemPx / checkerPx).toInt() + 1
+            for (row in 0 until rows) {
+                for (col in 0 until cols) {
+                    paint.color = if ((row + col) % 2 == 0) 0xFFAAAAAA.toInt() else 0xFFFFFFFF.toInt()
+                    canvas.drawRect(
+                        x + col * checkerPx,
+                        y + row * checkerPx,
+                        (x + (col + 1) * checkerPx).coerceAtMost(x + itemPx),
+                        (y + (row + 1) * checkerPx).coerceAtMost(y + itemPx),
+                        paint
+                    )
+                }
+            }
+        }
+
+        paint.color = color.toArgb()
+        canvas.drawRect(x, y, x + itemPx, y + itemPx, paint)
+    }
+
+    return bmp.asImageBitmap()
+}
 
 @Composable
 fun ColorItem(
@@ -243,6 +363,29 @@ private fun Preview() {
                 isInteractive = true,
             ),
             onColorSelected = {},
+        )
+    }
+}
+@Preview
+@Composable
+private fun PreviewPreview() {
+    InstaSpriteTheme {
+        PalettePreview(
+            colors = listOf(
+                Color.White,
+                Color.Green,
+                Color.Blue,
+                Color.Yellow,
+                Color.Magenta,
+                Color.Cyan,
+            ),
+            config = ColorPaletteConfig(
+                backgroundColor = Color.Red,
+                itemSpacing = 0.pixelDp,
+                listHeight = 26.pixelDp,
+                colorItemSize = 22.pixelDp,
+                isInteractive = true,
+            )
         )
     }
 }

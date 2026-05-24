@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
-import com.instasprite.app.ui.components.composable.ColorPaletteView
+import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.data.model.InputField
 import com.instasprite.app.ui.components.composable.InputTextField
@@ -196,13 +196,13 @@ private fun PaletteEditorContent(
                             )
                         }
                     } else {
-                        ColorPaletteView(
+                        PalettePreview(
                             colors = colors,
                             config = ColorPaletteConfig(
                                 backgroundColor = AppTheme.colors.BackgroundColorDarker,
-                                isInteractive = false,
-                                isWrap = true
+                                isInteractive = false
                             ),
+                            lines = 3,
                             modifier = Modifier
                                 .fillMaxWidth()
                         )

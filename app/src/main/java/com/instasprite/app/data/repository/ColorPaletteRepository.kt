@@ -11,10 +11,12 @@ import com.instasprite.app.data.mapper.toDomain
 import com.instasprite.app.data.network.lospec.LospecService
 import com.instasprite.app.data.network.lospec.model.toDomain
 import com.instasprite.app.domain.model.ColorPalette
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -37,18 +39,19 @@ class ColorPaletteRepository(
     private val _recentColors = MutableStateFlow(ArrayDeque<Color>())
     val recentColors: StateFlow<ArrayDeque<Color>> = _recentColors.asStateFlow()
 
+    private val defaultPalette = ColorPalette(
+        id = -1,
+        name = "SAGE57",
+        author = "strawbrysage",
+        colors = _colors.value.toMutableList()
+    )
+
     val savedPalettes: Flow<List<ColorPalette>> = colorPaletteDao.getAllPaletteFlow()
         .map { list ->
-            val sageColors = loadDefaultColorPalette(context)
-            val defaultPalette = ColorPalette(
-                id = -1,
-                name = "SAGE57",
-                author = "strawbrysage",
-                colors = sageColors
-            )
             val mappedList = list.map { it.toDomain() }
             listOf(defaultPalette) + mappedList
         }
+        .flowOn(Dispatchers.Default)
 
     fun addColorToPalette(color: Color) {
         if (color !in _colors.value) {

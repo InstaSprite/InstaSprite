@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
-import com.instasprite.app.ui.components.composable.ColorPaletteView
+import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.components.composable.NumberStepper
 import com.instasprite.app.ui.loadimage.LoadImageScreenEvent
 import com.instasprite.app.ui.loadimage.contract.ImageConfigEvent
@@ -168,7 +168,7 @@ private fun AdvancedSettingTab(
                 val context = LocalContext.current
                 val paletteToUse =
                     uiState.selectedPalette?.colors ?: loadDefaultColorPalette(context)
-                ColorPaletteView(
+                PalettePreview(
                     colors = paletteToUse,
                     config = ColorPaletteConfig(isInteractive = false),
                     modifier = Modifier

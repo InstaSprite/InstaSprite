@@ -41,7 +41,7 @@ import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
-import com.instasprite.app.ui.components.composable.ColorPaletteView
+import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.theme.AppTheme
 
 @Composable
@@ -181,7 +181,7 @@ fun CreateCanvasScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val palette = currentPalette?.colors ?: loadDefaultColorPalette(context)
-                ColorPaletteView(
+                PalettePreview(
                     colors = palette,
                     config = ColorPaletteConfig(isInteractive = false),
                     modifier = Modifier

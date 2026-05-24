@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.domain.model.ColorPalette
-import com.instasprite.app.ui.components.composable.ColorPaletteView
+import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.dialog.CustomDialog
 import com.instasprite.app.ui.components.shape.PixelShape
@@ -90,7 +90,7 @@ fun LospecImportDialog(
                 )
 
                 previewColors?.let {
-                    ColorPaletteView(
+                    PalettePreview(
                         colors = it.colors,
                         config = ColorPaletteConfig(isInteractive = false)
                     )

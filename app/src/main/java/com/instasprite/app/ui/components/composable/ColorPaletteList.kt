@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,14 +56,14 @@ fun ColorPaletteList(
             items = palettes,
             key = { palette ->
                 if (palette.id == -1) "default_${palette.name}" else "saved_${palette.id}"
-            }
+            },
+            contentType = { "palette" }
         ) { palette ->
             ListEntry(
                 palette = palette,
                 optionSlot = optionSlot,
                 colorPaletteConfig = colorPaletteConfig,
-                onClick = { onPaletteSelected(palette) },
-                modifier = Modifier.animateItem()
+                onClick = { onPaletteSelected(palette) }
             )
         }
     }
@@ -107,7 +108,7 @@ private fun ListEntry(
 
         Spacer(modifier = Modifier.height(6.pixelDp))
 
-        ColorPaletteView(
+        PalettePreview(
             colors = palette.colors,
             config = colorPaletteConfig,
             modifier = Modifier.fillMaxWidth()
