@@ -1,10 +1,5 @@
 package com.instasprite.app.ui.social.createpost
 
-import com.instasprite.app.utils.pixelDp
-
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -39,23 +35,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.instasprite.app.ui.components.shape.PixelShape
+import com.instasprite.app.R
+import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.social.createpost.composable.CaptionSection
 import com.instasprite.app.ui.social.createpost.composable.HashtagSection
 import com.instasprite.app.ui.social.createpost.composable.ImageSection
-import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.social.createpost.contract.CreatePostScreenEvent
 import com.instasprite.app.ui.social.createpost.contract.CreatePostState
-import com.instasprite.app.ui.social.feed.VerifyEmailState
 import com.instasprite.app.ui.social.feed.dialog.VerifyEmailDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.ui.theme.ThemeFlavour
+import com.instasprite.app.utils.pixelDp
 import java.io.File
 
 @Composable
@@ -198,41 +195,55 @@ private fun CreatePostScreenContent(
                 containerColor = AppTheme.colors.BackgroundColorDarker
             ) {
                 val context = LocalContext.current
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(6.pixelDp)
-                ) {
-                    items(uiState.userSprites) { spriteWithMeta ->
-                        val file =
-                            File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(2.pixelDp)
-                                .clickable {
-                                    event.onSpriteSelected(spriteWithMeta.sprite.id)
-                                }
-                        ) {
-                            AsyncImage(
-                                model = file,
-                                contentDescription = spriteWithMeta.meta?.spriteName,
+                if (uiState.userSprites.isEmpty()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(96.pixelDp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_sprite_yet),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppTheme.colors.TextColorLight
+                        )
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(6.pixelDp)
+                    ) {
+                        items(uiState.userSprites) { spriteWithMeta ->
+                            val file =
+                                File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1f)
-                                    .background(AppTheme.colors.BackgroundColor)
-                                    .padding(2.pixelDp),
-                                contentScale = ContentScale.FillHeight,
-                                filterQuality = FilterQuality.None
-                            )
-                            Text(
-                                text = spriteWithMeta.meta?.spriteName ?: "Untitled",
-                                color = AppTheme.colors.TextColorLight,
-                                modifier = Modifier.padding(top = 2.pixelDp),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                                    .padding(2.pixelDp)
+                                    .clickable {
+                                        event.onSpriteSelected(spriteWithMeta.sprite.id)
+                                    }
+                            ) {
+                                AsyncCanvasPreviewer(
+                                    sprite = spriteWithMeta.sprite,
+                                    meta = spriteWithMeta.meta,
+                                    onClick = { event.onSpriteSelected(spriteWithMeta.sprite.id) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(1f)
+                                        .background(AppTheme.colors.BackgroundColor)
+                                        .padding(2.pixelDp),
+                                )
+                                Text(
+                                    text = spriteWithMeta.meta?.spriteName ?: "Untitled",
+                                    color = AppTheme.colors.TextColorLight,
+                                    modifier = Modifier.padding(top = 2.pixelDp),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
                 }

@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -109,10 +110,9 @@ fun HomeScreen(
     val feedListState = rememberLazyListState()
     val isLoggedIn = sessionState is SocialSessionState.LoggedIn
     val isOnline by feedViewModel.isOnline.collectAsState()
-    val currentUsername = (sessionState as? SocialSessionState.LoggedIn)?.username
-        ?.takeIf { it.isNotBlank() }
-        ?: feedState.currentUser?.username?.takeIf { it.isNotBlank() }
-
+    val currentUser = feedState.currentUser
+    val currentUsername = currentUser?.username
+        ?: (sessionState as? SocialSessionState.LoggedIn)?.username
 
     LaunchedEffect(galleryViewModel.lastEditedSpriteId) {
         val editedId = galleryViewModel.lastEditedSpriteId ?: return@LaunchedEffect
@@ -204,27 +204,34 @@ fun HomeScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            HomeDrawer(
-                isLoggedIn = isLoggedIn,
-                currentUser = feedState.currentUser,
-                username = currentUsername,
-                onHomeClick = { launchDrawerAction() },
-                onProfileClick = {
-                    launchDrawerAction {
-                        currentUsername?.let(onOpenProfile) ?: onLoginClick()
+            key(
+                isLoggedIn,
+                feedState.currentUser?.avatarUrl,
+                feedState.currentUser?.displayName,
+                currentUsername
+            ) {
+                HomeDrawer(
+                    isLoggedIn = isLoggedIn,
+                    currentUser = feedState.currentUser,
+                    username = currentUsername,
+                    onHomeClick = { launchDrawerAction() },
+                    onProfileClick = {
+                        launchDrawerAction {
+                            currentUsername?.let(onOpenProfile) ?: onLoginClick()
+                        }
+                    },
+                    onLoginClick = { launchDrawerAction(onLoginClick) },
+                    onNotificationsClick = { launchDrawerAction(onOpenNotifications) },
+                    onSearchClick = { launchDrawerAction(onOpenSearch) },
+                    onSettingsClick = { launchDrawerAction(onOpenSetting) },
+                    onAboutClick = { launchDrawerAction(onOpenAbout) },
+                    onLogoutClick = {
+                        launchDrawerAction {
+                            sessionViewModel.logout()
+                        }
                     }
-                },
-                onLoginClick = { launchDrawerAction(onLoginClick) },
-                onNotificationsClick = { launchDrawerAction(onOpenNotifications) },
-                onSearchClick = { launchDrawerAction(onOpenSearch) },
-                onSettingsClick = { launchDrawerAction(onOpenSetting) },
-                onAboutClick = { launchDrawerAction(onOpenAbout) },
-                onLogoutClick = {
-                    launchDrawerAction {
-                        sessionViewModel.logout()
-                    }
-                }
-            )
+                )
+            }
         }
     ) {
         Box {

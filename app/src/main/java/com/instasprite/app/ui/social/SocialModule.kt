@@ -41,7 +41,8 @@ object SocialModule {
                 postId = args.postId,
                 onBackClick = { navigator.goBack() },
                 onProfileClick = { userId -> navigator.goTo(Screen.Profile(userId)) },
-                onLoginClick = { navigator.goTo(Screen.Auth) }
+                onLoginClick = { navigator.goTo(Screen.Auth) },
+                onHashtagClick = { hashtag -> navigator.goTo(Screen.Hashtag(hashtag)) }
             )
         }
     }

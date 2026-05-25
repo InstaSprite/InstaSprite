@@ -47,6 +47,7 @@
     <string name="gallery">Thư viện</string>
     <string name="about">Giới thiệu</string>
     <string name="create_your_first_sprite">Tạo sprite đầu tiên của bạn!</string>
+    <string name="no_sprite_yet">Chưa có bản vẽ :(</string>
     <string name="click_plus_to_create">Chọn + để tạo bản vẽ mới</string>
     <string name="no_posts_to_show">Không có bài viết nào để hiển thị</string>
     <string name="posts_you_save_will_appear_here">Bài viết bạn lưu sẽ xuất hiện ở đây</string>

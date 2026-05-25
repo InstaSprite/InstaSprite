@@ -6,8 +6,10 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +31,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,6 +84,7 @@ fun CommentScreen(
     postId: Long? = null,
     onBackClick: () -> Unit = {},
     onProfileClick: (String) -> Unit = {},
+    onHashtagClick: (String) -> Unit = {},
     onLoginClick: () -> Unit = {},
     viewModel: CommentViewModel = hiltViewModel(),
     sessionViewModel: SocialSessionViewModel = hiltViewModel()
@@ -125,11 +130,12 @@ fun CommentScreen(
             onClearReplyTarget = viewModel::clearReplyTarget,
             onZoomImage = { zoomedImageUrl = it },
             onDismissZoom = { zoomedImageUrl = null },
-            onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError
+            onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError,
+            onHashtagClick = onHashtagClick
         )
     }
 
-    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.showLoginRequiredError) {
         if (uiState.showLoginRequiredError) {
@@ -138,7 +144,7 @@ fun CommentScreen(
                 actionLabel = context.getString(R.string.login),
                 true
             )
-            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+            if (result == SnackbarResult.ActionPerformed) {
                 onLoginClick()
             }
             viewModel.consumeLoginRequiredError()
@@ -276,6 +282,28 @@ private fun CommentScreenContent(
                         }
                     }
 
+                    if (detail.hashtags.isNotEmpty()) {
+                        item {
+                            FlowRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 10.pixelDp),
+                                horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
+                                verticalArrangement = Arrangement.spacedBy(2.pixelDp)
+                            ) {
+                                detail.hashtags.forEach { tag ->
+                                    Text(
+                                        text = "#$tag",
+                                        color = AppTheme.colors.SelectedColor,
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.clickable { event.onHashtagClick(tag) }
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(6.pixelDp))
+                        }
+                    }
+
                     items(detail.postImages) { img ->
                         AsyncImageView(
                             imageUrl = img.postImageUrl,
@@ -308,8 +336,6 @@ private fun CommentScreenContent(
                         color = AppTheme.colors.Foreground2Color
                     )
                 }
-
-                // AssistChip for reply target is no longer needed here as it is moved to CommentInput
 
                 items(
                     items = uiState.comments,
@@ -411,7 +437,7 @@ private fun PostHeader(
                 modifier = Modifier.size(14.pixelDp)
             ) {
                 PixelIcon(
-                    icon =  if (postAuthor?.isFollowing == true)
+                    icon = if (postAuthor?.isFollowing == true)
                         R.drawable.ic_profile
                     else
                         R.drawable.ic_follow,
@@ -475,7 +501,8 @@ private fun CommentScreenPreview() {
                 onClearReplyTarget = {},
                 onZoomImage = {},
                 onDismissZoom = {},
-                onConsumeLoginRequiredError = {}
+                onConsumeLoginRequiredError = {},
+                onHashtagClick = {}
             ),
             isLoggedIn = true,
             onLoginClick = {}

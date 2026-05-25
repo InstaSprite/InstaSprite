@@ -48,6 +48,7 @@ data class CommentState(
 data class CommentScreenEvent(
     val onBackClick: () -> Unit,
     val onProfileClick: (String) -> Unit,
+    val onHashtagClick: (String) -> Unit,
     val onToggleLike: () -> Unit,
     val onToggleBookmark: () -> Unit,
     val onToggleFollow: () -> Unit,

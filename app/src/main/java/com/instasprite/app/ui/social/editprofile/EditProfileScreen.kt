@@ -74,6 +74,7 @@ import java.io.FileOutputStream
 import androidx.compose.ui.graphics.asAndroidBitmap
 import kotlinx.coroutines.launch
 import androidx.core.graphics.scale
+import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.PixelIcon
 
 @Composable
@@ -272,41 +273,55 @@ fun EditProfileContent(
                 containerColor = AppTheme.colors.BackgroundColorDarker
             ) {
                 val context = LocalContext.current
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(6.pixelDp)
-                ) {
-                    items(state.userSprites) { spriteWithMeta ->
-                        val file = File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .padding(2.pixelDp)
-                                .clickable {
-                                    event.onSpriteSelected(spriteWithMeta.sprite.id)
-                                }
-                        ) {
-                            AsyncImage(
-                                model = file,
-                                contentDescription = spriteWithMeta.meta?.spriteName,
+                if (state.userSprites.isEmpty()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(96.pixelDp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_sprite_yet),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppTheme.colors.TextColorLight
+                        )
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(6.pixelDp)
+                    ) {
+                        items(state.userSprites) { spriteWithMeta ->
+                            val file =
+                                File(context.filesDir, "thumbnail_${spriteWithMeta.sprite.id}.png")
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1f)
-                                    .background(AppTheme.colors.BackgroundColor)
-                                    .padding(2.pixelDp),
-                                contentScale = ContentScale.FillHeight,
-                                filterQuality = FilterQuality.None
-                            )
-                            Text(
-                                text = spriteWithMeta.meta?.spriteName ?: stringResource(R.string.no_sprite),
-                                color = AppTheme.colors.TextColorLight,
-                                modifier = Modifier.padding(top = 2.pixelDp),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                fontSize = 12.sp
-                            )
+                                    .padding(2.pixelDp)
+                                    .clickable {
+                                        event.onSpriteSelected(spriteWithMeta.sprite.id)
+                                    }
+                            ) {
+                                AsyncCanvasPreviewer(
+                                    sprite = spriteWithMeta.sprite,
+                                    meta = spriteWithMeta.meta,
+                                    onClick = { event.onSpriteSelected(spriteWithMeta.sprite.id) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(1f)
+                                        .background(AppTheme.colors.BackgroundColor)
+                                        .padding(2.pixelDp),
+                                )
+                                Text(
+                                    text = spriteWithMeta.meta?.spriteName ?: "Untitled",
+                                    color = AppTheme.colors.TextColorLight,
+                                    modifier = Modifier.padding(top = 2.pixelDp),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
                 }
