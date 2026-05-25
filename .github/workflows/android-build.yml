@@ -38,11 +38,11 @@ jobs:
         run: echo $GOOGLE_SERVICES_BASE64 | base64 --decode > app/google-services.json
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDevDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/dev/debug/app-dev-debug.apk
           retention-days: 7
