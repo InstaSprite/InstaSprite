@@ -24,6 +24,7 @@ import com.instasprite.app.navigation.EntryProviderInstaller
 import com.instasprite.app.navigation.Navigator
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.utils.AppSettings
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -54,6 +55,8 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(Unit) {
+                ColorPaletteRepository.prepopulatePalettesIfNeeded(this@MainActivity)
+
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
                     val permission = android.Manifest.permission.POST_NOTIFICATIONS
                     if (androidx.core.content.ContextCompat.checkSelfPermission(

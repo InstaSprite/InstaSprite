@@ -5,19 +5,25 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.instasprite.app.R
+import com.instasprite.app.data.database.AppDatabase
 import com.instasprite.app.data.database.ColorPaletteDao
 import com.instasprite.app.data.mapper.toData
 import com.instasprite.app.data.mapper.toDomain
+import com.instasprite.app.data.model.ColorPaletteData
 import com.instasprite.app.data.network.lospec.LospecService
 import com.instasprite.app.data.network.lospec.model.toDomain
+import com.instasprite.app.di.settingsDataStore
 import com.instasprite.app.domain.model.ColorPalette
+import com.instasprite.app.utils.parseGplStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.collections.ArrayDeque
@@ -127,69 +133,92 @@ class ColorPaletteRepository(
         }
     }
 
-    suspend fun importPaletteFromGplUri(uri: android.net.Uri, paletteName: String): ColorPalette? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-        try {
-            val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext null
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            
-            val colors = mutableListOf<Color>()
-            
-            var isGimpPalette = false
-            var line: String?
-            
-            while (reader.readLine().also { line = it } != null) {
-                val trimmed = line?.trim() ?: continue
-                if (trimmed.isEmpty()) continue
-                
-                if (!isGimpPalette) {
-                    if (trimmed.startsWith("GIMP Palette", ignoreCase = true)) {
-                        isGimpPalette = true
-                        continue
-                    } else {
-                        break
-                    }
-                }
-                
-                if (trimmed.startsWith("Name:", ignoreCase = true)) {
-                    continue
-                }
-                
-                if (trimmed.startsWith("Columns:", ignoreCase = true)) {
-                    continue
-                }
-                
-                if (trimmed.startsWith("#")) {
-                    continue
-                }
-                
-                val parts = trimmed.split(Regex("\\s+"))
-                if (parts.size >= 3) {
-                    val r = parts[0].toIntOrNull()
-                    val g = parts[1].toIntOrNull()
-                    val b = parts[2].toIntOrNull()
-                    if (r != null && g != null && b != null &&
-                        r in 0..255 && g in 0..255 && b in 0..255) {
-                        colors.add(Color(red = r / 255f, green = g / 255f, blue = b / 255f))
-                    }
-                }
-            }
-            reader.close()
-            
-            if (!isGimpPalette || colors.isEmpty()) {
-                null
-            } else {
+    suspend fun importPaletteFromGplUri(uri: android.net.Uri, paletteName: String): ColorPalette? =
+        withContext(Dispatchers.IO) {
+            try {
+                val inputStream =
+                    context.contentResolver.openInputStream(uri) ?: return@withContext null
+                val result = parseGplStream(inputStream, fallbackName = paletteName)
+                    ?: return@withContext null
+
                 val palette = ColorPalette(
-                    name = paletteName,
+                    name = result.name,
                     author = "Imported",
-                    colors = colors
+                    colors = result.colors.toMutableList()
                 )
                 savePaletteToDB(palette)
                 palette
+            } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                Log.e("ColorPaletteRepository", "Failed to parse GPL file", e)
+                null
             }
-        } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
-            Log.e("ColorPaletteRepository", "Failed to parse GPL file", e)
-            null
+        }
+
+    companion object {
+
+        // Increment this when adding new palette files in a new 'assets/palettes/vX/. folder
+        // Set to -1 for always reload all palettes
+        const val CURRENT_PALETTE_VERSION = 1
+
+        //Check and insert any new prepopulated palettes
+        suspend fun prepopulatePalettesIfNeeded(context: Context) {
+            try {
+                val dataStore = context.settingsDataStore
+                val settings = dataStore.data.first()
+                val storedVersion = settings.prepopulatedPaletteVersion
+
+                val isDevMode = CURRENT_PALETTE_VERSION == -1
+
+                if (!isDevMode && storedVersion >= CURRENT_PALETTE_VERSION) return
+
+                val dao = AppDatabase.getInstance(context).colorPaletteDao()
+
+                val startVersion = if (isDevMode) 1 else storedVersion + 1
+                val endVersion = if (isDevMode) {
+                    val allFolders = context.assets.list("palettes") ?: emptyArray()
+                    allFolders.mapNotNull { it.removePrefix("v").toIntOrNull() }.maxOrNull() ?: 0
+                } else CURRENT_PALETTE_VERSION
+
+                for (version in startVersion..endVersion) {
+                    val folder = "palettes/v$version"
+                    val files = try {
+                        context.assets.list(folder) ?: emptyArray()
+                    } catch (e: Exception) {
+                        emptyArray()
+                    }
+
+                    for (fileName in files) {
+                        if (!fileName.endsWith(".gpl", ignoreCase = true)) continue
+                        try {
+                            val inputStream = context.assets.open("$folder/$fileName")
+                            val fallbackName = fileName.removeSuffix(".gpl")
+                            val result = parseGplStream(inputStream, fallbackName = fallbackName)
+                                ?: continue
+
+                            val palette = ColorPaletteData(
+                                name = result.name,
+                                author = "Built-in",
+                                colors = result.colors.toMutableList()
+                            )
+                            dao.insert(palette)
+                        } catch (e: Exception) {
+                            Log.e("ColorPaletteRepository", "Failed to load palette: $fileName", e)
+                        }
+                    }
+                }
+
+                if (!isDevMode) {
+                    dataStore.updateData { it.copy(prepopulatedPaletteVersion = CURRENT_PALETTE_VERSION) }
+                }
+                Log.d(
+                    "ColorPaletteRepository",
+                    "Prepopulated palettes (devMode=$isDevMode, endVersion=$endVersion)"
+                )
+            } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                Log.e("ColorPaletteRepository", "Failed to prepopulate palettes", e)
+            }
         }
     }
 }
@@ -217,7 +246,7 @@ fun loadDefaultColorPalette(context: Context): MutableList<Color> {
         }
         reader.close()
     } catch (e: Exception) {
-            if (e is kotlinx.coroutines.CancellationException) throw e
+        if (e is kotlinx.coroutines.CancellationException) throw e
         e.printStackTrace()
         return ColorPaletteFallback.ColorsList.toMutableList()
     }

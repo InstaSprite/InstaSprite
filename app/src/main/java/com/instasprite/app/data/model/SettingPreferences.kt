@@ -12,7 +12,8 @@ data class SettingPreferences(
     val themeFlavour: ThemeFlavour = ThemeFlavour.MOCHA,
     val appFont: AppFont = AppFont.DETERMINATION,
     val drawSetting: DrawSetting = DrawSetting(),
-    val gallerySettings: GallerySettings = GallerySettings()
+    val gallerySettings: GallerySettings = GallerySettings(),
+    val prepopulatedPaletteVersion: Int = 0
 )
 
 @Serializable
