@@ -31,4 +31,7 @@ interface ColorPaletteDao {
 
     @Query("DELETE FROM palette_data WHERE id = :id")
     suspend fun deletePaletteById(id: Int)
+
+    @Query("UPDATE palette_data SET isFavorite = :isFavorite WHERE id = :id")
+    suspend fun setFavorite(id: Int, isFavorite: Boolean)
 }

@@ -44,7 +44,7 @@ object DrawingModule {
             DrawingScreen(
                 viewModel = viewModel,
                 onNavigateToPalette = {
-                    navigator.goTo(Screen.Palette)
+                    navigator.goTo(Screen.Palette(clickToReturn = true))
                 },
                 onNavigateBack = { spriteId ->
                     scope.launch {

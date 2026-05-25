@@ -13,7 +13,8 @@ data class SettingPreferences(
     val appFont: AppFont = AppFont.DETERMINATION,
     val drawSetting: DrawSetting = DrawSetting(),
     val gallerySettings: GallerySettings = GallerySettings(),
-    val prepopulatedPaletteVersion: Int = 0
+    val prepopulatedPaletteVersion: Int = 0,
+    val defaultPaletteId: Int = -1
 )
 
 @Serializable

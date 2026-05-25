@@ -9,13 +9,19 @@ import com.instasprite.app.R
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.domain.dialog.DialogController
 import com.instasprite.app.domain.model.ColorPalette
+import com.instasprite.app.utils.AppSettings
 import com.instasprite.app.utils.getFileName
+import com.instasprite.app.di.settingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -28,13 +34,67 @@ class ColorPaletteViewModel @Inject constructor(
 ) : ViewModel(),
     DialogController<ColorPaletteDialog> by dialogController {
 
-    val savedPalettes: StateFlow<List<ColorPalette>> = colorPaletteRepository.savedPalettes
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _showSearchBar = MutableStateFlow(false)
+    val showSearchBar: StateFlow<Boolean> = _showSearchBar.asStateFlow()
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun toggleSearchBar() {
+        _showSearchBar.value = !_showSearchBar.value
+        if (!_showSearchBar.value) {
+            _searchQuery.value = ""
+        }
+    }
+
+    val savedPalettes: StateFlow<List<ColorPalette>> = combine(
+        colorPaletteRepository.savedPalettes,
+        _searchQuery
+    ) { list, query ->
+        if (query.isBlank()) {
+            list
+        } else {
+            list.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                it.author.contains(query, ignoreCase = true)
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Companion.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    val favoritePalettes: StateFlow<List<ColorPalette>> = combine(
+        colorPaletteRepository.savedPalettes,
+        _searchQuery
+    ) { list, query ->
+        val favorites = list.filter { it.isFavorite }
+        if (query.isBlank()) {
+            favorites
+        } else {
+            favorites.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                it.author.contains(query, ignoreCase = true)
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Companion.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    val defaultPaletteId: StateFlow<Int> = context.settingsDataStore.data
+        .map { it.defaultPaletteId }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Companion.WhileSubscribed(5000),
-            initialValue = emptyList()
+            initialValue = AppSettings.getDefaultPaletteId(context)
         )
-
 
     fun savePalette(palette: ColorPalette) {
         viewModelScope.launch {
@@ -46,6 +106,16 @@ class ColorPaletteViewModel @Inject constructor(
         viewModelScope.launch {
             colorPaletteRepository.deletePalette(palette.id)
         }
+    }
+
+    fun toggleFavorite(palette: ColorPalette) {
+        viewModelScope.launch {
+            colorPaletteRepository.setFavorite(palette.id, !palette.isFavorite)
+        }
+    }
+
+    fun setDefaultPalette(paletteId: Int) {
+        AppSettings.setDefaultPaletteId(context, paletteId)
     }
 
     suspend fun importPaletteFromLospecUrl(url: String): ColorPalette? {

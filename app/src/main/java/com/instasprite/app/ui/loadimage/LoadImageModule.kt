@@ -44,7 +44,7 @@ object LoadImageModule {
                     )
                 },
                 onPaletteViewClick = {
-                    navigator.goTo(Screen.Palette)
+                    navigator.goTo(Screen.Palette(clickToReturn = true))
                 },
                 selectedPalette = selectedPalette
             )

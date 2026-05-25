@@ -26,7 +26,11 @@ object PaletteModule {
                     navigator.goBack()
                 },
                 onPaletteSelected = { palette ->
-                    navigator.goBackWithResult(palette)
+                    if (args.clickToReturn) {
+                        navigator.goBackWithResult(palette)
+                    } else {
+                        navigator.goTo(Screen.PaletteEditor(palette))
+                    }
                 },
                 onPaletteEdit = { palette ->
                     navigator.goTo(Screen.PaletteEditor(palette))

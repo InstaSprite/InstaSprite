@@ -360,6 +360,7 @@
     <string name="processed_image">Processed Image</string>
     <string name="add_image">Add image</string>
     <string name="delete_palette">Delete palette</string>
+    <string name="search_palette">Search palette</string>
     <string name="import_location">Import Location</string>
     <string name="import_color_palettes">Import Color Palettes</string>
     <string name="import_from_lospec">Import from Lospec</string>
@@ -453,4 +454,6 @@
     <string name="save_isprite">Save ISprite</string>
     <string name="tap_to_change">Tap to change</string>
     <string name="must_be_between_25_and_20000">Must be between 25 and 20000</string>
+    <string name="all_palettes">All</string>
+    <string name="favorites">Favorites</string>
 </resources>

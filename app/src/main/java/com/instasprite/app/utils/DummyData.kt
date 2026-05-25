@@ -216,6 +216,9 @@ object DummyData {
             override suspend fun deletePaletteById(id: Int) {
             }
 
+            override suspend fun setFavorite(id: Int, isFavorite: Boolean) {
+            }
+
         }
 
         class MockLospecService() : LospecService {

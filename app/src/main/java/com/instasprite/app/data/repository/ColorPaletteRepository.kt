@@ -99,6 +99,9 @@ class ColorPaletteRepository(
         colorPaletteDao.deletePaletteById(id)
     }
 
+    suspend fun setFavorite(id: Int, isFavorite: Boolean) {
+        colorPaletteDao.setFavorite(id, isFavorite)
+    }
 
     suspend fun getPaletteById(id: Int): ColorPalette? {
         return colorPaletteDao.getPaletteById(id)?.toDomain()

@@ -50,7 +50,7 @@ object HomeModule {
                 onOpenSetting = { navigator.goTo(Screen.Setting) },
                 onOpenAbout = { navigator.goTo(Screen.About) },
                 onNavigateToCreatePost = { navigator.goTo(Screen.CreatePost) },
-                onNavigateToPalette = { navigator.goTo(Screen.Palette) },
+                onNavigateToPalette = { navigator.goTo(Screen.Palette(clickToReturn = false)) },
             )
         }
 

@@ -360,6 +360,7 @@
     <string name="processed_image">Hình ảnh đã xử lý</string>
     <string name="add_image">Thêm ảnh</string>
     <string name="delete_palette">Xóa bảng màu</string>
+    <string name="search_palette">Tìm bảng màu</string>
     <string name="import_location">Vị trí Nhập</string>
     <string name="import_color_palettes">Nhập Bảng màu</string>
     <string name="import_from_lospec">Nhập từ Lospec</string>
@@ -455,4 +456,6 @@
     <string name="save_isprite">Lưu ISprite</string>
     <string name="must_be_between_25_and_20000">Phải là số từ 25 đến 20000</string>
     <string name="tap_to_change">Nhấn để đổi</string>
+    <string name="all_palettes">Tất cả</string>
+    <string name="favorites">Yêu thích</string>
 </resources>

@@ -14,7 +14,7 @@ sealed interface Screen : NavKey {
     data object Gallery : Screen
 
     @Serializable
-    data object Palette : Screen
+    data class Palette(val clickToReturn: Boolean = false) : Screen
 
     @Serializable
     data class PaletteEditor(val palette: ColorPalette? = null) : Screen

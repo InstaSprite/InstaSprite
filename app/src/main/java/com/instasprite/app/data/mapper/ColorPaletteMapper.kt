@@ -9,7 +9,8 @@ fun ColorPaletteData.toDomain() : ColorPalette {
         id = this.id,
         name = this.name,
         author = this.author,
-        colors = this.colors
+        colors = this.colors,
+        isFavorite = this.isFavorite,
     )
 }
 
@@ -18,6 +19,7 @@ fun ColorPalette.toData() : ColorPaletteData {
         id = this.id,
         name = this.name,
         author = this.author,
-        colors = this.colors
+        colors = this.colors,
+        isFavorite = this.isFavorite,
     )
 }

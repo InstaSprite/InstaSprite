@@ -16,4 +16,5 @@ data class ColorPalette(
     val name: String = "Unnamed",
     val author: String = "Anonymous",
     var colors: MutableList<@Serializable(with = ColorSerializer::class) Color> = mutableListOf(),
+    val isFavorite: Boolean = false,
 ) : Parcelable

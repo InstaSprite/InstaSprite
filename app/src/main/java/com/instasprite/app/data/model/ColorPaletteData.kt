@@ -14,4 +14,5 @@ data class ColorPaletteData(
     val name: String = "Unnamed",
     val author: String = "Anonymous",
     var colors: MutableList<Color> = mutableListOf(),
+    val isFavorite: Boolean = false,
 )

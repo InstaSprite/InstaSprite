@@ -34,7 +34,7 @@ object GalleryModule {
 
             CreateCanvasScreen(
                 onDismiss = { navigator.goBack() },
-                onConfirm = { name, width, height ->
+                onConfirm = { name, width, height, palette ->
                     val id = UUID.randomUUID().toString()
 
                     navigator.replace(
@@ -43,12 +43,12 @@ object GalleryModule {
                             width = width,
                             height = height,
                             spriteName = name,
-                            colorPalette = selectedPalette
+                            colorPalette = palette
                         )
                     )
                 },
                 onPaletteViewClick = {
-                    navigator.goTo(Screen.Palette)
+                    navigator.goTo(Screen.Palette(clickToReturn = true))
                 },
                 selectedPalette = selectedPalette,
             )

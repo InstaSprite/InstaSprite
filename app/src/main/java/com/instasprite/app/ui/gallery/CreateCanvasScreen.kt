@@ -38,9 +38,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.instasprite.app.data.database.AppDatabase
+import com.instasprite.app.data.mapper.toDomain
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.InputField
+import com.instasprite.app.utils.AppSettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.PaletteListEntry
@@ -51,7 +56,7 @@ import com.instasprite.app.ui.theme.AppTheme
 @Composable
 fun CreateCanvasScreen(
     onDismiss: () -> Unit,
-    onConfirm: (name: String, width: Int, height: Int) -> Unit,
+    onConfirm: (name: String, width: Int, height: Int, palette: ColorPalette?) -> Unit,
     onPaletteViewClick: () -> Unit = {},
     selectedPalette: ColorPalette? = null,
 ) {
@@ -59,9 +64,21 @@ fun CreateCanvasScreen(
 
     val context = LocalContext.current
 
-    var currentPalette by rememberSaveable { mutableStateOf(selectedPalette) }
+    var currentPalette by remember { mutableStateOf<ColorPalette?>(selectedPalette) }
     LaunchedEffect(selectedPalette) {
-        if (selectedPalette != null) currentPalette = selectedPalette
+        if (selectedPalette != null) {
+            currentPalette = selectedPalette
+        } else {
+            val defaultId = AppSettings.getDefaultPaletteId(context)
+            if (defaultId > 0) {
+                val paletteData = withContext(Dispatchers.IO) {
+                    AppDatabase.getInstance(context).colorPaletteDao().getPaletteById(defaultId)
+                }
+                currentPalette = paletteData?.toDomain()
+            } else {
+                currentPalette = null
+            }
+        }
     }
 
     val nameLabel = stringResource(R.string.name)
@@ -116,8 +133,8 @@ fun CreateCanvasScreen(
         fields.map { mutableStateOf(it.defaultValue) }
     }
 
-    fun isInputValid() : Boolean {
-        return  fields.withIndex().all { (i, field) ->
+    fun isInputValid(): Boolean {
+        return fields.withIndex().all { (i, field) ->
             field.validator(inputStates[i].value)
         }
     }
@@ -133,11 +150,13 @@ fun CreateCanvasScreen(
                             onConfirm(
                                 inputStates[0].value,
                                 inputStates[1].value.toInt(),
-                                inputStates[2].value.toInt()
+                                inputStates[2].value.toInt(),
+                                currentPalette
                             )
                         },
                         enabled = isInputValid(),
-                        modifier = Modifier.padding(end = 8.pixelDp
+                        modifier = Modifier.padding(
+                            end = 8.pixelDp
                         ),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AppTheme.colors.AccentButtonColor

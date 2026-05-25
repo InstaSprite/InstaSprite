@@ -70,6 +70,14 @@ object AppSettings {
         persist(context) { it.copy(drawSetting = it.drawSetting.copy(isCursorMode = isCursorMode)) }
     }
 
+    fun getDefaultPaletteId(context: Context): Int {
+        return getPersistedSettings(context).defaultPaletteId
+    }
+
+    fun setDefaultPaletteId(context: Context, id: Int) {
+        persist(context) { it.copy(defaultPaletteId = id) }
+    }
+
     fun getSupportedLocales(): List<Pair<String, String>> {
         return listOf(
             "en" to "English",
