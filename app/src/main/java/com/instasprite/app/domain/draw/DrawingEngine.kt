@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.domain.canvashistory.CanvasHistoryManager
 import com.instasprite.app.domain.canvashistory.HistoryCanvasState
+import com.instasprite.app.domain.canvashistory.HistoryDiskStore
 import com.instasprite.app.domain.canvashistory.OperationEntry
 import com.instasprite.app.domain.canvashistory.TileChangeTracker
 import com.instasprite.app.domain.canvashistory.TransformEntry
@@ -32,9 +33,10 @@ sealed class TapResult {
 class DrawingEngine(
     private val pixelCanvasUseCase: PixelCanvasUseCase,
     private val colorPaletteRepository: ColorPaletteRepository,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    historyDiskStore: HistoryDiskStore? = null
 ) {
-    private val canvasHistoryManager = CanvasHistoryManager()
+    private val canvasHistoryManager = CanvasHistoryManager(historyDiskStore)
     private var activeHistoryTracker: TileChangeTracker? = null
     private var isProcessingTool = false
 

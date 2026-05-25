@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.instasprite.app.domain.canvashistory.HistoryDiskStore
 import androidx.lifecycle.viewModelScope
 import com.instasprite.app.data.model.DrawSetting
 import com.instasprite.app.data.repository.ColorPaletteRepository
@@ -102,6 +103,11 @@ class DrawingViewModel @AssistedInject constructor(
             // ignore
         }
         try {
+            historyDiskStore.destroy()
+        } catch (e: Throwable) {
+            // ignore
+        }
+        try {
             drawingEngine.release()
         } catch (e: Throwable) {
             // ignore
@@ -121,8 +127,12 @@ class DrawingViewModel @AssistedInject constructor(
         colorPaletteRepository = colorPaletteRepository
     )
 
+    private val historyDiskStore = HistoryDiskStore(
+        historyDir = java.io.File(applicationContext.cacheDir, "history/$spriteId")
+    )
+
     private val drawingEngine =
-        DrawingEngine(pixelCanvasUseCase, colorPaletteRepository, drawingScope)
+        DrawingEngine(pixelCanvasUseCase, colorPaletteRepository, drawingScope, historyDiskStore)
 
     val bitmap get() = drawingEngine.bitmapManager.bitmap
     val overlayBitmap get() = drawingEngine.bitmapManager.overlayBitmap
@@ -190,6 +200,7 @@ class DrawingViewModel @AssistedInject constructor(
     override fun onCleared() {
         super.onCleared()
         drawingEngine.release()
+        historyDiskStore.destroy()
     }
 
     private fun applyDrawSetting(drawSetting: DrawSetting) {

@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+option java_package = "com.instasprite.app";
+option java_multiple_files = true;
+
+message TileCoordProto {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message TileDeltaProto {
+  string layer_id = 1;
+  TileCoordProto coord = 2;
+  bytes before_pixels = 3;
+}
+
+message SelectionStateProto {
+  bytes mask = 1;
+  int32 bounds_left = 2;
+  int32 bounds_top = 3;
+  int32 bounds_right = 4;
+  int32 bounds_bottom = 5;
+  int32 canvas_width = 6;
+  int32 canvas_height = 7;
+}
+
+message UndoEntryProto {
+  repeated TileDeltaProto deltas = 1;
+  SelectionStateProto before_selection = 2;
+  SelectionStateProto after_selection = 3;
+  bool has_before_selection = 4;
+  bool has_after_selection = 5;
+}
+
+message LayerProto {
+  string id = 1;
+  string name = 2;
+  bool is_visible = 3;
+  bool is_locked = 4;
+  float opacity = 5;
+  string blend_mode = 6;
+  bytes tile_data = 7;
+}
+
+message HistoryCanvasStateProto {
+  int32 width = 1;
+  int32 height = 2;
+  repeated LayerProto layers = 3;
+  string active_layer_id = 4;
+  SelectionStateProto selection_state = 5;
+  bool has_selection_state = 6;
+}
+
+message OperationEntryProto {
+  HistoryCanvasStateProto before = 1;
+  HistoryCanvasStateProto after = 2;
+}
+
+enum TransformTypeProto {
+  ROTATE_CW = 0;
+  ROTATE_CCW = 1;
+  FLIP_H = 2;
+  FLIP_V = 3;
+}
+
+message TransformEntryProto {
+  TransformTypeProto transform = 1;
+}
+
+message HistoryEntryProto {
+  oneof entry {
+    UndoEntryProto undo_entry = 1;
+    OperationEntryProto operation_entry = 2;
+    TransformEntryProto transform_entry = 3;
+  }
+}

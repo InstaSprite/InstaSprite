@@ -8,65 +8,92 @@ import com.instasprite.app.utils.tilesToPixels
 import java.util.ArrayDeque
 import java.util.LinkedHashMap
 
-class CanvasHistoryManager {
+class CanvasHistoryManager(
+    private val diskStore: HistoryDiskStore? = null
+) {
     private val undoStack: ArrayDeque<HistoryEntry> = ArrayDeque()
     private val redoStack: ArrayDeque<HistoryEntry> = ArrayDeque()
 
     private val transparentTile = IntArray(TILE_SIZE * TILE_SIZE)
 
     companion object {
-        private const val MAX_HISTORY_SIZE = 100
+        private const val IN_MEMORY_LIMIT = 30
     }
 
     fun push(entry: HistoryEntry) {
         if (entry.isEmpty()) return
 
         undoStack.addLast(entry)
-        while (undoStack.size > MAX_HISTORY_SIZE) {
-            undoStack.removeFirst()
+
+        // Spill oldest to disk when over limit
+        if (diskStore != null) {
+            while (undoStack.size > IN_MEMORY_LIMIT) {
+                diskStore.appendUndo(undoStack.removeFirst())
+            }
+        } else {
+            while (undoStack.size > IN_MEMORY_LIMIT) {
+                undoStack.removeFirst()
+            }
         }
+
         redoStack.clear()
+        diskStore?.clearRedo()
     }
 
     fun undo(current: HistoryCanvasState): HistoryCanvasState? {
-        val entry = if (undoStack.isNotEmpty()) undoStack.removeLast() else return null
+        val entry = if (undoStack.isNotEmpty()) {
+            undoStack.removeLast()
+        } else {
+            diskStore?.popUndo() ?: return null
+        }
+
         return when (entry) {
             is UndoEntry -> {
                 val (restoredState, redoEntry) = applyTileEntry(entry, current)
                 if (!redoEntry.isEmpty()) {
-                    redoStack.addLast(redoEntry)
+                    pushRedo(redoEntry)
                 }
                 restoredState
             }
+
             is OperationEntry -> {
-                redoStack.addLast(entry)
+                pushRedo(entry)
                 deepCopyState(entry.before)
             }
+
             is TransformEntry -> {
                 val transformed = applyTransform(current, inverseTransform(entry.transform))
-                redoStack.addLast(entry)
+                pushRedo(entry)
                 transformed
             }
         }
     }
 
     fun redo(current: HistoryCanvasState): HistoryCanvasState? {
-        val entry = if (redoStack.isNotEmpty()) redoStack.removeLast() else return null
+        // Try in-memory first, then disk
+        val entry = if (redoStack.isNotEmpty()) {
+            redoStack.removeLast()
+        } else {
+            diskStore?.popRedo() ?: return null
+        }
+
         return when (entry) {
             is UndoEntry -> {
                 val (restoredState, undoEntry) = applyTileEntry(entry, current)
                 if (!undoEntry.isEmpty()) {
-                    undoStack.addLast(undoEntry)
+                    pushUndo(undoEntry)
                 }
                 restoredState
             }
+
             is OperationEntry -> {
-                undoStack.addLast(entry)
+                pushUndo(entry)
                 deepCopyState(entry.after)
             }
+
             is TransformEntry -> {
                 val transformed = applyTransform(current, entry.transform)
-                undoStack.addLast(entry)
+                pushUndo(entry)
                 transformed
             }
         }
@@ -75,13 +102,41 @@ class CanvasHistoryManager {
     fun reset() {
         undoStack.clear()
         redoStack.clear()
+        diskStore?.clearAll()
     }
+
+    val canUndo: Boolean
+        get() = undoStack.isNotEmpty() || (diskStore?.undoCount ?: 0) > 0
+
+    val canRedo: Boolean
+        get() = redoStack.isNotEmpty() || (diskStore?.redoCount ?: 0) > 0
 
     internal fun restore(entry: UndoEntry, current: HistoryCanvasState): HistoryCanvasState {
         return applyTileEntry(entry, current).first
     }
 
-    private fun applyTileEntry(entry: UndoEntry, current: HistoryCanvasState): Pair<HistoryCanvasState, UndoEntry> {
+    private fun pushUndo(entry: HistoryEntry) {
+        undoStack.addLast(entry)
+        if (diskStore != null) {
+            while (undoStack.size > IN_MEMORY_LIMIT) {
+                diskStore.appendUndo(undoStack.removeFirst())
+            }
+        }
+    }
+
+    private fun pushRedo(entry: HistoryEntry) {
+        redoStack.addLast(entry)
+        if (diskStore != null) {
+            while (redoStack.size > IN_MEMORY_LIMIT) {
+                diskStore.appendRedo(redoStack.removeFirst())
+            }
+        }
+    }
+
+    private fun applyTileEntry(
+        entry: UndoEntry,
+        current: HistoryCanvasState
+    ): Pair<HistoryCanvasState, UndoEntry> {
         val layers = current.layers.toMutableList()
         val layerIndexById = HashMap<String, Int>(layers.size)
         for (i in layers.indices) {
@@ -152,7 +207,10 @@ class CanvasHistoryManager {
         }
     }
 
-    private fun applyTransform(state: HistoryCanvasState, transform: TransformType): HistoryCanvasState {
+    private fun applyTransform(
+        state: HistoryCanvasState,
+        transform: TransformType
+    ): HistoryCanvasState {
         return when (transform) {
             TransformType.ROTATE_CW -> rotateClockwise(state)
             TransformType.ROTATE_CCW -> rotateCounterClockwise(state)
