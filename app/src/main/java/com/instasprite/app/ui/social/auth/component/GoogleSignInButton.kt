@@ -48,7 +48,7 @@ fun GoogleSignInButton(
             .border(
                 width = 1.pixelDp,
                 color = AppTheme.colors.Foreground2Color,
-                shape = ButtonDefaults.shape
+                shape = MaterialTheme.shapes.small
             )
     ) {
         if (isLoading) {
