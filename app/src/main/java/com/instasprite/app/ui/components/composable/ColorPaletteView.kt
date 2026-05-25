@@ -207,6 +207,7 @@ private fun MultiLinePalettePreview(
 ) {
     val density = LocalDensity.current
     val colorsPerLine = kotlin.math.ceil(colorCount.toFloat() / lines).toInt()
+    val effectiveColorsPerLine = maxOf(colorsPerLine, 10)
     val contentPadding = (config.listHeight - config.colorItemSize) / 2
 
     BoxWithConstraints(
@@ -219,17 +220,17 @@ private fun MultiLinePalettePreview(
         val availableWidthPx = with(density) { maxWidth.toPx() }
 
         val spacingPx = with(density) { config.itemSpacing.toPx() }
-        val itemPx = (availableWidthPx - spacingPx * (colorsPerLine - 1).coerceAtLeast(0)) / colorsPerLine
+        val itemPx = (availableWidthPx - spacingPx * (effectiveColorsPerLine - 1).coerceAtLeast(0)) / effectiveColorsPerLine
         val checkerPx = with(density) { 4.pixelDp.toPx() }
 
         val totalW = availableWidthPx.toInt().coerceAtLeast(1)
         val totalH = (itemPx * lines + spacingPx * (lines - 1).coerceAtLeast(0))
             .toInt().coerceAtLeast(1)
 
-        val paletteBitmap = remember(colors, lines, totalW, totalH) {
+        val paletteBitmap = remember(colors, lines, totalW, totalH, effectiveColorsPerLine) {
             renderPaletteBitmap(colors, totalW, totalH, itemPx, spacingPx, checkerPx) { index, itemPx, spacingPx ->
-                val col = index % colorsPerLine
-                val row = index / colorsPerLine
+                val col = index % effectiveColorsPerLine
+                val row = index / effectiveColorsPerLine
                 val x = col * (itemPx + spacingPx)
                 val y = row * (itemPx + spacingPx)
                 Offset(x, y)
