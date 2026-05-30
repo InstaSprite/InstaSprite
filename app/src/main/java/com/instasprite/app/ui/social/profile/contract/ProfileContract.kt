@@ -64,5 +64,6 @@ data class ProfileScreenEvent(
     val onDismissFollowers: () -> Unit = {},
     val onDismissFollowing: () -> Unit = {},
     val onConsumeLoginRequiredError: () -> Unit = {},
+    val onOtherProfileClick: (userId: String) -> Unit = {},
     val onNavigateToEditProfile: () -> Unit = {},
 )

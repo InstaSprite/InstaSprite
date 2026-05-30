@@ -1,43 +1,34 @@
 package com.instasprite.app.ui.social.profile.dialog
 
-import com.instasprite.app.utils.pixelDp
-
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-
-import com.instasprite.app.ui.components.dialog.CustomDialog
-import androidx.compose.material3.CircularProgressIndicator
-
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.dialog.CustomDialog
+import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.social.profile.contract.FollowerUser
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun FollowersDialog(
@@ -136,32 +127,29 @@ private fun FollowerItem(
                 .clickable { onProfileClick(follower.username) }
         ) {
             Text(
-                text = follower.username,
+                text = follower.displayName,
                 color = AppTheme.colors.TextColorLight,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
-            if (follower.displayName.isNotEmpty()) {
-                Text(
-                    text = follower.displayName,
-                    color = AppTheme.colors.Foreground2Color,
-                    fontSize = 12.sp
-                )
-            }
+            Text(
+                text = "@" + follower.username,
+                color = AppTheme.colors.Foreground2Color,
+                fontSize = 12.sp
+            )
+
         }
 
         Spacer(modifier = Modifier.width(10.pixelDp))
 
         if (!follower.isFollowing) {
-            OutlinedButton(
+            Button(
                 onClick = { onFollowClick(follower.id) },
-                colors = ButtonDefaults.outlinedButtonColors(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AppTheme.colors.LinkColor,
                     contentColor = AppTheme.colors.TextColorLight
                 ),
-                border = androidx.compose.foundation.BorderStroke(
-                    width = 1.pixelDp,
-                    color = AppTheme.colors.Foreground2Color
-                )
+                shape = PixelShape(),
             ) {
                 Text(
                     text = stringResource(R.string.follow_user),

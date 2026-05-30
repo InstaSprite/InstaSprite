@@ -67,6 +67,7 @@ fun ProfileScreen(
     onPostClick: ((postId: Long) -> Unit)? = null,
     onMenuClick: (() -> Unit)? = null,
     onLoginClick: () -> Unit = {},
+    onOtherProfileClick: (userId: String) -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
     viewModel: ProfileScreenViewModel = hiltViewModel(),
     sessionViewModel: SocialSessionViewModel = hiltViewModel()
@@ -123,6 +124,7 @@ fun ProfileScreen(
                 onDismissFollowers = { viewModel.hideFollowersDialog() },
                 onDismissFollowing = { viewModel.hideFollowingDialog() },
                 onConsumeLoginRequiredError = { viewModel.consumeLoginRequiredError() },
+                onOtherProfileClick = onOtherProfileClick,
                 onNavigateToEditProfile = onNavigateToEditProfile
             ),
             isLoggedIn = isLoggedIn
@@ -268,7 +270,7 @@ fun ProfileContent(
             isLoading = state.followersLoading,
             onDismiss = event.onDismissFollowers,
             onFollowClick = event.onFollowUser,
-            onProfileClick = { _ -> }
+            onProfileClick = { userId -> event.onOtherProfileClick(userId)}
         )
     }
 
@@ -278,7 +280,7 @@ fun ProfileContent(
             isLoading = state.followingLoading,
             onDismiss = event.onDismissFollowing,
             onUnfollowClick = event.onUnfollowUser,
-            onProfileClick = { _ -> }
+            onProfileClick = { userId -> event.onOtherProfileClick(userId)}
         )
     }
 }
