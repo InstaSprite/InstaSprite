@@ -113,13 +113,13 @@ fun FeedPostItem(
                             if (post.isFollowing) {
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.follow) + " " + post.member.memberName,
+                                    context.getString(R.string.unfollow) + " " + post.member.memberName,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.unfollow) + " " + post.member.memberName,
+                                    context.getString(R.string.follow) + " " + post.member.memberName,
                                     Toast.LENGTH_SHORT
                                 ).show()
 

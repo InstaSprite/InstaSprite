@@ -78,8 +78,8 @@ fun OtpDialog(
         title = defaultTitle,
         onDismiss = { if (enabled) onDismiss() },
         onConfirm = { if (enabled && currentOtp.length == otpLength) onOtpComplete(currentOtp) },
-        confirmButtonText = "",
-        dismissButtonText = "",
+        confirmButtonText = defaultConfirmText,
+        dismissButtonText = defaultDismissText,
     ) {
         Column(
             modifier = modifier.fillMaxWidth(),
@@ -150,43 +150,6 @@ fun OtpDialog(
                             .weight(1f)
                             .focusRequester(focusRequesters[index])
                             .onFocusChanged { isFocused = it.isFocused }
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.pixelDp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(
-                    enabled = enabled,
-                    onClick = onDismiss
-                ) {
-                    Text(
-                        text = defaultDismissText,
-                        color = AppTheme.colors.TextColorLight
-                    )
-                }
-                Button(
-                    enabled = enabled && currentOtp.length == otpLength,
-                    onClick = {
-                        onOtpComplete(currentOtp)
-                    },
-                    shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.AccentButtonColor,
-                        disabledContainerColor = AppTheme.colors.Foreground1Color
-                    ),
-                ) {
-                    Text(
-                        text = defaultConfirmText,
-                        color = if (enabled && currentOtp.length == otpLength) {
-                            AppTheme.colors.TextColorDark
-                        } else {
-                            AppTheme.colors.TextColorLight
-                        }
                     )
                 }
             }
