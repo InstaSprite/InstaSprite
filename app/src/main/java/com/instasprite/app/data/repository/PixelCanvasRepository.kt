@@ -7,6 +7,7 @@ import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.PixelCanvas
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.TileCoord
+import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.utils.TILE_SIZE
 import com.instasprite.app.utils.blendPixel
 import com.instasprite.app.utils.pixelToTileCoord
@@ -380,10 +381,21 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
     fun getAllPixels(): IntArray {
         val composited = IntArray(width * height) { transparentArgb }
-        for (layer in _layers) {
+        val activeIdx = getActiveLayerIndex()
+        for (i in _layers.indices) {
+            val layer = _layers[i]
             if (!layer.isVisible) continue
             val layerOpacity = layer.opacity
             val layerBlendMode = layer.blendMode
+            if (i == activeIdx && MoveTool.isMoving) {
+                val shifted = MoveTool.getShiftedPixels()
+                if (shifted != null && shifted.size == width * height) {
+                    for (idx in shifted.indices) {
+                        composited[idx] = blendPixel(composited[idx], shifted[idx], layerOpacity, layerBlendMode)
+                    }
+                    continue
+                }
+            }
             for ((coord, tilePixels) in layer.tiles) {
                 val originX = coord.x * TILE_SIZE
                 val originY = coord.y * TILE_SIZE
@@ -409,9 +421,20 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     fun getCompositedPixelAt(row: Int, col: Int): Int {
         if (row !in 0 until height || col !in 0 until width) return transparentArgb
         var color = transparentArgb
-        for (layer in _layers) {
+        val activeIdx = getActiveLayerIndex()
+        for (i in _layers.indices) {
+            val layer = _layers[i]
             if (!layer.isVisible) continue
-            val argb = tilePixelAt(layer.tiles, row, col)
+            val argb = if (i == activeIdx && MoveTool.isMoving) {
+                val shifted = MoveTool.getShiftedPixels()
+                if (shifted != null && shifted.size == width * height) {
+                    shifted[row * width + col]
+                } else {
+                    tilePixelAt(layer.tiles, row, col)
+                }
+            } else {
+                tilePixelAt(layer.tiles, row, col)
+            }
             color = blendPixel(color, argb, layer.opacity, layer.blendMode)
         }
         return color
@@ -444,11 +467,30 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
         val regionEndRow = startRow + regionHeight
         val regionEndCol = startCol + regionWidth
+        val activeIdx = getActiveLayerIndex()
 
-        for (layer in _layers) {
+        for (i in _layers.indices) {
+            val layer = _layers[i]
             if (!layer.isVisible) continue
             val layerOpacity = layer.opacity
             val layerBlendMode = layer.blendMode
+            if (i == activeIdx && MoveTool.isMoving) {
+                val shifted = MoveTool.getShiftedPixels()
+                if (shifted != null && shifted.size == width * height) {
+                    for (row in startRow until regionEndRow) {
+                        if (row !in 0 until height) continue
+                        val dstBase = (row - startRow) * regionWidth
+                        val srcBase = row * width
+                        for (col in startCol until regionEndCol) {
+                            if (col !in 0 until width) continue
+                            val argb = shifted[srcBase + col]
+                            val dstIdx = dstBase + (col - startCol)
+                            result[dstIdx] = blendPixel(result[dstIdx], argb, layerOpacity, layerBlendMode)
+                        }
+                    }
+                    continue
+                }
+            }
             for ((coord, tilePixels) in layer.tiles) {
                 val originX = coord.x * TILE_SIZE
                 val originY = coord.y * TILE_SIZE
