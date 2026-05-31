@@ -14,6 +14,10 @@ object MoveTool : StrokeTool {
     private var session: MoveSession? = null
     val isMoving: Boolean get() = session != null
 
+    fun reset() {
+        session = null
+    }
+
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {}
 
     override fun beginStroke(

@@ -12,9 +12,13 @@ import com.instasprite.app.domain.canvashistory.TransformType
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.FillTool
+import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.selection.SelectionTool
+import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
+import com.instasprite.app.domain.tool.selection.LassoSelectionTool
+import com.instasprite.app.domain.tool.selection.MagicWandTool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.ui.drawing.contract.PixelCanvasState
 import kotlinx.coroutines.CoroutineScope
@@ -525,5 +529,9 @@ class DrawingEngine(
 
     fun release() {
         bitmapManager.release()
+        MoveTool.reset()
+        RectangleSelectionTool.clearSelection()
+        LassoSelectionTool.clearSelection()
+        MagicWandTool.clearSelection()
     }
 }

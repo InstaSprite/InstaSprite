@@ -522,6 +522,7 @@ class DrawingViewModel @AssistedInject constructor(
     fun saveImage(folderUri: Uri, fileName: String, scalePercent: Int = 100): Boolean {
         try {
             if (fileName.isBlank()) return false
+            commitPendingTool()
             val sprite = pixelCanvasUseCase.getSprite()
             val bmp = ImageExporter.convertToBitmap(
                 sprite.compositedPixels,
@@ -541,6 +542,8 @@ class DrawingViewModel @AssistedInject constructor(
         try {
             if (fileName.isBlank()) return false
             if (_uiState.value.isSaving) return false
+
+            commitPendingTool()
 
             _uiState.value = _uiState.value.copy(isSaving = true)
             return try {
@@ -566,6 +569,7 @@ class DrawingViewModel @AssistedInject constructor(
 
     suspend fun loadSprite(sprite: Sprite) {
         try {
+            drawingEngine.release()
             drawingEngine.setCanvasSize(sprite.width, sprite.height)
             drawingEngine.setCanvas(sprite)
             sprite.colorPalette?.let {
@@ -581,6 +585,8 @@ class DrawingViewModel @AssistedInject constructor(
     suspend fun saveToDB(name: String? = null) {
         try {
             if (_uiState.value.isSaving) return
+
+            commitPendingTool()
 
             _uiState.value = _uiState.value.copy(isSaving = true)
             try {
