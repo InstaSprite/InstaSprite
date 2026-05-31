@@ -41,7 +41,7 @@
     <string name="set_password">Set Password</string>
     <string name="set_password_description">Set a password to allow signing in with your email directly.</string>
     <string name="new_password">New Password</string>
-    <string name="setting_password">Setting Password...</string>
+    <string name="setting_password">Setting Password…</string>
     <string name="notifications">Notifications</string>
     <string name="gallery">Gallery</string>
     <string name="about">About</string>
@@ -58,14 +58,15 @@
     <string name="add_photo">Add Photo</string>
     <string name="add_caption">Add Caption</string>
     <string name="add_hashtags">Add Hashtags</string>
-    <string name="loading">Loading...</string>
-    <string name="loading_image">Loading image...</string>
+    <string name="loading">Loading…</string>
+    <string name="loading_image">Loading image…</string>
     <string name="pixel_size">%dpx</string>
     <string name="create_pixel_art_with_ease">Create pixel art with ease</string>
     <string name="profile_updated_successfully">Profile updated successfully!</string>
     <string name="complete_profile">Complete Profile</string>
     <string name="cancel">Cancel</string>
-    <string name="uploading">Uploading...</string>
+    <string name="apply">Cancel</string>
+    <string name="uploading">Uploading…</string>
     <string name="complete_your_profile">Complete Your Profile</string>
     <string name="username">Username</string>
     <string name="name">Name</string>
@@ -78,7 +79,7 @@
     <string name="email_verified_notification_title">Email Verified</string>
     <string name="email_verified_notification_body">Your email has been successfully verified!</string>
     <string name="dismiss">Dismiss</string>
-    <string name="sending_email">Sending emailâ€¦</string>
+    <string name="sending_email">Sending email…</string>
     <string name="update_profile">Update Profile</string>
     <string name="introduction_optional">Introduction (Optional)</string>
     <string name="please_enter_username">Please enter a username</string>
@@ -87,7 +88,7 @@
     <string name="name_length_error">Name must be between 2 and 12 characters</string>
     <string name="please_enter_email">Please enter your email</string>
     <string name="please_enter_valid_email">Please enter a valid email</string>
-    <string name="uploading_image">Uploading Image...</string>
+    <string name="uploading_image">Uploading Image…</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="reset_password_email">Email with temporary password sent, please check your inbox</string>
     <string name="reset_password">Reset password</string>
@@ -135,6 +136,7 @@
     <string name="flip_horizontal">Flip Horizontal</string>
     <string name="flip_vertical">Flip Vertical</string>
     <string name="color_picker">Color Picker</string>
+    <string name="select_color">Select Color</string>
     <string name="brush_size">Brush Size</string>
     <string name="opacity">Opacity</string>
     <string name="layers">Layers</string>
@@ -158,7 +160,7 @@
     <string name="privacy_policy">Privacy Policy</string>
     
     <!-- Comments -->
-    <string name="write_comment">Write a comment...</string>
+    <string name="write_comment">Write a comment…</string>
     <string name="report_comment">Report Comment</string>
     
     <!-- Notifications -->
@@ -225,7 +227,7 @@
     <string name="replying_tap_to_cancel">Replyingâ€¦ tap to cancel</string>
     <string name="zoomed_image">Zoomed image</string>
     <string name="your_profile">Your Profile</string>
-    <string name="add_a_comment">Add a comment...</string>
+    <string name="add_a_comment">Add a comment…</string>
     <string name="like_comment">Like comment</string>
     <string name="reply">Reply</string>
     <string name="delete_comment">Delete comment</string>
@@ -260,8 +262,8 @@
     <!-- Followers/Following Dialog -->
     <string name="no_followers">No followers yet</string>
     <string name="no_following">Not following anyone</string>
-    <string name="loading_followers">Loading followers...</string>
-    <string name="loading_following">Loading following...</string>
+    <string name="loading_followers">Loading followers…</string>
+    <string name="loading_following">Loading following…</string>
     <string name="follow_user">Follow</string>
     <string name="unfollow_user">Unfollow</string>
     <string name="view_profile">View Profile</string>
@@ -313,6 +315,7 @@
     <string name="reorder">Reorder</string>
     <string name="add_layer">Add Layer</string>
     <string name="layer_preview">Layer Preview</string>
+    <string name="layer_option">Layer Option</string>
     <string name="toggle_visibility">Toggle Visibility</string>
     <string name="toggle_lock">Toggle Lock</string>
     <string name="merge_down">Merge Down</string>
@@ -333,6 +336,7 @@
     <string name="save_as_image_1">Save as image</string>
     <string name="edit_sprite">Edit sprite</string>
     <string name="delete_sprite">Delete sprite</string>
+    <string name="delete_post">Delete post</string>
     <string name="search_sprites">Search sprites</string>
     <string name="rename">Rename</string>
     <string name="options">Options</string>
@@ -357,6 +361,8 @@
     <string name="enable_dithering">Enable Dithering</string>
     <string name="apply_custom_palette">Apply Custom Palette</string>
     <string name="tap_to_select_image">Tap to select image</string>
+    <string name="tap_to_select_file">Tap to select file</string>
+    <string name="tap_to_select_folder">Tap to select folder</string>
     <string name="processed_image">Processed Image</string>
     <string name="add_image">Add image</string>
     <string name="delete_palette">Delete palette</string>
@@ -389,7 +395,7 @@
     <string name="are_you_sure_you_want_to_delete_this_post">Are you sure you want to delete this post?</string>
     <string name="no_notifications_yet">No notifications yet.</string>
     <string name="str_res">×</string>
-    <string name="search_posts_users_hashtags">Search posts, @users, #hashtags...</string>
+    <string name="search_posts_users_hashtags">Search posts, @users, #hashtags…</string>
     <string name="no_users_found">No users found</string>
     <string name="no_posts_found">No posts found</string>
     <string name="trending">Trending</string>
@@ -456,4 +462,43 @@
     <string name="must_be_between_25_and_20000">Must be between 25 and 20000</string>
     <string name="all_palettes">All</string>
     <string name="favorites">Favorites</string>
+    <string name="palette_imported_successfully">Palette imported successfully!</string>
+    <string name="please_fetch_a_palette_first">Please fetch a palette first</string>
+    <string name="please_enter_a_lospec_url">Please enter a Lospec URL</string>
+    <string name="please_enter_a_valid_lospec_palette_url">Please enter a valid Lospec palette URL</string>
+    <string name="no_palette_found">No palette found</string>
+    <string name="palette_loaded_successfully">Palette loaded successfully!</string>
+    <string name="an_error_occurred_while_importing_the_palette">An error occurred while importing the palette</string>
+    <string name="import_from_file">Import from File</string>
+    <string name="no_colors_found_in_file">No colors found in file</string>
+    <string name="colors_loaded_successfully">Colors loaded successfully!</string>
+    <string name="please_select_a_file_first">Please select a file first</string>
+    <string name="no_file_selected">No file selected</string>
+    <string name="import_button">Import</string>
+    <string name="tool_pencil_desc">Draw on the canvas</string>
+    <string name="tool_eraser_desc">Erase pixels</string>
+    <string name="tool_fill_desc">Fill an area with color</string>
+    <string name="tool_eyedropper_desc">Pick a color from canvas</string>
+    <string name="tool_move_desc">Move the canvas</string>
+    <string name="tool_shape">Shape</string>
+    <string name="tool_shape_desc">Draw shapes</string>
+    <string name="tool_selection">Selection</string>
+    <string name="tool_selection_desc">Select an area</string>
+    <string name="tool_circle">Circle</string>
+    <string name="tool_circle_desc">Draw a circle</string>
+    <string name="tool_diamond">Diamond</string>
+    <string name="tool_diamond_desc">Draw a diamond</string>
+    <string name="tool_line">Line</string>
+    <string name="tool_line_desc">Draw a straight line</string>
+    <string name="tool_oval">Oval</string>
+    <string name="tool_oval_desc">Draw an oval</string>
+    <string name="tool_rectangle">Rectangle</string>
+    <string name="tool_rectangle_desc">Draw a rectangle</string>
+    <string name="tool_lasso_selection">Lasso Selection</string>
+    <string name="tool_lasso_selection_desc">Select an arbitrary shape</string>
+    <string name="tool_magic_wand">Magic Wand</string>
+    <string name="tool_magic_wand_desc">Select continuous areas of similar color</string>
+    <string name="tool_rectangle_selection">Rectangle Selection</string>
+    <string name="tool_rectangle_selection_desc">Select a rectangular area</string>
+    <string name="shape_square">Square</string>
 </resources>

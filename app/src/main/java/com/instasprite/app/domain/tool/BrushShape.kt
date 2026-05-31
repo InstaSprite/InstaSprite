@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asComposePath
 import com.instasprite.app.R
 
-enum class BrushShape(val icon: Int) {
-    Circle(R.drawable.ic_circle_shape),
-    Square(R.drawable.ic_square_shape)
+enum class BrushShape(val icon: Int, val nameRes: Int) {
+    Circle(R.drawable.ic_circle_shape, R.string.tool_circle),
+    Square(R.drawable.ic_square_shape, R.string.shape_square)
 }
 
 class BrushStamp private constructor(

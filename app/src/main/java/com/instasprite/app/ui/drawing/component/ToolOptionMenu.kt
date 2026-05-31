@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.ui.components.composable.TitledBox
 import com.instasprite.app.ui.theme.AppTheme
@@ -25,7 +26,7 @@ fun ToolOptionMenu(
     content: LazyListScope.() -> Unit
 ) {
     TitledBox(
-        title = selectedTool.name,
+        title = stringResource(id = selectedTool.nameRes),
         titleBackgroundColor = AppTheme.colors.BackgroundColorDarker,
         modifier = modifier
     ) {
@@ -41,3 +42,4 @@ fun ToolOptionMenu(
         }
     }
 }
+

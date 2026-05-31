@@ -67,12 +67,12 @@ fun SaveFileDialog(
     InputDialog(
         title = title,
         fields = fields,
-        confirmButtonText = "Save",
+        confirmButtonText = stringResource(R.string.save),
         isLoading = isSaving,
         onDismiss = onDismiss,
         onConfirm = { values ->
             if (folderUri == null) {
-                Toast.makeText(context, "Please select a folder", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.choose_folder), Toast.LENGTH_SHORT).show()
             } else {
                 onValuesChanged?.invoke(values, folderUri)
                 onSave()

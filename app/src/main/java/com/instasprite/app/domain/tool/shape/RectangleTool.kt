@@ -10,8 +10,8 @@ import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 object RectangleTool : ShapeTool {
     override val icon: Int = R.drawable.ic_rect_tool
-    override val name: String = "Rectangle"
-    override val description: String = "Draw rectangle shapes"
+    override val nameRes: Int = R.string.tool_rectangle
+    override val descriptionRes: Int = R.string.tool_rectangle_desc
     override val commitsImmediately: Boolean = false
 
     private var startRow = 0

@@ -67,8 +67,8 @@ fun DisplayOptionsDialog(
             onLayoutModeSelected(selectedLayoutMode)
             onDismiss()
         },
-        confirmButtonText = "Apply",
-        dismissButtonText = "Cancel",
+        confirmButtonText = stringResource(R.string.apply),
+        dismissButtonText = stringResource(R.string.cancel),
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             DropdownField(

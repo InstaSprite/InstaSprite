@@ -11,8 +11,8 @@ import com.instasprite.app.utils.bresenhamLine
 
 object LineTool : ShapeTool {
     override val icon: Int = R.drawable.ic_line_tool
-    override val name: String = "Line"
-    override val description: String = "Draw straight lines"
+    override val nameRes: Int = R.string.tool_line
+    override val descriptionRes: Int = R.string.tool_line_desc
     override val commitsImmediately: Boolean = false
 
     private var startRow = 0

@@ -7,8 +7,8 @@ import com.instasprite.app.utils.bresenhamLine
 
 object EraserTool : StrokeTool {
     override val icon: Int = R.drawable.ic_eraser_tool
-    override val name: String = "Eraser"
-    override val description: String = "Erase pixels on the canvas"
+    override val nameRes: Int = R.string.eraser
+    override val descriptionRes: Int = R.string.tool_eraser_desc
     override val commitsImmediately: Boolean = true
 
     private var lastRow = 0

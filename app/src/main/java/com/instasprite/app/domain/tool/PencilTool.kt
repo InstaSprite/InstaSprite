@@ -8,8 +8,8 @@ import com.instasprite.app.utils.bresenhamLine
 
 object PencilTool : StrokeTool {
     override val icon: Int = R.drawable.ic_pencil_tool
-    override val name: String = "Pencil"
-    override val description: String = "Draw on the canvas"
+    override val nameRes: Int = R.string.pencil
+    override val descriptionRes: Int = R.string.tool_pencil_desc
     override val commitsImmediately: Boolean = false
 
     private var lastRow = 0

@@ -11,8 +11,8 @@ import com.instasprite.app.utils.bresenhamLine
 
 object DiamondTool : ShapeTool {
     override val icon: Int = R.drawable.ic_diamond_tool
-    override val name: String = "Diamond"
-    override val description: String = "Draw diamond shapes"
+    override val nameRes: Int = R.string.tool_diamond
+    override val descriptionRes: Int = R.string.tool_diamond_desc
     override val commitsImmediately: Boolean = false
 
     private var startRow = 0

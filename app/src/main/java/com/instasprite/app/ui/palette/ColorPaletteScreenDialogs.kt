@@ -40,8 +40,8 @@ fun ColorPaletteScreenDialogs(
                     title = "Delete palette",
                     text = stringResource(R.string.are_you_sure_you_want_to_delete),
                     highlightText = dialog.palette.name,
-                    confirmButtonText = "Delete",
-                    dismissButtonText = "Cancel",
+                    confirmButtonText = stringResource(R.string.delete),
+                    dismissButtonText = stringResource(R.string.cancel),
                     highlightTextColor = AppTheme.colors.DismissButtonColor,
                     hasQuestionMark = true,
                     onConfirm = {

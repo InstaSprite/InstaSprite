@@ -6,8 +6,8 @@ import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 data object ShapeToolPlaceholder : ShapeTool {
     override val icon: Int = R.drawable.ic_rect_tool
-    override val name: String = "Shape"
-    override val description: String = "Select a shape tool"
+    override val nameRes: Int = R.string.tool_shape
+    override val descriptionRes: Int = R.string.tool_shape_desc
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
     }

@@ -44,27 +44,27 @@ fun LospecImportDialog(
     val scope = rememberCoroutineScope()
 
     CustomDialog(
-        title = "Import from Lospec",
+        title = stringResource(R.string.import_from_lospec),
         onDismiss = onDismiss,
         onConfirm = {
             if (previewColors != null && previewColors!!.colors.isNotEmpty()) {
                 onImport(previewColors!!)
                 Toast.makeText(
                     context,
-                    "Palette imported successfully!",
+                    context.getString(R.string.palette_imported_successfully),
                     Toast.LENGTH_SHORT
                 ).show()
                 onDismiss()
             } else {
                 Toast.makeText(
                     context,
-                    "Please fetch a palette first",
+                    context.getString(R.string.please_fetch_a_palette_first),
                     Toast.LENGTH_SHORT
                 ).show()
             }
         },
-        confirmButtonText = "Import",
-        dismissButtonText = "Back",
+        confirmButtonText = stringResource(R.string.import_button),
+        dismissButtonText = stringResource(R.string.back),
         content = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -104,7 +104,7 @@ fun LospecImportDialog(
                             if (trimmedUrl.isBlank()) {
                                 Toast.makeText(
                                     context,
-                                    "Please enter a Lospec URL",
+                                    context.getString(R.string.please_enter_a_lospec_url),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return@launch
@@ -114,7 +114,7 @@ fun LospecImportDialog(
                                 !trimmedUrl.contains("palette-list")) {
                                 Toast.makeText(
                                     context,
-                                    "Please enter a valid Lospec palette URL",
+                                    context.getString(R.string.please_enter_a_valid_lospec_palette_url),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return@launch
@@ -123,15 +123,15 @@ fun LospecImportDialog(
                             try {
                                 val palette = onImportColorsFromLospecUrl(trimmedUrl)
                                 if (palette == null) {
-                                    Toast.makeText(context, "No palette found", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.no_palette_found), Toast.LENGTH_SHORT).show()
                                     previewColors = null
                                 } else {
                                     previewColors = palette
-                                    Toast.makeText(context, "Palette loaded successfully!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.palette_loaded_successfully), Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
                                 previewColors = null
-                                Toast.makeText(context, "An error occurred while importing the palette", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.an_error_occurred_while_importing_the_palette), Toast.LENGTH_SHORT).show()
                             }
                         }
                     },

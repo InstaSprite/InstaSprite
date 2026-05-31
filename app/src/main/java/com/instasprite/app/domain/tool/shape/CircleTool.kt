@@ -12,8 +12,8 @@ import kotlin.math.sqrt
 
 object CircleTool : ShapeTool {
     override val icon: Int = R.drawable.ic_circle_tool
-    override val name: String = "Circle"
-    override val description: String = "Draw circles"
+    override val nameRes: Int = R.string.tool_circle
+    override val descriptionRes: Int = R.string.tool_circle_desc
     override val commitsImmediately: Boolean = false
 
     private var startRow = 0

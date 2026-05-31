@@ -61,14 +61,14 @@ fun FileImportDialog(
                     try {
                         val colors = onImportPaletteFromFile(it)
                         if (colors.isEmpty()) {
-                            Toast.makeText(context, "No colors found in file", Toast.LENGTH_SHORT)
+                            Toast.makeText(context, context.getString(R.string.no_colors_found_in_file), Toast.LENGTH_SHORT)
                                 .show()
                             previewColors = null
                         } else {
                             previewColors = colors
                             Toast.makeText(
                                 context,
-                                "Colors loaded successfully!",
+                                context.getString(R.string.colors_loaded_successfully),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -76,7 +76,7 @@ fun FileImportDialog(
                         previewColors = null
                         Toast.makeText(
                             context,
-                            "An error occurred while importing the palette",
+                            context.getString(R.string.an_error_occurred_while_importing_the_palette),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -86,20 +86,20 @@ fun FileImportDialog(
     )
 
     InputDialog(
-        title = "Import from File",
+        title = stringResource(R.string.import_from_file),
         fields = listOf(),
         onDismiss = onDismiss,
         onConfirm = {
             if (previewColors != null && previewColors!!.isNotEmpty()) {
                 onImport(previewColors!!)
-                Toast.makeText(context, "Palette imported successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.palette_imported_successfully), Toast.LENGTH_SHORT).show()
                 onDismiss()
             } else {
-                Toast.makeText(context, "Please select a file first", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.please_select_a_file_first), Toast.LENGTH_SHORT).show()
             }
         },
-        confirmButtonText = "Import",
-        dismissButtonText = "Back",
+        confirmButtonText = stringResource(R.string.import_button),
+        dismissButtonText = stringResource(R.string.back),
         extraTopContent = {
             Box(
                 modifier = Modifier
@@ -107,7 +107,7 @@ fun FileImportDialog(
                     .clickable { filePickerLauncher.launch(arrayOf("text/plain")) }
             ) {
                 OutlinedTextField(
-                    value = selectedFileName ?: "No file selected",
+                    value = selectedFileName ?: stringResource(R.string.no_file_selected),
                     onValueChange = {},
                     label = { Text(stringResource(R.string.import_location), color = AppTheme.colors.SelectedColor) },
                     readOnly = true,

@@ -11,8 +11,8 @@ import kotlin.math.roundToInt
 
 object OvalTool : ShapeTool {
     override val icon: Int = R.drawable.ic_oval_tool
-    override val name: String = "Oval"
-    override val description: String = "Draw oval shapes"
+    override val nameRes: Int = R.string.tool_oval
+    override val descriptionRes: Int = R.string.tool_oval_desc
     override val commitsImmediately: Boolean = false
 
     private var startRow = 0

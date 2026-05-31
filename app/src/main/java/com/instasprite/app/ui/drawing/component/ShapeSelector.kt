@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.tool.shape.CircleTool
 import com.instasprite.app.domain.tool.shape.DiamondTool
@@ -62,10 +63,10 @@ fun ShapeSelector(
         ) {
             PixelIcon(
                 icon = selectedTool.icon,
-                contentDescription = selectedTool.name,
+                contentDescription = stringResource(id = selectedTool.nameRes),
             )
             Spacer(modifier = Modifier.width(6.pixelDp))
-            Text(text = selectedTool.name, fontSize = 12.sp)
+            Text(text = stringResource(id = selectedTool.nameRes), fontSize = 12.sp)
         }
 
         DropdownMenu(
@@ -75,7 +76,7 @@ fun ShapeSelector(
         ) {
             shapeTools.forEach { tool ->
                 DropdownMenuItem(
-                    text = { Text(tool.name, color = AppTheme.colors.TextColorLight) },
+                    text = { Text(stringResource(id = tool.nameRes), color = AppTheme.colors.TextColorLight) },
                     leadingIcon = {
                         PixelIcon(
                             icon = tool.icon,

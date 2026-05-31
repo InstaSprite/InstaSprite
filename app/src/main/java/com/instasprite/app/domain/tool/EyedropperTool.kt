@@ -6,8 +6,8 @@ import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 object EyedropperTool : Tool {
     override val icon: Int = R.drawable.ic_eyedropper_tool
-    override val name: String = "Eyedropper"
-    override val description: String = "Select a pixel color"
+    override val nameRes: Int = R.string.eyedropper
+    override val descriptionRes: Int = R.string.tool_eyedropper_desc
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         val selectedColor = Color(canvas.getCompositedPixelAt(row, col))
         if (selectedColor != Color.Transparent) {

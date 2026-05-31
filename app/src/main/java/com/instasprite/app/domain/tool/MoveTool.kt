@@ -7,8 +7,8 @@ import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 object MoveTool : StrokeTool {
     override val icon: Int = R.drawable.ic_move_tool
-    override val name: String = "Move"
-    override val description: String = "Move layer or selection"
+    override val nameRes: Int = R.string.move
+    override val descriptionRes: Int = R.string.tool_move_desc
     override val commitsImmediately: Boolean = false
     override val staysPendingAfterStroke: Boolean = true
 

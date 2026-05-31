@@ -7,8 +7,8 @@ import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 object FillTool : Tool {
     override val icon: Int = R.drawable.ic_fill_tool
-    override val name: String = "Fill"
-    override val description: String = "Fill canvas section with the selected color"
+    override val nameRes: Int = R.string.fill
+    override val descriptionRes: Int = R.string.tool_fill_desc
 
     data class FillResult(
         val dirtyMinRow: Int,

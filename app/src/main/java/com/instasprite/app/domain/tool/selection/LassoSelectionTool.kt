@@ -11,8 +11,8 @@ import com.instasprite.app.utils.bresenhamLine
 
 object LassoSelectionTool : StrokeTool, SelectionTool {
     override val icon: Int = R.drawable.ic_lasso_tool
-    override val name: String = "Lasso"
-    override val description: String = "Draw a freeform selection area"
+    override val nameRes: Int = R.string.tool_lasso_selection
+    override val descriptionRes: Int = R.string.tool_lasso_selection_desc
     override val commitsImmediately: Boolean = false
 
     override var currentSelection: SelectionState? = null

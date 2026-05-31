@@ -147,11 +147,11 @@ fun LayerView(
 
                     if (showDeleteConfirm) {
                         ConfirmationDialog(
-                            title = "Delete layer",
-                            text = "Are you sure you want to delete this layer",
-                            highlightText = "",
-                            confirmButtonText = "Delete",
-                            dismissButtonText = "Cancel",
+                            title = stringResource(R.string.delete_layer),
+                            text = stringResource(R.string.are_you_sure_you_want_to_delete),
+                            highlightText = layer.name,
+                            confirmButtonText = stringResource(R.string.delete),
+                            dismissButtonText = stringResource(R.string.cancel),
                             highlightTextColor = AppTheme.colors.DismissButtonColor,
                             hasQuestionMark = true,
                             onConfirm = {

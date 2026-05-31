@@ -159,7 +159,7 @@ fun ColorWheelDialog(
 
     CustomDialog(
         onDismiss = onDismiss,
-        confirmButtonText = "Select Color",
+        confirmButtonText = stringResource(R.string.select_color),
         onConfirm = {
             onColorSelected(selectedColor.value)
             onDismiss()

@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.shape.PixelShape
@@ -52,7 +53,7 @@ fun BrushShapeSelector(
 
             PixelIcon(
                 icon = selectedShape.icon,
-                contentDescription = selectedShape.name,
+                contentDescription = stringResource(selectedShape.nameRes),
             )
         }
 
@@ -63,7 +64,7 @@ fun BrushShapeSelector(
         ) {
             BrushShape.entries.forEach { shape ->
                 DropdownMenuItem(
-                    text = { Text(shape.name, color = AppTheme.colors.TextColorLight) },
+                    text = { Text(stringResource(shape.nameRes), color = AppTheme.colors.TextColorLight) },
                     leadingIcon = {
                         PixelIcon(
                             icon = shape.icon,
@@ -79,3 +80,4 @@ fun BrushShapeSelector(
         }
     }
 }
+

@@ -29,8 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.ui.components.shape.PixelShape
@@ -56,10 +58,10 @@ fun LayerOptionsDialog(
     val currentBlendMode = layer.blendMode
 
     CustomDialog(
-        title = "Layer Options",
+        title = stringResource(R.string.layer_option),
         onDismiss = onDismiss,
         onConfirm = onDismiss,
-        confirmButtonText = "Close",
+        confirmButtonText = stringResource(R.string.close),
         dismissButtonText = "",
     ) {
         Column(
@@ -147,7 +149,7 @@ fun LayerOptionsDialog(
                     modifier = Modifier
                 ) {
                     Text(
-                        text = "Merge Down",
+                        text = stringResource(R.string.merge_down),
                         color = AppTheme.colors.TextColorDark,
                     )
                 }

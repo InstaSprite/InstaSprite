@@ -65,7 +65,7 @@ fun ToolSelector(
         Box {
             ToolItem(
                 iconResourceId = selectedTool.icon,
-                contentDescription = selectedTool.name,
+                contentDescription = stringResource(id = selectedTool.nameRes),
                 selected = true,
                 onClick = { toolListVisible = true }
             )
@@ -80,10 +80,10 @@ fun ToolSelector(
                         leadingIcon = {
                             PixelIcon(
                                 icon = tool.icon,
-                                contentDescription = tool.description,
+                                contentDescription = stringResource(id = tool.descriptionRes),
                             )
                         },
-                        text = { Text(tool.name) },
+                        text = { Text(stringResource(id = tool.nameRes)) },
                         onClick = {
                             if (tool == ShapeToolPlaceholder) {
                                 onToolSelectorEvent(ToolSelectorEvent.SelectTool(com.instasprite.app.domain.tool.shape.LineTool))
