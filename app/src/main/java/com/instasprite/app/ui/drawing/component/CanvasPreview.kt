@@ -121,42 +121,44 @@ fun CanvasPreview(
             BackHandler {
                 isExpanded = false
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.pixelDp)
-                    .zIndex(5f)
-            ) {
-                Box(
+            if (!isSliding) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .background(AppTheme.colors.BackgroundColor)
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.pixelDp)
+                        .zIndex(5f)
                 ) {
-                    Text(
-                        text = "Preview",
-                        color = AppTheme.colors.TextColorLight,
-                        style = MaterialTheme.typography.titleMedium,
+                    Box(
                         modifier = Modifier
-                            .padding(4.pixelDp)
-                    )
-                }
+                            .clip(MaterialTheme.shapes.small)
+                            .background(AppTheme.colors.BackgroundColor)
+                    ) {
+                        Text(
+                            text = "Preview",
+                            color = AppTheme.colors.TextColorLight,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .padding(4.pixelDp)
+                        )
+                    }
 
-                IconButton(
-                    onClick = { isExpanded = false },
-                    shape = MaterialTheme.shapes.small,
-                    colors = IconButtonColors(
-                        containerColor = AppTheme.colors.BackgroundColor,
-                        contentColor = Color.Unspecified,
-                        disabledContainerColor = Color.Unspecified,
-                        disabledContentColor = Color.Unspecified
-                    ),
-                ) {
-                    PixelIcon(
-                        icon = R.drawable.ic_close,
-                        tint = AppTheme.colors.DismissButtonColor
-                    )
+                    IconButton(
+                        onClick = { isExpanded = false },
+                        shape = MaterialTheme.shapes.small,
+                        colors = IconButtonColors(
+                            containerColor = AppTheme.colors.BackgroundColor,
+                            contentColor = Color.Unspecified,
+                            disabledContainerColor = Color.Unspecified,
+                            disabledContentColor = Color.Unspecified
+                        ),
+                    ) {
+                        PixelIcon(
+                            icon = R.drawable.ic_close,
+                            tint = AppTheme.colors.DismissButtonColor
+                        )
+                    }
                 }
             }
 
@@ -247,6 +249,7 @@ fun CanvasPreview(
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding((2 / animScale).pixelDp)
                     .zoomable(zoomState)
                     .drawCheckerboard(canvasWidth, canvasHeight)
             ) {
