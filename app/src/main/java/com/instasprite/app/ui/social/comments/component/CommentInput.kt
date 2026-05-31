@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,10 +113,8 @@ fun CommentInput(
                         value = text,
                         onValueChange = onTextChange,
                         modifier = Modifier.fillMaxWidth(),
-                        textStyle = TextStyle(
-                            color = AppTheme.colors.TextColorLight,
-                            fontFamily = RetronFont,
-                            fontSize = 14.sp
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppTheme.colors.TextColorLight
                         ),
                         cursorBrush = SolidColor(AppTheme.colors.AccentButtonColor),
                         maxLines = 4
