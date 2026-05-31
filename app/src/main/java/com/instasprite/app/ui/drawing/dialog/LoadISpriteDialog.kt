@@ -24,6 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.CircularProgressIndicator
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.compose.runtime.rememberCoroutineScope
 import com.instasprite.app.R
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
@@ -38,13 +43,15 @@ import com.instasprite.app.utils.pixelDp
 @Composable
 fun LoadISpriteDialog(
     onDismiss: () -> Unit,
-    onFilePicked: (Uri) -> Sprite?,
+    onFilePicked: suspend (Uri) -> Sprite?,
     onLoad: (Sprite) -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var fileUri by remember { mutableStateOf<Uri?>(null) }
     var spriteData by remember { mutableStateOf<Sprite?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(), onResult = { uri: Uri? ->
@@ -52,7 +59,17 @@ fun LoadISpriteDialog(
                 val fileName = getFileName(context, it)
                 if (fileName?.endsWith(".isprite") == true) {
                     fileUri = it
-                    spriteData = onFilePicked(it)
+                    isLoading = true
+                    scope.launch(Dispatchers.IO) {
+                        val result = onFilePicked(it)
+                        withContext(Dispatchers.Main) {
+                            isLoading = false
+                            spriteData = result
+                            if (result == null) {
+                                Toast.makeText(context, "Error loading file", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 } else {
                     Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show()
                 }
@@ -143,6 +160,14 @@ fun LoadISpriteDialog(
                             onDismiss = { showOverlay = false }
                         )
                     }
+                }
+                
+                if (isLoading) {
+                    Spacer(Modifier.height(16.pixelDp))
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppTheme.colors.SelectedColor
+                    )
                 }
             }
         })

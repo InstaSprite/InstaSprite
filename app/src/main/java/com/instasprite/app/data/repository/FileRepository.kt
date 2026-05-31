@@ -22,10 +22,17 @@ class FileRepository(val context: Context) {
         folderUri: Uri,
         fileName: String
     ): Boolean = withContext(Dispatchers.IO) {
-        val finalFileName = if (fileName.endsWith(".isprite")) fileName else "$fileName.isprite"
+        val folder = DocumentFile.fromTreeUri(context, folderUri) ?: return@withContext false
 
-        val folder = DocumentFile.fromTreeUri(context, folderUri)
-        val file = folder?.createFile("application/isprite", finalFileName) ?: return@withContext false
+        val nameWithoutExt = fileName.removeSuffix(".isprite")
+        var uniqueFileName = "$nameWithoutExt.isprite"
+        var counter = 1
+        while (folder.findFile(uniqueFileName) != null) {
+            uniqueFileName = "$nameWithoutExt ($counter).isprite"
+            counter++
+        }
+
+        val file = folder.createFile("application/isprite", uniqueFileName) ?: return@withContext false
 
         val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return@withContext false
 
@@ -80,8 +87,20 @@ class FileRepository(val context: Context) {
         val formatInfo = getFormatFromExtension(fileName) ?: return false
         val (compressFormat, mimeType) = formatInfo
 
-        val folder = DocumentFile.fromTreeUri(context, folderUri)
-        val file = folder?.createFile(mimeType, fileName) ?: return false
+        val folder = DocumentFile.fromTreeUri(context, folderUri) ?: return false
+
+        val nameWithoutExt = fileName.substringBeforeLast(".")
+        val extension = if (fileName.contains(".")) fileName.substringAfterLast(".") else ""
+        val extStr = if (extension.isNotEmpty()) ".$extension" else ""
+
+        var uniqueFileName = fileName
+        var counter = 1
+        while (folder.findFile(uniqueFileName) != null) {
+            uniqueFileName = "$nameWithoutExt ($counter)$extStr"
+            counter++
+        }
+
+        val file = folder.createFile(mimeType, uniqueFileName) ?: return false
         val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return false
 
         return try {
