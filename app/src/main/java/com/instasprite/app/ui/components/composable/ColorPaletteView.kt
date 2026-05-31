@@ -63,6 +63,27 @@ data class ColorPaletteConfig(
 }
 
 @Composable
+fun IntColorPaletteView(
+    colors: List<Int>,
+    modifier: Modifier = Modifier,
+    activeColor: Color? = null,
+    onColorSelected: ((Color) -> Unit)? = null,
+    config: ColorPaletteConfig = ColorPaletteConfig.Default,
+    lazyListState: LazyListState = rememberLazyListState(),
+    itemColorModifier: Modifier? = null,
+) {
+    ColorPaletteView(
+        colors = colors.map { Color(it) },
+        modifier = modifier,
+        activeColor = activeColor,
+        onColorSelected = onColorSelected,
+        config = config,
+        lazyListState = lazyListState,
+        itemColorModifier = itemColorModifier,
+    )
+}
+
+@Composable
 fun ColorPaletteView(
     colors: List<Color>,
     modifier: Modifier = Modifier,

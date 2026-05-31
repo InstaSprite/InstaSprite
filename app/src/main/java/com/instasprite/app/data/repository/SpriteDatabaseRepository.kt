@@ -71,7 +71,15 @@ class SpriteDatabaseRepository @Inject constructor(
 
     fun getAllSpritesWithMeta(): Flow<List<SpriteWithMeta>> {
         return dao.getAllSpritesWithMeta().map { list ->
-            list.map { it.toDomain() }
+            list.map { item ->
+                val proto = pixelDataSource.getDataStore(item.sprite.id).data.firstOrNull()
+                item.toDomain(
+                    sprite = item.sprite.toDomain(
+                        layers = emptyList(),
+                        colorPalette = proto?.colorPaletteList
+                    )
+                )
+            }
         }
     }
 

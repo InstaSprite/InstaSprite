@@ -1,10 +1,5 @@
 package com.instasprite.app.ui.gallery.component
 
-import com.instasprite.app.utils.pixelDp
-
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -38,20 +32,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay
-import com.instasprite.app.ui.components.composable.TopBar
+import com.instasprite.app.ui.components.composable.IntColorPaletteView
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.components.shape.PixelShape
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.drawCheckerboard
+import com.instasprite.app.utils.pixelDp
 import com.instasprite.app.utils.toDateString
 import java.io.File
 
@@ -214,6 +210,14 @@ private fun BottomBar(
         ) {
             Text(text =  stringResource(R.string.name) + ": " + spriteName)
             Text(text = stringResource(R.string.sort_date_created) + ": " + dateCreated)
+
+            Spacer(modifier = Modifier.height(8.pixelDp))
+
+            if (sprite.colorPalette != null) {
+                IntColorPaletteView(
+                    colors = sprite.colorPalette,
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.pixelDp))
 
