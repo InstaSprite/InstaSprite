@@ -18,6 +18,7 @@ import com.instasprite.app.data.model.SpriteData
 import com.instasprite.app.data.model.SpriteMetaData
 import com.instasprite.app.data.model.UserEntity
 import com.instasprite.app.data.model.UserProfileEntity
+import com.instasprite.app.data.model.OfflineMutationEntity
 
 @Database(
     entities = [
@@ -30,8 +31,9 @@ import com.instasprite.app.data.model.UserProfileEntity
         FeedPostCrossRef::class,
         PostRemoteKeys::class,
         NotificationEntity::class,
-        NotificationRemoteKeys::class
-    ], version = 6, exportSchema = false
+        NotificationRemoteKeys::class,
+        OfflineMutationEntity::class
+    ], version = 7, exportSchema = false
 )
 @TypeConverters(
     value = [
@@ -51,6 +53,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun postRemoteKeysDao(): PostRemoteKeysDao
     abstract fun notificationDao(): NotificationDao
     abstract fun notificationRemoteKeysDao(): NotificationRemoteKeysDao
+    abstract fun offlineMutationDao(): OfflineMutationDao
 
     companion object {
         @Volatile
@@ -119,6 +122,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `offline_mutations` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `payloadJson` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `retryCount` INTEGER NOT NULL)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -131,7 +140,8 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_2_3,
                         MIGRATION_3_4,
                         MIGRATION_4_5,
-                        MIGRATION_5_6
+                        MIGRATION_5_6,
+                        MIGRATION_6_7
                     )
                     .build()
                 INSTANCE = instance

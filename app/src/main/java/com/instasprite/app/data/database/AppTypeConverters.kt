@@ -3,6 +3,7 @@ package com.instasprite.app.data.database
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.instasprite.app.data.model.MutationType
 import com.instasprite.app.data.network.model.ActorSummaryDto
 import com.instasprite.app.data.network.model.CommentDto
 import com.instasprite.app.data.network.model.FollowingMemberFollowItemDto
@@ -11,6 +12,16 @@ import com.instasprite.app.data.network.model.PostImageDto
 
 class AppTypeConverters {
     private val gson = Gson()
+
+    @TypeConverter
+    fun fromMutationType(value: MutationType?): String? {
+        return value?.name
+    }
+
+    @TypeConverter
+    fun toMutationType(value: String?): MutationType? {
+        return value?.let { enumValueOf<MutationType>(it) }
+    }
 
     @TypeConverter
     fun fromStringList(value: List<String>?): String? {

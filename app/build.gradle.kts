@@ -140,6 +140,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // --- UI Utilities & Theme ---
     implementation(libs.accompanist.systemuicontroller)
@@ -158,6 +160,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.annotations) // Javax Annotations (used by Room, etc.)
     implementation(libs.protobuf.kotlin.lite)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // --- Network ---
     implementation(libs.okhttp)

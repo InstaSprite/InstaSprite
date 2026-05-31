@@ -29,7 +29,8 @@ class PostRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val postApi: PostApi,
     private val s3UploadClient: S3UploadClient,
-    private val database: com.instasprite.app.data.database.AppDatabase
+    private val database: com.instasprite.app.data.database.AppDatabase,
+    private val syncManager: com.instasprite.app.data.network.sync.SyncManager
 ) {
 
     fun getPagedPosts(filter: com.instasprite.app.ui.social.feed.PostFilter): kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<PostData>> {
@@ -134,12 +135,24 @@ class PostRepository @Inject constructor(
         postApi.getRecentPostsPage(lastPostId).toResult().map { it.toDomain() }
     }
 
-    suspend fun likePost(postId: Long): Result<String> = safeApiCall {
-        postApi.likePost(postId).toResultMessage("Post liked")
+    suspend fun likePost(postId: Long): Result<String> {
+        val post = database.postDao().getPostById(postId)
+        if (post != null) {
+            val newLikeCount = post.postLikesCount + 1
+            database.postDao().updateLikeState(postId, true, newLikeCount)
+        }
+        syncManager.enqueueMutation(com.instasprite.app.data.model.MutationType.LIKE_POST, postId.toString())
+        return Result.success("Post liked offline")
     }
 
-    suspend fun unlikePost(postId: Long): Result<String> = safeApiCall {
-        postApi.unlikePost(postId).toResultMessage("Post unliked")
+    suspend fun unlikePost(postId: Long): Result<String> {
+        val post = database.postDao().getPostById(postId)
+        if (post != null) {
+            val newLikeCount = if (post.postLikesCount > 0) post.postLikesCount - 1 else 0
+            database.postDao().updateLikeState(postId, false, newLikeCount)
+        }
+        syncManager.enqueueMutation(com.instasprite.app.data.model.MutationType.UNLIKE_POST, postId.toString())
+        return Result.success("Post unliked offline")
     }
 
     suspend fun bookmarkPost(postId: Long): Result<String> = safeApiCall {
