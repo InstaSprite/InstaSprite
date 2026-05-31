@@ -1,5 +1,6 @@
 package com.instasprite.app.domain.draw
 
+import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.utils.blendPixel
@@ -25,12 +26,12 @@ class MoveCompositor(
     private class AboveLayerCache(
         val pixels: IntArray,
         val opacity: Float,
-        val blendMode: com.instasprite.app.domain.model.BlendMode
+        val blendMode: BlendMode
     )
     private val aboveLayers = mutableListOf<AboveLayerCache>()
 
     private var activeOpacity = 1.0f
-    private var activeBlendMode = com.instasprite.app.domain.model.BlendMode.NORMAL
+    private var activeBlendMode = BlendMode.NORMAL
 
     init {
         val activeIdx = layers.indexOfFirst { it.id == activeLayerId }

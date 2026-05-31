@@ -2,23 +2,22 @@ package com.instasprite.app.domain.draw
 
 import androidx.compose.ui.graphics.Color
 import com.instasprite.app.data.repository.ColorPaletteRepository
-import com.instasprite.app.domain.canvashistory.CanvasHistoryManager
-import com.instasprite.app.domain.canvashistory.HistoryCanvasState
 import com.instasprite.app.domain.canvashistory.HistoryDiskStore
-import com.instasprite.app.domain.canvashistory.OperationEntry
-import com.instasprite.app.domain.canvashistory.TileChangeTracker
-import com.instasprite.app.domain.canvashistory.TransformEntry
 import com.instasprite.app.domain.canvashistory.TransformType
+import com.instasprite.app.domain.draw.state.*
+import com.instasprite.app.domain.model.BlendMode
+import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.FillTool
 import com.instasprite.app.domain.tool.MoveTool
+import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
-import com.instasprite.app.domain.tool.selection.SelectionTool
-import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.LassoSelectionTool
 import com.instasprite.app.domain.tool.selection.MagicWandTool
+import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
+import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.ui.drawing.contract.PixelCanvasState
 import kotlinx.coroutines.CoroutineScope
@@ -35,17 +34,16 @@ sealed class TapResult {
 }
 
 class DrawingEngine(
-    private val pixelCanvasUseCase: PixelCanvasUseCase,
+    override val pixelCanvasUseCase: PixelCanvasUseCase,
     private val colorPaletteRepository: ColorPaletteRepository,
     private val scope: CoroutineScope,
     historyDiskStore: HistoryDiskStore? = null
-) {
-    private val canvasHistoryManager = CanvasHistoryManager(historyDiskStore)
-    private var activeHistoryTracker: TileChangeTracker? = null
+) : ILayerManager, ITransformManager, IHistoryManager, InteractionContext {
+
     private var isProcessingTool = false
 
-    val bitmapManager = BitmapManager(pixelCanvasUseCase)
-    private val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope) { sel ->
+    override val bitmapManager = BitmapManager(pixelCanvasUseCase)
+    override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope) { sel ->
         _canvasState.value = _canvasState.value.copy(selectionState = sel)
     }
 
@@ -57,9 +55,56 @@ class DrawingEngine(
             activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         )
     )
+    override val mutableCanvasState: MutableStateFlow<PixelCanvasState> = _canvasState
     val canvasState: StateFlow<PixelCanvasState> = _canvasState.asStateFlow()
 
-    // Stroke
+    override var selectedTool: Tool = PencilTool
+    override var activeColor: Color = Color.Black
+    override var toolSize: Int = 1
+    override var brushShape: BrushShape = BrushShape.Circle
+    override var isAppendSelectionMode: Boolean = false
+    override var zoomScale: Float = 1f
+
+    private var activeState: CanvasInteractionState = StandbyState
+
+    override fun transitionTo(newState: CanvasInteractionState) {
+        activeState = newState
+    }
+
+    override val historyManager = HistoryDelegate(
+        pixelCanvasUseCase = pixelCanvasUseCase,
+        historyDiskStore = historyDiskStore,
+        canvasState = _canvasState,
+        bitmapManager = bitmapManager,
+        scope = scope,
+        refreshCanvasSizeState = ::refreshCanvasSizeState,
+        refreshLayerState = ::refreshLayerState,
+        refreshActiveLayerState = ::refreshActiveLayerState,
+        syncStateVersions = ::syncStateVersions
+    )
+
+    private val layerDelegate = LayerDelegate(
+        pixelCanvasUseCase = pixelCanvasUseCase,
+        historyManager = historyManager,
+        refreshLayerState = ::refreshLayerState,
+        refreshActiveLayerState = ::refreshActiveLayerState,
+        syncStateVersions = ::syncStateVersions,
+        scope = scope,
+        bitmapManager = bitmapManager
+    )
+
+    private val transformDelegate = TransformDelegate(
+        pixelCanvasUseCase = pixelCanvasUseCase,
+        historyManager = historyManager,
+        refreshCanvasSizeState = ::refreshCanvasSizeState,
+        refreshLayerState = ::refreshLayerState,
+        scope = scope,
+        bitmapManager = bitmapManager,
+        syncStateVersions = ::syncStateVersions
+    )
+
+    // =========== FSM ===========
+
     fun onStrokeStart(
         tool: StrokeTool,
         row: Int,
@@ -70,76 +115,48 @@ class DrawingEngine(
         zoomScale: Float
     ) {
         if (isProcessingTool) return
-        if (tool !is SelectionTool) {
-            saveState()
-        }
-        val selectionState = _canvasState.value.selectionState
-        strokeEngine.onStrokeStart(
-            tool,
-            row,
-            col,
-            color,
-            scale,
-            brushShape,
-            selectionState,
-            zoomScale
-        )
+        this.selectedTool = tool
+        this.activeColor = color
+        this.toolSize = scale
+        this.brushShape = brushShape
+        this.zoomScale = zoomScale
+
+        activeState.onTouchStart(row, col, this)
         syncStateVersions()
     }
 
     fun onStrokeMove(tool: StrokeTool, row: Int, col: Int) {
-        strokeEngine.onStrokeMove(tool, row, col)
+        this.selectedTool = tool
+        activeState.onTouchMove(row, col, this)
         syncStateVersions()
     }
 
     fun onStrokeEnd(tool: StrokeTool, isAppendSelectionMode: Boolean) {
-        val currentSelectionState = _canvasState.value.selectionState
-        val result = strokeEngine.onStrokeEnd(tool, isAppendSelectionMode, currentSelectionState)
-
-        if (result.updatedSelectionState != null) {
-            _canvasState.value =
-                _canvasState.value.copy(selectionState = result.updatedSelectionState)
-        }
-
-        if (result.shouldUpdateHistory) {
-            updateHistoryCurrentState()
-            refreshLayerState()
-        }
-
+        this.selectedTool = tool
+        this.isAppendSelectionMode = isAppendSelectionMode
+        activeState.onTouchEnd(this)
         syncStateVersions()
     }
 
     fun onStrokeCancel(tool: StrokeTool) {
-        strokeEngine.onStrokeCancel(tool)
-
-        if (tool !is SelectionTool) {
-            restorePendingHistoryCapture()
-            refreshLayerState()
-            scope.launch {
-                bitmapManager.refreshBitmapState()
-                syncStateVersions()
-            }
-        }
+        this.selectedTool = tool
+        activeState.onTouchCancel(this)
         syncStateVersions()
     }
 
     fun commitPendingTool(tool: StrokeTool) {
-        if (strokeEngine.commitPendingTool(tool)) {
-            updateHistoryCurrentState()
-            syncStateVersions()
-        }
+        this.selectedTool = tool
+        activeState.commitPending(this)
+        syncStateVersions()
     }
 
     fun cancelPendingTool(tool: StrokeTool): Boolean {
-        if (strokeEngine.cancelPendingTool(tool)) {
-            discardHistoryCapture()
-            syncStateVersions()
-            return true
-        }
-        return false
+        this.selectedTool = tool
+        activeState.cancelPending(this)
+        syncStateVersions()
+        return true
     }
 
-    // Tap
     fun onTapAt(tool: Tool, row: Int, col: Int, color: Color, size: Int): TapResult {
         if (isProcessingTool) return TapResult.HandledSync
 
@@ -195,8 +212,7 @@ class DrawingEngine(
         return TapResult.HandledSync
     }
 
-    // Selection
-
+    // =========== SELECTION ===========
     fun clearSelection(tool: Tool?) {
         pixelCanvasUseCase.setSelectionMask(null)
         _canvasState.value = _canvasState.value.copy(selectionState = null)
@@ -215,7 +231,7 @@ class DrawingEngine(
         for (i in newMask.indices) {
             newMask[i] = !sel.mask[i]
         }
-        val newSel = com.instasprite.app.domain.model.SelectionState(
+        val newSel = SelectionState(
             mask = newMask,
             bounds = android.graphics.Rect(0, 0, w, h),
             canvasWidth = w,
@@ -227,262 +243,37 @@ class DrawingEngine(
         syncStateVersions()
     }
 
-    // Layer stuffs
+    // =========== LAYER ===========
+    override fun addLayer(name: String) = layerDelegate.addLayer(name)
+    override fun removeLayer(layerId: String) = layerDelegate.removeLayer(layerId)
+    override fun selectLayer(layerId: String) = layerDelegate.selectLayer(layerId)
+    override fun toggleLock(layerId: String) = layerDelegate.toggleLock(layerId)
+    override fun toggleVisibility(layerId: String) = layerDelegate.toggleVisibility(layerId)
+    override fun mergeLayerDown(layerId: String) = layerDelegate.mergeLayerDown(layerId)
+    override fun reorderLayer(fromIndex: Int, toIndex: Int) = layerDelegate.reorderLayer(fromIndex, toIndex)
+    override fun setLayerOpacity(layerId: String, opacity: Float) = layerDelegate.setLayerOpacity(layerId, opacity)
+    override fun setLayerBlendMode(layerId: String, mode: BlendMode) = layerDelegate.setLayerBlendMode(layerId, mode)
 
-    fun addLayer(name: String) {
-        recordOperationHistory {
-            pixelCanvasUseCase.addLayer(name)
-        }
-        refreshLayerState()
-        refreshActiveLayerState()
-    }
+    // =========== TRANSFORM ===========
 
-    fun removeLayer(layerId: String) {
-        recordOperationHistory {
-            pixelCanvasUseCase.removeLayer(layerId)
-        }
-        refreshLayerState()
-        refreshActiveLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
+    override fun rotate() = transformDelegate.rotate()
+    override fun hFlip() = transformDelegate.hFlip()
+    override fun vFlip() = transformDelegate.vFlip()
+    override fun resizeCanvas(width: Int, height: Int) = transformDelegate.resizeCanvas(width, height)
 
-    fun selectLayer(layerId: String) {
-        pixelCanvasUseCase.setActiveLayer(layerId)
-        refreshActiveLayerState()
-    }
+    // =========== HISTORY ===========
 
-    fun toggleLock(layerId: String) {
-        recordOperationHistory {
-            pixelCanvasUseCase.toggleLock(layerId)
-        }
-        refreshLayerState()
-    }
+    override fun saveState() = historyManager.saveState()
+    override fun undo() = historyManager.undo()
+    override fun redo() = historyManager.redo()
+    override fun resetHistory() = historyManager.resetHistory()
+    override fun discardHistoryCapture() = historyManager.discardHistoryCapture()
+    override fun updateHistoryCurrentState() = historyManager.updateHistoryCurrentState()
+    override fun restorePendingHistoryCapture() = historyManager.restorePendingHistoryCapture()
+    override fun recordOperationHistory(operation: () -> Unit) = historyManager.recordOperationHistory(operation)
+    override fun recordTransformHistory(transform: TransformType, operation: () -> Unit) = historyManager.recordTransformHistory(transform, operation)
 
-    fun toggleVisibility(layerId: String) {
-        recordOperationHistory {
-            pixelCanvasUseCase.toggleVisibility(layerId)
-        }
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    fun mergeLayerDown(layerId: String) {
-        recordOperationHistory {
-            pixelCanvasUseCase.mergeLayerDown(layerId)
-        }
-        refreshLayerState()
-        refreshActiveLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    fun reorderLayer(fromIndex: Int, toIndex: Int) {
-        recordOperationHistory {
-            pixelCanvasUseCase.reorderLayer(fromIndex = fromIndex, toIndex = toIndex)
-        }
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    fun setLayerOpacity(layerId: String, opacity: Float) {
-        recordOperationHistory {
-            pixelCanvasUseCase.setLayerOpacity(layerId, opacity)
-        }
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    fun setLayerBlendMode(layerId: String, mode: com.instasprite.app.domain.model.BlendMode) {
-        recordOperationHistory {
-            pixelCanvasUseCase.setLayerBlendMode(layerId, mode)
-        }
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    // Transform
-
-    fun rotate() {
-        recordTransformHistory(TransformType.ROTATE_CW) {
-            pixelCanvasUseCase.rotateCanvas()
-        }
-        refreshCanvasSizeState()
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    fun hFlip() {
-        recordTransformHistory(TransformType.FLIP_H) {
-            pixelCanvasUseCase.hFlipCanvas()
-        }
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    fun vFlip() {
-        recordTransformHistory(TransformType.FLIP_V) {
-            pixelCanvasUseCase.vFlipCanvas()
-        }
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    fun resizeCanvas(width: Int, height: Int) {
-        recordOperationHistory {
-            pixelCanvasUseCase.resizeCanvas(width, height)
-        }
-        refreshCanvasSizeState()
-        refreshLayerState()
-        scope.launch {
-            bitmapManager.refreshBitmapState()
-            syncStateVersions()
-        }
-    }
-
-    // History
-
-    fun saveState() {
-        if (activeHistoryTracker == null) {
-            val sel = _canvasState.value.selectionState
-            activeHistoryTracker = TileChangeTracker(sel?.deepCopy())
-            pixelCanvasUseCase.beginTileHistory(activeHistoryTracker!!)
-        }
-    }
-
-    fun undo() {
-        discardHistoryCapture()
-        val restoredState = canvasHistoryManager.undo(captureHistoryCanvasState())
-        if (restoredState != null) {
-            applyHistoryCanvasState(restoredState)
-            bitmapManager.clearOverlayBitmap()
-            bitmapManager.incrementOverlayVersion()
-            refreshCanvasSizeState()
-            refreshLayerState()
-            refreshActiveLayerState()
-            scope.launch {
-                bitmapManager.refreshBitmapState()
-                syncStateVersions()
-            }
-        }
-    }
-
-    fun redo() {
-        discardHistoryCapture()
-        val restoredState = canvasHistoryManager.redo(captureHistoryCanvasState())
-        if (restoredState != null) {
-            applyHistoryCanvasState(restoredState)
-            bitmapManager.clearOverlayBitmap()
-            bitmapManager.incrementOverlayVersion()
-            refreshCanvasSizeState()
-            refreshLayerState()
-            refreshActiveLayerState()
-            scope.launch {
-                bitmapManager.refreshBitmapState()
-                syncStateVersions()
-            }
-        }
-    }
-
-    fun resetHistory() {
-        canvasHistoryManager.reset()
-        discardHistoryCapture()
-    }
-
-    private fun updateHistoryCurrentState() {
-        val tracker = activeHistoryTracker ?: return
-        pixelCanvasUseCase.endTileHistory()
-        activeHistoryTracker = null
-
-        val sel = _canvasState.value.selectionState
-        val entry = tracker.buildUndoEntry(sel?.deepCopy())
-        if (!entry.isEmpty()) {
-            canvasHistoryManager.push(entry)
-        }
-    }
-
-    private fun captureHistoryCanvasState(): HistoryCanvasState {
-        return HistoryCanvasState(
-            width = pixelCanvasUseCase.getCanvasWidth(),
-            height = pixelCanvasUseCase.getCanvasHeight(),
-            layers = pixelCanvasUseCase.getLayers().map { it.copy() },
-            activeLayerId = pixelCanvasUseCase.getActiveLayerId(),
-            selectionState = _canvasState.value.selectionState?.deepCopy()
-        )
-    }
-
-    private fun applyHistoryCanvasState(state: HistoryCanvasState) {
-        pixelCanvasUseCase.setCanvas(
-            Sprite(
-                width = state.width,
-                height = state.height,
-                layers = state.layers.map { it.copy() }
-            )
-        )
-        pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
-        pixelCanvasUseCase.setSelectionMask(state.selectionState?.mask)
-        _canvasState.value = _canvasState.value.copy(selectionState = state.selectionState)
-        bitmapManager.refreshSelectionBitmap(state.selectionState)
-    }
-
-    private inline fun recordOperationHistory(operation: () -> Unit) {
-        discardHistoryCapture()
-        val before = captureHistoryCanvasState()
-        operation()
-        val after = captureHistoryCanvasState()
-        if (before != after) {
-            canvasHistoryManager.push(OperationEntry(before = before, after = after))
-        }
-    }
-
-    private inline fun recordTransformHistory(transform: TransformType, operation: () -> Unit) {
-        discardHistoryCapture()
-        operation()
-        canvasHistoryManager.push(TransformEntry(transform))
-    }
-
-    private fun discardHistoryCapture() {
-        if (activeHistoryTracker != null) {
-            pixelCanvasUseCase.endTileHistory()
-            activeHistoryTracker = null
-        }
-    }
-
-    private fun restorePendingHistoryCapture() {
-        val tracker = activeHistoryTracker ?: return
-        val sel = _canvasState.value.selectionState
-        val entry = tracker.buildUndoEntry(sel?.deepCopy())
-        val restored = canvasHistoryManager.restore(entry, captureHistoryCanvasState())
-        applyHistoryCanvasState(restored)
-        discardHistoryCapture()
-    }
-
-    // --- State Refresh ---
+    // =========== HELPER ===========
 
     fun setCanvasSize(width: Int, height: Int) {
         pixelCanvasUseCase.setCanvas(width, height)
@@ -533,5 +324,6 @@ class DrawingEngine(
         RectangleSelectionTool.clearSelection()
         LassoSelectionTool.clearSelection()
         MagicWandTool.clearSelection()
+        activeState = StandbyState
     }
 }
