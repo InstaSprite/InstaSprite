@@ -154,6 +154,7 @@ dependencies {
     // --- Persistence / Storage ---
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
     ksp(libs.androidx.room.compiler)
     implementation(libs.annotations) // Javax Annotations (used by Room, etc.)
     implementation(libs.protobuf.kotlin.lite)

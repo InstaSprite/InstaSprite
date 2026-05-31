@@ -1,19 +1,33 @@
 package com.instasprite.app.data.repository
 
 import android.util.Log
-import com.instasprite.app.di.RetrofitModule
+import androidx.paging.map
 import com.instasprite.app.data.network.api.NotificationApi
 import com.instasprite.app.data.network.getBodyOrError
 import com.instasprite.app.data.network.model.FcmTokenRequestDto
 import com.instasprite.app.data.network.model.GroupedNotificationDto
 import com.instasprite.app.data.network.model.SpringPageDto
+import com.instasprite.app.data.network.model.toDomain
+import com.instasprite.app.di.RetrofitModule
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
-import javax.inject.Inject
-
 class NotificationRepository @Inject constructor(
-    private val notificationApi : NotificationApi
+    private val notificationApi : NotificationApi,
+    private val database: com.instasprite.app.data.database.AppDatabase
 ) {
+
+    fun getPagedNotifications(): kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<com.instasprite.app.domain.model.GroupedNotificationData>> {
+        @OptIn(androidx.paging.ExperimentalPagingApi::class)
+        return androidx.paging.Pager(
+            config = androidx.paging.PagingConfig(pageSize = 20, enablePlaceholders = false),
+            remoteMediator = com.instasprite.app.data.paging.NotificationRemoteMediator(notificationApi, database),
+            pagingSourceFactory = { database.notificationDao().pagingSource() }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toDomain() }
+        }
+    }
 
     suspend fun registerFcmToken(fcmToken: String): Result<Unit> {
         return try {

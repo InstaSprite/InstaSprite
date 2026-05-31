@@ -92,19 +92,7 @@ class FeedViewModel @Inject constructor(
         .map { it.uiState.postFilter to it.currentUser?.username }
         .distinctUntilChanged()
         .flatMapLatest { (filter, _) ->
-            Pager(
-                config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                pagingSourceFactory = {
-                    FeedPagingSource(
-                        fetchLogic = { cursor ->
-                            when (filter) {
-                                PostFilter.Follow -> postRepository.getPostPage(cursor)
-                                PostFilter.Recent -> postRepository.getRecentPostsPage(cursor)
-                            }
-                        }
-                    )
-                }
-            ).flow
+            postRepository.getPagedPosts(filter)
         }
         .cachedIn(viewModelScope)
 

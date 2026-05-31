@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.instasprite.app.data.database.AppDatabase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,7 +26,8 @@ class SocialSessionManager @Inject constructor(
     private val tokenStore: SessionTokenStore,
     private val profileRepository: Lazy<ProfileRepository>,
     private val accountRepository: AccountRepository,
-    private val notificationRepository: Lazy<NotificationRepository>
+    private val notificationRepository: Lazy<NotificationRepository>,
+    private val database: AppDatabase
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -47,6 +49,13 @@ class SocialSessionManager @Inject constructor(
             SocialSessionState.LoggedOut
         }
         if (isLoggedIn) {
+            scope.launch {
+                try {
+                    profileRepository.get().getCachedCurrentUserProfile()
+                } catch (e: Exception) {
+                    Log.e("SocialSessionManager", "Failed to cache current user at boot", e)
+                }
+            }
             refreshCurrentUser()
         }
     }
@@ -88,6 +97,17 @@ class SocialSessionManager @Inject constructor(
                 tokenStore.clearTokens()
                 _sessionState.value = SocialSessionState.LoggedOut
                 _currentUser.value = null
+
+                // Clear offline cache but keep Sprite and Color palettes
+                try {
+                    database.userProfileDao().clear()
+                    database.postDao().clearAll()
+                    database.postRemoteKeysDao().clearRemoteKeys()
+                    database.notificationDao().clearAll()
+                    database.notificationRemoteKeysDao().clearRemoteKeys()
+                } catch (e: Exception) {
+                    Log.e("SocialSessionManager", "Error clearing cache", e)
+                }
             }
         }
     }

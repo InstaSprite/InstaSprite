@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.paging.map
 import coil3.decode.DecodeUtils.calculateInSampleSize
 import coil3.size.Scale
 import com.instasprite.app.data.network.S3UploadClient
@@ -18,6 +19,7 @@ import com.instasprite.app.data.network.toResultUnit
 import com.instasprite.app.domain.model.PageData
 import com.instasprite.app.domain.model.PostData
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.map
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -26,8 +28,20 @@ import javax.inject.Inject
 class PostRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val postApi: PostApi,
-    private val s3UploadClient: S3UploadClient
+    private val s3UploadClient: S3UploadClient,
+    private val database: com.instasprite.app.data.database.AppDatabase
 ) {
+
+    fun getPagedPosts(filter: com.instasprite.app.ui.social.feed.PostFilter): kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<PostData>> {
+        @OptIn(androidx.paging.ExperimentalPagingApi::class)
+        return androidx.paging.Pager(
+            config = androidx.paging.PagingConfig(pageSize = 10, enablePlaceholders = false),
+            remoteMediator = com.instasprite.app.data.paging.FeedRemoteMediator(postApi, database, filter),
+            pagingSourceFactory = { database.postDao().pagingSource(filter.name) }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toDomain() }
+        }
+    }
 
     suspend fun getPost(postId: Long): Result<PostData> = safeApiCall {
         postApi.getPost(postId).toResult().map { it.toDomain() }

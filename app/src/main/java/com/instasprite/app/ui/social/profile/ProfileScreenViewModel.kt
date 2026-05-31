@@ -110,6 +110,19 @@ class ProfileScreenViewModel @Inject constructor(
     fun loadCurrentUserProfile() {
         viewModelScope.launch(Dispatchers.IO) {
             _contentState.update { it.copy(isLoading = true, errorMessage = null) }
+            
+            val cachedProfile = profileRepository.getCachedCurrentUserProfile()
+            if (cachedProfile != null) {
+                val userProfile = mapUserProfileResponseToUserProfile(cachedProfile)
+                _contentState.update {
+                    it.copy(isLoading = false, errorMessage = null, userProfile = userProfile)
+                }
+                refreshPosts(userProfile.username)
+                if (_contentState.value.selectedTabIndex == 1) {
+                    refreshSavedPosts()
+                }
+            }
+
             val currentUsername = sessionManager.currentUsername()
             val result = if (currentUsername != null) {
                 profileRepository.getUserProfile(currentUsername)
@@ -125,10 +138,17 @@ class ProfileScreenViewModel @Inject constructor(
                     }
                     sessionManager.refreshCurrentUser()
                     refreshPosts(userProfile.username)
+                    if (_contentState.value.selectedTabIndex == 1) {
+                        refreshSavedPosts()
+                    }
                 },
                 onFailure = { error ->
-                    _contentState.update {
-                        it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
+                    if (cachedProfile == null) {
+                        _contentState.update {
+                            it.copy(isLoading = false, errorMessage = error.toUserMessage(context))
+                        }
+                    } else {
+                        _contentState.update { it.copy(isLoading = false) }
                     }
                 }
             )
@@ -141,6 +161,7 @@ class ProfileScreenViewModel @Inject constructor(
             profileRepository.getUserProfile(userId).fold(
                 onSuccess = { data ->
                     val userProfile = mapUserProfileResponseToUserProfile(data)
+                    val targetTabIndex = if (userProfile.isOwnProfile) _contentState.value.selectedTabIndex else 0
                     _contentState.update {
                         it.copy(
                             isLoading = false,
@@ -148,10 +169,13 @@ class ProfileScreenViewModel @Inject constructor(
                             userProfile = userProfile,
                             userPosts = emptyList(),
                             sharedPosts = emptyList(),
-                            selectedTabIndex = if (userProfile.isOwnProfile) it.selectedTabIndex else 0
+                            selectedTabIndex = targetTabIndex
                         )
                     }
                     refreshPosts(userProfile.username)
+                    if (targetTabIndex == 1 && userProfile.isOwnProfile) {
+                        refreshSavedPosts()
+                    }
                 },
                 onFailure = { error ->
                     _contentState.update {
@@ -168,19 +192,23 @@ class ProfileScreenViewModel @Inject constructor(
         }
     }
 
+    private suspend fun refreshSavedPosts() {
+        profileRepository.getRecentSavedPosts().fold(
+            onSuccess = { posts ->
+                _contentState.update { it.copy(sharedPosts = posts) }
+            },
+            onFailure = {
+                _contentState.update { it.copy(sharedPosts = emptyList()) }
+            }
+        )
+    }
+
     fun selectTab(tabIndex: Int) {
         _contentState.update { it.copy(selectedTabIndex = tabIndex) }
         viewModelScope.launch(Dispatchers.IO) {
             if (tabIndex == 1) {
                 if (_contentState.value.userProfile.isOwnProfile) {
-                    profileRepository.getRecentSavedPosts().fold(
-                        onSuccess = { posts ->
-                            _contentState.update { it.copy(sharedPosts = posts) }
-                        },
-                        onFailure = {
-                            _contentState.update { it.copy(sharedPosts = emptyList()) }
-                        }
-                    )
+                    refreshSavedPosts()
                 } else {
                     _contentState.update { it.copy(sharedPosts = emptyList()) }
                 }

@@ -38,4 +38,24 @@ object SingletonModule {
     fun provideStorageLocationRepository(@ApplicationContext context: Context): StorageLocationRepository {
         return StorageLocationRepository(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideUserProfileDao(db: AppDatabase) = db.userProfileDao()
+
+    @Provides
+    @Singleton
+    fun providePostDao(db: AppDatabase) = db.postDao()
+
+    @Provides
+    @Singleton
+    fun providePostRemoteKeysDao(db: AppDatabase) = db.postRemoteKeysDao()
+
+    @Provides
+    @Singleton
+    fun provideNotificationDao(db: AppDatabase) = db.notificationDao()
+
+    @Provides
+    @Singleton
+    fun provideNotificationRemoteKeysDao(db: AppDatabase) = db.notificationRemoteKeysDao()
 }

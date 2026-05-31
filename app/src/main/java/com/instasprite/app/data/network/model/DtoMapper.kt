@@ -1,6 +1,10 @@
 package com.instasprite.app.data.network.model
 
 import androidx.core.graphics.toColorInt
+import com.instasprite.app.data.model.NotificationEntity
+import com.instasprite.app.data.model.PostEntity
+import com.instasprite.app.data.model.UserEntity
+import com.instasprite.app.data.model.UserProfileEntity
 import com.instasprite.app.domain.model.CommentData
 import com.instasprite.app.domain.model.GroupedNotificationData
 import com.instasprite.app.domain.model.Jwt
@@ -199,3 +203,139 @@ fun GroupedNotificationDto.toDomain(): GroupedNotificationData {
     )
 }
 
+
+fun PostDto.toPostEntity(fallbackAuthorId: Long = 0L): PostEntity {
+    return PostEntity(
+        postId = postId,
+        authorId = member?.id ?: fallbackAuthorId,
+        postContent = postContent,
+        postUploadDate = postUploadDate,
+        postCommentsCount = postCommentsCount,
+        postLikesCount = postLikesCount,
+        postBookmarkFlag = postBookmarkFlag,
+        postLikeFlag = postLikeFlag,
+        commentOptionFlag = commentOptionFlag,
+        likeOptionFlag = likeOptionFlag,
+        isFollowing = following ?: isFollowing,
+        followingMemberUsernameLikedPost = followingMemberUsernameLikedPost,
+        mentionsOfContent = mentionsOfContent,
+        hashtags = hashtags,
+        postImages = postImages ?: postImage?.let { listOf(it) },
+        recentComments = recentComments
+    )
+}
+
+fun MemberDto.toUserEntity(): UserEntity {
+    return UserEntity(
+        memberId = id,
+        username = username,
+        name = name,
+        avatarUrl = image?.imageUrl
+    )
+}
+
+fun com.instasprite.app.data.model.PostWithAuthor.toDomain(): PostData {
+    val authorData = author?.let {
+        MemberData(
+            memberId = it.memberId,
+            memberUsername = it.username,
+            memberName = it.name,
+            memberImage = if (it.avatarUrl.isNullOrEmpty()) null else com.instasprite.app.domain.model.MemberImageData(
+                imageUrl = if (it.avatarUrl.startsWith("http")) it.avatarUrl 
+                           else "${com.instasprite.app.utils.Constants.IMG_URL}/${it.avatarUrl}"
+            )
+        )
+    } ?: MemberData(0, "Unknown", "Unknown", null)
+
+    return PostData(
+        postId = post.postId,
+        postContent = post.postContent ?: "",
+        mentionsOfContent = post.mentionsOfContent ?: emptyList(),
+        hashtags = post.hashtags ?: emptyList(),
+        postImages = post.postImages?.map { it.toDomain() } ?: emptyList(),
+        postUploadDate = parseDateTime(post.postUploadDate),
+        member = authorData,
+        postCommentsCount = post.postCommentsCount,
+        postLikesCount = post.postLikesCount,
+        postBookmarkFlag = post.postBookmarkFlag,
+        postLikeFlag = post.postLikeFlag,
+        commentOptionFlag = post.commentOptionFlag,
+        isFollowing = post.isFollowing ?: false,
+        followingMemberUsernameLikedPost = post.followingMemberUsernameLikedPost ?: "",
+        recentComments = post.recentComments?.map { it.toDomain() } ?: emptyList()
+    )
+}
+
+fun NotificationEntity.toDomain(): GroupedNotificationData {
+    return GroupedNotificationData(
+        id = id,
+        groupKey = groupKey,
+        type = NotificationType.fromString(type),
+        relatedEntityId = relatedEntityId,
+        actorCount = actorCount,
+        isRead = isRead,
+        updatedAt = parseDateTime(updatedAt),
+        recentActors = recentActors.map { actor ->
+            val fullImageUrl = if (actor.avatarUrl?.startsWith("http") == true) {
+                actor.avatarUrl
+            } else if (!actor.avatarUrl.isNullOrEmpty()) {
+                "${Constants.IMG_URL}/${actor.avatarUrl}"
+            } else {
+                null
+            }
+            GroupedNotificationData.ActorSummary(
+                name = actor.name,
+                username = actor.username,
+                avatarUrl = fullImageUrl
+            )
+        },
+        title = title,
+        body = body
+    )
+}
+
+fun UserProfileDto.toEntity(): UserProfileEntity {
+    return UserProfileEntity(
+        memberId = memberId,
+        memberUsername = memberUsername,
+        memberName = memberName,
+        memberImage = memberImage,
+        memberImageUrl = memberImageUrl,
+        memberIntroduce = memberIntroduce,
+        memberPostsCount = memberPostsCount,
+        memberFollowingsCount = memberFollowingsCount,
+        memberFollowersCount = memberFollowersCount,
+        followingMemberFollow = followingMemberFollow,
+        followingMemberFollowCount = followingMemberFollowCount,
+        blocking = blocking,
+        following = following,
+        me = me,
+        follower = follower,
+        blocked = blocked,
+        verifiedEmail = verifiedEmail,
+        hasPassword = hasPassword
+    )
+}
+
+fun UserProfileEntity.toDto(): UserProfileDto {
+    return UserProfileDto(
+        memberId = memberId,
+        memberUsername = memberUsername,
+        memberName = memberName,
+        memberImage = memberImage,
+        memberImageUrl = memberImageUrl,
+        memberIntroduce = memberIntroduce,
+        memberPostsCount = memberPostsCount,
+        memberFollowingsCount = memberFollowingsCount,
+        memberFollowersCount = memberFollowersCount,
+        followingMemberFollow = followingMemberFollow,
+        followingMemberFollowCount = followingMemberFollowCount,
+        blocking = blocking,
+        following = following,
+        me = me,
+        follower = follower,
+        blocked = blocked,
+        verifiedEmail = verifiedEmail,
+        hasPassword = hasPassword
+    )
+}
