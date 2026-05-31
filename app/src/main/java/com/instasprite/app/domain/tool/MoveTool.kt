@@ -2,6 +2,7 @@ package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
 import com.instasprite.app.R
+import com.instasprite.app.domain.draw.StrokeEngine
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 object MoveTool : StrokeTool {
@@ -35,21 +36,30 @@ object MoveTool : StrokeTool {
             existing.startRow = row
             existing.accumulatedOffsetX = existing.offsetX
             existing.accumulatedOffsetY = existing.offsetY
+            
+            StrokeEngine.activeMoveCompositor?.composite(existing.offsetX, existing.offsetY)
+
             return StrokeUpdate(
                 isFullPreview = true,
-                overlayPixels = existing.computeShiftedPixels()
+                overlayPixels = IntArray(0),
+                mainLayerPixels = existing.computeClearedPixels(),
+                updatedSelectionMask = existing.computeShiftedMask()
             )
         }
         val w = canvas.getCanvasWidth()
         val h = canvas.getCanvasHeight()
-        val pixels = canvas.getActiveLayerPixelsDirect()!!.copyOf()
+        val pixels = canvas.getActiveLayerPixelsDirect() ?: return StrokeUpdate()
         val mask = canvas.getSelectionMask()
-        val s = MoveSession(pixels, mask, w, h, startCol = col, startRow = row)
+        val s = MoveSession(pixels.copyOf(), mask, w, h, startCol = col, startRow = row)
         session = s
+
+        StrokeEngine.activeMoveCompositor?.composite(0, 0)
+
         return StrokeUpdate(
             isFullPreview = true,
-            overlayPixels = s.computeShiftedPixels(),
-            mainLayerPixels = s.computeClearedPixels()
+            overlayPixels = IntArray(0),
+            mainLayerPixels = s.computeClearedPixels(),
+            updatedSelectionMask = s.computeShiftedMask()
         )
     }
 
@@ -63,9 +73,13 @@ object MoveTool : StrokeTool {
         val s = session ?: return StrokeUpdate()
         s.offsetX = s.accumulatedOffsetX + (col - s.startCol)
         s.offsetY = s.accumulatedOffsetY + (row - s.startRow)
+
+        StrokeEngine.activeMoveCompositor?.composite(s.offsetX, s.offsetY)
+
         return StrokeUpdate(
             isFullPreview = true,
-            overlayPixels = s.computeShiftedPixels(),
+            overlayPixels = IntArray(0),
+            mainLayerPixels = s.computeClearedPixels(),
             updatedSelectionMask = s.computeShiftedMask()
         )
     }
