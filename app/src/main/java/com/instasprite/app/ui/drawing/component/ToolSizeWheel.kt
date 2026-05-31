@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -40,10 +41,17 @@ fun ToolSizeWheelPopup(
 ) {
     val visibleItems = 5
     val wheelHeight = itemHeight * visibleItems
+    val listState = rememberLazyListState()
+    val range = 1..10
 
     Popup(
         alignment = Alignment.Center,
-        onDismissRequest = onDismiss
+        onDismissRequest = {
+            val index = listState.firstVisibleItemIndex
+                .coerceIn(0, range.count() - 1)
+            onValueChange(range.first + index)
+            onDismiss()
+        }
     ) {
         Surface(
             modifier = Modifier
@@ -57,6 +65,7 @@ fun ToolSizeWheelPopup(
                 toolSizeValue = toolSize,
                 onValueChange = onValueChange,
                 itemHeight = itemHeight,
+                listState = listState,
                 modifier = Modifier.fillMaxSize(),
                 onItemClick = {
                     onValueChange(it)
@@ -73,6 +82,7 @@ fun ToolSizeWheelPicker(
     onValueChange: (Int) -> Unit,
     itemHeight: Dp,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
     onItemClick: (value: Int) -> Unit = {}
 ) {
     val range = 1..10
@@ -80,7 +90,6 @@ fun ToolSizeWheelPicker(
     val visibleItems = 5
     val wheelHeight = itemHeight * visibleItems
 
-    val listState = rememberLazyListState()
     val fling = rememberSnapFlingBehavior(listState)
 
     LaunchedEffect(Unit) {
