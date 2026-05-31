@@ -32,7 +32,7 @@ data class UserProfileDto(
     val memberFollowersCount: Int,
     
     @SerializedName("followingMemberFollow")
-    val followingMemberFollow: List<FollowingMemberFollowItemDto> = emptyList(),
+    val followingMemberFollow: List<FollowingMemberFollowItemDto>? = emptyList(),
     
     @SerializedName("followingMemberFollowCount")
     val followingMemberFollowCount: Int = 0,

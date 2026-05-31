@@ -3,6 +3,7 @@ package com.instasprite.app.domain.session
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
 import com.instasprite.app.data.network.SessionTokenStore
+import com.instasprite.app.data.network.model.UserProfileDto
 import com.instasprite.app.data.repository.AccountRepository
 import com.instasprite.app.data.repository.NotificationRepository
 import com.instasprite.app.data.repository.ProfileRepository
@@ -43,15 +44,19 @@ class SocialSessionManager @Inject constructor(
 
     fun refreshFromStorage() {
         val isLoggedIn = tokenStore.isLoggedIn()
+        val username = tokenStore.getUsername().orEmpty()
         _sessionState.value = if (isLoggedIn) {
-            SocialSessionState.LoggedIn(tokenStore.getUsername().orEmpty())
+            SocialSessionState.LoggedIn(username)
         } else {
             SocialSessionState.LoggedOut
         }
         if (isLoggedIn) {
             scope.launch {
                 try {
-                    profileRepository.get().getCachedCurrentUserProfile()
+                    val cachedProfile = profileRepository.get().getCachedCurrentUserProfile()
+                    if (cachedProfile != null) {
+                        _currentUser.value = cachedProfile.toCurrentUserState()
+                    }
                 } catch (e: Exception) {
                     Log.e("SocialSessionManager", "Failed to cache current user at boot", e)
                 }
@@ -60,18 +65,34 @@ class SocialSessionManager @Inject constructor(
         }
     }
 
-    fun onLoginSuccess(jwt: Jwt) {
+    suspend fun onLoginSuccess(jwt: Jwt) {
+        val username = jwt.username.orEmpty()
         tokenStore.saveTokens(
             accessToken = jwt.accessToken,
             refreshToken = jwt.refreshToken,
             tokenType = jwt.type,
-            username = jwt.username
+            username = username
         )
-        _sessionState.value = SocialSessionState.LoggedIn(jwt.username.orEmpty())
-        refreshCurrentUser()
+        _sessionState.value = SocialSessionState.LoggedIn(username)
+        
+        // Fetch and cache the real profile data immediately on login success
+        profileRepository.get().getCurrentUserProfile().onSuccess { response ->
+            val state = response.toCurrentUserState()
+            _currentUser.value = state
+
+            accountRepository.updateAccount(response.memberUsername) { currentAccount ->
+                currentAccount.copy(
+                    name = response.memberName,
+                    avatarUrl = state.avatarUrl,
+                    isVerified = response.verifiedEmail
+                )
+            }
+        }.onFailure {
+            Log.e("SocialSessionManager", "Failed to fetch profile on login", it)
+        }
     }
 
-    fun onTokensRefreshed(
+    suspend fun onTokensRefreshed(
         accessToken: String,
         refreshToken: String,
         tokenType: String = "Bearer",
@@ -123,35 +144,39 @@ class SocialSessionManager @Inject constructor(
         if (!isLoggedIn()) return
         scope.launch {
             profileRepository.get().getCurrentUserProfile().onSuccess { response ->
-                val rawUrl = response.memberImage?.imageUrl ?: response.memberImageUrl
-                val resolvedUrl = when {
-                    rawUrl.isNullOrEmpty() -> null
-                    rawUrl.startsWith("http") -> "$rawUrl?ts=${System.currentTimeMillis()}"
-                    else -> "${Constants.IMG_URL}/$rawUrl?ts=${System.currentTimeMillis()}"
-                }
-
-                _currentUser.value = CurrentUserState(
-                    memberId = response.memberId,
-                    username = response.memberUsername,
-                    displayName = response.memberName,
-                    bio = response.memberIntroduce ?: "",
-                    avatarUrl = resolvedUrl,
-                    isVerified = response.verifiedEmail,
-                    postsCount = response.memberPostsCount,
-                    followersCount = response.memberFollowersCount,
-                    followingCount = response.followingMemberFollowCount,
-                    hasPassword = response.hasPassword
-                )
+                val state = response.toCurrentUserState()
+                _currentUser.value = state
 
                 // Sync with DataStore for Account Switcher
                 accountRepository.updateAccount(response.memberUsername) { currentAccount ->
                     currentAccount.copy(
                         name = response.memberName,
-                        avatarUrl = resolvedUrl,
+                        avatarUrl = state.avatarUrl,
                         isVerified = response.verifiedEmail
                     )
                 }
             }
         }
     }
+}
+
+private fun UserProfileDto.toCurrentUserState(): CurrentUserState {
+    val rawUrl = memberImage?.imageUrl ?: memberImageUrl
+    val resolvedUrl = when {
+        rawUrl.isNullOrEmpty() -> null
+        rawUrl.startsWith("http") -> "$rawUrl?ts=${System.currentTimeMillis()}"
+        else -> "${Constants.IMG_URL}/$rawUrl?ts=${System.currentTimeMillis()}"
+    }
+    return CurrentUserState(
+        memberId = memberId,
+        username = memberUsername,
+        displayName = memberName,
+        bio = memberIntroduce ?: "",
+        avatarUrl = resolvedUrl,
+        isVerified = verifiedEmail,
+        postsCount = memberPostsCount,
+        followersCount = memberFollowersCount,
+        followingCount = followingMemberFollowCount,
+        hasPassword = hasPassword
+    )
 }

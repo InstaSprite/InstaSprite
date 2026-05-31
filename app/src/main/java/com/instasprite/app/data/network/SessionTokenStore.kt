@@ -1,7 +1,7 @@
 package com.instasprite.app.data.network
 
 interface SessionTokenStore {
-    fun saveTokens(
+    suspend fun saveTokens(
         accessToken: String,
         refreshToken: String,
         tokenType: String = "Bearer",

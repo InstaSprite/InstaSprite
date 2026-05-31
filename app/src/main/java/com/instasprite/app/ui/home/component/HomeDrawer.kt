@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.home.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -25,20 +21,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.domain.session.CurrentUserState
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun HomeDrawer(
     isLoggedIn: Boolean,
     currentUser: CurrentUserState?,
-    username: String?,
     onHomeClick: () -> Unit,
     onProfileClick: () -> Unit,
     onLoginClick: () -> Unit,
@@ -58,8 +52,8 @@ fun HomeDrawer(
         selectedTextColor = AppTheme.colors.TextColorLight,
     )
 
-    val memberName = currentUser?.displayName?.takeIf { it.isNotBlank() } ?: username?.takeIf { it.isNotBlank() } ?: stringResource(R.string.app_name)
-    val memberUsername = currentUser?.username?.takeIf { it.isNotBlank() } ?: username.orEmpty()
+    val memberName = currentUser?.displayName?.takeIf { it.isNotBlank() }  ?: stringResource(R.string.app_name)
+    val memberUsername = currentUser?.username?.takeIf { it.isNotBlank() } ?: ""
 
     ModalDrawerSheet(
         drawerContainerColor = AppTheme.colors.TopBarColor,

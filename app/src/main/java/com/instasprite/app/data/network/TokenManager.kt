@@ -38,28 +38,20 @@ class TokenManager @Inject constructor(
         return current
     }
 
-    override fun saveTokens(
+    override suspend fun saveTokens(
         accessToken: String,
         refreshToken: String,
         tokenType: String,
         username: String?
     ) {
         val finalUsername = if (!username.isNullOrEmpty()) username else getUsername()
-        cachedTokens = TokenPreferences(
-            keyAccessToken = accessToken,
-            keyRefreshToken = refreshToken,
-            keyTokenType = tokenType,
-            keyUsername = finalUsername
-        )
-        scope.launch {
-            dataStore.updateData {
-                it.copy(
-                    keyAccessToken = accessToken,
-                    keyRefreshToken = refreshToken,
-                    keyTokenType = tokenType,
-                    keyUsername = finalUsername
-                )
-            }
+        cachedTokens = dataStore.updateData {
+            it.copy(
+                keyAccessToken = accessToken,
+                keyRefreshToken = refreshToken,
+                keyTokenType = tokenType,
+                keyUsername = finalUsername
+            )
         }
     }
 

@@ -57,12 +57,14 @@ class AuthInterceptor @Inject constructor(
                     if (refreshResponse != null) {
                         response.close()
 
-                        sessionManager.onTokensRefreshed(
-                            accessToken = refreshResponse.accessToken,
-                            refreshToken = refreshResponse.refreshToken,
-                            tokenType = refreshResponse.type,
-                            username = refreshResponse.username
-                        )
+                        runBlocking {
+                            sessionManager.onTokensRefreshed(
+                                accessToken = refreshResponse.accessToken,
+                                refreshToken = refreshResponse.refreshToken,
+                                tokenType = refreshResponse.type,
+                                username = refreshResponse.username
+                            )
+                        }
 
                         // Retry the original request with new token
                         val newAuthHeader = tokenUtils.getAuthorizationHeader()

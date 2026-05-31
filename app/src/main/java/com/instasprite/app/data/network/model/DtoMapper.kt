@@ -305,7 +305,7 @@ fun UserProfileDto.toEntity(): UserProfileEntity {
         memberPostsCount = memberPostsCount,
         memberFollowingsCount = memberFollowingsCount,
         memberFollowersCount = memberFollowersCount,
-        followingMemberFollow = followingMemberFollow,
+        followingMemberFollow = followingMemberFollow ?: emptyList(),
         followingMemberFollowCount = followingMemberFollowCount,
         blocking = blocking,
         following = following,

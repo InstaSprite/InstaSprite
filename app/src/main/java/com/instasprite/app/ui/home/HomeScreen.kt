@@ -110,9 +110,7 @@ fun HomeScreen(
     val feedListState = rememberLazyListState()
     val isLoggedIn = sessionState is SocialSessionState.LoggedIn
     val isOnline by feedViewModel.isOnline.collectAsState()
-    val currentUser = feedState.currentUser
-    val currentUsername = currentUser?.username
-        ?: (sessionState as? SocialSessionState.LoggedIn)?.username
+    val currentUser by sessionViewModel.currentUser.collectAsState()
 
     LaunchedEffect(galleryViewModel.lastEditedSpriteId) {
         val editedId = galleryViewModel.lastEditedSpriteId ?: return@LaunchedEffect
@@ -206,18 +204,17 @@ fun HomeScreen(
         drawerContent = {
             key(
                 isLoggedIn,
-                feedState.currentUser?.avatarUrl,
-                feedState.currentUser?.displayName,
-                currentUsername
+                currentUser?.avatarUrl,
+                currentUser?.displayName,
+                currentUser?.username
             ) {
                 HomeDrawer(
                     isLoggedIn = isLoggedIn,
-                    currentUser = feedState.currentUser,
-                    username = currentUsername,
+                    currentUser = currentUser,
                     onHomeClick = { launchDrawerAction() },
                     onProfileClick = {
                         launchDrawerAction {
-                            currentUsername?.let(onOpenProfile) ?: onLoginClick()
+                            currentUser?.username?.let(onOpenProfile) ?: onLoginClick()
                         }
                     },
                     onLoginClick = { launchDrawerAction(onLoginClick) },

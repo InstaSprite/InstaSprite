@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.instasprite.app.domain.session.SocialSessionManager
 import com.instasprite.app.domain.session.SocialSessionState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.instasprite.app.domain.session.CurrentUserState
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -13,6 +14,7 @@ class SocialSessionViewModel @Inject constructor(
 ) : ViewModel() {
 
     val sessionState: StateFlow<SocialSessionState> = sessionManager.sessionState
+    val currentUser: StateFlow<CurrentUserState?> = sessionManager.currentUser
 
     fun logout() {
         sessionManager.logout()
