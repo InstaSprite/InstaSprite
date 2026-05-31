@@ -44,7 +44,11 @@ fun JumpToTopButton(
     Button(
         onClick = {
             coroutineScope.launch {
-                listState.animateScrollToItem(0)
+                if (listState.firstVisibleItemIndex > 10) {
+                    listState.scrollToItem(0)
+                } else {
+                    listState.animateScrollToItem(0)
+                }
             }
         },
         colors = ButtonDefaults.buttonColors(
