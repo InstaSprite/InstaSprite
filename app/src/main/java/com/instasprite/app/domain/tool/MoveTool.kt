@@ -18,8 +18,6 @@ object MoveTool : StrokeTool {
         session = null
     }
 
-    fun getShiftedPixels(): IntArray? = session?.computeShiftedPixels()
-
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {}
 
     override fun beginStroke(
@@ -39,8 +37,7 @@ object MoveTool : StrokeTool {
             existing.accumulatedOffsetY = existing.offsetY
             return StrokeUpdate(
                 isFullPreview = true,
-                overlayPixels = IntArray(0),
-                mainLayerPixels = existing.computeClearedPixels()
+                overlayPixels = existing.computeShiftedPixels()
             )
         }
         val w = canvas.getCanvasWidth()
@@ -51,7 +48,7 @@ object MoveTool : StrokeTool {
         session = s
         return StrokeUpdate(
             isFullPreview = true,
-            overlayPixels = IntArray(0),
+            overlayPixels = s.computeShiftedPixels(),
             mainLayerPixels = s.computeClearedPixels()
         )
     }
@@ -68,8 +65,7 @@ object MoveTool : StrokeTool {
         s.offsetY = s.accumulatedOffsetY + (row - s.startRow)
         return StrokeUpdate(
             isFullPreview = true,
-            overlayPixels = IntArray(0),
-            mainLayerPixels = s.computeClearedPixels(),
+            overlayPixels = s.computeShiftedPixels(),
             updatedSelectionMask = s.computeShiftedMask()
         )
     }
