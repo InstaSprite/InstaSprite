@@ -153,7 +153,8 @@ private fun FollowerItem(
             ) {
                 Text(
                     text = stringResource(R.string.follow_user),
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = AppTheme.colors.TextColorDark
                 )
             }
         }

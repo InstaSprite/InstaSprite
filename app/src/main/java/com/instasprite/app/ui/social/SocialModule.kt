@@ -89,7 +89,8 @@ object SocialModule {
                 onPostClick = { postId -> navigator.goTo(Screen.Comments(postId)) },
                 onMenuClick = {},
                 onLoginClick = { navigator.goTo(Screen.Auth) },
-                onNavigateToEditProfile = { navigator.goTo(Screen.EditProfile) }
+                onNavigateToEditProfile = { navigator.goTo(Screen.EditProfile) },
+                onOtherProfileClick = { userId -> navigator.goTo(Screen.Profile(userId)) }
             )
         }
     }

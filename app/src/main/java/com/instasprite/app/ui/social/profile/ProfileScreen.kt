@@ -124,7 +124,11 @@ fun ProfileScreen(
                 onDismissFollowers = { viewModel.hideFollowersDialog() },
                 onDismissFollowing = { viewModel.hideFollowingDialog() },
                 onConsumeLoginRequiredError = { viewModel.consumeLoginRequiredError() },
-                onOtherProfileClick = onOtherProfileClick,
+                onOtherProfileClick = { userId ->
+                    onOtherProfileClick(userId)
+                    viewModel.hideFollowersDialog()
+                    viewModel.hideFollowingDialog()
+                },
                 onNavigateToEditProfile = onNavigateToEditProfile
             ),
             isLoggedIn = isLoggedIn
