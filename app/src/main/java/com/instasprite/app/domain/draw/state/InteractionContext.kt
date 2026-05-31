@@ -25,4 +25,5 @@ interface InteractionContext {
     val zoomScale: Float
 
     fun transitionTo(newState: CanvasInteractionState)
+    fun refreshLayerState()
 }

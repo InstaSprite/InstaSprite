@@ -20,6 +20,6 @@ object StandbyState : CanvasInteractionState {
     override fun onTouchEnd(ctx: InteractionContext) {}
     override fun onTouchCancel(ctx: InteractionContext) {}
     override fun onTap(row: Int, col: Int, ctx: InteractionContext) {}
-    override fun commitPending(ctx: InteractionContext) {}
-    override fun cancelPending(ctx: InteractionContext) {}
+    override fun commitPending(ctx: InteractionContext): Boolean = false
+    override fun cancelPending(ctx: InteractionContext): Boolean = false
 }

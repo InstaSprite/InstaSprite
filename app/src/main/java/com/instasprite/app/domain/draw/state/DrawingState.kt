@@ -43,6 +43,7 @@ object DrawingState : CanvasInteractionState {
 
         if (result.shouldUpdateHistory) {
             ctx.historyManager.updateHistoryCurrentState()
+            ctx.refreshLayerState()
         }
 
         ctx.transitionTo(StandbyState)
@@ -60,6 +61,6 @@ object DrawingState : CanvasInteractionState {
     }
 
     override fun onTap(row: Int, col: Int, ctx: InteractionContext) {}
-    override fun commitPending(ctx: InteractionContext) {}
-    override fun cancelPending(ctx: InteractionContext) {}
+    override fun commitPending(ctx: InteractionContext): Boolean = false
+    override fun cancelPending(ctx: InteractionContext): Boolean = false
 }
