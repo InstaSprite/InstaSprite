@@ -2,7 +2,7 @@ package com.instasprite.app.ui.social.feed.contract
 
 import androidx.paging.PagingData
 import com.instasprite.app.domain.model.PostData
-import com.instasprite.app.ui.gallery.contract.BottomBarEvent
+
 import com.instasprite.app.ui.social.feed.FeedUiState
 import com.instasprite.app.ui.social.feed.VerifyEmailState
 import com.instasprite.app.domain.session.CurrentUserState
@@ -27,7 +27,6 @@ data class FeedContentState(
 
 data class FeedScreenEvent(
     val onLoginClick: () -> Unit,
-    val onBottomBarEvent: (BottomBarEvent) -> Unit,
     val onOpenComments: (commentId: Long) -> Unit,
     val onOpenProfile: (profileId: String) -> Unit,
     val onToggleLike: (postId: Long, isLike: Boolean) -> Unit,

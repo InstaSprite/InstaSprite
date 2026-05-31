@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.components.shape
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -19,20 +17,21 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
-import com.instasprite.app.utils.Constants.PIXEL_DP
+import com.instasprite.app.utils.pixelDp
 
 class PixelShape(
-    private val steps: Int = 1
+    private val steps: Int = 1,
+    private val pixelSize: Dp = 3.dp
 ) : CornerBasedShape(
-    topStart = CornerSize((PIXEL_DP * 2).dp),
-    topEnd = CornerSize((PIXEL_DP * 2).dp),
-    bottomEnd = CornerSize((PIXEL_DP * 2).dp),
-    bottomStart = CornerSize((PIXEL_DP * 2).dp)
+    topStart = CornerSize(pixelSize),
+    topEnd = CornerSize(pixelSize),
+    bottomEnd = CornerSize(pixelSize),
+    bottomStart = CornerSize(pixelSize)
 ) {
     override fun createOutline(
         size: Size,
