@@ -59,6 +59,7 @@ object MovingPixelsState : CanvasInteractionState {
         val cancelled = ctx.strokeEngine.cancelPendingTool(tool)
         if (cancelled) {
             ctx.historyManager.discardHistoryCapture()
+            ctx.refreshLayerState()
         }
         ctx.transitionTo(StandbyState)
         return cancelled

@@ -101,6 +101,7 @@ class HistoryDelegate(
         val entry = tracker.buildUndoEntry(sel?.deepCopy())
         val restored = canvasHistoryManager.restore(entry, captureHistoryCanvasState())
         applyHistoryCanvasState(restored)
+        refreshLayerState()
         discardHistoryCapture()
     }
 
