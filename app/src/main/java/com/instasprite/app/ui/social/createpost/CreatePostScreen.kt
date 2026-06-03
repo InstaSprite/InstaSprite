@@ -119,14 +119,18 @@ private fun CreatePostScreenContent(
                 actions = {
                     Button(
                         onClick = event.onCreatePost,
+                        modifier = Modifier.padding(
+                            end = 8.pixelDp
+                        ),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AppTheme.colors.SelectedColor,
-                            contentColor = AppTheme.colors.TextColorLight
+                            containerColor = AppTheme.colors.AccentButtonColor
                         ),
                         shape = MaterialTheme.shapes.small,
-                        enabled = uiState.caption.isNotBlank() && uiState.selectedImage != null && !uiState.isPostInProgress,
                     ) {
-                        Text(stringResource(R.string.post), color = AppTheme.colors.TextColorDark)
+                        Text(
+                            stringResource(R.string.post),
+                            color = AppTheme.colors.TextColorDark
+                        )
                     }
                 }
             )
