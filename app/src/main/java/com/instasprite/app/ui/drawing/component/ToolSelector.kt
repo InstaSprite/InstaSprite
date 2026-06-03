@@ -154,6 +154,14 @@ fun ToolSelector(
                         menuListVisible = false
                     }
                 )
+
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(R.string.settings)) },
+                    onClick = {
+                        onToolSelectorEvent(ToolSelectorEvent.OpenDrawingSettingsDialog)
+                        menuListVisible = false
+                    }
+                )
             }
         }
     }

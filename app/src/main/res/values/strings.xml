@@ -501,4 +501,6 @@
     <string name="tool_rectangle_selection">Rectangle Selection</string>
     <string name="tool_rectangle_selection_desc">Select a rectangular area</string>
     <string name="shape_square">Square</string>
+    <string name="drawing_settings">Drawing Settings</string>
+    <string name="canvas_preview">Canvas Preview</string>
 </resources>

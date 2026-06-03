@@ -392,6 +392,7 @@ private fun DrawingScreenContent(
                     selectionBitmap = selectionBitmap,
                     selectedTool = uiState.selectedTool,
                     isSelectionAppendMode = uiState.isAppendSelectionMode,
+                    isShowPreview = uiState.showCanvasPreview,
                     scale = scale,
                     offset = offset,
                     isCursorMode = uiState.isCursorMode,

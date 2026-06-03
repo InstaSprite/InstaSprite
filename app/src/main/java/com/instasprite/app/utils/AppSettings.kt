@@ -70,6 +70,10 @@ object AppSettings {
         persist(context) { it.copy(drawSetting = it.drawSetting.copy(isCursorMode = isCursorMode)) }
     }
 
+    fun setShowCanvasPreview(context: Context, showCanvasPreview: Boolean) {
+        persist(context) { it.copy(drawSetting = it.drawSetting.copy(showCanvasPreview = showCanvasPreview)) }
+    }
+
     fun getDefaultPaletteId(context: Context): Int {
         return getPersistedSettings(context).defaultPaletteId
     }

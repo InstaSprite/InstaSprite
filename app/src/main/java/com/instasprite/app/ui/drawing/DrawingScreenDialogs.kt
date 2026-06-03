@@ -5,7 +5,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import com.instasprite.app.domain.dialog.Dialog
+import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
 import com.instasprite.app.ui.drawing.dialog.ColorWheelDialog
+import com.instasprite.app.ui.drawing.dialog.DrawingSettingsDialog
 import com.instasprite.app.ui.drawing.dialog.LoadISpriteDialog
 import com.instasprite.app.ui.drawing.dialog.ResizeCanvasDialog
 import com.instasprite.app.ui.drawing.dialog.SaveISpriteDialog
@@ -18,6 +20,7 @@ sealed interface DrawingDialog : Dialog {
     data object LoadISprite : DrawingDialog
     data object ResizeCanvas : DrawingDialog
     data object ColorWheel : DrawingDialog
+    data object DrawingSettings : DrawingDialog
 }
 
 @Composable
@@ -83,6 +86,19 @@ fun DrawingScreenDialogs(
                     onOpenPaletteScreen = {
                         viewModel.onOpenPalette()
                     }
+                )
+
+            DrawingDialog.DrawingSettings ->
+                DrawingSettingsDialog(
+                    isCursorMode = uiState.isCursorMode,
+                    showCanvasPreview = uiState.showCanvasPreview,
+                    onCursorModeChange = { 
+                        viewModel.onCursorDrawEvent(CursorDrawEvent.ToggleCursorMode(-1f, -1f))
+                    },
+                    onShowCanvasPreviewChange = {
+                        viewModel.toggleCanvasPreview()
+                    },
+                    onDismiss = viewModel::closeTopDialog
                 )
         }
     }

@@ -19,7 +19,8 @@ data class SettingPreferences(
 
 @Serializable
 data class DrawSetting(
-    val isCursorMode: Boolean = false
+    val isCursorMode: Boolean = false,
+    val showCanvasPreview: Boolean = true
 )
 
 @Serializable

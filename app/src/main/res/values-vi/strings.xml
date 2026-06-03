@@ -501,4 +501,6 @@
     <string name="tool_rectangle_selection">Chọn hình chữ nhật</string>
     <string name="tool_rectangle_selection_desc">Chọn một khu vực hình chữ nhật</string>
     <string name="shape_square">Hình vuông</string>
+    <string name="drawing_settings">Cài đặt vẽ</string>
+    <string name="canvas_preview">Xem trước Canvas</string>
 </resources>

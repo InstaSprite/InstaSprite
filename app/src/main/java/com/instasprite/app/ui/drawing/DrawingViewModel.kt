@@ -57,6 +57,7 @@ data class DrawingScreenState(
     val showLayerDrawer: Boolean = false,
     val isAppendSelectionMode: Boolean = false,
     val isCursorMode: Boolean = false,
+    val showCanvasPreview: Boolean = true,
     val cursorState: CursorState = CursorState()
 )
 
@@ -204,6 +205,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     private fun applyDrawSetting(drawSetting: DrawSetting) {
+        _uiState.value = _uiState.value.copy(showCanvasPreview = drawSetting.showCanvasPreview)
         if (drawSetting.isCursorMode) {
             toggleCursorMode(-1f, -1f)
         }
@@ -337,6 +339,7 @@ class DrawingViewModel @AssistedInject constructor(
                 is ToolSelectorEvent.OpenSaveImageDialog -> openDialog(DrawingDialog.SaveImage)
                 is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
                 is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
+                is ToolSelectorEvent.OpenDrawingSettingsDialog -> openDialog(DrawingDialog.DrawingSettings)
                 is ToolSelectorEvent.SelectTool -> selectTool(tool = event.tool)
                 is ToolSelectorEvent.ToggleAppendSelectionMode -> {
                     _uiState.value = _uiState.value.copy(
@@ -386,6 +389,12 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun toggleLayerDrawer() {
         _uiState.value = _uiState.value.copy(showLayerDrawer = !_uiState.value.showLayerDrawer)
+    }
+
+    fun toggleCanvasPreview() {
+        val newState = !_uiState.value.showCanvasPreview
+        _uiState.value = _uiState.value.copy(showCanvasPreview = newState)
+        AppSettings.setShowCanvasPreview(applicationContext, newState)
     }
 
     fun onCursorDrawEvent(event: CursorDrawEvent) {

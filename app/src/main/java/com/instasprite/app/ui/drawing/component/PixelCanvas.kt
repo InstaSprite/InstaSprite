@@ -56,6 +56,7 @@ fun PixelCanvas(
     selectionBitmap: Bitmap?,
     selectedTool: Tool?,
     isSelectionAppendMode: Boolean,
+    isShowPreview: Boolean,
     scale: Float,
     offset: Offset,
     isCursorMode: Boolean = false,
@@ -224,13 +225,15 @@ fun PixelCanvas(
             }
         }
 
-        CanvasPreview(
-            imageBitmap = imageBitmap,
-            overlayImageBitmap = if (selectedTool is SelectionTool || selectedTool is MoveTool) overlayImageBitmap else null,
-            canvasWidth = canvasWidth,
-            canvasHeight = canvasHeight,
-            modifier = Modifier.fillMaxSize()
-        )
+        if (isShowPreview) {
+            CanvasPreview(
+                imageBitmap = imageBitmap,
+                overlayImageBitmap = if (selectedTool is SelectionTool || selectedTool is MoveTool) overlayImageBitmap else null,
+                canvasWidth = canvasWidth,
+                canvasHeight = canvasHeight,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
@@ -252,7 +255,8 @@ private fun Preview() {
             overlayBitmap = null,
             selectionBitmap = null,
             onEvent = {},
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            isShowPreview = true,
         )
     }
 }
@@ -279,7 +283,8 @@ private fun PreviewCursorMode() {
             overlayBitmap = null,
             selectionBitmap = null,
             onEvent = {},
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            isShowPreview = true,
         )
     }
 }
