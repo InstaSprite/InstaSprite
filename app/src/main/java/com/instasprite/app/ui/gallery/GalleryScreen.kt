@@ -45,7 +45,7 @@ import com.instasprite.app.ui.components.composable.JumpToTopButton
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
 import com.instasprite.app.ui.gallery.component.SpriteList
-import com.instasprite.app.ui.gallery.contract.BottomBarEvent
+
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
@@ -59,7 +59,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 data class GalleryScreenEvent(
-    val onBottomBarEvent: (BottomBarEvent) -> Unit,
     val onImagePagerEvent: (ImagePagerEvent) -> Unit,
     val onSearchBarEvent: (SearchBarContract) -> Unit,
     val onSpriteListEvent: (SpriteListEvent) -> Unit,
@@ -140,7 +139,6 @@ fun GalleryScreen(
         viewModel.onOpenDrawing = onNavigateToDrawing
 
         GalleryScreenEvent(
-            onBottomBarEvent = viewModel::onBottomBarEvent,
             onImagePagerEvent = viewModel::onImagePagerEvent,
             onSearchBarEvent = viewModel::onSearchBarEvent,
             onSpriteListEvent = viewModel::onSpriteListEvent,
@@ -242,10 +240,10 @@ private fun GalleryScreenContent(
                 }
             },
             bottomBar = {
-                HomeBottomBar(
-                    onBottomBarEvent = event.onBottomBarEvent,
-                    modifier = Modifier.height(38.pixelDp)
-                )
+//                HomeBottomBar(
+//                    onBottomBarEvent = event.onBottomBarEvent,
+//                    modifier = Modifier.height(38.pixelDp)
+//                )
             },
         ) { innerPadding ->
             Box(
@@ -307,7 +305,6 @@ private fun GalleryScreenPreview() {
             spriteList = DummyData.previewSprites,
             searchQuery = "",
             event = GalleryScreenEvent(
-                onBottomBarEvent = {},
                 onImagePagerEvent = {},
                 onSearchBarEvent = {},
                 onSpriteListEvent = {},
@@ -329,7 +326,6 @@ private fun GalleryScreenPreviewStaggeredLayout() {
             spriteList = DummyData.previewSprites,
             searchQuery = "",
             event = GalleryScreenEvent(
-                onBottomBarEvent = {},
                 onImagePagerEvent = {},
                 onSearchBarEvent = {},
                 onSpriteListEvent = {},
@@ -351,7 +347,6 @@ private fun GalleryScreenPreviewSquareLayout() {
             spriteList = DummyData.previewSprites,
             searchQuery = "",
             event = GalleryScreenEvent(
-                onBottomBarEvent = {},
                 onImagePagerEvent = {},
                 onSearchBarEvent = {},
                 onSpriteListEvent = {},

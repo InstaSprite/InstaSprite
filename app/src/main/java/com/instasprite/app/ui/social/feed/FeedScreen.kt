@@ -57,7 +57,6 @@ fun FeedScreen(
     val event = remember(viewModel, onLoginClick, onOpenComments, onOpenProfile) {
         FeedScreenEvent(
             onLoginClick = onLoginClick,
-            onBottomBarEvent = viewModel::onBottomBarEvent,
             onOpenComments = onOpenComments,
             onOpenProfile = onOpenProfile,
             onToggleLike = viewModel::toggleLikePost,
@@ -153,7 +152,6 @@ private fun FeedContentPreview() {
             listState = LazyListState(),
             event = FeedScreenEvent(
                 onLoginClick = {},
-                onBottomBarEvent = {},
                 onOpenComments = {},
                 onOpenProfile = {},
                 onToggleLike = { _, _ -> },

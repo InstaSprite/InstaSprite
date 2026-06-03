@@ -17,7 +17,7 @@ import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
-import com.instasprite.app.ui.gallery.contract.BottomBarEvent
+
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
@@ -127,12 +127,7 @@ class GalleryViewModel @Inject constructor(
         )
     }
 
-    fun onBottomBarEvent(event: BottomBarEvent) {
-        when (event) {
-            is BottomBarEvent.ToggleSearchBar -> toggleSearchBar()
-            is BottomBarEvent.OpenDisplayOptions -> openDialog(GalleryDialog.DisplayOptions)
-        }
-    }
+
 
     fun onImagePagerEvent(event: ImagePagerEvent) {
         when (event) {

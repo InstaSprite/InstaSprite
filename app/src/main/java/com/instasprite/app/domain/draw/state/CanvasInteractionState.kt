@@ -6,6 +6,6 @@ interface CanvasInteractionState {
     fun onTouchEnd(ctx: InteractionContext)
     fun onTouchCancel(ctx: InteractionContext)
     fun onTap(row: Int, col: Int, ctx: InteractionContext)
-    fun commitPending(ctx: InteractionContext)
-    fun cancelPending(ctx: InteractionContext)
+    fun commitPending(ctx: InteractionContext): Boolean
+    fun cancelPending(ctx: InteractionContext): Boolean
 }

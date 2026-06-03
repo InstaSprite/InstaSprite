@@ -24,7 +24,6 @@ import com.instasprite.app.ui.components.composable.ExpandableFabMenu
 import com.instasprite.app.ui.components.composable.FabMenuColors
 import com.instasprite.app.ui.components.composable.FabMenuItem
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.gallery.contract.BottomBarEvent
 import com.instasprite.app.ui.theme.AppFont
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -33,9 +32,8 @@ import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun HomeBottomBar(
-    onBottomBarEvent: (BottomBarEvent) -> Unit,
-    onMenuClick: () -> Unit = {},
-    onPaletteClick: () -> Unit = {},
+    leftItems: @Composable () -> Unit = {},
+    rightItems: @Composable () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     BottomAppBar(
@@ -53,18 +51,7 @@ fun HomeBottomBar(
                 .weight(1f)
 
         ) {
-            BottomBarItem(
-                icon = R.drawable.ic_menu,
-                title = stringResource(R.string.menu),
-                onClick = onMenuClick,
-                iconTint = AppTheme.colors.TextColorLight,
-            )
-            BottomBarItem(
-                icon = R.drawable.ic_palette,
-                title = stringResource(R.string.palette),
-                onClick = onPaletteClick,
-                iconTint = AppTheme.colors.TextColorLight,
-            )
+            leftItems()
         }
 
         // for FAB cutout
@@ -76,22 +63,7 @@ fun HomeBottomBar(
                 .weight(1f),
             horizontalArrangement = Arrangement.End
         ) {
-            BottomBarItem(
-                icon = R.drawable.ic_search,
-                title = stringResource(R.string.search),
-                onClick = {
-                    onBottomBarEvent(BottomBarEvent.ToggleSearchBar)
-                },
-                iconTint = AppTheme.colors.TextColorLight
-            )
-            BottomBarItem(
-                icon = R.drawable.ic_sort,
-                title = stringResource(R.string.sort),
-                onClick = {
-                    onBottomBarEvent(BottomBarEvent.OpenDisplayOptions)
-                },
-                iconTint = AppTheme.colors.TextColorLight
-            )
+            rightItems()
         }
     }
 }
@@ -185,7 +157,34 @@ fun FeedFab(
 private fun HomeBottomBarPreview() {
     InstaSpriteTheme(appFont = AppFont.RETRON) {
         HomeBottomBar(
-            onBottomBarEvent = {}
+            leftItems = {
+                BottomBarItem(
+                    icon = R.drawable.ic_menu,
+                    title = stringResource(R.string.menu),
+                    onClick = {},
+                    iconTint = AppTheme.colors.TextColorLight,
+                )
+                BottomBarItem(
+                    icon = R.drawable.ic_palette,
+                    title = stringResource(R.string.palette),
+                    onClick = {},
+                    iconTint = AppTheme.colors.TextColorLight,
+                )
+            },
+            rightItems = {
+                BottomBarItem(
+                    icon = R.drawable.ic_search,
+                    title = stringResource(R.string.search),
+                    onClick = {},
+                    iconTint = AppTheme.colors.TextColorLight
+                )
+                BottomBarItem(
+                    icon = R.drawable.ic_sort,
+                    title = stringResource(R.string.sort),
+                    onClick = {},
+                    iconTint = AppTheme.colors.TextColorLight
+                )
+            }
         )
     }
 }

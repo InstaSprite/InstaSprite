@@ -70,7 +70,6 @@ fun HashtagFeedScreenContent(
 
     val event = FeedScreenEvent(
         onLoginClick = {},
-        onBottomBarEvent = {},
         onOpenComments = onOpenComments,
         onOpenProfile = onOpenProfile,
         onToggleLike = { _, _ -> },

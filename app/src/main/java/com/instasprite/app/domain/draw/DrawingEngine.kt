@@ -144,17 +144,18 @@ class DrawingEngine(
         syncStateVersions()
     }
 
-    fun commitPendingTool(tool: StrokeTool) {
+    fun commitPendingTool(tool: StrokeTool): Boolean {
         this.selectedTool = tool
-        activeState.commitPending(this)
+        val result = activeState.commitPending(this)
         syncStateVersions()
+        return result
     }
 
     fun cancelPendingTool(tool: StrokeTool): Boolean {
         this.selectedTool = tool
-        activeState.cancelPending(this)
+        val result = activeState.cancelPending(this)
         syncStateVersions()
-        return true
+        return result
     }
 
     fun onTapAt(tool: Tool, row: Int, col: Int, color: Color, size: Int): TapResult {
@@ -292,7 +293,7 @@ class DrawingEngine(
         syncStateVersions()
     }
 
-    private fun refreshLayerState() {
+    override fun refreshLayerState() {
         _canvasState.value = _canvasState.value.copy(
             layers = pixelCanvasUseCase.getLayers().toList()
         )

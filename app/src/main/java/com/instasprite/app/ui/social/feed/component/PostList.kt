@@ -282,7 +282,6 @@ private fun Preview() {
             ),
             event = FeedScreenEvent(
                 onLoginClick = {},
-                onBottomBarEvent = {},
                 onOpenComments = {},
                 onOpenProfile = {},
                 onToggleLike = { _, _ -> },

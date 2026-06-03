@@ -20,7 +20,7 @@ import com.instasprite.app.data.repository.FollowRepository
 import com.instasprite.app.data.repository.PostRepository
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.domain.dialog.DialogController
-import com.instasprite.app.ui.gallery.contract.BottomBarEvent
+
 import com.instasprite.app.ui.social.PostInteractionEvent
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.domain.session.SocialSessionManager
@@ -220,12 +220,7 @@ class FeedViewModel @Inject constructor(
         _contentState.update { it.copy(hasNewPosts = false) }
     }
 
-    fun onBottomBarEvent(event: BottomBarEvent) {
-        when(event) {
-            BottomBarEvent.OpenDisplayOptions -> openDialog(FeedDialog.PostFilter)
-            BottomBarEvent.ToggleSearchBar -> openSearch()
-        }
-    }
+
 
     fun setPostFilter(filter: PostFilter) {
         _contentState.update {
