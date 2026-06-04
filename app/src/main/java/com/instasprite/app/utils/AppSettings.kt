@@ -74,6 +74,10 @@ object AppSettings {
         persist(context) { it.copy(drawSetting = it.drawSetting.copy(showCanvasPreview = showCanvasPreview)) }
     }
 
+    fun setPixelPerfect(context: Context, isPixelPerfect: Boolean) {
+        persist(context) { it.copy(drawSetting = it.drawSetting.copy(isPixelPerfect = isPixelPerfect)) }
+    }
+
     fun getDefaultPaletteId(context: Context): Int {
         return getPersistedSettings(context).defaultPaletteId
     }

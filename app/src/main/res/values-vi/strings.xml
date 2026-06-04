@@ -503,4 +503,5 @@
     <string name="shape_square">Hình vuông</string>
     <string name="drawing_settings">Cài đặt vẽ</string>
     <string name="canvas_preview">Xem trước Canvas</string>
+    <string name="pixel_perfect">Pixel Perfect</string>
 </resources>

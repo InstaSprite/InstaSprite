@@ -58,6 +58,7 @@ data class DrawingScreenState(
     val isAppendSelectionMode: Boolean = false,
     val isCursorMode: Boolean = false,
     val showCanvasPreview: Boolean = true,
+    val isPixelPerfect: Boolean = false,
     val cursorState: CursorState = CursorState()
 )
 
@@ -205,7 +206,10 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     private fun applyDrawSetting(drawSetting: DrawSetting) {
-        _uiState.value = _uiState.value.copy(showCanvasPreview = drawSetting.showCanvasPreview)
+        _uiState.value = _uiState.value.copy(
+            showCanvasPreview = drawSetting.showCanvasPreview,
+            isPixelPerfect = drawSetting.isPixelPerfect
+        )
         if (drawSetting.isCursorMode) {
             toggleCursorMode(-1f, -1f)
         }
@@ -274,8 +278,12 @@ class DrawingViewModel @AssistedInject constructor(
 
             when (event) {
                 is PixelCanvasEvent.OnStrokeStart -> {
+                    val strokeTool = tool as? StrokeTool ?: return
+                    if (strokeTool is PencilTool) {
+                        strokeTool.isPixelPerfect = _uiState.value.isPixelPerfect
+                    }
                     drawingEngine.onStrokeStart(
-                        tool as? StrokeTool ?: return,
+                        strokeTool,
                         event.y,
                         event.x,
                         color,
@@ -397,6 +405,12 @@ class DrawingViewModel @AssistedInject constructor(
         AppSettings.setShowCanvasPreview(applicationContext, newState)
     }
 
+    fun togglePixelPerfect() {
+        val newValue = !_uiState.value.isPixelPerfect
+        _uiState.value = _uiState.value.copy(isPixelPerfect = newValue)
+        AppSettings.setPixelPerfect(applicationContext, newValue)
+    }
+
     fun onCursorDrawEvent(event: CursorDrawEvent) {
         try {
             when (event) {
@@ -491,6 +505,9 @@ class DrawingViewModel @AssistedInject constructor(
         val shape = _uiState.value.brushShape
 
         if (tool is StrokeTool) {
+            if (tool is PencilTool) {
+                tool.isPixelPerfect = _uiState.value.isPixelPerfect
+            }
             drawingEngine.onStrokeStart(tool, state.gridY, state.gridX, color, scale, shape, 1f)
         } else {
             drawingEngine.onTapAt(tool, state.gridY, state.gridX, color, scale)

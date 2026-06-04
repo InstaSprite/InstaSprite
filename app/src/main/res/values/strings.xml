@@ -503,4 +503,5 @@
     <string name="shape_square">Square</string>
     <string name="drawing_settings">Drawing Settings</string>
     <string name="canvas_preview">Canvas Preview</string>
+    <string name="pixel_perfect">Pixel Perfect</string>
 </resources>
