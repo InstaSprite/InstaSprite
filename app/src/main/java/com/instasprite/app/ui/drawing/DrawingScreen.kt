@@ -56,18 +56,15 @@ import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.ui.components.composable.DrawerLayout
 import com.instasprite.app.ui.components.composable.DrawerSide
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.drawing.component.BrushShapeSelector
 import com.instasprite.app.ui.drawing.component.ColorPalette
 import com.instasprite.app.ui.drawing.component.CursorDrawButton
 import com.instasprite.app.ui.drawing.component.CursorModeToggle
 import com.instasprite.app.ui.drawing.component.LayerDrawer
 import com.instasprite.app.ui.drawing.component.PixelCanvas
-import com.instasprite.app.ui.drawing.component.SelectionModeSelector
 import com.instasprite.app.ui.drawing.component.SelectionToolOption
-import com.instasprite.app.ui.drawing.component.ShapeSelector
 import com.instasprite.app.ui.drawing.component.ToolOptionMenu
 import com.instasprite.app.ui.drawing.component.ToolSelector
-import com.instasprite.app.ui.drawing.component.ToolSizeOption
+import com.instasprite.app.ui.drawing.component.toolOptions
 import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
@@ -242,59 +239,18 @@ private fun DrawingScreenContent(
                 ) {
                     ToolOptionMenu(
                         selectedTool = uiState.selectedTool,
-                        modifier = Modifier
-                            .weight(8f)
+                        modifier = Modifier.weight(8f)
                     ) {
-                        if (uiState.selectedTool is SelectionTool) {
-                            item {
-                                SelectionModeSelector(
-                                    selectedTool = uiState.selectedTool,
-                                    onSelectionToolSelected = { tool ->
-                                        event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
-                                    }
-                                )
+                        toolOptions(
+                            tool = uiState.selectedTool,
+                            uiState = uiState,
+                            event = event,
+                            toolSize = toolSizeValue,
+                            onToolSizeChange = {
+                                toolSizeValue = it
+                                event.onToolSizeChange(it)
                             }
-                        }
-
-                        if (uiState.selectedTool is ShapeTool) {
-                            item {
-                                ShapeSelector(
-                                    selectedTool = uiState.selectedTool,
-                                    onShapeSelected = { tool ->
-                                        event.onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
-                                    }
-                                )
-                            }
-                        }
-
-                        if (uiState.selectedTool is StrokeTool
-                            && uiState.selectedTool !is SelectionTool
-                            && uiState.selectedTool !is ShapeTool
-                            && uiState.selectedTool !is MoveTool
-                        ) {
-                            item {
-                                BrushShapeSelector(
-                                    selectedShape = uiState.brushShape,
-                                    onShapeSelected = event.onBrushShapeChange
-                                )
-                            }
-                        }
-
-                        if (uiState.selectedTool is StrokeTool
-                            && uiState.selectedTool !is SelectionTool
-                            && uiState.selectedTool !is MoveTool
-                        ) {
-                            item {
-                                ToolSizeOption(
-                                    toolSize = toolSizeValue,
-                                    onToolSizeChange = {
-                                        toolSizeValue = it
-                                        event.onToolSizeChange(it)
-                                    },
-                                    modifier = Modifier.padding(end = 6.pixelDp)
-                                )
-                            }
-                        }
+                        )
                     }
 
                     CursorModeToggle(

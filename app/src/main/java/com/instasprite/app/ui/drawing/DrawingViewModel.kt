@@ -354,6 +354,9 @@ class DrawingViewModel @AssistedInject constructor(
                         isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
                     )
                 }
+                is ToolSelectorEvent.TogglePixelPerfect -> {
+                    togglePixelPerfect()
+                }
             }
         } catch (t: Throwable) {
             handleFatalError(t)
