@@ -92,15 +92,11 @@ fun DrawingScreenDialogs(
                 DrawingSettingsDialog(
                     isCursorMode = uiState.isCursorMode,
                     showCanvasPreview = uiState.showCanvasPreview,
-                    isPixelPerfect = uiState.isPixelPerfect,
-                    onCursorModeChange = { 
+                    onCursorModeChange = {
                         viewModel.onCursorDrawEvent(CursorDrawEvent.ToggleCursorMode(-1f, -1f))
                     },
                     onShowCanvasPreviewChange = {
                         viewModel.toggleCanvasPreview()
-                    },
-                    onPixelPerfectChange = {
-                        viewModel.togglePixelPerfect()
                     },
                     onDismiss = viewModel::closeTopDialog
                 )

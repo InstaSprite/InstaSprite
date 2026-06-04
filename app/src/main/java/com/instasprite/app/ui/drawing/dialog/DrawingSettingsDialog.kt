@@ -26,10 +26,8 @@ import com.instasprite.app.utils.pixelDp
 fun DrawingSettingsDialog(
     isCursorMode: Boolean,
     showCanvasPreview: Boolean,
-    isPixelPerfect: Boolean,
     onCursorModeChange: (Boolean) -> Unit,
     onShowCanvasPreviewChange: (Boolean) -> Unit,
-    onPixelPerfectChange: (Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     val colors = AppTheme.colors
@@ -90,34 +88,6 @@ fun DrawingSettingsDialog(
                 Checkbox(
                     checked = showCanvasPreview,
                     onCheckedChange = onShowCanvasPreviewChange,
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = colors.LinkColor,
-                        uncheckedColor = colors.Subtext0Color,
-                        checkmarkColor = colors.TextColorDark
-                    )
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onPixelPerfectChange(!isPixelPerfect) }
-                    .padding(vertical = 4.pixelDp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                PixelIcon(
-                    icon = R.drawable.ic_pencil_tool
-                )
-                Spacer(modifier = Modifier.width(8.pixelDp))
-                Text(
-                    text = stringResource(R.string.pixel_perfect),
-                    color = colors.TextColorLight,
-                    fontSize = 14.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                Checkbox(
-                    checked = isPixelPerfect,
-                    onCheckedChange = onPixelPerfectChange,
                     colors = CheckboxDefaults.colors(
                         checkedColor = colors.LinkColor,
                         uncheckedColor = colors.Subtext0Color,

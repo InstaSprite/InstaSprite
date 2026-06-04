@@ -253,25 +253,6 @@ private fun DrawingScreenContent(
                         )
                     }
 
-                    CursorModeToggle(
-                        isCursorMode = uiState.isCursorMode,
-                        onToggle = {
-                            var cx = -1f
-                            var cy = -1f
-                            if (canvasLayoutSize.width > 0 && canvasState.width > 0) {
-                                val cellWidth = canvasLayoutSize.width.toFloat() / canvasState.width
-                                val cellHeight =
-                                    canvasLayoutSize.height.toFloat() / canvasState.height
-                                val centerX = canvasLayoutSize.width / 2f - offset.x / scale
-                                val centerY = canvasLayoutSize.height / 2f - offset.y / scale
-                                cx = centerX / cellWidth
-                                cy = centerY / cellHeight
-                            }
-                            event.onCursorDrawEvent(CursorDrawEvent.ToggleCursorMode(cx, cy))
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-
                     IconButton(
                         onClick = { event.onToggleLayerDrawer() },
                         modifier = Modifier.weight(1f)
