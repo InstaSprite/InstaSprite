@@ -115,36 +115,13 @@ fun ColorPalette(
         ) {
             ActiveColor(
                 activeColor = activeColor,
-                onClick = {
-                    if (activeColor in colorPalette) {
-                        val index = colorPalette.indexOf(activeColor)
-                        coroutineScope.launch {
-                            colorPaletteListState.scrollItemToCenter(
-                                index = index,
-                                itemSizeDp = 22.pixelDp,
-                                itemSpacingDp = 0.pixelDp,
-                                density = density
-                            )
-                        }
-                    }
-                },
+                onClick = { onColorPaletteEvent(ColorPaletteEvent.OpenColorWheelDialog) },
                 modifier = Modifier
                     .height(26.pixelDp)
                     .width(64.pixelDp) //  ̶E̶q̶u̶a̶l̶ ̶t̶w̶o̶ ̶c̶o̶l̶o̶r̶ ̶i̶t̶e̶m̶ ̶i̶n̶ ̶p̶a̶l̶e̶t̶t̶e̶ ̶+̶ ̶s̶p̶a̶c̶i̶n̶g̶
             )
 
-            IconButton(
-                onClick = { onColorPaletteEvent(ColorPaletteEvent.OpenColorWheelDialog) },
-                modifier = Modifier
-                    .size(30.pixelDp)
-                    .padding(horizontal = 2.pixelDp)
-            ) {
-                PixelIcon(
-                    icon = R.drawable.ic_plus,
-                    contentDescription = stringResource(R.string.show_color_wheel),
-                    tint = AppTheme.colors.TextColorLight,
-                )
-            }
+            Spacer(modifier = Modifier.width(4.pixelDp))
 
             // Recent Colors section
             ColorPaletteView(
@@ -161,8 +138,6 @@ fun ColorPalette(
             Box {
                 IconButton(
                     onClick = { showCanvasMenu = true },
-                    modifier = Modifier
-                        .size(30.pixelDp)
                 ) {
                     PixelIcon(
                         icon = R.drawable.ic_three_dots,
