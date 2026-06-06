@@ -129,9 +129,8 @@ fun calculateNewScaleAndOffset(
     val layoutCenter = Offset(layoutSize.width / 2f, layoutSize.height / 2f)
     val centroidFromCenter = centroid - layoutCenter
 
-    val zoomedOffset = (currentOffset - centroidFromCenter) * (newScale / currentScale) + centroidFromCenter
-
-    val newOffset = zoomedOffset + panChange * currentScale
+    // The screen pan is panChange * currentScale.
+    val newOffset = currentOffset + panChange * currentScale - centroidFromCenter * (newScale - currentScale)
 
     val extraWidth = (layoutSize.width * (newScale - 1f)) / 2f
     val extraHeight = (layoutSize.height * (newScale - 1f)) / 2f
