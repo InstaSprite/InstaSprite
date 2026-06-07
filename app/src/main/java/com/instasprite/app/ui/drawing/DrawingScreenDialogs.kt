@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.domain.dialog.Dialog
 import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
 import com.instasprite.app.ui.drawing.dialog.ColorWheelDialog
@@ -101,5 +103,22 @@ fun DrawingScreenDialogs(
                     onDismiss = viewModel::closeTopDialog
                 )
         }
+    }
+
+    if (viewModel.tutorialManager.state.collectAsState().value.showWelcomeDialog) {
+        com.instasprite.app.ui.components.dialog.CustomDialog(
+            title = stringResource(R.string.tut_welcome_title),
+            onDismiss = { viewModel.tutorialManager.onEvent(com.instasprite.app.ui.tutorial.TutorialEvent.OnDismiss) },
+            onConfirm = { viewModel.tutorialManager.onEvent(com.instasprite.app.ui.tutorial.TutorialEvent.OnStartTutorial) },
+            confirmButtonText = stringResource(R.string.tut_btn_show),
+            dismissButtonText = stringResource(R.string.tut_btn_skip),
+            content = {
+                androidx.compose.material3.Text(
+                    text = stringResource(R.string.tut_welcome_desc),
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                    color = com.instasprite.app.ui.theme.AppTheme.colors.TextColorLight
+                )
+            }
+        )
     }
 }

@@ -40,6 +40,10 @@ import com.instasprite.app.ui.theme.AppTheme
 @Composable
 fun ToolSelector(
     modifier: Modifier = Modifier,
+    activeToolModifier: Modifier = Modifier,
+    undoModifier: Modifier = Modifier,
+    redoModifier: Modifier = Modifier,
+    projectMenuModifier: Modifier = Modifier,
     selectedTool: Tool,
     onToolSelectorEvent: (ToolSelectorEvent) -> Unit,
 ) {
@@ -64,6 +68,7 @@ fun ToolSelector(
 
         Box {
             ToolItem(
+                modifier = activeToolModifier,
                 iconResourceId = selectedTool.icon,
                 contentDescription = stringResource(id = selectedTool.nameRes),
                 selected = true,
@@ -101,6 +106,7 @@ fun ToolSelector(
         }
 
         ToolItem(
+            modifier = undoModifier,
             iconResourceId = R.drawable.ic_undo,
             contentDescription = stringResource(R.string.undo_last_change),
             selected = false,
@@ -110,6 +116,7 @@ fun ToolSelector(
         )
 
         ToolItem(
+            modifier = redoModifier,
             iconResourceId = R.drawable.ic_redo,
             contentDescription = stringResource(R.string.redo_last_change),
             selected = false,
@@ -120,6 +127,7 @@ fun ToolSelector(
 
         Box {
             ToolItem(
+                modifier = projectMenuModifier,
                 iconResourceId = R.drawable.ic_menu,
                 contentDescription = stringResource(R.string.menu),
                 selected = false,

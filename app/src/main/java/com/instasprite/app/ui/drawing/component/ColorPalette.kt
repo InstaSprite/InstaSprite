@@ -52,6 +52,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ColorPalette(
     modifier: Modifier = Modifier,
+    activeColorModifier: Modifier = Modifier,
+    canvasMenuModifier: Modifier = Modifier,
     colorPaletteState: ColorPaletteState,
     onColorPaletteEvent: (ColorPaletteEvent) -> Unit,
     onCanvasMenuEvent: (CanvasMenuEvent) -> Unit
@@ -116,9 +118,9 @@ fun ColorPalette(
             ActiveColor(
                 activeColor = activeColor,
                 onClick = { onColorPaletteEvent(ColorPaletteEvent.OpenColorWheelDialog) },
-                modifier = Modifier
+                modifier = activeColorModifier
                     .height(26.pixelDp)
-                    .width(64.pixelDp) //  ̶E̶q̶u̶a̶l̶ ̶t̶w̶o̶ ̶c̶o̶l̶o̶r̶ ̶i̶t̶e̶m̶ ̶i̶n̶ ̶p̶a̶l̶e̶t̶t̶e̶ ̶+̶ ̶s̶p̶a̶c̶i̶n̶g̶
+                    .width(64.pixelDp)
             )
 
             Spacer(modifier = Modifier.width(4.pixelDp))
@@ -138,6 +140,7 @@ fun ColorPalette(
             Box {
                 IconButton(
                     onClick = { showCanvasMenu = true },
+                    modifier = canvasMenuModifier
                 ) {
                     PixelIcon(
                         icon = R.drawable.ic_three_dots,

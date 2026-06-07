@@ -504,4 +504,30 @@
     <string name="drawing_settings">Drawing Settings</string>
     <string name="canvas_preview">Canvas Preview</string>
     <string name="pixel_perfect">Pixel Perfect</string>
+
+    <!-- Tutorial Strings -->
+    <string name="tut_welcome_title">Welcome to InstaSprite!</string>
+    <string name="tut_welcome_desc">Would you like a quick tour of the drawing workspace?</string>
+    <string name="tut_btn_show">Show Tutorial</string>
+    <string name="tut_btn_skip">Skip</string>
+    <string name="tut_btn_next">Next</string>
+    <string name="tut_btn_finish">Finish</string>
+    <string name="tut_canvas_title">Canvas</string>
+    <string name="tut_canvas_desc">Draw your pixel here, you can zoom and pan with 2 finger gesture.</string>
+    <string name="tut_color_palette_title">Colors</string>
+    <string name="tut_color_palette_desc">Select a color to draw with.</string>
+    <string name="tut_color_wheel_title">Color Picker</string>
+    <string name="tut_color_wheel_desc">Pick a custom color.</string>
+    <string name="tut_canvas_menu_title">Canvas Options</string>
+    <string name="tut_canvas_menu_desc">Resize, flip, or rotate the canvas.</string>
+    <string name="tut_tool_button_title">Active Tool</string>
+    <string name="tut_tool_button_desc">Select your drawing tool.</string>
+    <string name="tut_tool_option_title">Tool Settings</string>
+    <string name="tut_tool_option_desc">You can tweak tool options here.</string>
+    <string name="tut_undo_redo_title">Undo &amp; Redo</string>
+    <string name="tut_undo_redo_desc">Undo or redo your last action.</string>
+    <string name="tut_project_menu_title">Project Menu</string>
+    <string name="tut_project_menu_desc">Save, load, export your artwork, and adjust drawing settings.</string>
+    <string name="tut_layer_toggle_title">Layers</string>
+    <string name="tut_layer_toggle_desc">Manage your artwork layers.</string>
 </resources>

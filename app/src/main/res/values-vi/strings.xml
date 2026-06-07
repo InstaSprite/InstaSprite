@@ -504,4 +504,30 @@
     <string name="drawing_settings">Cài đặt vẽ</string>
     <string name="canvas_preview">Xem trước Canvas</string>
     <string name="pixel_perfect">Pixel Perfect</string>
+
+    <!-- Tutorial Strings -->
+    <string name="tut_welcome_title">Chào mừng đến với InstaSprite!</string>
+    <string name="tut_welcome_desc">Bạn có muốn tham gia một vòng hướng dẫn nhanh về không gian vẽ không?</string>
+    <string name="tut_btn_show">Xem Hướng dẫn</string>
+    <string name="tut_btn_skip">Bỏ qua</string>
+    <string name="tut_btn_next">Tiếp</string>
+    <string name="tut_btn_finish">Hoàn tất</string>
+    <string name="tut_canvas_title">Khung vẽ</string>
+    <string name="tut_canvas_desc">Đây là khu vực vẽ. Bạn có thể di chuyển và thu phóng bằng cử 2 ngón.</string>
+    <string name="tut_color_palette_title">Màu sắc</string>
+    <string name="tut_color_palette_desc">Chọn một màu để vẽ.</string>
+    <string name="tut_color_wheel_title">Bộ chọn màu</string>
+    <string name="tut_color_wheel_desc">Tuỳ chỉnh màu.</string>
+    <string name="tut_canvas_menu_title">Tùy chọn khung vẽ</string>
+    <string name="tut_canvas_menu_desc">Đổi kích thước, lật hoặc xoay khung vẽ.</string>
+    <string name="tut_tool_button_title">Công cụ đang dùng</string>
+    <string name="tut_tool_button_desc">Chọn công cụ vẽ.</string>
+    <string name="tut_tool_option_title">Cài đặt công cụ</string>
+    <string name="tut_tool_option_desc">Bạn có thể tinh chỉnh tùy chọn công cụ tại đây.</string>
+    <string name="tut_undo_redo_title">Hoàn tác &amp; Làm lại</string>
+    <string name="tut_undo_redo_desc">Hoàn tác hoặc làm lại thao tác gần nhất.</string>
+    <string name="tut_project_menu_title">Menu Dự án</string>
+    <string name="tut_project_menu_desc">Lưu, tải, xuất tác phẩm và thiết lập tùy chọn vẽ.</string>
+    <string name="tut_layer_toggle_title">Lớp</string>
+    <string name="tut_layer_toggle_desc">Quản lý các lớp vẽ.</string>
 </resources>

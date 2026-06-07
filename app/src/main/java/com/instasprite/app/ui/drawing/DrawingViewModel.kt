@@ -30,6 +30,8 @@ import com.instasprite.app.ui.drawing.contract.CursorState
 import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
+import com.instasprite.app.ui.drawing.tutorial.drawingTutorialSequence
+import com.instasprite.app.ui.tutorial.TutorialManager
 import com.instasprite.app.utils.AppSettings
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -214,6 +216,15 @@ class DrawingViewModel @AssistedInject constructor(
             toggleCursorMode(-1f, -1f)
         }
     }
+
+    val tutorialManager = TutorialManager(
+        sequence = drawingTutorialSequence,
+        hasSeenTutorial = AppSettings.getHasSeenAppTutorial(applicationContext),
+        onCompleteTutorial = {
+            AppSettings.setHasSeenAppTutorial(applicationContext, true)
+        }
+    )
+    val tutorialState = tutorialManager.state
 
     fun onCanvasMenuEvent(event: CanvasMenuEvent) {
         try {

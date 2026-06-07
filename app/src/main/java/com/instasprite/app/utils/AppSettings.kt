@@ -78,6 +78,14 @@ object AppSettings {
         persist(context) { it.copy(drawSetting = it.drawSetting.copy(isPixelPerfect = isPixelPerfect)) }
     }
 
+    fun getHasSeenAppTutorial(context: Context): Boolean {
+        return getPersistedSettings(context).drawSetting.hasSeenAppTutorial
+    }
+
+    fun setHasSeenAppTutorial(context: Context, hasSeen: Boolean) {
+        persist(context) { it.copy(drawSetting = it.drawSetting.copy(hasSeenAppTutorial = hasSeen)) }
+    }
+
     fun getDefaultPaletteId(context: Context): Int {
         return getPersistedSettings(context).defaultPaletteId
     }
