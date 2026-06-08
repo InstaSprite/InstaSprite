@@ -14,7 +14,8 @@ data class SettingPreferences(
     val drawSetting: DrawSetting = DrawSetting(),
     val gallerySettings: GallerySettings = GallerySettings(),
     val prepopulatedPaletteVersion: Int = 0,
-    val defaultPaletteId: Int = -1
+    val defaultPaletteId: Int = -1,
+    val hasSeenOnboarding: Boolean = false
 )
 
 @Serializable

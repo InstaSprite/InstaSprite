@@ -61,6 +61,8 @@ import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.Catppuccin
 import com.instasprite.app.ui.theme.ThemeFlavour
 import com.instasprite.app.ui.theme.AppFont
+import com.instasprite.app.ui.components.composable.FlavourCard
+import com.instasprite.app.ui.components.composable.FontCard
 import com.instasprite.app.ui.theme.buildCatppuccinTypography
 import com.instasprite.app.utils.UiUtils
 import com.instasprite.app.utils.pixelDp
@@ -351,96 +353,7 @@ fun SettingScreen(
     }
 }
 
-@Composable
-private fun FlavourCard(
-    label: String,
-    previewColors: AppColors,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = AppTheme.colors
-    val borderColor = if (isSelected) colors.SelectedColor else colors.Foreground1Color
 
-    Column(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.small)
-            .border(1.pixelDp, borderColor, MaterialTheme.shapes.small)
-            .background(previewColors.BackgroundColor)
-            .clickable(onClick = onClick)
-            .padding(6.pixelDp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Swatch row — key semantic colors from the theme
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.pixelDp),
-            modifier = Modifier.padding(vertical = 2.pixelDp)
-        ) {
-            listOf(
-                previewColors.SelectedColor,
-                previewColors.AccentButtonColor,
-                previewColors.DismissButtonColor,
-                previewColors.LinkColor,
-            ).forEach { color ->
-                Box(
-                    modifier = Modifier
-                        .size(6.pixelDp)
-                        .clip(PixelShape())
-                        .background(color)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(2.pixelDp))
-
-        Text(
-            text = label,
-            fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = previewColors.TextColorLight,
-        )
-    }
-}
-
-
-@Composable
-private fun FontCard(
-    font: AppFont,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = AppTheme.colors
-    val borderColor = if (isSelected) colors.SelectedColor else colors.Foreground1Color
-
-    val typography = buildCatppuccinTypography(colors, font)
-
-    Column(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.small)
-            .border(1.pixelDp, borderColor, MaterialTheme.shapes.small)
-            .background(colors.BackgroundColorDarker)
-            .clickable(onClick = onClick)
-            .padding(6.pixelDp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Aa",
-            style = typography.titleLarge,
-            color = if (isSelected) colors.SelectedColor else colors.TextColorLight,
-        )
-
-        Spacer(modifier = Modifier.height(4.pixelDp))
-
-        Text(
-            text = font.label,
-            style = typography.bodyMedium,
-            fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = colors.TextColorLight,
-        )
-    }
-}
 
 
 @Preview()

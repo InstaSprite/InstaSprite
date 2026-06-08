@@ -94,6 +94,14 @@ object AppSettings {
         persist(context) { it.copy(defaultPaletteId = id) }
     }
 
+    fun getHasSeenOnboarding(context: Context): Boolean {
+        return getPersistedSettings(context).hasSeenOnboarding
+    }
+
+    fun setHasSeenOnboarding(context: Context, hasSeen: Boolean) {
+        persist(context) { it.copy(hasSeenOnboarding = hasSeen) }
+    }
+
     fun getSupportedLocales(): List<Pair<String, String>> {
         return listOf(
             "en" to "English",

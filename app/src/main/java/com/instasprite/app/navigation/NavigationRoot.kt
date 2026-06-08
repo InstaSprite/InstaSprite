@@ -11,6 +11,9 @@ sealed interface Screen : NavKey {
     data object Home : Screen
 
     @Serializable
+    data object Onboarding : Screen
+
+    @Serializable
     data object Gallery : Screen
 
     @Serializable

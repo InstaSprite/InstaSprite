@@ -360,6 +360,7 @@
     <string name="enable_dithering">Bật Dithering (Nhiễu màu)</string>
     <string name="apply_custom_palette">Áp dụng Bảng màu tùy chỉnh</string>
     <string name="tap_to_select_image">Chạm để chọn ảnh</string>
+    <string name="tap_to_select_folder">Chạm để chọn thư mục</string>
     <string name="processed_image">Hình ảnh đã xử lý</string>
     <string name="add_image">Thêm ảnh</string>
     <string name="delete_palette">Xóa bảng màu</string>
@@ -530,4 +531,16 @@
     <string name="tut_project_menu_desc">Lưu, tải, xuất tác phẩm và thiết lập tùy chọn vẽ.</string>
     <string name="tut_layer_toggle_title">Lớp</string>
     <string name="tut_layer_toggle_desc">Quản lý các lớp vẽ.</string>
+    <string name="onboarding_next">Tiếp theo</string>
+    <string name="onboarding_get_started">Bắt đầu</string>
+    <string name="onboarding_welcome_title">Chào mừng đến với\nInstaSprite!</string>
+    <string name="onboarding_welcome_desc">Cảm ơn bạn đã trải nghiệm ứng dụng. Hãy cùng thiết lập để phù hợp với phong cách của bạn.</string>
+    <string name="onboarding_personalize_title">Cá nhân hóa</string>
+    <string name="onboarding_personalize_desc">Chọn phông chữ và giao diện phù hợp với phong cách của bạn.</string>
+    <string name="onboarding_font">Phông chữ</string>
+    <string name="onboarding_drawing_mode_title">Chế độ vẽ</string>
+    <string name="onboarding_drawing_mode_desc">Chọn cách bạn muốn vẽ. Bạn luôn có thể thay đổi sau trong phần Cài đặt.</string>
+    <string name="onboarding_touch_mode">Chế độ chạm</string>
+    <string name="onboarding_cursor_mode">Chế độ con trỏ</string>
+    <string name="tap_to_select_file">Chạm để chọn tệp</string>
 </resources>
