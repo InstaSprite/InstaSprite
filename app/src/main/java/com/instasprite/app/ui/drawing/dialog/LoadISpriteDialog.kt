@@ -76,7 +76,7 @@ fun LoadISpriteDialog(
             }
         })
 
-    val displayPath = fileUri?.let { getFileName(context, it) } ?: "Tap to select file"
+    val displayPath = fileUri?.let { getFileName(context, it) } ?: stringResource(R.string.tap_to_select_file)
     val spriteWidth = spriteData?.width ?: ""
     val spriteHeight = spriteData?.height ?: ""
 
