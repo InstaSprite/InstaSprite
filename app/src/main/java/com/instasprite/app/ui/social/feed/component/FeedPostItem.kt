@@ -24,6 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,6 +66,7 @@ fun FeedPostItem(
     showBookmarkButton: Boolean = !showDeleteButton,
 ) {
     val context = LocalContext.current
+    var zoomedImageUrl by remember { mutableStateOf<String?>(null) }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -208,7 +212,7 @@ fun FeedPostItem(
                         }
                         .clip(MaterialTheme.shapes.small)
                         .clickable {
-                            onPostClick()
+                            zoomedImageUrl = postImage.postImageUrl
                         }
 
                     AsyncImageView(
@@ -303,6 +307,13 @@ fun FeedPostItem(
                 }
             }
         }
+    }
+
+    zoomedImageUrl?.let { url ->
+        com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay(
+            model = url,
+            onDismiss = { zoomedImageUrl = null }
+        )
     }
 }
 

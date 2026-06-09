@@ -178,7 +178,12 @@ fun CommentScreen(
         }
     }
 
-    // TODO: Implement image zoom overlay if needed
+    zoomedImageUrl?.let { url ->
+        com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay(
+            model = url,
+            onDismiss = { zoomedImageUrl = null }
+        )
+    }
 
     if (uiState.verifyEmailState.showVerifyDialog) {
         VerifyEmailDialog(

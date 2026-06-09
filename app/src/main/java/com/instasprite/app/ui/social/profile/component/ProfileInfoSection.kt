@@ -21,6 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +61,7 @@ fun ProfileInfoSection(
     val fadeAlpha = lerp(1f, 0f, (compressionProgress * 2f).coerceAtMost(1f))
     val bioBoxHeight = lerp(40.pixelDp, 1.pixelDp, compressionProgress)
     val buttonBoxHeight = lerp(38.pixelDp, 1.pixelDp, compressionProgress)
+    var zoomedImageUrl by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -69,7 +74,13 @@ fun ProfileInfoSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(avatarContainerSize),
+                modifier = Modifier
+                    .size(avatarContainerSize)
+                    .clickable {
+                        if (!userProfile.profileImageUrl.isNullOrEmpty()) {
+                            zoomedImageUrl = userProfile.profileImageUrl
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 ProfileImage(
@@ -187,6 +198,13 @@ fun ProfileInfoSection(
                 }
             }
         }
+    }
+
+    zoomedImageUrl?.let { url ->
+        com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay(
+            model = url,
+            onDismiss = { zoomedImageUrl = null }
+        )
     }
 }
 
