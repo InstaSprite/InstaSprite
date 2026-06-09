@@ -541,5 +541,7 @@
     <string name="onboarding_drawing_mode_title">Drawing Mode</string>
     <string name="onboarding_drawing_mode_desc">Choose how you want to draw. You can always change this later in Settings.</string>
     <string name="onboarding_touch_mode">Touch Mode</string>
+    <string name="onboarding_touch_mode_desc">Draw directly where your finger touches the screen.</string>
     <string name="onboarding_cursor_mode">Cursor Mode</string>
+    <string name="onboarding_cursor_mode_desc">Use an cursor to draw precisely without your finger blocking the view.</string>
 </resources>

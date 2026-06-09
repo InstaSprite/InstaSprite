@@ -541,6 +541,8 @@
     <string name="onboarding_drawing_mode_title">Chế độ vẽ</string>
     <string name="onboarding_drawing_mode_desc">Chọn cách bạn muốn vẽ. Bạn luôn có thể thay đổi sau trong phần Cài đặt.</string>
     <string name="onboarding_touch_mode">Chế độ chạm</string>
+    <string name="onboarding_touch_mode_desc">Vẽ trực tiếp nơi ngón tay của bạn chạm vào màn hình.</string>
     <string name="onboarding_cursor_mode">Chế độ con trỏ</string>
+    <string name="onboarding_cursor_mode_desc">Sử dụng con trỏ để vẽ chính xác mà không bị ngón tay che khuất tầm nhìn.</string>
     <string name="tap_to_select_file">Chạm để chọn tệp</string>
 </resources>

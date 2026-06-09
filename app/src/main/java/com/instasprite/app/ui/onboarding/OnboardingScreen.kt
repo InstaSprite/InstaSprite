@@ -1,6 +1,6 @@
 package com.instasprite.app.ui.onboarding
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,17 +34,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
+import coil3.gif.AnimatedImageDecoder
+import coil3.gif.GifDecoder
+import coil3.request.ImageRequest
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.FlavourCard
 import com.instasprite.app.ui.components.composable.FontCard
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppFont
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.Catppuccin
@@ -354,6 +358,35 @@ fun CursorModePage(
                 )
                 Spacer(modifier = Modifier.height(16.pixelDp))
 
+                // Options List
+                val context = LocalContext.current
+                val imageLoader = coil3.ImageLoader.Builder(context)
+                    .components {
+                        if (Build.VERSION.SDK_INT >= 28) {
+                            add(AnimatedImageDecoder.Factory())
+                        } else {
+                            add(GifDecoder.Factory())
+                        }
+                    }
+                    .build()
+
+                // Selected GIF at the top
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(if (uiState.isCursorMode) R.drawable.pen_mode else R.drawable.normal_mode)
+                        .build(),
+                    imageLoader = imageLoader,
+                    contentDescription = "Mode Demo",
+//                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .aspectRatio(3/4f)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(colors.Foreground1Color)
+                )
+
+                Spacer(modifier = Modifier.height(8.pixelDp))
+
                 // Touch Mode Option
                 Column(
                     modifier = Modifier
@@ -366,13 +399,9 @@ fun CursorModePage(
                             MaterialTheme.shapes.small
                         )
                         .clickable { onCursorModeSelected(false) }
-                        .padding(8.pixelDp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(8.pixelDp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = !uiState.isCursorMode,
                             onClick = null,
@@ -381,23 +410,18 @@ fun CursorModePage(
                         Spacer(modifier = Modifier.width(8.pixelDp))
                         Text(
                             text = stringResource(R.string.onboarding_touch_mode),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = colors.TextColorLight,
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.pixelDp))
-                    // TODO: add real gif
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.pixelDp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(colors.Foreground1Color),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "[ GIF Placeholder ]", color = colors.Subtext1Color)
-                    }
+                    Spacer(modifier = Modifier.height(4.pixelDp))
+                    Text(
+                        text = stringResource(R.string.onboarding_touch_mode_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.Subtext0Color,
+                        modifier = Modifier.padding(start = 8.pixelDp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.pixelDp))
@@ -414,13 +438,9 @@ fun CursorModePage(
                             MaterialTheme.shapes.small
                         )
                         .clickable { onCursorModeSelected(true) }
-                        .padding(8.pixelDp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(12.pixelDp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = uiState.isCursorMode,
                             onClick = null,
@@ -429,23 +449,18 @@ fun CursorModePage(
                         Spacer(modifier = Modifier.width(8.pixelDp))
                         Text(
                             text = stringResource(R.string.onboarding_cursor_mode),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = colors.TextColorLight,
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.pixelDp))
-                    // TODO: add real gif
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.pixelDp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(colors.Foreground1Color),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "[ GIF Placeholder ]", color = colors.Subtext1Color)
-                    }
+                    Spacer(modifier = Modifier.height(4.pixelDp))
+                    Text(
+                        text = stringResource(R.string.onboarding_cursor_mode_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.Subtext0Color,
+                        modifier = Modifier.padding(start = 8.pixelDp)
+                    )
                 }
             }
         }
@@ -482,4 +497,3 @@ private fun CursorModePagePreview() {
         )
     }
 }
-
