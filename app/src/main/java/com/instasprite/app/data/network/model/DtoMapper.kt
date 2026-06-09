@@ -16,6 +16,7 @@ import com.instasprite.app.domain.model.PageData
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.domain.model.PostImageData
 import com.instasprite.app.domain.model.PostTagData
+import com.instasprite.app.ui.social.profile.contract.FollowerUser
 import com.instasprite.app.utils.Constants
 import java.time.LocalDateTime
 
@@ -64,6 +65,16 @@ fun MemberDto.toDomain(): MemberData {
         memberUsername = username,
         memberName = name,
         memberImage = image?.toDomain()
+    )
+}
+
+fun LikeMemberDto.toFollowerUser(): FollowerUser {
+    return FollowerUser(
+        id = member.username, // using username as ID for following logic
+        username = member.username,
+        displayName = member.name,
+        profileImageUrl = member.image?.toDomain()?.imageUrl,
+        isFollowing = isFollowing
     )
 }
 

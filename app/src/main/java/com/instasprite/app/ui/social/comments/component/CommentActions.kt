@@ -5,10 +5,14 @@ import com.instasprite.app.utils.pixelDp
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -27,12 +31,14 @@ import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.noRippleClickable
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CommentActions(
     isLiked: Boolean,
     isBookmarked: Boolean,
     likesCount: Int,
     onLikeClick: () -> Unit,
+    onLikesCountClick: () -> Unit = {},
     onBookmarkClick: () -> Unit,
     showBookmark: Boolean = true
 ) {
@@ -55,8 +61,7 @@ fun CommentActions(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.noRippleClickable { onLikeClick() }
+            verticalAlignment = Alignment.CenterVertically
         ) {
             PixelIcon(
                 icon = R.drawable.ic_heart,
@@ -64,10 +69,18 @@ fun CommentActions(
                 tint = if (isLiked) AppTheme.colors.DismissButtonColor else AppTheme.colors.TextColorLight,
                 modifier = Modifier
                     .scale(likeScale)
+                    .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onLikeClick,
+                        onLongClick = onLikesCountClick
+                    )
             )
             Spacer(modifier = Modifier.width(4.pixelDp))
             Box(
-                modifier = Modifier.width(22.pixelDp),
+                modifier = Modifier
+                    .width(22.pixelDp)
+                    .noRippleClickable { onLikesCountClick() },
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (likesCount > 0) {

@@ -32,6 +32,8 @@
     <string name="comment">Bình luận</string>
     <string name="following">Đang theo dõi</string>
     <string name="followers">Người theo dõi</string>
+    <string name="likes">Lượt thích</string>
+    <string name="no_likes">Chưa có ai thích bài viết này.</string>
     <string name="posts">Bài viết</string>
     <string name="search">Tìm kiếm</string>
     <string name="home">Trang chủ</string>

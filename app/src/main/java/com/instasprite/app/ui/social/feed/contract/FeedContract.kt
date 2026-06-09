@@ -22,7 +22,9 @@ data class FeedContentState(
     val hasNewPosts: Boolean = false,
     val deletedPostIds: Set<Long> = emptySet(),
     val isServerMaintenance: Boolean = false,
-    val showLoginRequiredError: Boolean = false
+    val showLoginRequiredError: Boolean = false,
+    val showLikesForPostId: Long? = null,
+    val postLikesFlow: Flow<PagingData<com.instasprite.app.ui.social.profile.contract.FollowerUser>>? = null
 )
 
 data class FeedScreenEvent(
@@ -39,5 +41,8 @@ data class FeedScreenEvent(
     val onOpenHashtag: (hashtag: String) -> Unit,
     val onClearError: () -> Unit,
     val onRetryConnection: () -> Unit,
-    val onConsumeLoginRequiredError: () -> Unit
+    val onConsumeLoginRequiredError: () -> Unit,
+    val onLikesCountClick: (postId: Long) -> Unit,
+    val onDismissLikesDialog: () -> Unit,
+    val onFollowUserInLikes: (userId: String) -> Unit
 )

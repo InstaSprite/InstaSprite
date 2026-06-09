@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.instasprite.app.R
+import com.instasprite.app.ui.social.feed.component.PostLikesDialog
 import com.instasprite.app.ui.social.feed.component.PostList
 import com.instasprite.app.ui.social.feed.contract.FeedContentState
 import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
@@ -69,7 +71,10 @@ fun FeedScreen(
             onOpenHashtag = {},
             onClearError = viewModel::clearError,
             onRetryConnection = viewModel::retryConnection,
-            onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError
+            onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError,
+            onLikesCountClick = viewModel::showLikesForPost,
+            onDismissLikesDialog = viewModel::dismissLikesDialog,
+            onFollowUserInLikes = { username -> viewModel.toggleFollow(username, false) }
         )
     }
 
@@ -139,6 +144,18 @@ fun FeedContent(
 
             )
         }
+
+        if (state.showLikesForPostId != null && state.postLikesFlow != null) {
+            val likes = state.postLikesFlow.collectAsLazyPagingItems()
+            PostLikesDialog(
+                likes = likes,
+                onDismiss = event.onDismissLikesDialog,
+                onProfileClick = { username ->
+                    event.onDismissLikesDialog()
+                    event.onOpenProfile(username)
+                }
+            )
+        }
     }
 }
 
@@ -164,7 +181,10 @@ private fun FeedContentPreview() {
                 onOpenHashtag = {},
                 onClearError = {},
                 onRetryConnection = {},
-                onConsumeLoginRequiredError = {}
+                onConsumeLoginRequiredError = {},
+                onLikesCountClick = {},
+                onDismissLikesDialog = {},
+                onFollowUserInLikes = {}
             )
         )
     }

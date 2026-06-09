@@ -86,5 +86,13 @@ interface PostApi {
     @Headers("Guest-Aware: true", "Content-Type: application/json")
     @GET("/api/v1/posts/most-liked")
     suspend fun getMostLikedPost(): Response<ResultResponse<PostDto>>
+
+    @Headers("Guest-Aware: true", "Content-Type: application/json")
+    @GET("/api/v1/posts/{postId}/likes")
+    suspend fun getMembersLikedPost(
+        @Path("postId") postId: Long,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Response<ResultResponse<SpringPageDto<com.instasprite.app.data.network.model.LikeMemberDto>>>
 }
 

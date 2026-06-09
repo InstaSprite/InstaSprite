@@ -70,6 +70,8 @@ import com.instasprite.app.ui.social.comments.contract.PostAuthor
 import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.social.feed.dialog.VerifyEmailDialog
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.instasprite.app.ui.social.feed.component.PostLikesDialog
 import com.instasprite.app.domain.session.SocialSessionState
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.home.SocialSessionViewModel
@@ -131,6 +133,9 @@ fun CommentScreen(
             onZoomImage = { zoomedImageUrl = it },
             onDismissZoom = { zoomedImageUrl = null },
             onConsumeLoginRequiredError = viewModel::consumeLoginRequiredError,
+            onLikesCountClick = { postId -> viewModel.showLikesForPost(postId) },
+            onDismissLikesDialog = viewModel::dismissLikesDialog,
+            onFollowUserInLikes = viewModel::toggleFollowUserInLikes,
             onHashtagClick = onHashtagClick
         )
     }
@@ -182,6 +187,19 @@ fun CommentScreen(
         com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay(
             model = url,
             onDismiss = { zoomedImageUrl = null }
+        )
+    }
+
+    val currentLikesFlow = uiState.postLikesFlow
+    if (uiState.showLikesForPostId != null && currentLikesFlow != null) {
+        val likes = currentLikesFlow.collectAsLazyPagingItems()
+        PostLikesDialog(
+            likes = likes,
+            onDismiss = event.onDismissLikesDialog,
+            onProfileClick = { username ->
+                event.onDismissLikesDialog()
+                event.onProfileClick(username)
+            }
         )
     }
 
@@ -328,6 +346,7 @@ private fun CommentScreenContent(
                         isBookmarked = uiState.isBookmarked,
                         likesCount = uiState.likesCount,
                         onLikeClick = event.onToggleLike,
+                        onLikesCountClick = { event.onLikesCountClick(uiState.backendPost?.postId ?: 0L) },
                         onBookmarkClick = event.onToggleBookmark,
                         showBookmark = !uiState.isOwnPost
                     )

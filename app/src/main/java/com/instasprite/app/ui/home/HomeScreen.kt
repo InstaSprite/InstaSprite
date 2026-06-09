@@ -195,7 +195,10 @@ fun HomeScreen(
             onOpenHashtag = onNavigateToHashtag,
             onClearError = feedViewModel::clearError,
             onRetryConnection = feedViewModel::retryConnection,
-            onConsumeLoginRequiredError = feedViewModel::consumeLoginRequiredError
+            onConsumeLoginRequiredError = feedViewModel::consumeLoginRequiredError,
+            onLikesCountClick = feedViewModel::showLikesForPost,
+            onDismissLikesDialog = feedViewModel::dismissLikesDialog,
+            onFollowUserInLikes = { username -> feedViewModel.toggleFollow(username, false) }
         )
     }
 

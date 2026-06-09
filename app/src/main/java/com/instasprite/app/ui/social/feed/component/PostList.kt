@@ -209,6 +209,7 @@ fun PostList(
                                 onFollowClick = { username, following ->
                                     if (!isOwnPost) event.onToggleFollow(username, following)
                                 },
+                                onLikesCountClick = { event.onLikesCountClick(rawPost.postId) },
                                 onLikeClick = { event.onToggleLike(rawPost.postId, isLiked) },
                                 onBookmarkClick = {
                                     event.onToggleBookmark(rawPost.postId, isBookmarked)
@@ -294,7 +295,10 @@ private fun Preview() {
                 onOpenHashtag = {},
                 onClearError = {},
                 onRetryConnection = {},
-                onConsumeLoginRequiredError = {}
+                onConsumeLoginRequiredError = {},
+                onLikesCountClick = {},
+                onDismissLikesDialog = {},
+                onFollowUserInLikes = {}
             ),
             lazyListState = LazyListState(),
             isOnline = true,

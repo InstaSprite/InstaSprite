@@ -1,7 +1,10 @@
 package com.instasprite.app.ui.social.comments.contract
 
+import com.instasprite.app.ui.social.profile.contract.FollowerUser
 import com.instasprite.app.domain.model.PostData
 import com.instasprite.app.ui.social.feed.VerifyEmailState
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 
 data class Comment(
     val id: String,
@@ -42,7 +45,9 @@ data class CommentState(
     val currentUserImageUrl: String? = null,
     val replyParentId: Long? = null,
     val showLoginRequiredError: Boolean = false,
-    val verifyEmailState: VerifyEmailState = VerifyEmailState()
+    val verifyEmailState: VerifyEmailState = VerifyEmailState(),
+    val showLikesForPostId: Long? = null,
+    val postLikesFlow: Flow<PagingData<FollowerUser>>? = null
 )
 
 data class CommentScreenEvent(
@@ -59,5 +64,8 @@ data class CommentScreenEvent(
     val onClearReplyTarget: () -> Unit,
     val onZoomImage: (String) -> Unit,
     val onDismissZoom: () -> Unit,
-    val onConsumeLoginRequiredError: () -> Unit = {}
+    val onConsumeLoginRequiredError: () -> Unit = {},
+    val onLikesCountClick: (Long) -> Unit = {},
+    val onDismissLikesDialog: () -> Unit = {},
+    val onFollowUserInLikes: (String) -> Unit = {}
 )

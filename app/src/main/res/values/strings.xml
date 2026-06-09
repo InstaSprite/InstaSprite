@@ -28,9 +28,11 @@
     <string name="edit">Edit</string>
     <string name="share">Share</string>
     <string name="like">Like</string>
-    <string name="comment">Comment</string>b
-    <string name="following">Following</string>
+    <string name="comment">Comment</string>
     <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="likes">Likes</string>
+    <string name="no_likes">No one has liked this post yet.</string>
     <string name="posts">Posts</string>
     <string name="search">Search</string>
     <string name="home">Home</string>

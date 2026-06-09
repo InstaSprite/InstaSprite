@@ -3,6 +3,7 @@ package com.instasprite.app.ui.social.comments
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.instasprite.app.R
 import com.instasprite.app.data.network.ApiError
 import com.instasprite.app.data.network.api.FollowApi
@@ -435,6 +436,46 @@ class CommentViewModel @Inject constructor(
 
     fun consumeLoginRequiredError() {
         _uiState.update { it.copy(showLoginRequiredError = false) }
+    }
+
+    fun showLikesForPost(postId: Long) {
+        _uiState.update {
+            it.copy(
+                showLikesForPostId = postId,
+                postLikesFlow = postRepository.getPostLikes(postId).cachedIn(viewModelScope)
+            )
+        }
+    }
+
+    fun dismissLikesDialog() {
+        _uiState.update {
+            it.copy(
+                showLikesForPostId = null,
+                postLikesFlow = null
+            )
+        }
+    }
+
+    fun toggleFollowUserInLikes(username: String) {
+        if (!isLoggedIn) {
+            _uiState.update { it.copy(showLoginRequiredError = true) }
+            return
+        }
+        val normalizedUsername = username.trim()
+        if (_uiState.value.currentUserImageUrl?.contains(normalizedUsername, ignoreCase = true) == true) return
+        
+        viewModelScope.launch {
+            try {
+                // PostLikesDialog only shows "Follow" if not following, so we assume newFollowing = true
+                val response = followApi.follow(normalizedUsername)
+                if (response.body()?.status == 200) {
+                    com.instasprite.app.ui.social.PostInteractionEvent.emitFollowEvent(
+                        username = normalizedUsername,
+                        isFollowing = true
+                    )
+                }
+            } catch (e: Exception) {}
+        }
     }
 
     fun dismissEmailNotVerified() {

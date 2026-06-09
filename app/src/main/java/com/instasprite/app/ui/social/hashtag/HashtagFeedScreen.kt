@@ -82,7 +82,10 @@ fun HashtagFeedScreenContent(
         onOpenHashtag = onOpenHashtag,
         onClearError = {},
         onRetryConnection = {},
-        onConsumeLoginRequiredError = {}
+        onConsumeLoginRequiredError = {},
+        onLikesCountClick = {},
+        onDismissLikesDialog = {},
+        onFollowUserInLikes = {}
     )
 
     Scaffold(

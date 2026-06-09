@@ -3,7 +3,10 @@ package com.instasprite.app.ui.social.feed.component
 import com.instasprite.app.utils.pixelDp
 
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,7 +50,7 @@ import com.instasprite.app.utils.TimeUtils
 import com.instasprite.app.utils.noRippleClickable
 import com.instasprite.app.utils.toSuffixString
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun FeedPostItem(
     post: PostData,
@@ -57,6 +60,7 @@ fun FeedPostItem(
     onLikeClick: () -> Unit = {},
     onBookmarkClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
+    onLikesCountClick: () -> Unit = {},
     onDeleteClick: (Long) -> Unit = {},
     onHashtagClick: (String) -> Unit = {},
     onMentionClick: (String) -> Unit = {},
@@ -248,11 +252,18 @@ fun FeedPostItem(
                                 AppTheme.colors.TextColorLight,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
-                                .noRippleClickable { onLikeClick() }
+                                .combinedClickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = { onLikeClick() },
+                                    onLongClick = { onLikesCountClick() }
+                                )
                         )
                         Spacer(modifier = Modifier.width(2.pixelDp))
                         Box(
-                            contentAlignment = Alignment.CenterStart
+                            contentAlignment = Alignment.CenterStart,
+                            modifier = Modifier
+                                .noRippleClickable { onLikesCountClick() }
                         ) {
                             if (post.postLikesCount > 0) {
                                 Text(

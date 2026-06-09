@@ -392,4 +392,22 @@ class FeedViewModel @Inject constructor(
             closeAllDialogs()
         }
     }
+
+    fun showLikesForPost(postId: Long) {
+        _contentState.update {
+            it.copy(
+                showLikesForPostId = postId,
+                postLikesFlow = postRepository.getPostLikes(postId).cachedIn(viewModelScope)
+            )
+        }
+    }
+
+    fun dismissLikesDialog() {
+        _contentState.update {
+            it.copy(
+                showLikesForPostId = null,
+                postLikesFlow = null
+            )
+        }
+    }
 }

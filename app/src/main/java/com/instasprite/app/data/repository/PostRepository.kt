@@ -13,18 +13,26 @@ import com.instasprite.app.data.network.model.CommitPostRequestDto
 import com.instasprite.app.data.network.model.UploadInitRequestDto
 import com.instasprite.app.data.network.model.toDomain
 import com.instasprite.app.data.network.safeApiCall
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.instasprite.app.data.network.toResult
 import com.instasprite.app.data.network.toResultMessage
 import com.instasprite.app.data.network.toResultUnit
 import com.instasprite.app.domain.model.PageData
 import com.instasprite.app.domain.model.PostData
+import com.instasprite.app.domain.model.PostTagData
+import com.instasprite.app.ui.social.profile.contract.FollowerUser
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PostRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val postApi: PostApi,
@@ -280,5 +288,15 @@ class PostRepository @Inject constructor(
             "webp" -> "image/webp"
             else -> "image/jpeg"
         }
+    }
+
+    fun getPostLikes(postId: Long): Flow<PagingData<FollowerUser>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { com.instasprite.app.data.paging.PostLikesPagingSource(postApi, postId) }
+        ).flow
     }
 }
