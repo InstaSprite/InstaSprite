@@ -92,6 +92,8 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun createPost() {
+        if (_uiState.value.isPostInProgress) return
+
         val caption = _uiState.value.caption
         val selectedImage = _uiState.value.selectedImage ?: return
         val commentEnabled = _uiState.value.commentEnabled

@@ -119,6 +119,7 @@ private fun CreatePostScreenContent(
                 actions = {
                     Button(
                         onClick = event.onCreatePost,
+                        enabled = !uiState.isPostInProgress,
                         modifier = Modifier.padding(
                             end = 8.pixelDp
                         ),
