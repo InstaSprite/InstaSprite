@@ -42,7 +42,6 @@ fun VerifyEmailDialog(
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
         ) {
             if (verifyEmailState.isSending) {
                 CircularProgressIndicator(
