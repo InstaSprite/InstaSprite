@@ -40,6 +40,7 @@ class FeedViewModelTest {
     private lateinit var accountRepository: AccountRepository
     private lateinit var sessionManager: SocialSessionManager
     private lateinit var connectivityObserver: com.instasprite.app.utils.ConnectivityObserver
+    private lateinit var dialogController: com.instasprite.app.domain.dialog.DialogController<FeedDialog>
     private lateinit var context: android.content.Context
 
     private lateinit var viewModel: FeedViewModel
@@ -55,6 +56,7 @@ class FeedViewModelTest {
         accountRepository = mockk()
         sessionManager = mockk(relaxed = true)
         connectivityObserver = mockk(relaxed = true)
+        dialogController = mockk(relaxed = true)
         context = mockk(relaxed = true)
 
         val sessionFlow = MutableStateFlow<SocialSessionState>(SocialSessionState.LoggedIn("testuser"))
@@ -70,11 +72,10 @@ class FeedViewModelTest {
         viewModel = FeedViewModel(
             authRepository,
             postRepository,
-            profileRepository,
             followRepository,
-            accountRepository,
             sessionManager,
             connectivityObserver,
+            dialogController,
             context
         )
         

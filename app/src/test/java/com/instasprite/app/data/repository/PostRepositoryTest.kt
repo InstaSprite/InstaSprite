@@ -19,6 +19,9 @@ class PostRepositoryTest {
     private lateinit var postApi: PostApi
     private lateinit var s3UploadClient: S3UploadClient
     private lateinit var context: Context
+    private lateinit var database: com.instasprite.app.data.database.AppDatabase
+    private lateinit var syncManager: com.instasprite.app.data.network.sync.SyncManager
+    private lateinit var postDao: com.instasprite.app.data.database.PostDao
     private lateinit var repo: PostRepository
 
     @Before
@@ -26,7 +29,11 @@ class PostRepositoryTest {
         postApi = mockk()
         s3UploadClient = mockk(relaxed = true)
         context = mockk(relaxed = true)
-        repo = PostRepository(context, postApi, s3UploadClient)
+        database = mockk(relaxed = true)
+        postDao = mockk(relaxed = true)
+        io.mockk.every { database.postDao() } returns postDao
+        syncManager = mockk(relaxed = true)
+        repo = PostRepository(context, postApi, s3UploadClient, database, syncManager)
     }
 
     // ============================
@@ -34,33 +41,21 @@ class PostRepositoryTest {
     // ============================
 
     @Test
-    fun `likePost returns success on 200 OK`() = runTest {
-        coEvery { postApi.likePost(42L) } returns Response.success(
-            ResultResponse(status = 200, code = "PL01", message = "Liked", data = "Post liked successfully")
+    fun `likePost updates local database and enqueues sync mutation`() = runTest {
+        val post = com.instasprite.app.data.model.PostEntity(
+            postId = 42L, authorId = 1L, postContent = "", postUploadDate = "", postCommentsCount = 0L, postLikesCount = 5L,
+            postBookmarkFlag = false, postLikeFlag = false, commentOptionFlag = true, likeOptionFlag = true,
+            isFollowing = false, followingMemberUsernameLikedPost = null, mentionsOfContent = null, hashtags = null, postImages = null, recentComments = null
         )
+        coEvery { postDao.getPostById(42L) } returns post
+        coEvery { postDao.updateLikeState(42L, true, 6) } returns Unit
 
         val result = repo.likePost(42L)
         assertTrue(result.isSuccess)
-        assertEquals("Liked", result.getOrNull())
-    }
+        assertEquals("Post liked offline", result.getOrNull())
 
-    @Test
-    fun `likePost returns failure on error response`() = runTest {
-        coEvery { postApi.likePost(42L) } returns Response.error(
-            400, "{}".toResponseBody()
-        )
-
-        val result = repo.likePost(42L)
-        assertTrue(result.isFailure)
-    }
-
-    @Test
-    fun `likePost returns failure on network exception`() = runTest {
-        coEvery { postApi.likePost(42L) } throws RuntimeException("Connection refused")
-
-        val result = repo.likePost(42L)
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()!!.message!!.contains("Connection refused"))
+        io.mockk.coVerify { postDao.updateLikeState(42L, true, 6) }
+        io.mockk.coVerify { syncManager.enqueueMutation(com.instasprite.app.data.model.MutationType.LIKE_POST, "42") }
     }
 
     // ============================
@@ -68,21 +63,21 @@ class PostRepositoryTest {
     // ============================
 
     @Test
-    fun `unlikePost returns success on 200 OK`() = runTest {
-        coEvery { postApi.unlikePost(42L) } returns Response.success(
-            ResultResponse(status = 200, code = "PL02", message = "Unliked", data = "Post unliked successfully")
+    fun `unlikePost updates local database and enqueues sync mutation`() = runTest {
+        val post = com.instasprite.app.data.model.PostEntity(
+            postId = 42L, authorId = 1L, postContent = "", postUploadDate = "", postCommentsCount = 0L, postLikesCount = 5L,
+            postBookmarkFlag = false, postLikeFlag = true, commentOptionFlag = true, likeOptionFlag = true,
+            isFollowing = false, followingMemberUsernameLikedPost = null, mentionsOfContent = null, hashtags = null, postImages = null, recentComments = null
         )
+        coEvery { postDao.getPostById(42L) } returns post
+        coEvery { postDao.updateLikeState(42L, false, 4) } returns Unit
 
         val result = repo.unlikePost(42L)
         assertTrue(result.isSuccess)
-    }
+        assertEquals("Post unliked offline", result.getOrNull())
 
-    @Test
-    fun `unlikePost returns failure on exception`() = runTest {
-        coEvery { postApi.unlikePost(42L) } throws RuntimeException("Timeout")
-
-        val result = repo.unlikePost(42L)
-        assertTrue(result.isFailure)
+        io.mockk.coVerify { postDao.updateLikeState(42L, false, 4) }
+        io.mockk.coVerify { syncManager.enqueueMutation(com.instasprite.app.data.model.MutationType.UNLIKE_POST, "42") }
     }
 
     // ============================

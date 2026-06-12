@@ -249,7 +249,7 @@ class FeedViewModel @Inject constructor(
             return
         }
         val newStatus = !currentStatus
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             PostInteractionEvent.emitLikeEvent(postId, newStatus)
             val result =
                 if (newStatus) postRepository.likePost(postId) else postRepository.unlikePost(postId)
@@ -263,7 +263,7 @@ class FeedViewModel @Inject constructor(
             return
         }
         val newStatus = !currentStatus
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             PostInteractionEvent.emitBookmarkEvent(postId, newStatus)
             val result = if (newStatus) {
                 postRepository.bookmarkPost(postId)
@@ -287,7 +287,7 @@ class FeedViewModel @Inject constructor(
         val newStatus = !currentStatus
         val normalizedUsername = username.trim()
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             PostInteractionEvent.emitFollowEvent(normalizedUsername, newStatus)
             val result = if (newStatus) {
                 followRepository.follow(normalizedUsername)

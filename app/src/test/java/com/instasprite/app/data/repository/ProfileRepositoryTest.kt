@@ -24,6 +24,7 @@ class ProfileRepositoryTest {
     private lateinit var profileApi: ProfileApi
     private lateinit var memberPostApi: MemberPostApi
     private lateinit var postApi: PostApi
+    private lateinit var database: com.instasprite.app.data.database.AppDatabase
     private lateinit var repo: ProfileRepository
 
     @Before
@@ -37,7 +38,8 @@ class ProfileRepositoryTest {
         profileApi = mockk()
         memberPostApi = mockk()
         postApi = mockk()
-        repo = ProfileRepository(profileApi, memberPostApi, postApi)
+        database = mockk(relaxed = true)
+        repo = ProfileRepository(profileApi, memberPostApi, postApi, database)
     }
 
     @After
