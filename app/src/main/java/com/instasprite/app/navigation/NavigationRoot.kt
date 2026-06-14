@@ -29,6 +29,12 @@ sealed interface Screen : NavKey {
     data object LoadImage : Screen
 
     @Serializable
+    data object Setting : Screen
+
+    @Serializable
+    data object About : Screen
+
+    @Serializable
     data class Drawing(
         val spriteId: String,
         val width: Int,
@@ -36,40 +42,4 @@ sealed interface Screen : NavKey {
         val spriteName: String?,
         val colorPalette: ColorPalette? = null
     ) : Screen
-    
-    @Serializable
-    data object Auth : Screen
-
-    @Serializable
-    data object Feed : Screen
-
-    @Serializable
-    data class Comments(val postId: Long) : Screen
-
-    @Serializable
-    data object CompletionProfile : Screen
-
-    @Serializable
-    data object CreatePost : Screen
-
-    @Serializable
-    data object Notification : Screen
-
-    @Serializable
-    data object Setting : Screen
-
-    @Serializable
-    data class Profile(val userId: String? = null) : Screen
-
-    @Serializable
-    data class Hashtag(val hashtag: String) : Screen
-
-    @Serializable
-    data object Search : Screen
-
-    @Serializable
-    data object About : Screen
-
-    @Serializable
-    data object EditProfile : Screen
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -23,24 +24,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
-import com.instasprite.app.domain.session.CurrentUserState
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.social.feed.component.ProfileImage
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun HomeDrawer(
-    isLoggedIn: Boolean,
-    currentUser: CurrentUserState?,
-    onHomeClick: () -> Unit,
-    onProfileClick: () -> Unit,
-    onLoginClick: () -> Unit,
-    onNotificationsClick: () -> Unit,
-    onSearchClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onAboutClick: () -> Unit,
-    onLogoutClick: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val drawerItemColors = NavigationDrawerItemDefaults.colors(
@@ -51,9 +43,6 @@ fun HomeDrawer(
         unselectedTextColor = AppTheme.colors.TextColorLight,
         selectedTextColor = AppTheme.colors.TextColorLight,
     )
-
-    val memberName = currentUser?.displayName?.takeIf { it.isNotBlank() }  ?: stringResource(R.string.app_name)
-    val memberUsername = currentUser?.username?.takeIf { it.isNotBlank() } ?: ""
 
     ModalDrawerSheet(
         drawerContainerColor = AppTheme.colors.TopBarColor,
@@ -67,68 +56,24 @@ fun HomeDrawer(
         ) {
             Spacer(modifier = Modifier.height(32.pixelDp))
 
-            if (isLoggedIn) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ProfileImage(
-                        imageUrl = currentUser?.avatarUrl,
-                        size = 64.pixelDp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.pixelDp))
-
-                Text(
-                    text = memberName,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = AppTheme.colors.TextColorLight
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                PixelIcon(
+                    icon = R.drawable.ic_launcher,
+                    modifier = Modifier
+                        .size(58.pixelDp)
                 )
-
-                if (memberUsername.isNotBlank()) {
-                    Text(
-                        text = "@$memberUsername",
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppTheme.colors.Foreground2Color
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.pixelDp))
             }
 
-            HomeDrawerItem(
-                icon = R.drawable.ic_profile,
-                label = if (isLoggedIn) stringResource(R.string.profile) else stringResource(R.string.login),
-                selected = false,
-                colors = drawerItemColors,
-                onClick = if (isLoggedIn) onProfileClick else onLoginClick
-            )
+            Spacer(modifier = Modifier.height(8.pixelDp))
 
-            HomeDrawerItem(
-                icon = R.drawable.ic_home,
-                label = stringResource(R.string.home),
-                selected = true,
-                colors = drawerItemColors,
-                onClick = onHomeClick
-            )
-
-            HomeDrawerItem(
-                icon = R.drawable.ic_notification_bell,
-                label = stringResource(R.string.notifications),
-                selected = false,
-                colors = drawerItemColors,
-                onClick = onNotificationsClick
-            )
-
-            HomeDrawerItem(
-                icon = R.drawable.ic_search,
-                label = "Search",
-                selected = false,
-                colors = drawerItemColors,
-                onClick = onSearchClick
+            Text(
+                text = stringResource(R.string.app_name),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = MaterialTheme.typography.bodyLarge,
+                color = AppTheme.colors.TextColorLight
             )
 
             HomeDrawerItem(
@@ -154,15 +99,13 @@ fun HomeDrawer(
                 onClick = onAboutClick
             )
 
-            if (isLoggedIn) {
-                HomeDrawerItem(
-                    icon = R.drawable.ic_left_arrow,
-                    label = stringResource(R.string.logout),
-                    selected = false,
-                    colors = drawerItemColors,
-                    onClick = onLogoutClick
-                )
-            }
+            HomeDrawerItem(
+                icon = R.drawable.ic_left_arrow,
+                label = stringResource(R.string.back),
+                selected = false,
+                colors = drawerItemColors,
+                onClick = onBackClick
+            )
 
             Spacer(modifier = Modifier.height(10.pixelDp))
         }

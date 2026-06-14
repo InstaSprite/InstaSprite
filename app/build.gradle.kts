@@ -1,5 +1,5 @@
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.protobuf)
-    alias(libs.plugins.google.services)
     id("kotlin-parcelize")
 }
 
@@ -30,10 +29,6 @@ android {
         val ciVersionCode = project.findProperty("ciVersionCode")?.toString()?.toIntOrNull()
         versionCode = ciVersionCode ?: 3
         versionName = "0.8.3"
-
-        buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL", "\"\""))
-        buildConfigField("String", "IMG_URL", localProperties.getProperty("IMG_URL", "\"\""))
-        buildConfigField("String", "GOOGLE_WEBCLIENT_ID", localProperties.getProperty("GOOGLE_WEBCLIENT_ID", "\"\""))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -81,6 +76,7 @@ android {
     kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+            freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
         }
     }
     buildFeatures {
@@ -169,14 +165,13 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.coil.network.okhttp)
     implementation(libs.okhttp3.logging.interceptor)
-
-
+    
     // --- Testing ---
     testImplementation(libs.junit)
-    testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
-    testImplementation("app.cash.turbine:turbine:1.2.0")
-    testImplementation("androidx.paging:paging-testing:3.3.6")
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.androidx.paging.testing)
 
     // Android Instrumentation Tests
     androidTestImplementation(libs.androidx.junit)
@@ -192,12 +187,4 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.play.services.auth.coroutines)
 
-    // --- Firebase & Auth ---
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.messaging)
-
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
 }

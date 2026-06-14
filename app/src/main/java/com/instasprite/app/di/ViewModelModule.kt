@@ -12,7 +12,6 @@ import com.instasprite.app.domain.model.PixelCanvas
 import com.instasprite.app.ui.drawing.DrawingDialog
 import com.instasprite.app.ui.gallery.GalleryDialog
 import com.instasprite.app.ui.palette.ColorPaletteDialog
-import com.instasprite.app.ui.social.feed.FeedDialog
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,11 +53,6 @@ object ViewModelModule {
 
     @Provides
     fun provideColorPaletteDialogController(): DialogController<ColorPaletteDialog> {
-        return DialogControllerImpl()
-    }
-
-    @Provides
-    fun provideFeedDialogController(): DialogController<FeedDialog> {
         return DialogControllerImpl()
     }
 }

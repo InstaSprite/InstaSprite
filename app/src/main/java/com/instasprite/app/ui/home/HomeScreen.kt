@@ -9,14 +9,11 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -32,23 +29,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
 import com.instasprite.app.R
-import com.instasprite.app.domain.session.SocialSessionState
-import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.gallery.GalleryDialog
 import com.instasprite.app.ui.gallery.GalleryPageContent
 import com.instasprite.app.ui.gallery.GalleryScreenDialogs
@@ -57,27 +46,17 @@ import com.instasprite.app.ui.gallery.GalleryViewModel
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
 import com.instasprite.app.ui.home.component.BottomBarItem
-import com.instasprite.app.ui.home.component.FeedFab
 import com.instasprite.app.ui.home.component.HomeBottomBar
 import com.instasprite.app.ui.home.component.HomeDrawer
 import com.instasprite.app.ui.home.component.HomeFab
-import com.instasprite.app.ui.social.feed.FeedContent
-import com.instasprite.app.ui.social.feed.FeedDialog
-import com.instasprite.app.ui.social.feed.FeedScreenDialogs
-import com.instasprite.app.ui.social.feed.FeedViewModel
-import com.instasprite.app.ui.social.feed.component.ProfileImage
-import com.instasprite.app.ui.social.feed.contract.FeedContentState
-import com.instasprite.app.ui.social.feed.contract.FeedScreenEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.UiUtils
-import com.instasprite.app.utils.noRippleClickable
 import com.instasprite.app.utils.pixelDp
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 enum class HomeTab(@StringRes val titleRes: Int) {
     GALLERY(R.string.gallery),
-    FEED(R.string.feed)
 }
 
 @Composable
@@ -85,19 +64,10 @@ fun HomeScreen(
     onNavigateToDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit,
     onNavigateToCreateCanvas: () -> Unit,
     onNavigateToLoadImage: () -> Unit,
-    onNavigateToHashtag: (hashtag: String) -> Unit,
     onNavigateToPalette: () -> Unit,
-    onLoginClick: () -> Unit,
-    onOpenComments: (postId: Long) -> Unit,
-    onOpenProfile: (userId: String) -> Unit,
-    onOpenNotifications: () -> Unit,
-    onOpenSearch: () -> Unit,
     onOpenSetting: () -> Unit,
     onOpenAbout: () -> Unit,
-    onNavigateToCreatePost: () -> Unit,
-    galleryViewModel: GalleryViewModel = hiltViewModel(),
-    feedViewModel: FeedViewModel = hiltViewModel(),
-    sessionViewModel: SocialSessionViewModel = hiltViewModel(),
+    galleryViewModel: GalleryViewModel = hiltViewModel()
 ) {
     UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
     UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
@@ -112,14 +82,6 @@ fun HomeScreen(
     val sortedSprites by galleryViewModel.sortedAndFilteredSprites.collectAsState()
     val searchQuery by galleryViewModel.searchQuery.collectAsState()
     val galleryListState = rememberLazyListState()
-
-    val feedState by feedViewModel.contentState.collectAsState(initial = FeedContentState())
-    val feedDialogState by feedViewModel.dialogState.collectAsState()
-    val sessionState by sessionViewModel.sessionState.collectAsState()
-    val feedListState = rememberLazyListState()
-    val isLoggedIn = sessionState is SocialSessionState.LoggedIn
-    val isOnline by feedViewModel.isOnline.collectAsState()
-    val currentUser by sessionViewModel.currentUser.collectAsState()
 
     LaunchedEffect(galleryViewModel.lastEditedSpriteId) {
         val editedId = galleryViewModel.lastEditedSpriteId ?: return@LaunchedEffect
@@ -145,13 +107,6 @@ fun HomeScreen(
         }
     }
 
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    LaunchedEffect(feedViewModel, lifecycle) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            feedViewModel.startPolling()
-        }
-    }
-
     if (galleryUiState.showImagePager) {
         ImagePagerOverlay(
             onImagePagerEvent = galleryViewModel::onImagePagerEvent,
@@ -165,7 +120,6 @@ fun HomeScreen(
     }
 
     GalleryScreenDialogs(galleryDialogState, galleryViewModel)
-    FeedScreenDialogs(feedDialogState, feedViewModel)
 
     val galleryEvent = remember(galleryViewModel) {
         galleryViewModel.onOpenDrawing = onNavigateToDrawing
@@ -179,66 +133,18 @@ fun HomeScreen(
         )
     }
 
-    val feedEvent = remember(feedViewModel, onLoginClick, onOpenComments, onOpenProfile) {
-        feedViewModel.openSearch = onOpenSearch
-        FeedScreenEvent(
-            onLoginClick = onLoginClick,
-            onOpenComments = onOpenComments,
-            onOpenProfile = onOpenProfile,
-            onToggleLike = feedViewModel::toggleLikePost,
-            onToggleBookmark = feedViewModel::toggleBookmarkPost,
-            onToggleFollow = feedViewModel::toggleFollow,
-            onDeleteClick = { postId -> feedViewModel.openDialog(FeedDialog.DeletePostConfirm(postId)) },
-            onRefreshed = feedViewModel::onRefreshed,
-            onConsumeRefreshPending = feedViewModel::consumeRefreshPending,
-            onUpdateTopPostId = feedViewModel::updateTopPostId,
-            onOpenHashtag = onNavigateToHashtag,
-            onClearError = feedViewModel::clearError,
-            onRetryConnection = feedViewModel::retryConnection,
-            onConsumeLoginRequiredError = feedViewModel::consumeLoginRequiredError,
-            onLikesCountClick = feedViewModel::showLikesForPost,
-            onDismissLikesDialog = feedViewModel::dismissLikesDialog,
-            onFollowUserInLikes = { username -> feedViewModel.toggleFollow(username, false) }
-        )
-    }
-
-    fun launchDrawerAction(action: () -> Unit = {}) {
-        scope.launch {
-            drawerState.close()
-            action()
-        }
-    }
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            key(
-                isLoggedIn,
-                currentUser?.avatarUrl,
-                currentUser?.displayName,
-                currentUser?.username
-            ) {
-                HomeDrawer(
-                    isLoggedIn = isLoggedIn,
-                    currentUser = currentUser,
-                    onHomeClick = { launchDrawerAction() },
-                    onProfileClick = {
-                        launchDrawerAction {
-                            currentUser?.username?.let(onOpenProfile) ?: onLoginClick()
-                        }
-                    },
-                    onLoginClick = { launchDrawerAction(onLoginClick) },
-                    onNotificationsClick = { launchDrawerAction(onOpenNotifications) },
-                    onSearchClick = { launchDrawerAction(onOpenSearch) },
-                    onSettingsClick = { launchDrawerAction(onOpenSetting) },
-                    onAboutClick = { launchDrawerAction(onOpenAbout) },
-                    onLogoutClick = {
-                        launchDrawerAction {
-                            sessionViewModel.logout()
-                        }
+            HomeDrawer(
+                onSettingsClick = onOpenSetting,
+                onAboutClick = onOpenAbout,
+                onBackClick = {
+                    scope.launch {
+                        drawerState.close()
                     }
-                )
-            }
+                }
+            )
         }
     ) {
         Box {
@@ -289,28 +195,13 @@ fun HomeScreen(
                 },
                 bottomBar = {
                     HomeScreenBottomBar(
-                        currentPage = pagerState.currentPage,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onPaletteClick = onNavigateToPalette,
                         onSearchClick = {
-                            if (pagerState.currentPage == 0) {
-                                galleryViewModel.toggleSearchBar()
-                            } else {
-                                feedViewModel.openSearch()
-                            }
-                        },
-                        avatarUrl = currentUser?.avatarUrl,
-                        onProfileClick = {
-                            launchDrawerAction {
-                                currentUser?.username?.let(onOpenProfile) ?: onLoginClick()
-                            }
+                            galleryViewModel.toggleSearchBar()
                         },
                         onSortClick = {
-                            if (pagerState.currentPage == 0) {
-                                galleryViewModel.openDialog(GalleryDialog.DisplayOptions)
-                            } else {
-                                feedViewModel.openDialog(FeedDialog.PostFilter)
-                            }
+                            galleryViewModel.openDialog(GalleryDialog.DisplayOptions)
                         }
                     )
                 },
@@ -328,14 +219,6 @@ fun HomeScreen(
                             spriteList = sortedSprites,
                             searchQuery = searchQuery,
                             event = galleryEvent,
-                        )
-
-                        1 -> FeedContent(
-                            isLoggedIn = isLoggedIn,
-                            isOnline = isOnline,
-                            state = feedState,
-                            listState = feedListState,
-                            event = feedEvent,
                         )
                     }
                 }
@@ -360,16 +243,6 @@ fun HomeScreen(
                         onLoadImage = galleryEvent.onLoadImage,
                     )
                 }
-
-                AnimatedVisibility(
-                    visible = pagerState.currentPage == 1 && isLoggedIn,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    FeedFab(
-                        onCreatePost = onNavigateToCreatePost,
-                    )
-                }
             }
         }
     }
@@ -377,12 +250,9 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenBottomBar(
-    currentPage: Int,
     onMenuClick: () -> Unit,
     onPaletteClick: () -> Unit,
     onSearchClick: () -> Unit,
-    avatarUrl: String?,
-    onProfileClick: () -> Unit,
     onSortClick: () -> Unit
 ) {
     HomeBottomBar(
@@ -407,34 +277,12 @@ private fun HomeScreenBottomBar(
                 onClick = onSearchClick,
                 iconTint = AppTheme.colors.TextColorLight
             )
-            if (currentPage == 1) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .noRippleClickable(onClick = onProfileClick)
-                        .padding(horizontal = 8.pixelDp, vertical = 2.pixelDp)
-                ) {
-                    ProfileImage(
-                        imageUrl = avatarUrl,
-                        shape = PixelShape(1, 1.pixelDp),
-                        modifier = Modifier.size(16.pixelDp)
-                    )
-                    Text(
-                        text = stringResource(R.string.profile),
-                        color = AppTheme.colors.TextColorLight,
-                        fontSize = 9.sp,
-                        maxLines = 1
-                    )
-                }
-            } else {
-                BottomBarItem(
-                    icon = R.drawable.ic_sort,
-                    title = stringResource(R.string.sort),
-                    onClick = onSortClick,
-                    iconTint = AppTheme.colors.TextColorLight
-                )
-            }
+            BottomBarItem(
+                icon = R.drawable.ic_sort,
+                title = stringResource(R.string.sort),
+                onClick = onSortClick,
+                iconTint = AppTheme.colors.TextColorLight
+            )
         },
         modifier = Modifier.height(48.pixelDp)
     )

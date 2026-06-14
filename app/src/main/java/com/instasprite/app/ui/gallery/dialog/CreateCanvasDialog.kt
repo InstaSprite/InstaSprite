@@ -75,7 +75,7 @@ fun CreateCanvasDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     var palette = loadDefaultColorPalette(LocalContext.current)
-                    if (selectedPalette != null) palette = selectedPalette!!.colors
+                    if (selectedPalette != null) palette = selectedPalette.colors
 
                     ColorPaletteView(
                         colors = palette,
