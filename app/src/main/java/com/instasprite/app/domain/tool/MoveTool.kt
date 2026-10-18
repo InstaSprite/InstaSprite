@@ -1,22 +1,21 @@
 package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.R
-import com.instasprite.app.domain.draw.StrokeEngine
+import com.instasprite.app.domain.draw.MoveCompositor
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
-object MoveTool : StrokeTool {
-    override val icon: Int = R.drawable.ic_move_tool
-    override val nameRes: Int = R.string.move
-    override val descriptionRes: Int = R.string.tool_move_desc
+class MoveTool : StrokeTool {
+    override val type = ToolType.Move
     override val commitsImmediately: Boolean = false
     override val staysPendingAfterStroke: Boolean = true
 
     private var session: MoveSession? = null
+    internal var compositor: MoveCompositor? = null
     val isMoving: Boolean get() = session != null
 
     fun reset() {
         session = null
+        compositor = null
     }
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {}
@@ -37,7 +36,7 @@ object MoveTool : StrokeTool {
             existing.accumulatedOffsetX = existing.offsetX
             existing.accumulatedOffsetY = existing.offsetY
             
-            StrokeEngine.activeMoveCompositor?.composite(existing.offsetX, existing.offsetY)
+            compositor?.composite(existing.offsetX, existing.offsetY)
 
             return StrokeUpdate(
                 isFullPreview = true,
@@ -53,7 +52,7 @@ object MoveTool : StrokeTool {
         val s = MoveSession(pixels.copyOf(), mask, w, h, startCol = col, startRow = row)
         session = s
 
-        StrokeEngine.activeMoveCompositor?.composite(0, 0)
+        compositor?.composite(0, 0)
 
         return StrokeUpdate(
             isFullPreview = true,
@@ -74,7 +73,7 @@ object MoveTool : StrokeTool {
         s.offsetX = s.accumulatedOffsetX + (col - s.startCol)
         s.offsetY = s.accumulatedOffsetY + (row - s.startRow)
 
-        StrokeEngine.activeMoveCompositor?.composite(s.offsetX, s.offsetY)
+        compositor?.composite(s.offsetX, s.offsetY)
 
         return StrokeUpdate(
             isFullPreview = true,
@@ -87,7 +86,7 @@ object MoveTool : StrokeTool {
     override fun endStroke() {}
 
     override fun cancelStroke() {
-        session = null
+        reset()
     }
 
     override fun commitPending(canvas: PixelCanvasUseCase): StrokeUpdate? {

@@ -24,7 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.SpriteWithMeta
+import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.ui.components.composable.JumpToTopButton
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
@@ -65,6 +66,7 @@ data class GalleryScreenEvent(
     val onCreateNewCanvas: () -> Unit,
     val onLoadCanvas: () -> Unit,
     val onLoadImage: () -> Unit,
+    val onOpenDrawing: (Sprite, String?) -> Unit
 )
 
 @Composable
@@ -78,14 +80,14 @@ fun GalleryScreen(
     UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
     UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
 
-    val uiState by viewModel.uiState.collectAsState()
-    val dialogState by viewModel.dialogState.collectAsState()
-    val sprites by viewModel.sprites.collectAsState()
-    val sortedSprites by viewModel.sortedAndFilteredSprites.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
+    val sprites by viewModel.sprites.collectAsStateWithLifecycle()
+    val sortedSprites by viewModel.sortedAndFilteredSprites.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     DrawingNavigationEffect(
-        destination = uiState.drawingDestination,
+        state = viewModel.uiState,
         onHandled = viewModel::onDrawingNavigationHandled,
         onNavigate = onNavigateToDrawing
     )
@@ -129,6 +131,9 @@ fun GalleryScreen(
 
     if (uiState.showImagePager) {
         ImagePagerOverlay(
+            onOpenDrawing = { sprite, name ->
+                onNavigateToDrawing(sprite.id, sprite.width, sprite.height, name, null)
+            },
             onImagePagerEvent = viewModel::onImagePagerEvent,
             spriteList = sortedSprites,
             startIndex = viewModel.currentSelectedSpriteIndex,
@@ -141,7 +146,7 @@ fun GalleryScreen(
 
     GalleryScreenDialogs(dialogState, viewModel)
 
-    val event = remember(viewModel, onNavigateToCreateCanvas, onNavigateToLoadImage) {
+    val event = remember(viewModel, onNavigateToDrawing, onNavigateToCreateCanvas, onNavigateToLoadImage) {
         GalleryScreenEvent(
             onImagePagerEvent = viewModel::onImagePagerEvent,
             onSearchBarEvent = viewModel::onSearchBarEvent,
@@ -149,6 +154,9 @@ fun GalleryScreen(
             onCreateNewCanvas = onNavigateToCreateCanvas,
             onLoadCanvas = { viewModel.openDialog(GalleryDialog.LoadISprite) },
             onLoadImage = onNavigateToLoadImage,
+            onOpenDrawing = { sprite, name ->
+                onNavigateToDrawing(sprite.id, sprite.width, sprite.height, name, null)
+            },
         )
     }
 
@@ -183,6 +191,7 @@ fun GalleryPageContent(
         if (spriteList.isNotEmpty()) {
             SpriteList(
                 onSpriteListEvent = event.onSpriteListEvent,
+                onOpenDrawing = event.onOpenDrawing,
                 spriteList = spriteList,
                 layoutMode = uiState.layoutMode,
                 onIsScrolledChange = { isScrolled = it },
@@ -260,6 +269,7 @@ private fun GalleryScreenContent(
             ) {
                 SpriteList(
                     onSpriteListEvent = event.onSpriteListEvent,
+                    onOpenDrawing = event.onOpenDrawing,
                     spriteList = spriteList,
                     layoutMode = uiState.layoutMode,
                     onIsScrolledChange = { isScrolled = it },
@@ -315,6 +325,7 @@ private fun GalleryScreenPreview() {
                 onCreateNewCanvas = {},
                 onLoadCanvas = {},
                 onLoadImage = {},
+                onOpenDrawing = { _, _ -> },
             )
         )
     }
@@ -336,6 +347,7 @@ private fun GalleryScreenPreviewStaggeredLayout() {
                 onCreateNewCanvas = {},
                 onLoadCanvas = {},
                 onLoadImage = {},
+                onOpenDrawing = { _, _ -> },
             )
         )
     }
@@ -357,6 +369,7 @@ private fun GalleryScreenPreviewSquareLayout() {
                 onCreateNewCanvas = {},
                 onLoadCanvas = {},
                 onLoadImage = {},
+                onOpenDrawing = { _, _ -> },
             )
         )
     }

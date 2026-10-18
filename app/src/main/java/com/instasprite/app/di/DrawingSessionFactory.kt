@@ -4,6 +4,7 @@ import android.content.Context
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.data.repository.PixelCanvasRepository
 import com.instasprite.app.domain.canvashistory.HistoryDiskStore
+import com.instasprite.app.domain.draw.DrawingSession
 import com.instasprite.app.domain.draw.DrawingEngine
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,23 +21,5 @@ class DrawingSessionFactory @Inject constructor(
         val useCase = PixelCanvasUseCase(pixelCanvasRepository, colorPaletteRepository)
         val historyStore = HistoryDiskStore(File(context.cacheDir, "history/$spriteId"))
         return DrawingSession(useCase, DrawingEngine(useCase, scope, historyStore), historyStore)
-    }
-}
-
-class DrawingSession internal constructor(
-    val canvas: PixelCanvasUseCase,
-    val engine: DrawingEngine,
-    private val historyStore: HistoryDiskStore
-) {
-    fun clearHistory() {
-        historyStore.destroy()
-    }
-
-    fun close() {
-        try {
-            engine.release()
-        } finally {
-            clearHistory()
-        }
     }
 }

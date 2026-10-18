@@ -2,13 +2,10 @@ package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.instasprite.app.R
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 object FillTool : Tool {
-    override val icon: Int = R.drawable.ic_fill_tool
-    override val nameRes: Int = R.string.fill
-    override val descriptionRes: Int = R.string.tool_fill_desc
+    override val type = ToolType.Fill
 
     data class FillResult(
         val dirtyMinRow: Int,
@@ -17,17 +14,8 @@ object FillTool : Tool {
         val dirtyMaxCol: Int,
     )
 
-    var dirtyMinRow: Int = 0; private set
-    var dirtyMinCol: Int = 0; private set
-    var dirtyMaxRow: Int = 0; private set
-    var dirtyMaxCol: Int = 0; private set
-
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
-        val result = fillDirect(canvas, row, col, color) ?: return
-        dirtyMinRow = result.dirtyMinRow
-        dirtyMinCol = result.dirtyMinCol
-        dirtyMaxRow = result.dirtyMaxRow
-        dirtyMaxCol = result.dirtyMaxCol
+        fillDirect(canvas, row, col, color)
     }
 
     fun fillDirect(

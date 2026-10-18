@@ -27,7 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -78,10 +78,10 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    val galleryUiState by galleryViewModel.uiState.collectAsState()
-    val galleryDialogState by galleryViewModel.dialogState.collectAsState()
-    val sortedSprites by galleryViewModel.sortedAndFilteredSprites.collectAsState()
-    val searchQuery by galleryViewModel.searchQuery.collectAsState()
+    val galleryUiState by galleryViewModel.uiState.collectAsStateWithLifecycle()
+    val galleryDialogState by galleryViewModel.dialogState.collectAsStateWithLifecycle()
+    val sortedSprites by galleryViewModel.sortedAndFilteredSprites.collectAsStateWithLifecycle()
+    val searchQuery by galleryViewModel.searchQuery.collectAsStateWithLifecycle()
     val galleryListState = rememberLazyListState()
 
     LaunchedEffect(galleryViewModel.lastEditedSpriteId) {
@@ -110,6 +110,9 @@ fun HomeScreen(
 
     if (galleryUiState.showImagePager) {
         ImagePagerOverlay(
+            onOpenDrawing = { sprite, name ->
+                onNavigateToDrawing(sprite.id, sprite.width, sprite.height, name, null)
+            },
             onImagePagerEvent = galleryViewModel::onImagePagerEvent,
             spriteList = sortedSprites,
             startIndex = galleryViewModel.currentSelectedSpriteIndex,
@@ -123,12 +126,12 @@ fun HomeScreen(
     GalleryScreenDialogs(galleryDialogState, galleryViewModel)
 
     DrawingNavigationEffect(
-        destination = galleryUiState.drawingDestination,
+        state = galleryViewModel.uiState,
         onHandled = galleryViewModel::onDrawingNavigationHandled,
         onNavigate = onNavigateToDrawing
     )
 
-    val galleryEvent = remember(galleryViewModel, onNavigateToCreateCanvas, onNavigateToLoadImage) {
+    val galleryEvent = remember(galleryViewModel, onNavigateToDrawing, onNavigateToCreateCanvas, onNavigateToLoadImage) {
         GalleryScreenEvent(
             onImagePagerEvent = galleryViewModel::onImagePagerEvent,
             onSearchBarEvent = galleryViewModel::onSearchBarEvent,
@@ -136,6 +139,9 @@ fun HomeScreen(
             onCreateNewCanvas = onNavigateToCreateCanvas,
             onLoadCanvas = { galleryViewModel.openDialog(GalleryDialog.LoadISprite) },
             onLoadImage = onNavigateToLoadImage,
+            onOpenDrawing = { sprite, name ->
+                onNavigateToDrawing(sprite.id, sprite.width, sprite.height, name, null)
+            },
         )
     }
 

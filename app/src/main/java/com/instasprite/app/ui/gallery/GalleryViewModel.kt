@@ -13,6 +13,7 @@ import com.instasprite.app.data.repository.FileRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
 import com.instasprite.app.domain.dialog.DialogController
+import com.instasprite.app.di.IoDispatcher
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.Sprite
@@ -25,6 +26,7 @@ import com.instasprite.app.utils.AppSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -69,7 +71,8 @@ class GalleryViewModel @Inject constructor(
     private val storageLocationRepository: StorageLocationRepository,
     private val fileRepository: FileRepository,
     private val dialogController: DialogController<GalleryDialog>,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(),
     DialogController<GalleryDialog> by dialogController {
 
@@ -146,14 +149,6 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenDrawingActivity -> openDrawing(
-                event.sprite.id,
-                event.sprite.width,
-                event.sprite.height,
-                event.name,
-                null
-            )
-
             is ImagePagerEvent.OpenSaveImageDialog -> openDialog(GalleryDialog.SaveImage(event.sprite))
         }
     }
@@ -174,14 +169,6 @@ class GalleryViewModel @Inject constructor(
                         spriteId = event.spriteId
                     )
                 )
-
-            is SpriteListEvent.OpenDrawingScreen -> openDrawing(
-                event.sprite.id,
-                event.sprite.width,
-                event.sprite.height,
-                event.name,
-                null
-            )
 
             is SpriteListEvent.OpenPager -> toggleImagePager(event.sprite)
             is SpriteListEvent.OpenRenameDialog -> openDialog(GalleryDialog.Rename(event.spriteId))
@@ -246,7 +233,7 @@ class GalleryViewModel @Inject constructor(
         scalePercent: Int = 100,
         onResult: (Boolean) -> Unit
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val sprite = spriteDatabaseRepository.loadSprite(spriteId)
             if (sprite == null) {
                 Log.e("SaveFile", "Sprite not found: $spriteId")
@@ -278,7 +265,7 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun deleteSpriteById(spriteId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             try {
                 spriteDatabaseRepository.deleteSpriteById(spriteId)
             } catch (e: Exception) {
@@ -288,14 +275,14 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun deleteSpriteByIdDelay(spriteId: String, duration: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             delay(duration)
             deleteSpriteById(spriteId)
         }
     }
 
     fun renameSprite(spriteId: String, newName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             spriteDatabaseRepository.changeName(spriteId, newName)
         }
     }
@@ -315,7 +302,7 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun importSprite(sprite: Sprite) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val newId = java.util.UUID.randomUUID().toString()
             val newSprite = sprite.copy(id = newId)
             

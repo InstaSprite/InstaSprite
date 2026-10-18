@@ -247,7 +247,7 @@ private fun Preview() {
                 height = 16
             ),
             bitmap = createBitmap(16, 16),
-            selectedTool = PencilTool,
+            selectedTool = PencilTool(),
             isSelectionAppendMode = false,
             scale = 1f,
             offset = Offset.Zero,
@@ -271,7 +271,7 @@ private fun PreviewCursorMode() {
                 height = 16
             ),
             bitmap = createBitmap(16, 16),
-            selectedTool = MoveTool,
+            selectedTool = MoveTool(),
             isSelectionAppendMode = false,
             scale = 1f,
             offset = Offset.Zero,

@@ -24,10 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.tool.Tool
-import com.instasprite.app.domain.tool.selection.LassoSelectionTool
-import com.instasprite.app.domain.tool.selection.MagicWandTool
-import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
@@ -36,12 +34,12 @@ import com.instasprite.app.ui.theme.AppTheme
 fun SelectionModeSelector(
     modifier: Modifier = Modifier,
     selectedTool: Tool,
-    onSelectionToolSelected: (Tool) -> Unit
+    onSelectionToolSelected: (ToolType) -> Unit
 ) {
     val selectionTools = listOf(
-        RectangleSelectionTool,
-        LassoSelectionTool,
-        MagicWandTool
+        ToolType.RectangleSelection,
+        ToolType.LassoSelection,
+        ToolType.MagicWand
     )
 
     var expanded by remember { mutableStateOf(false) }

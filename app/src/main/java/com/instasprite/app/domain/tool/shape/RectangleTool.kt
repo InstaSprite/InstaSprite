@@ -2,16 +2,14 @@ package com.instasprite.app.domain.tool.shape
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.instasprite.app.R
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.tool.ShapeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
 import com.instasprite.app.domain.tool.forEachBrushPixel
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
-object RectangleTool : ShapeTool {
-    override val icon: Int = R.drawable.ic_rect_tool
-    override val nameRes: Int = R.string.tool_rectangle
-    override val descriptionRes: Int = R.string.tool_rectangle_desc
+class RectangleTool : ShapeTool {
+    override val type = ToolType.Rectangle
     override val commitsImmediately: Boolean = false
 
     private var startRow = 0

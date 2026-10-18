@@ -1,14 +1,11 @@
 package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.R
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.utils.bresenhamLine
 
-object EraserTool : StrokeTool {
-    override val icon: Int = R.drawable.ic_eraser_tool
-    override val nameRes: Int = R.string.eraser
-    override val descriptionRes: Int = R.string.tool_eraser_desc
+class EraserTool : StrokeTool {
+    override val type = ToolType.Eraser
     override val commitsImmediately: Boolean = true
 
     private var lastRow = 0

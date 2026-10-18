@@ -2,7 +2,7 @@ package com.instasprite.app.ui.drawing
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
@@ -32,9 +32,9 @@ fun DrawingScreenDialogs(
     onNavigateToPalette: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    var lastSavedUri = viewModel.lastSavedLocation.collectAsState().value
+    var lastSavedUri = viewModel.lastSavedLocation.collectAsStateWithLifecycle().value
 
     LaunchedEffect(Unit) {
         lastSavedUri = viewModel.getLastSavedLocation()
@@ -82,8 +82,8 @@ fun DrawingScreenDialogs(
 
             DrawingDialog.ColorWheel ->
                 ColorWheelDialog(
-                    initialColor = viewModel.activeColor.collectAsState().value,
-                    colorPalette = viewModel.colorPalette.collectAsState().value,
+                    initialColor = viewModel.activeColor.collectAsStateWithLifecycle().value,
+                    colorPalette = viewModel.colorPalette.collectAsStateWithLifecycle().value,
                     onDismiss = viewModel::closeTopDialog,
                     onColorSelected = viewModel::selectColor,
                     onOpenPaletteScreen = onNavigateToPalette
@@ -104,7 +104,7 @@ fun DrawingScreenDialogs(
         }
     }
 
-    if (viewModel.tutorialManager.state.collectAsState().value.showWelcomeDialog) {
+    if (viewModel.tutorialManager.state.collectAsStateWithLifecycle().value.showWelcomeDialog) {
         com.instasprite.app.ui.components.dialog.CustomDialog(
             title = stringResource(R.string.tut_welcome_title),
             onDismiss = { viewModel.tutorialManager.onEvent(com.instasprite.app.ui.tutorial.TutorialEvent.OnDismiss) },

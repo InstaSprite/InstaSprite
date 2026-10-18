@@ -70,6 +70,7 @@ fun SpriteList(
     onIsScrolledChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
+    onOpenDrawing: (Sprite, String?) -> Unit,
 ) {
 
     AnimatedContent(
@@ -97,7 +98,7 @@ fun SpriteList(
                                 onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
                             },
                             onEdit = {
-                                onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite))
+                                onOpenDrawing(sprite, meta?.spriteName)
                             },
                             onClick = {
                                 onSpriteListEvent(SpriteListEvent.OpenPager(sprite))
@@ -130,7 +131,7 @@ fun SpriteList(
                         SpriteGridCard(
                             spriteWithMeta = spriteWithMeta,
                             layoutMode = GalleryLayoutMode.StaggeredGrid,
-                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite)) },
+                            onEdit = { onOpenDrawing(sprite, meta?.spriteName) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
                             onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
@@ -160,7 +161,7 @@ fun SpriteList(
                         SpriteGridCard(
                             spriteWithMeta = spriteWithMeta,
                             layoutMode = GalleryLayoutMode.SquareGrid,
-                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite)) },
+                            onEdit = { onOpenDrawing(sprite, meta?.spriteName) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
                             onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
@@ -321,6 +322,7 @@ private fun SpriteListListPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
+            onOpenDrawing = { _, _ -> },
             spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.List
         )
@@ -333,6 +335,7 @@ private fun SpriteListStaggeredPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
+            onOpenDrawing = { _, _ -> },
             spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.StaggeredGrid
         )
@@ -345,6 +348,7 @@ private fun SpriteListSquareGridPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
+            onOpenDrawing = { _, _ -> },
             spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.SquareGrid
         )

@@ -2,7 +2,7 @@ package com.instasprite.app.domain.tool.selection
 
 import android.graphics.Rect
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.R
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
@@ -15,10 +15,8 @@ interface SelectionTool {
     }
 }
 
-object RectangleSelectionTool : StrokeTool, SelectionTool {
-    override val icon: Int = R.drawable.ic_selection_tool
-    override val nameRes: Int = R.string.tool_rectangle_selection
-    override val descriptionRes: Int = R.string.tool_rectangle_selection_desc
+class RectangleSelectionTool : StrokeTool, SelectionTool {
+    override val type = ToolType.RectangleSelection
     override val commitsImmediately: Boolean = false
 
     private var startRow = 0

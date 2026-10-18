@@ -19,6 +19,7 @@ import com.instasprite.app.domain.tool.EyedropperTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
@@ -139,7 +140,7 @@ class DrawingViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
-            selectedTool = PencilTool,
+            selectedTool = drawingEngine.tools.pencil,
             toolSize = 1,
         )
     )
@@ -350,7 +351,7 @@ class DrawingViewModel @AssistedInject constructor(
                 is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
                 is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
                 is ToolSelectorEvent.OpenDrawingSettingsDialog -> openDialog(DrawingDialog.DrawingSettings)
-                is ToolSelectorEvent.SelectTool -> selectTool(tool = event.tool)
+                is ToolSelectorEvent.SelectTool -> selectTool(type = event.tool)
                 is ToolSelectorEvent.ToggleAppendSelectionMode -> {
                     _uiState.value = _uiState.value.copy(
                         isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
@@ -365,9 +366,10 @@ class DrawingViewModel @AssistedInject constructor(
         }
     }
 
-    fun selectTool(tool: Tool) {
+    fun selectTool(type: ToolType) {
         try {
             commitPendingTool()
+            val tool = drawingEngine.tools[type]
             val state = _uiState.value.cursorState
             
             var previewColor: Color? = null

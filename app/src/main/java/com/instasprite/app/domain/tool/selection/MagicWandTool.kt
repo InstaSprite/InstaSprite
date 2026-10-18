@@ -2,16 +2,14 @@ package com.instasprite.app.domain.tool.selection
 
 import android.graphics.Rect
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.R
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import java.util.ArrayDeque
 
-object MagicWandTool : Tool, SelectionTool {
-    override val icon: Int = R.drawable.ic_wand_tool
-    override val nameRes: Int = R.string.tool_magic_wand
-    override val descriptionRes: Int = R.string.tool_magic_wand_desc
+class MagicWandTool : Tool, SelectionTool {
+    override val type = ToolType.MagicWand
 
     override var currentSelection: SelectionState? = null
 

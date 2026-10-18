@@ -56,7 +56,8 @@ fun ImagePagerOverlay(
     onImagePagerEvent: (ImagePagerEvent) -> Unit,
     spriteList: List<SpriteWithMeta>,
     startIndex: Int,
-    onDismiss: (Sprite?) -> Unit
+    onDismiss: (Sprite?) -> Unit,
+    onOpenDrawing: (Sprite, String?) -> Unit
 ) {
 
     if (spriteList.isEmpty()) {
@@ -121,12 +122,7 @@ fun ImagePagerOverlay(
                 BottomBar(
                     onEditButtonTap = {
                         currentSprite?.let {
-                            onImagePagerEvent(
-                                ImagePagerEvent.OpenDrawingActivity(
-                                    it.meta?.spriteName,
-                                    it.sprite
-                                )
-                            )
+                            onOpenDrawing(it.sprite, it.meta?.spriteName)
                         }
                     },
                     onSaveImageTap = {

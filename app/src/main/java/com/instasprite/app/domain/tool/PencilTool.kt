@@ -2,15 +2,12 @@ package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.instasprite.app.R
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.domain.draw.PixelPerfectFilter
 import com.instasprite.app.utils.bresenhamLine
 
-object PencilTool : StrokeTool {
-    override val icon: Int = R.drawable.ic_pencil_tool
-    override val nameRes: Int = R.string.pencil
-    override val descriptionRes: Int = R.string.tool_pencil_desc
+class PencilTool : StrokeTool {
+    override val type = ToolType.Pencil
     override val commitsImmediately: Boolean = false
 
     private var lastRow = 0

@@ -2,17 +2,15 @@ package com.instasprite.app.domain.tool.selection
 
 import android.graphics.Rect
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.R
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.utils.bresenhamLine
 
-object LassoSelectionTool : StrokeTool, SelectionTool {
-    override val icon: Int = R.drawable.ic_lasso_tool
-    override val nameRes: Int = R.string.tool_lasso_selection
-    override val descriptionRes: Int = R.string.tool_lasso_selection_desc
+class LassoSelectionTool : StrokeTool, SelectionTool {
+    override val type = ToolType.LassoSelection
     override val commitsImmediately: Boolean = false
 
     override var currentSelection: SelectionState? = null

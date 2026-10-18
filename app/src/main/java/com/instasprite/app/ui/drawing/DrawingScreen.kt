@@ -20,7 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -99,7 +99,7 @@ fun DrawingScreen(
 ) {
     BackHandler(onBack = { onNavigateBack(viewModel.spriteId) })
 
-    val fatalError by viewModel.fatalError.collectAsState()
+    val fatalError by viewModel.fatalError.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(fatalError) {
         fatalError?.let { throwable ->
@@ -126,11 +126,11 @@ fun DrawingScreen(
         }
     }
 
-    val colorPaletteState by viewModel.colorPaletteState.collectAsState()
-    val canvasState by viewModel.canvasState.collectAsState()
-    val uiState by viewModel.uiState.collectAsState()
-    val dialogState by viewModel.dialogState.collectAsState()
-    val tutorialState by viewModel.tutorialState.collectAsState()
+    val colorPaletteState by viewModel.colorPaletteState.collectAsStateWithLifecycle()
+    val canvasState by viewModel.canvasState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
+    val tutorialState by viewModel.tutorialState.collectAsStateWithLifecycle()
 
     // reverse the layer list in ui since use reverseLayout = true in LazyColumn kinda broke with Reorderable lib
     val uiLayers = canvasState.layers.asReversed()
@@ -482,14 +482,14 @@ private fun DrawingScreenPreview() {
         colorPaletteDao = DummyData.MockClass.MockColorPaletteDao(),
         lospecService = DummyData.MockClass.MockLospecService()
     )
-    val colors = colorPaletteRepository.colors.collectAsState()
-    val activeColor = colorPaletteRepository.activeColor.collectAsState()
+    val colors = colorPaletteRepository.colors.collectAsStateWithLifecycle()
+    val activeColor = colorPaletteRepository.activeColor.collectAsStateWithLifecycle()
 
     InstaSpriteTheme {
         DrawingScreenContent(
             uiState = DrawingScreenState(
                 isLoading = false,
-                selectedTool = PencilTool,
+                selectedTool = PencilTool(),
                 toolSize = 1
             ),
             canvasState = PixelCanvasState(
@@ -531,14 +531,14 @@ private fun DrawingScreenPreviewSelection() {
         colorPaletteDao = DummyData.MockClass.MockColorPaletteDao(),
         lospecService = DummyData.MockClass.MockLospecService()
     )
-    val colors = colorPaletteRepository.colors.collectAsState()
-    val activeColor = colorPaletteRepository.activeColor.collectAsState()
+    val colors = colorPaletteRepository.colors.collectAsStateWithLifecycle()
+    val activeColor = colorPaletteRepository.activeColor.collectAsStateWithLifecycle()
 
     InstaSpriteTheme {
         DrawingScreenContent(
             uiState = DrawingScreenState(
                 isLoading = false,
-                selectedTool = RectangleSelectionTool,
+                selectedTool = RectangleSelectionTool(),
                 toolSize = 1
             ),
             canvasState = PixelCanvasState(
@@ -586,13 +586,13 @@ private fun DrawingScreenPreviewLoading() {
         colorPaletteDao = DummyData.MockClass.MockColorPaletteDao(),
         lospecService = DummyData.MockClass.MockLospecService()
     )
-    val colors = colorPaletteRepository.colors.collectAsState()
-    val activeColor = colorPaletteRepository.activeColor.collectAsState()
+    val colors = colorPaletteRepository.colors.collectAsStateWithLifecycle()
+    val activeColor = colorPaletteRepository.activeColor.collectAsStateWithLifecycle()
 
     InstaSpriteTheme {
         DrawingScreenContent(
             uiState = DrawingScreenState(
-                selectedTool = PencilTool,
+                selectedTool = PencilTool(),
                 toolSize = 1
             ),
             canvasState = PixelCanvasState(

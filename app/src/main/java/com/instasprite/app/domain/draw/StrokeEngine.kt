@@ -26,10 +26,16 @@ class StrokeEngine(
     private val pixelCanvasUseCase: PixelCanvasUseCase,
     private val bitmapManager: BitmapManager,
     private val scope: CoroutineScope,
+    private val moveTool: MoveTool,
     private val onSelectionStateChanged: (SelectionState?) -> Unit
 ) {
-    companion object {
-        var activeMoveCompositor: MoveCompositor? = null
+    private var activeMoveCompositor: MoveCompositor?
+        get() = moveTool.compositor
+        set(value) { moveTool.compositor = value }
+
+    fun reset() {
+        activeMoveCompositor = null
+        strokeTouchedCount = 0
     }
     // Reused stroke buffers to avoid per-move allocations.
     private var strokeTouchMarks: IntArray = IntArray(0)

@@ -8,14 +8,10 @@ import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.DrawingTools
 import com.instasprite.app.domain.tool.FillTool
-import com.instasprite.app.domain.tool.MoveTool
-import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
-import com.instasprite.app.domain.tool.selection.LassoSelectionTool
-import com.instasprite.app.domain.tool.selection.MagicWandTool
-import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -34,13 +30,14 @@ sealed class TapResult {
 class DrawingEngine(
     override val pixelCanvasUseCase: PixelCanvasUseCase,
     private val scope: CoroutineScope,
-    historyDiskStore: HistoryDiskStore? = null
+    historyDiskStore: HistoryDiskStore? = null,
+    val tools: DrawingTools = DrawingTools()
 ) : ILayerManager, ITransformManager, IHistoryManager, InteractionContext {
 
     private var isProcessingTool = false
 
     override val bitmapManager = BitmapManager(pixelCanvasUseCase)
-    override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope) { sel ->
+    override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope, tools.move) { sel ->
         _canvasState.value = _canvasState.value.copy(selectionState = sel)
     }
 
@@ -55,7 +52,7 @@ class DrawingEngine(
     override val mutableCanvasState: MutableStateFlow<DrawingCanvasState> = _canvasState
     val canvasState: StateFlow<DrawingCanvasState> = _canvasState.asStateFlow()
 
-    override var selectedTool: Tool = PencilTool
+    override var selectedTool: Tool = tools.pencil
     override var activeColor: Color = Color.Black
     override var toolSize: Int = 1
     override var brushShape: BrushShape = BrushShape.Circle
@@ -318,10 +315,8 @@ class DrawingEngine(
 
     fun release() {
         bitmapManager.release()
-        MoveTool.reset()
-        RectangleSelectionTool.clearSelection()
-        LassoSelectionTool.clearSelection()
-        MagicWandTool.clearSelection()
+        tools.reset()
+        strokeEngine.reset()
         activeState = StandbyState
     }
 }

@@ -5,7 +5,7 @@ import com.instasprite.app.R
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.domain.dialog.Dialog
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
@@ -29,9 +29,9 @@ fun GalleryScreenDialogs(
     dialogState: List<GalleryDialog>,
     viewModel: GalleryViewModel
 ) {
-    var lastSavedUri = viewModel.lastSavedLocation.collectAsState().value
-    val spriteListOrder = viewModel.spriteListOrder.collectAsState().value
-    val layoutMode = viewModel.uiState.collectAsState().value.layoutMode
+    var lastSavedUri = viewModel.lastSavedLocation.collectAsStateWithLifecycle().value
+    val spriteListOrder = viewModel.spriteListOrder.collectAsStateWithLifecycle().value
+    val layoutMode = viewModel.uiState.collectAsStateWithLifecycle().value.layoutMode
 
     LaunchedEffect(Unit) {
         lastSavedUri = viewModel.getLastSavedLocation()

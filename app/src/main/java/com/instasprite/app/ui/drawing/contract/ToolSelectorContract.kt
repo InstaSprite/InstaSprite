@@ -1,9 +1,9 @@
 package com.instasprite.app.ui.drawing.contract
 
-import com.instasprite.app.domain.tool.Tool
+import com.instasprite.app.domain.tool.ToolType
 
 sealed interface ToolSelectorEvent {
-    data class SelectTool(val tool: Tool) : ToolSelectorEvent
+    data class SelectTool(val tool: ToolType) : ToolSelectorEvent
     data object Undo : ToolSelectorEvent
     data object Redo : ToolSelectorEvent
 

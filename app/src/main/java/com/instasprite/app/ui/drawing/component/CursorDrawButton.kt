@@ -65,7 +65,7 @@ fun CursorDrawButton(
 private fun Preview() {
     InstaSpriteTheme {
         CursorDrawButton(
-            selectedTool = PencilTool,
+            selectedTool = PencilTool(),
             onPressed = {},
             onReleased = {}
         )
