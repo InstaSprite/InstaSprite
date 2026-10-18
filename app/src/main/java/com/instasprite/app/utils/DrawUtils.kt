@@ -20,8 +20,8 @@ import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.ui.drawing.contract.CursorState
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
-import com.instasprite.app.domain.draw.CursorGestureHandler
-import com.instasprite.app.domain.draw.DrawingGestureHandler
+import com.instasprite.app.ui.drawing.gesture.CursorGestureHandler
+import com.instasprite.app.ui.drawing.gesture.DrawingGestureHandler
 import kotlin.math.abs
 
 

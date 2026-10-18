@@ -42,6 +42,7 @@ import com.instasprite.app.ui.gallery.GalleryDialog
 import com.instasprite.app.ui.gallery.GalleryPageContent
 import com.instasprite.app.ui.gallery.GalleryScreenDialogs
 import com.instasprite.app.ui.gallery.GalleryScreenEvent
+import com.instasprite.app.ui.gallery.DrawingNavigationEffect
 import com.instasprite.app.ui.gallery.GalleryViewModel
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
@@ -121,8 +122,13 @@ fun HomeScreen(
 
     GalleryScreenDialogs(galleryDialogState, galleryViewModel)
 
-    val galleryEvent = remember(galleryViewModel) {
-        galleryViewModel.onOpenDrawing = onNavigateToDrawing
+    DrawingNavigationEffect(
+        destination = galleryUiState.drawingDestination,
+        onHandled = galleryViewModel::onDrawingNavigationHandled,
+        onNavigate = onNavigateToDrawing
+    )
+
+    val galleryEvent = remember(galleryViewModel, onNavigateToCreateCanvas, onNavigateToLoadImage) {
         GalleryScreenEvent(
             onImagePagerEvent = galleryViewModel::onImagePagerEvent,
             onSearchBarEvent = galleryViewModel::onSearchBarEvent,

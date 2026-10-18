@@ -9,7 +9,6 @@ import com.instasprite.app.domain.canvashistory.TransformEntry
 import com.instasprite.app.domain.canvashistory.TransformType
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
-import com.instasprite.app.ui.drawing.contract.PixelCanvasState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 class HistoryDelegate(
     private val pixelCanvasUseCase: PixelCanvasUseCase,
     historyDiskStore: HistoryDiskStore?,
-    private val canvasState: MutableStateFlow<PixelCanvasState>,
+    private val canvasState: MutableStateFlow<DrawingCanvasState>,
     private val bitmapManager: BitmapManager,
     private val scope: CoroutineScope,
     private val refreshCanvasSizeState: () -> Unit,

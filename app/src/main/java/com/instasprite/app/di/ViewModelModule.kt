@@ -17,6 +17,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ViewModelScoped
 
 
 @Module
@@ -24,6 +25,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 object ViewModelModule {
 
     @Provides
+    @ViewModelScoped
     fun provideColorPaletteRepository(
         @ApplicationContext context: Context, db: AppDatabase, lospecService: LospecService
     ): ColorPaletteRepository {
@@ -31,6 +33,7 @@ object ViewModelModule {
     }
 
     @Provides
+    @ViewModelScoped
     fun providePixelCanvasRepository(): PixelCanvasRepository {
         // Default 16x16, viewModel will resize this based on the Intent extras.
         return PixelCanvasRepository(PixelCanvas(16, 16))

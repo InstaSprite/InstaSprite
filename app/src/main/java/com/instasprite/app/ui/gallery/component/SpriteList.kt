@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -72,7 +71,6 @@ fun SpriteList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val context = LocalContext.current
 
     AnimatedContent(
         targetState = layoutMode,
@@ -99,7 +97,7 @@ fun SpriteList(
                                 onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
                             },
                             onEdit = {
-                                onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context))
+                                onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite))
                             },
                             onClick = {
                                 onSpriteListEvent(SpriteListEvent.OpenPager(sprite))
@@ -132,7 +130,7 @@ fun SpriteList(
                         SpriteGridCard(
                             spriteWithMeta = spriteWithMeta,
                             layoutMode = GalleryLayoutMode.StaggeredGrid,
-                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context)) },
+                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite)) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
                             onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
@@ -162,7 +160,7 @@ fun SpriteList(
                         SpriteGridCard(
                             spriteWithMeta = spriteWithMeta,
                             layoutMode = GalleryLayoutMode.SquareGrid,
-                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context)) },
+                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite)) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
                             onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },

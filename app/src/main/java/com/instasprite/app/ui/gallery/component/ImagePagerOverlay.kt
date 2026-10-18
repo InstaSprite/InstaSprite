@@ -58,7 +58,6 @@ fun ImagePagerOverlay(
     startIndex: Int,
     onDismiss: (Sprite?) -> Unit
 ) {
-    val context = LocalContext.current
 
     if (spriteList.isEmpty()) {
         return
@@ -125,8 +124,7 @@ fun ImagePagerOverlay(
                             onImagePagerEvent(
                                 ImagePagerEvent.OpenDrawingActivity(
                                     it.meta?.spriteName,
-                                    it.sprite,
-                                    context
+                                    it.sprite
                                 )
                             )
                         }

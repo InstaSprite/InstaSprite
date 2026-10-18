@@ -1,7 +1,6 @@
 package com.instasprite.app.domain.draw
 
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.domain.canvashistory.HistoryDiskStore
 import com.instasprite.app.domain.canvashistory.TransformType
 import com.instasprite.app.domain.draw.state.*
@@ -19,7 +18,6 @@ import com.instasprite.app.domain.tool.selection.MagicWandTool
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
-import com.instasprite.app.ui.drawing.contract.PixelCanvasState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +33,6 @@ sealed class TapResult {
 
 class DrawingEngine(
     override val pixelCanvasUseCase: PixelCanvasUseCase,
-    private val colorPaletteRepository: ColorPaletteRepository,
     private val scope: CoroutineScope,
     historyDiskStore: HistoryDiskStore? = null
 ) : ILayerManager, ITransformManager, IHistoryManager, InteractionContext {
@@ -48,15 +45,15 @@ class DrawingEngine(
     }
 
     private val _canvasState = MutableStateFlow(
-        PixelCanvasState(
+        DrawingCanvasState(
             width = pixelCanvasUseCase.getCanvasWidth(),
             height = pixelCanvasUseCase.getCanvasHeight(),
             layers = pixelCanvasUseCase.getLayers().toList(),
             activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         )
     )
-    override val mutableCanvasState: MutableStateFlow<PixelCanvasState> = _canvasState
-    val canvasState: StateFlow<PixelCanvasState> = _canvasState.asStateFlow()
+    override val mutableCanvasState: MutableStateFlow<DrawingCanvasState> = _canvasState
+    val canvasState: StateFlow<DrawingCanvasState> = _canvasState.asStateFlow()
 
     override var selectedTool: Tool = PencilTool
     override var activeColor: Color = Color.Black

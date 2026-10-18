@@ -1,4 +1,4 @@
-package com.instasprite.app.domain.draw
+package com.instasprite.app.ui.drawing.gesture
 
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom

@@ -84,6 +84,12 @@ fun GalleryScreen(
     val sortedSprites by viewModel.sortedAndFilteredSprites.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
 
+    DrawingNavigationEffect(
+        destination = uiState.drawingDestination,
+        onHandled = viewModel::onDrawingNavigationHandled,
+        onNavigate = onNavigateToDrawing
+    )
+
     val scope = rememberCoroutineScope()
 
     val lazyListState = rememberLazyListState()
@@ -135,9 +141,7 @@ fun GalleryScreen(
 
     GalleryScreenDialogs(dialogState, viewModel)
 
-    val event = remember(viewModel) {
-        viewModel.onOpenDrawing = onNavigateToDrawing
-
+    val event = remember(viewModel, onNavigateToCreateCanvas, onNavigateToLoadImage) {
         GalleryScreenEvent(
             onImagePagerEvent = viewModel::onImagePagerEvent,
             onSearchBarEvent = viewModel::onSearchBarEvent,

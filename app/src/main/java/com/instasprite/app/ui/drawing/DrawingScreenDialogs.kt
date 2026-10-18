@@ -28,7 +28,8 @@ sealed interface DrawingDialog : Dialog {
 @Composable
 fun DrawingScreenDialogs(
     dialogState: List<DrawingDialog>,
-    viewModel: DrawingViewModel
+    viewModel: DrawingViewModel,
+    onNavigateToPalette: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val uiState = viewModel.uiState.collectAsState().value
@@ -85,9 +86,7 @@ fun DrawingScreenDialogs(
                     colorPalette = viewModel.colorPalette.collectAsState().value,
                     onDismiss = viewModel::closeTopDialog,
                     onColorSelected = viewModel::selectColor,
-                    onOpenPaletteScreen = {
-                        viewModel.onOpenPalette()
-                    }
+                    onOpenPaletteScreen = onNavigateToPalette
                 )
 
             DrawingDialog.DrawingSettings ->

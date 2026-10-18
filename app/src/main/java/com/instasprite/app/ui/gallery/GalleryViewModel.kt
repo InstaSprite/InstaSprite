@@ -48,10 +48,19 @@ enum class SpriteListOrder {
 
 enum class GalleryLayoutMode { List, StaggeredGrid, SquareGrid }
 
+data class DrawingDestination(
+    val spriteId: String,
+    val width: Int,
+    val height: Int,
+    val name: String?,
+    val paletteId: Int? = null
+)
+
 data class GalleryState(
     val showSearchBar: Boolean = false,
     val showImagePager: Boolean = false,
-    val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List
+    val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List,
+    val drawingDestination: DrawingDestination? = null
 )
 
 @HiltViewModel
@@ -89,7 +98,6 @@ class GalleryViewModel @Inject constructor(
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var currentSelectedSpriteIndex by mutableIntStateOf(0)
     var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
-    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit = { _, _, _, _, _ -> }
 
 
     val sortedAndFilteredSprites: StateFlow<List<SpriteWithMeta>> = combine(
@@ -138,7 +146,7 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenDrawingActivity -> onOpenDrawing(
+            is ImagePagerEvent.OpenDrawingActivity -> openDrawing(
                 event.sprite.id,
                 event.sprite.width,
                 event.sprite.height,
@@ -167,7 +175,7 @@ class GalleryViewModel @Inject constructor(
                     )
                 )
 
-            is SpriteListEvent.OpenDrawingScreen -> onOpenDrawing(
+            is SpriteListEvent.OpenDrawingScreen -> openDrawing(
                 event.sprite.id,
                 event.sprite.width,
                 event.sprite.height,
@@ -184,6 +192,24 @@ class GalleryViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             showSearchBar = !_uiState.value.showSearchBar
         )
+    }
+
+    private fun openDrawing(
+        spriteId: String,
+        width: Int,
+        height: Int,
+        name: String?,
+        paletteId: Int? = null
+    ) {
+        _uiState.update {
+            it.copy(drawingDestination = DrawingDestination(spriteId, width, height, name, paletteId))
+        }
+    }
+
+    fun onDrawingNavigationHandled(destination: DrawingDestination) {
+        _uiState.update {
+            if (it.drawingDestination == destination) it.copy(drawingDestination = null) else it
+        }
     }
 
     fun setLayoutMode(mode: GalleryLayoutMode) {
@@ -297,7 +323,7 @@ class GalleryViewModel @Inject constructor(
             spriteDatabaseRepository.changeName(newId, "Imported Sprite")
             
             withContext(Dispatchers.Main) {
-                onOpenDrawing(newId, newSprite.width, newSprite.height, "Imported Sprite", null)
+                openDrawing(newId, newSprite.width, newSprite.height, "Imported Sprite")
             }
         }
     }

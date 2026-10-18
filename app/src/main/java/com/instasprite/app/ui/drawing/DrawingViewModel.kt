@@ -4,16 +4,14 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.instasprite.app.domain.canvashistory.HistoryDiskStore
 import androidx.lifecycle.viewModelScope
 import com.instasprite.app.data.model.DrawSetting
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.data.repository.FileRepository
-import com.instasprite.app.data.repository.PixelCanvasRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
+import com.instasprite.app.di.DrawingSessionFactory
 import com.instasprite.app.domain.dialog.DialogController
-import com.instasprite.app.domain.draw.DrawingEngine
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
@@ -21,7 +19,6 @@ import com.instasprite.app.domain.tool.EyedropperTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
-import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
@@ -30,6 +27,7 @@ import com.instasprite.app.ui.drawing.contract.CursorState
 import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
+import com.instasprite.app.ui.drawing.contract.toUiState
 import com.instasprite.app.ui.drawing.tutorial.drawingTutorialSequence
 import com.instasprite.app.ui.tutorial.TutorialManager
 import com.instasprite.app.utils.AppSettings
@@ -46,6 +44,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,7 +70,7 @@ class DrawingViewModel @AssistedInject constructor(
     @Assisted("spriteHeight") private val height: Int,
     @Assisted("spriteName") private val spriteName: String?,
     private val storageLocationRepository: StorageLocationRepository,
-    pixelCanvasRepository: PixelCanvasRepository,
+    drawingSessionFactory: DrawingSessionFactory,
     private val spriteDataRepository: SpriteDatabaseRepository,
     private val colorPaletteRepository: ColorPaletteRepository,
     private val fileRepository: FileRepository,
@@ -107,7 +106,7 @@ class DrawingViewModel @AssistedInject constructor(
             // ignore
         }
         try {
-            historyDiskStore.destroy()
+            drawingSession.clearHistory()
         } catch (e: Throwable) {
             // ignore
         }
@@ -123,25 +122,20 @@ class DrawingViewModel @AssistedInject constructor(
         _fatalError.value = t
     }
 
-    private val initialCanvasWidth: Int = if (width > 0) width else pixelCanvasRepository.width
-    private val initialCanvasHeight: Int = if (height > 0) height else pixelCanvasRepository.height
-
-    private val pixelCanvasUseCase = PixelCanvasUseCase(
-        pixelCanvasRepository = pixelCanvasRepository,
-        colorPaletteRepository = colorPaletteRepository
-    )
-
-    private val historyDiskStore = HistoryDiskStore(
-        historyDir = java.io.File(applicationContext.cacheDir, "history/$spriteId")
-    )
-
-    private val drawingEngine =
-        DrawingEngine(pixelCanvasUseCase, colorPaletteRepository, drawingScope, historyDiskStore)
+    private val drawingSession = drawingSessionFactory.create(spriteId, drawingScope)
+    private val pixelCanvasUseCase = drawingSession.canvas
+    private val drawingEngine = drawingSession.engine
+    private val initialCanvasWidth = if (width > 0) width else pixelCanvasUseCase.getCanvasWidth()
+    private val initialCanvasHeight = if (height > 0) height else pixelCanvasUseCase.getCanvasHeight()
 
     val bitmap get() = drawingEngine.bitmapManager.bitmap
     val overlayBitmap get() = drawingEngine.bitmapManager.overlayBitmap
     val selectionBitmap get() = drawingEngine.bitmapManager.selectionBitmap
-    val canvasState = drawingEngine.canvasState
+    val canvasState = drawingEngine.canvasState.map { it.toUiState() }.stateIn(
+        scope = drawingScope,
+        started = SharingStarted.Eagerly,
+        initialValue = drawingEngine.canvasState.value.toUiState()
+    )
 
     private val _uiState = MutableStateFlow(
         DrawingScreenState(
@@ -154,11 +148,9 @@ class DrawingViewModel @AssistedInject constructor(
     private val _lastSavedLocation = MutableStateFlow<Uri?>(null)
     val lastSavedLocation: StateFlow<Uri?> = _lastSavedLocation.asStateFlow()
 
-    var colorPalette = colorPaletteRepository.colors
-    var activeColor = colorPaletteRepository.activeColor
-    var recentColors = colorPaletteRepository.recentColors
-
-    var onOpenPalette: () -> Unit = {}
+    val colorPalette = colorPaletteRepository.colors
+    val activeColor = colorPaletteRepository.activeColor
+    val recentColors = colorPaletteRepository.recentColors
 
     val colorPaletteState: StateFlow<ColorPaletteState> = combine(
         colorPaletteRepository.colors,
@@ -203,8 +195,7 @@ class DrawingViewModel @AssistedInject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        drawingEngine.release()
-        historyDiskStore.destroy()
+        drawingSession.close()
     }
 
     private fun applyDrawSetting(drawSetting: DrawSetting) {
@@ -246,7 +237,7 @@ class DrawingViewModel @AssistedInject constructor(
         try {
             commitPendingTool()
             when (event) {
-                is LayerEvent.AddLayer -> drawingEngine.addLayer("Layer ${canvasState.value.layers.size + 1}")
+                is LayerEvent.AddLayer -> drawingEngine.addLayer("Layer ${drawingEngine.canvasState.value.layers.size + 1}")
                 is LayerEvent.DeleteLayer -> drawingEngine.removeLayer(event.layerId)
                 is LayerEvent.SelectLayer -> drawingEngine.selectLayer(event.layerId)
                 is LayerEvent.ToggleLock -> drawingEngine.toggleLock(event.layerId)
@@ -442,8 +433,8 @@ class DrawingViewModel @AssistedInject constructor(
         val current = _uiState.value
         val newCursorMode = !current.isCursorMode
         val cursorState = if (newCursorMode) {
-            val cw = canvasState.value.width
-            val ch = canvasState.value.height
+            val cw = drawingEngine.canvasState.value.width
+            val ch = drawingEngine.canvasState.value.height
             val startX = if (cx >= 0f) cx else (cw / 2f)
             val startY = if (cy >= 0f) cy else (ch / 2f)
             
@@ -473,8 +464,8 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     private fun moveCursor(cursorX: Float, cursorY: Float) {
-        val maxX = canvasState.value.width.toFloat() - 0.01f
-        val maxY = canvasState.value.height.toFloat() - 0.01f
+        val maxX = drawingEngine.canvasState.value.width.toFloat() - 0.01f
+        val maxY = drawingEngine.canvasState.value.height.toFloat() - 0.01f
         val clampedX = cursorX.coerceIn(0f, maxX)
         val clampedY = cursorY.coerceIn(0f, maxY)
         val current = _uiState.value.cursorState

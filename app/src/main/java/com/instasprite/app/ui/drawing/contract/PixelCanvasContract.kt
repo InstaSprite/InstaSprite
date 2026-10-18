@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.drawing.contract
 
+import com.instasprite.app.domain.draw.DrawingCanvasState
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.Tool
@@ -13,6 +14,16 @@ data class PixelCanvasState(
     val activeLayerId: String = "",
     val selectedTool: Tool? = null,
     val selectionState: SelectionState? = null
+)
+
+fun DrawingCanvasState.toUiState() = PixelCanvasState(
+    width = width,
+    height = height,
+    drawVersion = drawVersion,
+    overlayVersion = overlayVersion,
+    layers = layers,
+    activeLayerId = activeLayerId,
+    selectionState = selectionState
 )
 
 sealed interface PixelCanvasEvent {

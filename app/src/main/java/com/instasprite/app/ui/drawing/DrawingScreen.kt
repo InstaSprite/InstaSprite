@@ -144,11 +144,9 @@ fun DrawingScreen(
         UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColor)
     }
 
-    DrawingScreenDialogs(dialogState, viewModel)
+    DrawingScreenDialogs(dialogState, viewModel, onNavigateToPalette)
 
     val event = remember(viewModel) {
-        viewModel.onOpenPalette = onNavigateToPalette
-
         DrawingScreenEvent(
             onColorPaletteEvent = viewModel::onColorPaletteEvent,
             onCanvasMenuEvent = viewModel::onCanvasMenuEvent,
