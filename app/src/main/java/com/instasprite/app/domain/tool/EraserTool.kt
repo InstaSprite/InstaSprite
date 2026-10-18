@@ -38,6 +38,7 @@ class EraserTool : StrokeTool {
         plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
+        clearPreviousBatch()
         lastRow = row
         lastCol = col
         canvasWidth = canvas.getCanvasWidth()
@@ -54,8 +55,6 @@ class EraserTool : StrokeTool {
             batchColors = IntArray(bufferSize)
         }
 
-        batchCount = 0
-        touchedMask.fill(false)
         collectBrushPixels(row, col)
 
         if (batchCount > 0) {
@@ -73,8 +72,7 @@ class EraserTool : StrokeTool {
         plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
-        batchCount = 0
-        touchedMask.fill(false)
+        clearPreviousBatch()
 
         bresenhamLine(lastCol, lastRow, col, row) { px, py ->
             collectBrushPixels(py, px)
@@ -95,6 +93,14 @@ class EraserTool : StrokeTool {
     override fun cancelStroke() {
         lastRow = 0
         lastCol = 0
+    }
+
+    private fun clearPreviousBatch() {
+        // Only these entries were marked by the previous update.
+        for (i in 0 until batchCount) {
+            touchedMask[batchIndices[i]] = false
+        }
+        batchCount = 0
     }
 
     private inline fun collectBrushPixels(row: Int, col: Int) {

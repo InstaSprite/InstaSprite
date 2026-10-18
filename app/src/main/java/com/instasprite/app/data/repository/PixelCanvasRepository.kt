@@ -444,30 +444,34 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
         val regionEndRow = startRow + regionHeight
         val regionEndCol = startCol + regionWidth
+        val firstTileRow = startRow.floorDiv(TILE_SIZE)
+        val firstTileCol = startCol.floorDiv(TILE_SIZE)
+        val lastTileRow = (minOf(regionEndRow, height) - 1).floorDiv(TILE_SIZE)
+        val lastTileCol = (minOf(regionEndCol, width) - 1).floorDiv(TILE_SIZE)
+        if (firstTileRow > lastTileRow || firstTileCol > lastTileCol) return result
+        val regionTileCount = (lastTileRow - firstTileRow + 1).toLong() *
+            (lastTileCol - firstTileCol + 1)
 
         for (layer in _layers) {
             if (!layer.isVisible) continue
-            val layerOpacity = layer.opacity
-            val layerBlendMode = layer.blendMode
-            for ((coord, tilePixels) in layer.tiles) {
-                val originX = coord.x * TILE_SIZE
-                val originY = coord.y * TILE_SIZE
-                val startCanvasRow = maxOf(startRow, originY)
-                val endCanvasRow = minOf(regionEndRow, originY + TILE_SIZE, height)
-                val startCanvasCol = maxOf(startCol, originX)
-                val endCanvasCol = minOf(regionEndCol, originX + TILE_SIZE, width)
-                if (startCanvasRow >= endCanvasRow || startCanvasCol >= endCanvasCol) continue
-
-                for (row in startCanvasRow until endCanvasRow) {
-                    val tileRow = row - originY
-                    val dstBase = (row - startRow) * regionWidth
-                    val srcBase = tileRow * TILE_SIZE
-                    for (col in startCanvasCol until endCanvasCol) {
-                        val argb = tilePixels[srcBase + (col - originX)]
-                        val dstIdx = dstBase + (col - startCol)
-                        result[dstIdx] =
-                            blendPixel(result[dstIdx], argb, layerOpacity, layerBlendMode)
+            // Small dirty regions use direct lookups; sparse/full redraws keep the cheaper tile scan.
+            if (regionTileCount < layer.tiles.size) {
+                for (tileRow in firstTileRow..lastTileRow) {
+                    for (tileCol in firstTileCol..lastTileCol) {
+                        val coord = TileCoord(tileCol, tileRow)
+                        val tilePixels = layer.tiles[coord] ?: continue
+                        composeTileIntoBuffer(
+                            coord, tilePixels, result, width, height,
+                            layer.opacity, layer.blendMode, startRow, startCol, regionWidth, regionHeight
+                        )
                     }
+                }
+            } else {
+                for ((coord, tilePixels) in layer.tiles) {
+                    composeTileIntoBuffer(
+                        coord, tilePixels, result, width, height,
+                        layer.opacity, layer.blendMode, startRow, startCol, regionWidth, regionHeight
+                    )
                 }
             }
         }

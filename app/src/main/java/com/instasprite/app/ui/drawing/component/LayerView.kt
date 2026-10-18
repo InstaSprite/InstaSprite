@@ -72,10 +72,11 @@ fun LayerView(
     else
         AppTheme.colors.BackgroundColorDarker
 
-    val bitmapImage = remember(layer.cel, canvasWidth, canvasHeight) {
+    val previewCel = remember(layer.tiles) { layer.cel }
+    val bitmapImage = remember(previewCel, canvasWidth, canvasHeight) {
         if (canvasWidth > 0 && canvasHeight > 0) {
             val bitmap = createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888)
-            val argbPixels = inflateCel(layer.cel, canvasWidth, canvasHeight)
+            val argbPixels = inflateCel(previewCel, canvasWidth, canvasHeight)
             bitmap.setPixels(argbPixels, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
             bitmap.asImageBitmap()
         } else {
