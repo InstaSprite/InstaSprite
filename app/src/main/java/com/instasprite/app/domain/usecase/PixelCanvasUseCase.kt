@@ -18,6 +18,17 @@ class PixelCanvasUseCase(
 ) {
     private var tileChangeTracker: TileChangeTracker? = null
 
+    val animation get() = pixelCanvasRepository.animation
+    val activeFrameId get() = pixelCanvasRepository.activeFrameId
+    fun selectFrame(id: String) = pixelCanvasRepository.selectFrame(id)
+    fun insertFrame(empty: Boolean = false, linked: Boolean = false) = pixelCanvasRepository.insertFrame(empty, linked)
+    fun deleteFrame() = pixelCanvasRepository.deleteFrame()
+    fun setFrameDuration(value: Int) = pixelCanvasRepository.setFrameDuration(value)
+    fun setPosterFrame() = pixelCanvasRepository.setPosterFrame()
+    fun clearCel() = pixelCanvasRepository.clearCel()
+    fun copyPreviousCel(linked: Boolean) = pixelCanvasRepository.copyPreviousCel(linked)
+    fun unlinkCel() = pixelCanvasRepository.unlinkCel()
+
     fun getLayers(): List<Layer> = pixelCanvasRepository.layers
     fun getActiveLayerId(): String = pixelCanvasRepository.activeLayerId
     fun addLayer(name: String) = pixelCanvasRepository.addLayer(name)
@@ -73,7 +84,7 @@ class PixelCanvasUseCase(
     }
 
     fun setCanvas(sprite: Sprite) {
-        pixelCanvasRepository.setCanvasData(sprite.width, sprite.height, sprite.layers)
+        pixelCanvasRepository.setSprite(sprite)
     }
 
     fun setAllPixels(pixels: IntArray, ignoreSelection: Boolean = false) {

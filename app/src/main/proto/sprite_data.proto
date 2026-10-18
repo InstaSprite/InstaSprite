@@ -27,4 +27,26 @@ message ISprite {
   repeated int32 color_palette = 2;
   int32 width = 3;
   int32 height = 4;
+  int32 format_version = 5;
+  repeated AnimationFrameData frames = 6;
+  repeated AnimationCelData cels = 7;
+  repeated AnimationImageData images = 8;
+  string poster_frame_id = 9;
+}
+
+message AnimationFrameData {
+  string id = 1;
+  int32 duration_ms = 2;
+}
+
+message AnimationCelData {
+  string id = 1;
+  string layer_id = 2;
+  string frame_id = 3;
+  string data_id = 4;
+}
+
+message AnimationImageData {
+  string id = 1;
+  bytes tiles = 2;
 }

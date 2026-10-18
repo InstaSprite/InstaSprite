@@ -1,12 +1,12 @@
 package com.instasprite.app.domain.draw
 
 import com.instasprite.app.domain.canvashistory.CanvasHistoryManager
+import com.instasprite.app.domain.canvashistory.CelEditEntry
 import com.instasprite.app.domain.canvashistory.HistoryCanvasState
 import com.instasprite.app.domain.canvashistory.HistoryDiskStore
 import com.instasprite.app.domain.canvashistory.OperationEntry
-import com.instasprite.app.domain.canvashistory.TileChangeTracker
-import com.instasprite.app.domain.canvashistory.TransformEntry
 import com.instasprite.app.domain.canvashistory.TransformType
+import com.instasprite.app.domain.model.CelImage
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -26,14 +26,10 @@ class HistoryDelegate(
 ) : IHistoryManager {
 
     private val canvasHistoryManager = CanvasHistoryManager(historyDiskStore)
-    private var activeHistoryTracker: TileChangeTracker? = null
+    private var pendingState: HistoryCanvasState? = null
 
     override fun saveState() {
-        if (activeHistoryTracker == null) {
-            val sel = canvasState.value.selectionState
-            activeHistoryTracker = TileChangeTracker(sel?.deepCopy())
-            pixelCanvasUseCase.beginTileHistory(activeHistoryTracker!!)
-        }
+        if (pendingState == null) pendingState = captureHistoryCanvasState()
     }
 
     override fun undo() {
@@ -76,32 +72,36 @@ class HistoryDelegate(
     }
 
     override fun discardHistoryCapture() {
-        if (activeHistoryTracker != null) {
-            pixelCanvasUseCase.endTileHistory()
-            activeHistoryTracker = null
-        }
+        pendingState = null
     }
 
     override fun updateHistoryCurrentState() {
-        val tracker = activeHistoryTracker ?: return
-        pixelCanvasUseCase.endTileHistory()
-        activeHistoryTracker = null
-
-        val sel = canvasState.value.selectionState
-        val entry = tracker.buildUndoEntry(sel?.deepCopy())
-        if (!entry.isEmpty()) {
-            canvasHistoryManager.push(entry)
-        }
+        val before = pendingState ?: return
+        pendingState = null
+        val after = captureHistoryCanvasState()
+        val oldAnimation = before.sprite?.animation ?: return
+        val newAnimation = after.sprite?.animation ?: return
+        val oldCel = oldAnimation.cel(before.activeLayerId, before.activeFrameId)
+        val newCel = newAnimation.cel(before.activeLayerId, before.activeFrameId)
+        val oldImage = oldCel?.let { oldAnimation.images[it.dataId] }
+        val newImage = newCel?.let { newAnimation.images[it.dataId] }
+        val changed = ((oldImage?.tiles?.keys ?: emptySet()) + (newImage?.tiles?.keys ?: emptySet())).filter { coord ->
+            val old = oldImage?.tiles?.get(coord)
+            val new = newImage?.tiles?.get(coord)
+            if (old == null) new != null else new == null || !old.contentEquals(new)
+        }.toSet()
+        val entry = CelEditEntry(before.activeLayerId, before.activeFrameId, oldCel, newCel,
+            oldImage?.let { CelImage(it.id, it.tiles.filterKeys { key -> key in changed }) },
+            newImage?.let { CelImage(it.id, it.tiles.filterKeys { key -> key in changed }) },
+            before.selectionState, after.selectionState)
+        if (!entry.isEmpty()) canvasHistoryManager.push(entry)
     }
 
     override fun restorePendingHistoryCapture() {
-        val tracker = activeHistoryTracker ?: return
-        val sel = canvasState.value.selectionState
-        val entry = tracker.buildUndoEntry(sel?.deepCopy())
-        val restored = canvasHistoryManager.restore(entry, captureHistoryCanvasState())
-        applyHistoryCanvasState(restored)
+        val before = pendingState ?: return
+        pendingState = null
+        applyHistoryCanvasState(before)
         refreshLayerState()
-        discardHistoryCapture()
     }
 
     override fun recordOperationHistory(operation: () -> Unit) {
@@ -115,29 +115,30 @@ class HistoryDelegate(
     }
 
     override fun recordTransformHistory(transform: TransformType, operation: () -> Unit) {
-        discardHistoryCapture()
-        operation()
-        canvasHistoryManager.push(TransformEntry(transform))
+        recordOperationHistory(operation)
     }
 
     private fun captureHistoryCanvasState(): HistoryCanvasState {
         return HistoryCanvasState(
             width = pixelCanvasUseCase.getCanvasWidth(),
             height = pixelCanvasUseCase.getCanvasHeight(),
-            layers = pixelCanvasUseCase.getLayers().map { it.copy() },
+            layers = pixelCanvasUseCase.getLayers().toList(),
             activeLayerId = pixelCanvasUseCase.getActiveLayerId(),
-            selectionState = canvasState.value.selectionState?.deepCopy()
+            selectionState = canvasState.value.selectionState?.deepCopy(),
+            sprite = pixelCanvasUseCase.getSprite(),
+            activeFrameId = pixelCanvasUseCase.activeFrameId
         )
     }
 
     private fun applyHistoryCanvasState(state: HistoryCanvasState) {
         pixelCanvasUseCase.setCanvas(
-            Sprite(
+            state.sprite ?: Sprite(
                 width = state.width,
                 height = state.height,
                 layers = state.layers.map { it.copy() }
             )
         )
+        pixelCanvasUseCase.selectFrame(state.activeFrameId)
         pixelCanvasUseCase.setActiveLayer(state.activeLayerId)
         pixelCanvasUseCase.setSelectionMask(state.selectionState?.mask)
         canvasState.value = canvasState.value.copy(selectionState = state.selectionState)

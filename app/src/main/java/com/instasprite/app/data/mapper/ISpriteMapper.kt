@@ -1,11 +1,18 @@
 package com.instasprite.app.data.mapper
 
 import com.google.protobuf.ByteString
+import com.instasprite.app.AnimationCelData
+import com.instasprite.app.AnimationFrameData
+import com.instasprite.app.AnimationImageData
 import com.instasprite.app.CelData
 import com.instasprite.app.ISprite
 import com.instasprite.app.LayerData
+import com.instasprite.app.domain.model.Animation
+import com.instasprite.app.domain.model.AnimationCel
+import com.instasprite.app.domain.model.AnimationFrame
 import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Cel
+import com.instasprite.app.domain.model.CelImage
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.utils.celToTiles
@@ -32,31 +39,37 @@ fun Sprite.toISprite(): ISprite {
             .setOpacity(layer.opacity)
             .setBlendMode(layer.blendMode.name)
 
-        if (layer.tiles.isNotEmpty()) {
-            layerBuilder.setCel(layer.toProtoCel())
-        } else {
-            layerBuilder.setCel(
-                CelData.newBuilder()
-                    .setWidth(0)
-                    .setHeight(0)
-                    .setPixels(ByteString.EMPTY)
-                    .build()
-            )
-        }
-
         layerBuilder.build()
     }
 
     builder.addAllLayers(layerProtos)
 
     this.colorPalette?.let { builder.addAllColorPalette(it) }
+    val document = (animation ?: Animation.fromLayers(layers)).validated()
+    builder.setFormatVersion(1)
+    builder.setPosterFrameId(document.posterFrameId)
+    builder.addAllFrames(document.frames.map {
+        AnimationFrameData.newBuilder().setId(it.id).setDurationMs(it.durationMs).build()
+    })
+    builder.addAllCels(document.cels.map {
+        AnimationCelData.newBuilder().setId(it.id).setLayerId(it.layerId)
+            .setFrameId(it.frameId).setDataId(it.dataId).build()
+    })
+    builder.addAllImages(document.images.values.map {
+        AnimationImageData.newBuilder().setId(it.id)
+            .setTiles(ByteString.copyFrom(encodeTilesToByteArray(it.tiles))).build()
+    })
     return builder.build()
 }
 
 fun ISprite.toSprite(): Sprite {
+    require(formatVersion in 0..1) { "Unsupported sprite format: $formatVersion" }
+    require(width > 0 && height > 0 && width.toLong() * height <= 16_777_216) { "Invalid canvas size" }
+    require(framesCount <= Animation.MAX_FRAMES)
+
     val layers = this.layersList.map { layerData ->
         // Backward compatibility: pb defaults float to 0.0 and string to ""
-        val opacity = if (layerData.opacity > 0f) layerData.opacity else 1.0f
+        val opacity = if (formatVersion >= 1 || layerData.blendMode.isNotEmpty() || layerData.opacity > 0f) layerData.opacity else 1.0f
         val blendMode = try {
             if (layerData.blendMode.isNotEmpty()) BlendMode.valueOf(layerData.blendMode) else BlendMode.NORMAL
         } catch (_: IllegalArgumentException) {
@@ -95,19 +108,20 @@ fun ISprite.toSprite(): Sprite {
         width = this.width,
         height = this.height,
         layers = layers,
-        colorPalette = this.colorPaletteList.takeIf { it.isNotEmpty() }
+        colorPalette = this.colorPaletteList.takeIf { it.isNotEmpty() },
+        animation = if (formatVersion == 0) Animation.fromLayers(layers) else Animation(
+            frames = framesList.map { AnimationFrame(it.id, it.durationMs) },
+            cels = celsList.map { AnimationCel(it.id, it.layerId, it.frameId, it.dataId) },
+            images = imagesList.map {
+                CelImage(it.id, requireNotNull(decodeTilesFromByteArray(it.tiles.toByteArray())))
+            }.also { images -> require(images.map { it.id }.distinct().size == images.size) }
+                .associateBy { it.id },
+            posterFrameId = posterFrameId
+        ).validated().also { animation ->
+            require(layers.map { it.id }.distinct().size == layers.size)
+            require(animation.cels.all { cel -> layers.any { it.id == cel.layerId } })
+        }
     )
-}
-
-private fun Layer.toProtoCel(): CelData {
-    val cel = this.cel
-    return CelData.newBuilder()
-        .setX(cel.x)
-        .setY(cel.y)
-        .setWidth(cel.width)
-        .setHeight(cel.height)
-        .setPixels(ByteString.copyFrom(encodeTilesToByteArray(this.tiles)))
-        .build()
 }
 
 private fun CelData.toDomain(): Cel {

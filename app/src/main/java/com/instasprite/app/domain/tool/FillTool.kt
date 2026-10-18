@@ -8,6 +8,7 @@ object FillTool : Tool {
     override val type = ToolType.Fill
 
     data class FillResult(
+        val pixels: IntArray,
         val dirtyMinRow: Int,
         val dirtyMinCol: Int,
         val dirtyMaxRow: Int,
@@ -24,12 +25,14 @@ object FillTool : Tool {
         startCol: Int,
         color: Color,
     ): FillResult? {
-        val width = canvas.getCanvasWidth()
-        val height = canvas.getCanvasHeight()
-
-        if (startRow !in 0 until height || startCol !in 0 until width) return null
-
         val pixels = canvas.getActiveLayerPixelsDirect() ?: return null
+        val result = calculate(pixels, canvas.getCanvasWidth(), canvas.getCanvasHeight(), startRow, startCol, color)
+        result?.let { canvas.setAllPixels(it.pixels) }
+        return result
+    }
+
+    fun calculate(pixels: IntArray, width: Int, height: Int, startRow: Int, startCol: Int, color: Color): FillResult? {
+        if (startRow !in 0 until height || startCol !in 0 until width) return null
 
         val targetArgb = pixels[startRow * width + startCol]
         val fillArgb = color.toArgb()
@@ -116,10 +119,8 @@ object FillTool : Tool {
             }
         }
 
-        // Persist back into the active layer since the repository now returns an inflated buffer.
-        canvas.setAllPixels(pixels)
-
         return FillResult(
+            pixels = pixels,
             dirtyMinRow = minRow,
             dirtyMinCol = minCol,
             dirtyMaxRow = maxRow,

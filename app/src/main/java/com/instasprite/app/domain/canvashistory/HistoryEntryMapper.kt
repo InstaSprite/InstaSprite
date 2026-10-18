@@ -2,8 +2,12 @@ package com.instasprite.app.domain.canvashistory
 
 import android.graphics.Rect
 import com.google.protobuf.ByteString
+import com.instasprite.app.AnimationCelData
+import com.instasprite.app.AnimationImageData
+import com.instasprite.app.CelEditEntryProto
 import com.instasprite.app.HistoryCanvasStateProto
 import com.instasprite.app.HistoryEntryProto
+import com.instasprite.app.ISprite
 import com.instasprite.app.LayerProto
 import com.instasprite.app.OperationEntryProto
 import com.instasprite.app.SelectionStateProto
@@ -12,7 +16,11 @@ import com.instasprite.app.TileDeltaProto
 import com.instasprite.app.TransformEntryProto
 import com.instasprite.app.TransformTypeProto
 import com.instasprite.app.UndoEntryProto
+import com.instasprite.app.data.mapper.toISprite
+import com.instasprite.app.data.mapper.toSprite
+import com.instasprite.app.domain.model.AnimationCel
 import com.instasprite.app.domain.model.BlendMode
+import com.instasprite.app.domain.model.CelImage
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.model.TileCoord
@@ -34,6 +42,7 @@ object HistoryEntryMapper {
 
     fun HistoryEntry.toProto(): HistoryEntryProto = historyEntryProto {
         when (val entry = this@toProto) {
+            is CelEditEntry -> celEditEntry = entry.toCelEditProto()
             is UndoEntry -> undoEntry = entry.toUndoEntryProto()
             is OperationEntry -> operationEntry = entry.toOperationEntryProto()
             is TransformEntry -> transformEntry = entry.toTransformEntryProto()
@@ -42,6 +51,8 @@ object HistoryEntryMapper {
 
     fun HistoryEntryProto.toDomain(): HistoryEntry {
         return when (entryCase) {
+            HistoryEntryProto.EntryCase.CEL_EDIT_ENTRY -> celEditEntry.toCelEdit()
+
             HistoryEntryProto.EntryCase.UNDO_ENTRY ->
                 undoEntry.toDomainUndoEntry()
 
@@ -55,6 +66,36 @@ object HistoryEntryMapper {
                 error("HistoryEntryProto has no entry set")
         }
     }
+
+    private fun AnimationCel.toCelProto(): AnimationCelData = AnimationCelData.newBuilder()
+        .setId(id).setLayerId(layerId).setFrameId(frameId).setDataId(dataId).build()
+
+    private fun AnimationCelData.toCel() = AnimationCel(id, layerId, frameId, dataId)
+
+    private fun CelImage.toImageProto(): AnimationImageData = AnimationImageData.newBuilder()
+        .setId(id).setTiles(ByteString.copyFrom(encodeTilesToByteArray(tiles))).build()
+
+    private fun AnimationImageData.toImage() = CelImage(id,
+        requireNotNull(decodeTilesFromByteArray(tiles.toByteArray())))
+
+    private fun CelEditEntry.toCelEditProto(): CelEditEntryProto {
+        val builder = CelEditEntryProto.newBuilder().setLayerId(layerId).setFrameId(frameId)
+        beforeCel?.let { builder.setBeforeCel(it.toCelProto()) }
+        afterCel?.let { builder.setAfterCel(it.toCelProto()) }
+        beforeImagePatch?.let { builder.setBeforeImage(it.toImageProto()) }
+        afterImagePatch?.let { builder.setAfterImage(it.toImageProto()) }
+        beforeSelection?.let { builder.setBeforeSelection(it.toSelectionStateProto()) }
+        afterSelection?.let { builder.setAfterSelection(it.toSelectionStateProto()) }
+        return builder.build()
+    }
+
+    private fun CelEditEntryProto.toCelEdit() = CelEditEntry(layerId, frameId,
+        if (hasBeforeCel()) beforeCel.toCel() else null,
+        if (hasAfterCel()) afterCel.toCel() else null,
+        if (hasBeforeImage()) beforeImage.toImage() else null,
+        if (hasAfterImage()) afterImage.toImage() else null,
+        if (hasBeforeSelection()) beforeSelection.toDomainSelectionState() else null,
+        if (hasAfterSelection()) afterSelection.toDomainSelectionState() else null)
 
     private fun UndoEntry.toUndoEntryProto(): UndoEntryProto = undoEntryProto {
         deltas.addAll(this@toUndoEntryProto.deltas.map { it.toTileDeltaProto() })
@@ -137,9 +178,15 @@ object HistoryEntryMapper {
 
     private fun HistoryCanvasState.toHistoryCanvasStateProto(): HistoryCanvasStateProto =
         historyCanvasStateProto {
+            this@toHistoryCanvasStateProto.sprite?.let {
+                spriteDocument = ByteString.copyFrom(it.toISprite().toByteArray())
+            }
+            activeFrameId = this@toHistoryCanvasStateProto.activeFrameId
             width = this@toHistoryCanvasStateProto.width
             height = this@toHistoryCanvasStateProto.height
-            layers.addAll(this@toHistoryCanvasStateProto.layers.map { it.toLayerProto() })
+            if (this@toHistoryCanvasStateProto.sprite == null) {
+                layers.addAll(this@toHistoryCanvasStateProto.layers.map { it.toLayerProto() })
+            }
             activeLayerId = this@toHistoryCanvasStateProto.activeLayerId
             hasSelectionState = this@toHistoryCanvasStateProto.selectionState != null
             if (this@toHistoryCanvasStateProto.selectionState != null) {
@@ -153,6 +200,8 @@ object HistoryEntryMapper {
             width = width,
             height = height,
             layers = layersList.map { it.toDomainLayer() },
+            sprite = if (spriteDocument.isEmpty) null else ISprite.parseFrom(spriteDocument).toSprite(),
+            activeFrameId = activeFrameId,
             activeLayerId = activeLayerId,
             selectionState = if (hasSelectionState) {
                 selectionState.toDomainSelectionState()

@@ -54,10 +54,7 @@ class SpriteDatabaseRepository @Inject constructor(
         if (proto != null) {
             val sprite = proto.toSprite()
 
-            return entity.toDomain(
-                layers = sprite.layers,
-                colorPalette = proto.colorPaletteList,
-            )
+            return sprite.copy(id = entity.id)
         }
 
         return null

@@ -86,14 +86,20 @@ class BitmapManager(
         selectionVersion++
     }
 
+    private var renderRequest = 0L
+
     suspend fun refreshBitmapState(): Long {
+        val request = ++renderRequest
+        val snapshot = pixelCanvasUseCase.getSprite()
+        val frameId = pixelCanvasUseCase.activeFrameId
         val w = pixelCanvasUseCase.getCanvasWidth()
         val h = pixelCanvasUseCase.getCanvasHeight()
 
         val pixels = withContext(Dispatchers.Default) {
-            pixelCanvasUseCase.getAllPixels()
+            snapshot.renderFrame(frameId)
         }
 
+        if (request != renderRequest || frameId != pixelCanvasUseCase.activeFrameId) return drawVersion
         ensureBitmap(w, h)
         if (pixels.size == w * h) {
             _bitmap?.setPixels(pixels, 0, w, 0, 0, w, h)
@@ -103,6 +109,7 @@ class BitmapManager(
     }
 
     fun refreshBitmapRegion(startRow: Int, startCol: Int, endRow: Int, endCol: Int): Long {
+        renderRequest++
         val bmp = _bitmap ?: return drawVersion
         val w = pixelCanvasUseCase.getCanvasWidth()
         val h = pixelCanvasUseCase.getCanvasHeight()
@@ -123,6 +130,7 @@ class BitmapManager(
     }
 
     fun incrementDrawVersion() {
+        renderRequest++
         drawVersion++
     }
 

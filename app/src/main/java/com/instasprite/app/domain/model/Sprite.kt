@@ -8,10 +8,18 @@ data class Sprite(
     val width: Int,
     val height: Int,
     val layers: List<Layer>,
-    val colorPalette: List<Int>? = null
+    val colorPalette: List<Int>? = null,
+    val animation: Animation? = null
 ) {
+    fun layersAt(frameId: String): List<Layer> = animation?.let { document ->
+        layers.map { Layer(it.id, it.name, it.isVisible, it.isLocked, it.opacity, it.blendMode, document.tiles(it.id, frameId)) }
+    } ?: layers
+
+    fun renderFrame(frameId: String): IntArray = copy(layers = layersAt(frameId), animation = null).compositedPixels
+
     val compositedPixels: IntArray
         get() {
+            animation?.let { return renderFrame(it.posterFrameId) }
             val result = IntArray(width * height)
             for (layer in layers) {
                 if (layer.isVisible) {

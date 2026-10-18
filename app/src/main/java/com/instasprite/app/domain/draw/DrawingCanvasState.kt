@@ -4,6 +4,8 @@ import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.SelectionState
 
 data class DrawingCanvasState(
+    val animation: com.instasprite.app.domain.model.Animation? = null,
+    val activeFrameId: String = "",
     val width: Int = 0,
     val height: Int = 0,
     val drawVersion: Long = 0,

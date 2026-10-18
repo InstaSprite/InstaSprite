@@ -16,6 +16,7 @@ import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,7 +35,11 @@ class DrawingEngine(
     val tools: DrawingTools = DrawingTools()
 ) : ILayerManager, ITransformManager, IHistoryManager, InteractionContext {
 
+    private var processingJob: Job? = null
+    suspend fun awaitToolIdle() { processingJob?.join() }
+
     private var isProcessingTool = false
+    val isBusy get() = isProcessingTool || activeState == DrawingState
 
     override val bitmapManager = BitmapManager(pixelCanvasUseCase)
     override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope, tools.move) { sel ->
@@ -76,6 +81,8 @@ class DrawingEngine(
         refreshActiveLayerState = ::refreshActiveLayerState,
         syncStateVersions = ::syncStateVersions
     )
+
+    val animationManager = AnimationDelegate(pixelCanvasUseCase, historyManager, ::refreshFullCanvasState)
 
     private val layerDelegate = LayerDelegate(
         pixelCanvasUseCase = pixelCanvasUseCase,
@@ -170,13 +177,17 @@ class DrawingEngine(
         if (tool is FillTool) {
             isProcessingTool = true
             saveState()
-            scope.launch {
+            val pixels = pixelCanvasUseCase.getActiveLayerPixelsDirect()
+            val width = pixelCanvasUseCase.getCanvasWidth()
+            val height = pixelCanvasUseCase.getCanvasHeight()
+            processingJob = scope.launch {
                 try {
                     val result = withContext(Dispatchers.Default) {
-                        FillTool.fillDirect(pixelCanvasUseCase, row, col, color)
+                        pixels?.let { FillTool.calculate(it, width, height, row, col, color) }
                     }
 
                     if (result != null) {
+                        pixelCanvasUseCase.setAllPixels(result.pixels)
                         bitmapManager.refreshBitmapRegion(
                             result.dirtyMinRow, result.dirtyMinCol,
                             result.dirtyMaxRow, result.dirtyMaxCol
@@ -280,16 +291,18 @@ class DrawingEngine(
     }
 
     suspend fun refreshFullCanvasState() {
+        bitmapManager.refreshBitmapState()
         refreshCanvasSizeState()
         refreshLayerState()
         refreshActiveLayerState()
-        bitmapManager.refreshBitmapState()
         syncStateVersions()
     }
 
     override fun refreshLayerState() {
         _canvasState.value = _canvasState.value.copy(
-            layers = pixelCanvasUseCase.getLayers().toList()
+            layers = pixelCanvasUseCase.getLayers().toList(),
+            animation = pixelCanvasUseCase.animation,
+            activeFrameId = pixelCanvasUseCase.activeFrameId
         )
     }
 
@@ -309,11 +322,25 @@ class DrawingEngine(
     private fun syncStateVersions() {
         _canvasState.value = _canvasState.value.copy(
             drawVersion = bitmapManager.drawVersion,
-            overlayVersion = bitmapManager.overlayVersion
+            overlayVersion = bitmapManager.overlayVersion,
+            animation = pixelCanvasUseCase.animation,
+            activeFrameId = pixelCanvasUseCase.activeFrameId
         )
     }
 
+    suspend fun selectFrame(frameId: String, layerId: String? = null) {
+        if (isBusy) return
+        pixelCanvasUseCase.selectFrame(frameId)
+        layerId?.let { pixelCanvasUseCase.setActiveLayer(it) }
+        bitmapManager.clearOverlayBitmap()
+        bitmapManager.incrementOverlayVersion()
+        refreshFullCanvasState()
+    }
+
     fun release() {
+        processingJob?.cancel()
+        processingJob = null
+        isProcessingTool = false
         bitmapManager.release()
         tools.reset()
         strokeEngine.reset()
