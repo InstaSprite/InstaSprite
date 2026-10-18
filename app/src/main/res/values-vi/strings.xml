@@ -547,4 +547,27 @@
     <string name="onboarding_cursor_mode">Chế độ con trỏ</string>
     <string name="onboarding_cursor_mode_desc">Sử dụng con trỏ để vẽ chính xác mà không bị ngón tay che khuất tầm nhìn.</string>
     <string name="tap_to_select_file">Chạm để chọn tệp</string>
+
+    <string name="timeline_collapse">Dòng thời gian -</string>
+    <string name="timeline_expand">Dòng thời gian +</string>
+    <string name="animation_play">Phát</string>
+    <string name="animation_stop">Dừng</string>
+    <string name="animation_actions">Thao tác</string>
+    <string name="animation_position">%1$d / %2$d</string>
+    <string name="animation_duplicate">Nhân đôi khung hình</string>
+    <string name="animation_empty">Khung hình trống mới</string>
+    <string name="animation_linked">Khung hình liên kết mới</string>
+    <string name="animation_delete">Xóa khung hình</string>
+    <string name="animation_copy_cel">Sao chép cel từ khung trước</string>
+    <string name="animation_link_cel">Liên kết cel với khung trước</string>
+    <string name="animation_unlink">Tách liên kết cel</string>
+    <string name="animation_clear">Xóa cel</string>
+    <string name="animation_poster">Dùng khung làm ảnh thu nhỏ</string>
+    <string name="animation_duration">Thời lượng khung hình</string>
+    <string name="animation_milliseconds">Mili giây</string>
+    <string name="animation_duration_range">1-60,000 ms</string>
+    <string name="animation_cell">%1$s, khung %2$d, %3$s</string>
+    <string name="animation_cell_empty">cel trống</string>
+    <string name="animation_cell_linked">cel liên kết</string>
+    <string name="animation_cell_filled">cel độc lập</string>
 </resources>

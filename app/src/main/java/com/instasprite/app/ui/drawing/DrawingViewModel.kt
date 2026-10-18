@@ -2,6 +2,7 @@ package com.instasprite.app.ui.drawing
 
 import android.content.Context
 import android.net.Uri
+import android.os.SystemClock
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
 import com.instasprite.app.di.DrawingSessionFactory
 import com.instasprite.app.domain.dialog.DialogController
+import com.instasprite.app.domain.draw.AnimationPlayback
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
@@ -29,6 +31,7 @@ import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.drawing.contract.toUiState
+import com.instasprite.app.ui.drawing.timeline.TimelineEvent
 import com.instasprite.app.ui.drawing.tutorial.drawingTutorialSequence
 import com.instasprite.app.ui.tutorial.TutorialManager
 import com.instasprite.app.utils.AppSettings
@@ -40,6 +43,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,6 +56,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class DrawingScreenState(
+    val isPlaying: Boolean = false,
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val selectedTool: Tool,
@@ -180,9 +186,7 @@ class DrawingViewModel @AssistedInject constructor(
 
             drawingScope.launch {
                 try {
-                    withContext(Dispatchers.IO) {
-                        loadFromDB()
-                    }
+                    loadFromDB()
                     drawingEngine.refreshFullCanvasState()
                     _uiState.value = _uiState.value.copy(isLoading = false)
                 } catch (t: Throwable) {
@@ -195,6 +199,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     override fun onCleared() {
+        stopPlayback()
         super.onCleared()
         drawingSession.close()
     }
@@ -218,7 +223,68 @@ class DrawingViewModel @AssistedInject constructor(
     )
     val tutorialState = tutorialManager.state
 
+    private var playbackJob: Job? = null
+    private var playbackStartFrame: String? = null
+    private var timelineJob: Job? = null
+
+    fun stopPlayback() {
+        playbackJob?.cancel()
+        playbackJob = null
+        if (_uiState.value.isPlaying) {
+            _uiState.value = _uiState.value.copy(isPlaying = false)
+            playbackStartFrame?.let { id ->
+                pixelCanvasUseCase.selectFrame(id)
+                timelineJob = drawingScope.launch { drawingEngine.refreshFullCanvasState() }
+            }
+        }
+        playbackStartFrame = null
+    }
+
+    fun onTimelineEvent(event: TimelineEvent) {
+        if (_uiState.value.isLoading || drawingEngine.isBusy) return
+        timelineJob?.cancel()
+        val wasPlaying = _uiState.value.isPlaying
+        stopPlayback()
+        commitPendingTool()
+        if (event == TimelineEvent.TogglePlayback) {
+            if (wasPlaying || pixelCanvasUseCase.animation.frames.size < 2) return
+            val startFrame = pixelCanvasUseCase.activeFrameId
+            val playback = AnimationPlayback(pixelCanvasUseCase.animation.frames, startFrame)
+            playbackStartFrame = startFrame
+            _uiState.value = _uiState.value.copy(isPlaying = true)
+            playbackJob = drawingScope.launch {
+                val start = SystemClock.elapsedRealtime()
+                while (true) {
+                    val frame = playback.frameAt(SystemClock.elapsedRealtime() - start)
+                    if (frame != pixelCanvasUseCase.activeFrameId) drawingEngine.selectFrame(frame)
+                    delay(16)
+                }
+            }
+            return
+        }
+        timelineJob = drawingScope.launch {
+            if (event is TimelineEvent.Select) {
+                drawingEngine.selectFrame(event.frameId, event.layerId)
+            } else {
+                val manager = drawingEngine.animationManager
+                when (event) {
+                    is TimelineEvent.Insert -> manager.insertFrame(event.empty, event.linked)
+                    is TimelineEvent.Duration -> manager.setDuration(event.milliseconds)
+                    TimelineEvent.Delete -> manager.deleteFrame()
+                    TimelineEvent.ClearCel -> manager.clearCel()
+                    TimelineEvent.CopyPrevious -> manager.copyPreviousCel(false)
+                    TimelineEvent.LinkPrevious -> manager.copyPreviousCel(true)
+                    TimelineEvent.Unlink -> manager.unlinkCel()
+                    TimelineEvent.SetPoster -> manager.setPosterFrame()
+                    is TimelineEvent.Select, TimelineEvent.TogglePlayback -> Unit
+                }
+            }
+        }
+    }
+
     fun onCanvasMenuEvent(event: CanvasMenuEvent) {
+        if (drawingEngine.isBusy) return
+        stopPlayback()
         try {
             if (event !is CanvasMenuEvent.OpenResizeDialog) {
                 commitPendingTool()
@@ -235,6 +301,8 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onLayerEvent(event: LayerEvent) {
+        if (drawingEngine.isBusy) return
+        stopPlayback()
         try {
             commitPendingTool()
             when (event) {
@@ -254,6 +322,8 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun resizeCanvas(width: Int, height: Int) {
+        if (drawingEngine.isBusy) return
+        stopPlayback()
         try {
             drawingEngine.resizeCanvas(width, height)
             val state = _uiState.value.cursorState
@@ -273,6 +343,14 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCanvasEvent(event: PixelCanvasEvent) {
+        if (_uiState.value.isPlaying) {
+            stopPlayback()
+            return
+        }
+        if (_uiState.value.isLoading || timelineJob?.isActive == true) return
+        if (drawingEngine.isBusy && event !is PixelCanvasEvent.OnStrokeMove &&
+            event !is PixelCanvasEvent.OnStrokeEnd && event !is PixelCanvasEvent.OnStrokeCancel) return
+        stopPlayback()
         try {
             val tool = _uiState.value.selectedTool
             val color = activeColor.value
@@ -331,6 +409,8 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onToolSelectorEvent(event: ToolSelectorEvent) {
+        if (drawingEngine.isBusy) return
+        stopPlayback()
         try {
             when (event) {
                 is ToolSelectorEvent.Undo -> {
@@ -388,6 +468,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     private fun commitPendingTool() {
+        stopPlayback()
         val prev = _uiState.value.selectedTool
         if (prev is StrokeTool) {
             drawingEngine.commitPendingTool(prev)
@@ -419,6 +500,12 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCursorDrawEvent(event: CursorDrawEvent) {
+        if (_uiState.value.isPlaying) {
+            stopPlayback()
+            return
+        }
+        if (timelineJob?.isActive == true) return
+        stopPlayback()
         try {
             when (event) {
                 is CursorDrawEvent.ToggleCursorMode -> toggleCursorMode(event.cursorX, event.cursorY)
@@ -553,12 +640,13 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun saveImage(folderUri: Uri, fileName: String, scalePercent: Int = 100): Boolean {
+        if (drawingEngine.isBusy) return false
         try {
             if (fileName.isBlank()) return false
             commitPendingTool()
             val sprite = pixelCanvasUseCase.getSprite()
             val bmp = ImageExporter.convertToBitmap(
-                sprite.compositedPixels,
+                sprite.renderFrame(pixelCanvasUseCase.activeFrameId),
                 sprite.width,
                 sprite.height,
                 scalePercent
@@ -572,6 +660,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     suspend fun saveISprite(folderUri: Uri, fileName: String): Boolean {
+        drawingEngine.awaitToolIdle()
         try {
             if (fileName.isBlank()) return false
             if (_uiState.value.isSaving) return false
@@ -579,10 +668,11 @@ class DrawingViewModel @AssistedInject constructor(
             commitPendingTool()
 
             _uiState.value = _uiState.value.copy(isSaving = true)
+            val sprite = pixelCanvasUseCase.getSprite()
             return try {
                 withContext(Dispatchers.IO) {
                     fileRepository.saveISpriteFile(
-                        pixelCanvasUseCase.getSprite(),
+                        sprite,
                         folderUri,
                         fileName
                     )
@@ -601,6 +691,8 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     suspend fun loadSprite(sprite: Sprite) {
+        drawingEngine.awaitToolIdle()
+        stopPlayback()
         try {
             drawingEngine.release()
             drawingEngine.setCanvasSize(sprite.width, sprite.height)
@@ -616,15 +708,16 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     suspend fun saveToDB(name: String? = null) {
+        drawingEngine.awaitToolIdle()
         try {
             if (_uiState.value.isSaving) return
 
             commitPendingTool()
 
             _uiState.value = _uiState.value.copy(isSaving = true)
+            val sprite = pixelCanvasUseCase.getSprite()
             try {
                 withContext(Dispatchers.IO) {
-                    val sprite = pixelCanvasUseCase.getSprite()
                     spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
                     name?.let {
                         spriteDataRepository.changeName(spriteId, it)
@@ -640,7 +733,7 @@ class DrawingViewModel @AssistedInject constructor(
 
     suspend fun loadFromDB() {
         try {
-            val sprite = spriteDataRepository.loadSprite(spriteId)
+            val sprite = withContext(Dispatchers.IO) { spriteDataRepository.loadSprite(spriteId) }
             if (sprite != null) {
                 loadSprite(sprite)
             } else {

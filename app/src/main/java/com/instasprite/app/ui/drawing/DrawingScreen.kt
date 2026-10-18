@@ -20,7 +20,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -41,6 +40,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.createBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.domain.model.SelectionState
@@ -67,6 +69,8 @@ import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasState
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
+import com.instasprite.app.ui.drawing.timeline.AnimationTimeline
+import com.instasprite.app.ui.drawing.timeline.TimelineEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.ui.tutorial.SpotlightOverlay
@@ -78,6 +82,7 @@ import com.instasprite.app.utils.calculateNewScaleAndOffset
 import com.instasprite.app.utils.pixelDp
 
 data class DrawingScreenEvent(
+    val onTimelineEvent: (TimelineEvent) -> Unit = {},
     val onColorPaletteEvent: (ColorPaletteEvent) -> Unit,
     val onCanvasMenuEvent: (CanvasMenuEvent) -> Unit,
     val onToolSelectorEvent: (ToolSelectorEvent) -> Unit,
@@ -97,6 +102,7 @@ fun DrawingScreen(
     onNavigateToPalette: () -> Unit,
     viewModel: DrawingViewModel = hiltViewModel()
 ) {
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.stopPlayback() }
     BackHandler(onBack = { onNavigateBack(viewModel.spriteId) })
 
     val fatalError by viewModel.fatalError.collectAsStateWithLifecycle()
@@ -148,6 +154,7 @@ fun DrawingScreen(
 
     val event = remember(viewModel) {
         DrawingScreenEvent(
+            onTimelineEvent = viewModel::onTimelineEvent,
             onColorPaletteEvent = viewModel::onColorPaletteEvent,
             onCanvasMenuEvent = viewModel::onCanvasMenuEvent,
             onToolSelectorEvent = viewModel::onToolSelectorEvent,
@@ -280,6 +287,10 @@ private fun DrawingScreenContent(
                 Column(
                     modifier = Modifier.background(AppTheme.colors.BackgroundColor)
                 ) {
+                    canvasState.animation?.let { animation ->
+                        AnimationTimeline(animation, canvasState.layers, canvasState.activeFrameId,
+                            canvasState.activeLayerId, uiState.isPlaying, event.onTimelineEvent)
+                    }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,

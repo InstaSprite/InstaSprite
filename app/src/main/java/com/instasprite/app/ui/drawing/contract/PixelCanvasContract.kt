@@ -6,6 +6,8 @@ import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.Tool
 
 data class PixelCanvasState(
+    val animation: com.instasprite.app.domain.model.Animation? = null,
+    val activeFrameId: String = "",
     val width: Int = 0,
     val height: Int = 0,
     val drawVersion: Long = 0,
@@ -17,6 +19,8 @@ data class PixelCanvasState(
 )
 
 fun DrawingCanvasState.toUiState() = PixelCanvasState(
+    animation = animation,
+    activeFrameId = activeFrameId,
     width = width,
     height = height,
     drawVersion = drawVersion,

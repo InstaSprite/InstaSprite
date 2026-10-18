@@ -546,4 +546,27 @@
     <string name="onboarding_touch_mode_desc">Draw directly where your finger touches the screen.</string>
     <string name="onboarding_cursor_mode">Cursor Mode</string>
     <string name="onboarding_cursor_mode_desc">Use an cursor to draw precisely without your finger blocking the view.</string>
+
+    <string name="timeline_collapse">Timeline -</string>
+    <string name="timeline_expand">Timeline +</string>
+    <string name="animation_play">Play</string>
+    <string name="animation_stop">Stop</string>
+    <string name="animation_actions">Actions</string>
+    <string name="animation_position">%1$d / %2$d</string>
+    <string name="animation_duplicate">Duplicate frame</string>
+    <string name="animation_empty">New empty frame</string>
+    <string name="animation_linked">New linked frame</string>
+    <string name="animation_delete">Delete frame</string>
+    <string name="animation_copy_cel">Copy cel from previous frame</string>
+    <string name="animation_link_cel">Link cel to previous frame</string>
+    <string name="animation_unlink">Unlink cel</string>
+    <string name="animation_clear">Clear cel</string>
+    <string name="animation_poster">Use frame as thumbnail</string>
+    <string name="animation_duration">Frame duration</string>
+    <string name="animation_milliseconds">Milliseconds</string>
+    <string name="animation_duration_range">1-60,000 ms</string>
+    <string name="animation_cell">%1$s, frame %2$d, %3$s</string>
+    <string name="animation_cell_empty">empty cel</string>
+    <string name="animation_cell_linked">linked cel</string>
+    <string name="animation_cell_filled">independent cel</string>
 </resources>
