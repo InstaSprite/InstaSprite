@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +53,6 @@ import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.ui.components.composable.DrawerLayout
 import com.instasprite.app.ui.components.composable.DrawerSide
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.components.dialog.CustomDialog
 import com.instasprite.app.ui.drawing.component.ColorPalette
 import com.instasprite.app.ui.drawing.component.CursorDrawButton
 import com.instasprite.app.ui.drawing.component.LayerDrawer
@@ -68,9 +68,11 @@ import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
 import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasState
+import com.instasprite.app.ui.drawing.contract.TimelineEvent
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.drawing.timeline.AnimationTimeline
-import com.instasprite.app.ui.drawing.timeline.TimelineEvent
+import com.instasprite.app.ui.drawing.timeline.TimelinePreviewData
+import com.instasprite.app.ui.drawing.timeline.TimelineSheet
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.ui.tutorial.SpotlightOverlay
@@ -215,6 +217,12 @@ private fun DrawingScreenContent(
         }
     }
 
+    var showTimeline by rememberSaveable { mutableStateOf(false) }
+    val closeTimeline = {
+        showTimeline = false
+    }
+    BackHandler(enabled = showTimeline, onBack = closeTimeline)
+
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     var canvasLayoutSize by remember { mutableStateOf(IntSize.Zero) }
@@ -243,7 +251,8 @@ private fun DrawingScreenContent(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val timelineMaxHeight = maxHeight * 0.5f
         Scaffold(
             topBar = {
                 Column {
@@ -288,8 +297,32 @@ private fun DrawingScreenContent(
                     modifier = Modifier.background(AppTheme.colors.BackgroundColor)
                 ) {
                     canvasState.animation?.let { animation ->
-                        AnimationTimeline(animation, canvasState.layers, canvasState.activeFrameId,
-                            canvasState.activeLayerId, uiState.isPlaying, event.onTimelineEvent)
+                        if (showTimeline) {
+                            TimelineSheet(
+                                animation,
+                                canvasState.layers,
+                                canvasState.activeFrameId,
+                                canvasState.activeLayerId,
+                                uiState.isPlaying,
+                                timelineMaxHeight,
+                                event.onTimelineEvent,
+                                closeTimeline,
+                                onLayerEvent = event.onLayerEvent
+                            )
+                        } else {
+                            AnimationTimeline(
+                                animation,
+                                canvasState.layers,
+                                canvasState.activeFrameId,
+                                canvasState.activeLayerId,
+                                uiState.isPlaying,
+                                event.onTimelineEvent,
+                                { showTimeline = true },
+                                Modifier.height(30.pixelDp),
+                                expanded = false,
+                                onLayerEvent = event.onLayerEvent
+                            )
+                        }
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -504,6 +537,10 @@ private fun DrawingScreenPreview() {
                 toolSize = 1
             ),
             canvasState = PixelCanvasState(
+                animation = TimelinePreviewData.animation,
+                layers = TimelinePreviewData.layers,
+                activeFrameId = "frame-2",
+                activeLayerId = "character",
                 width = 16,
                 height = 16
             ),

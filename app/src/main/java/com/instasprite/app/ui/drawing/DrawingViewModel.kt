@@ -31,7 +31,7 @@ import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.drawing.contract.toUiState
-import com.instasprite.app.ui.drawing.timeline.TimelineEvent
+import com.instasprite.app.ui.drawing.contract.TimelineEvent
 import com.instasprite.app.ui.drawing.tutorial.drawingTutorialSequence
 import com.instasprite.app.ui.tutorial.TutorialManager
 import com.instasprite.app.utils.AppSettings
@@ -269,6 +269,7 @@ class DrawingViewModel @AssistedInject constructor(
                 val manager = drawingEngine.animationManager
                 when (event) {
                     is TimelineEvent.Insert -> manager.insertFrame(event.empty, event.linked)
+                    TimelineEvent.Append -> manager.appendFrame()
                     is TimelineEvent.Duration -> manager.setDuration(event.milliseconds)
                     TimelineEvent.Delete -> manager.deleteFrame()
                     TimelineEvent.ClearCel -> manager.clearCel()

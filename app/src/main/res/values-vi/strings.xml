@@ -570,4 +570,12 @@
     <string name="animation_cell_empty">cel trống</string>
     <string name="animation_cell_linked">cel liên kết</string>
     <string name="animation_cell_filled">cel độc lập</string>
+    <string name="animation_timeline">Dòng thời gian</string>
+    <string name="animation_previous">Khung trước</string>
+    <string name="animation_next">Khung sau</string>
+    <string name="animation_close">Đóng dòng thời gian</string>
+    <string name="animation_frame_time">%1$d ms</string>
+    <string name="animation_expand">Mở rộng dòng thời gian</string>
+    <string name="animation_collapse">Thu gọn dòng thời gian</string>
+    <string name="animation_add">Thêm khung hình</string>
 </resources>

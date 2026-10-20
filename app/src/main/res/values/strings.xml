@@ -569,4 +569,12 @@
     <string name="animation_cell_empty">empty cel</string>
     <string name="animation_cell_linked">linked cel</string>
     <string name="animation_cell_filled">independent cel</string>
+    <string name="animation_timeline">Timeline</string>
+    <string name="animation_previous">Previous frame</string>
+    <string name="animation_next">Next frame</string>
+    <string name="animation_close">Close timeline</string>
+    <string name="animation_frame_time">%1$d ms</string>
+    <string name="animation_expand">Expand timeline</string>
+    <string name="animation_collapse">Collapse timeline</string>
+    <string name="animation_add">Add frame</string>
 </resources>
