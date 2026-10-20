@@ -10,107 +10,101 @@ import java.util.ArrayDeque
 import java.util.LinkedHashMap
 
 class CanvasHistoryManager(
-    private val diskStore: HistoryDiskStore? = null
+    private val diskStore: HistoryDiskStore? = null,
+    private val memoryBudgetBytes: Long = minOf(32L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 8)
 ) {
     private val undoStack: ArrayDeque<HistoryEntry> = ArrayDeque()
     private val redoStack: ArrayDeque<HistoryEntry> = ArrayDeque()
+    private val memoryUsage = HistoryMemoryUsage()
+
+    internal val retainedMemoryBytes: Long get() = memoryUsage.bytes
 
     private val transparentTile = IntArray(TILE_SIZE * TILE_SIZE)
 
-    companion object {
-        private const val IN_MEMORY_LIMIT = 30
+    init {
+        require(memoryBudgetBytes > 0)
     }
 
     fun push(entry: HistoryEntry) {
         if (entry.isEmpty()) return
-
-        undoStack.addLast(entry)
-
-        // Spill oldest to disk when over limit
-        if (diskStore != null) {
-            while (undoStack.size > IN_MEMORY_LIMIT) {
-                diskStore.appendUndo(undoStack.removeFirst())
-            }
-        } else {
-            while (undoStack.size > IN_MEMORY_LIMIT) {
-                undoStack.removeFirst()
-            }
-        }
-
-        redoStack.clear()
+        pushUndo(entry)
+        while (redoStack.isNotEmpty()) memoryUsage.release(redoStack.removeLast())
         diskStore?.clearRedo()
+        trimHistory()
     }
 
     fun undo(current: HistoryCanvasState): HistoryCanvasState? {
-        val entry = if (undoStack.isNotEmpty()) {
-            undoStack.removeLast()
-        } else {
-            diskStore?.popUndo() ?: return null
-        }
+        val entry = undoStack.pollLast() ?: diskStore?.popUndo()?.also { memoryUsage.retain(it) } ?: return null
 
-        return when (entry) {
-            is CelEditEntry -> {
-                pushRedo(entry)
-                applyCelEdit(entry, current, true)
-            }
-            is UndoEntry -> {
-                val (restoredState, redoEntry) = applyTileEntry(entry, current)
-                if (!redoEntry.isEmpty()) {
-                    pushRedo(redoEntry)
+        return try {
+            when (entry) {
+                is CelEditEntry -> {
+                    pushRedo(entry)
+                    applyCelEdit(entry, current, true)
                 }
-                restoredState
-            }
+                is UndoEntry -> {
+                    val (restoredState, redoEntry) = applyTileEntry(entry, current)
+                    if (!redoEntry.isEmpty()) {
+                        pushRedo(redoEntry)
+                    }
+                    restoredState
+                }
 
-            is OperationEntry -> {
-                pushRedo(entry)
-                deepCopyState(entry.before)
-            }
+                is OperationEntry -> {
+                    pushRedo(entry)
+                    deepCopyState(entry.before)
+                }
 
-            is TransformEntry -> {
-                val transformed = applyTransform(current, inverseTransform(entry.transform))
-                pushRedo(entry)
-                transformed
+                is TransformEntry -> {
+                    val transformed = applyTransform(current, inverseTransform(entry.transform))
+                    pushRedo(entry)
+                    transformed
+                }
             }
+        } finally {
+            memoryUsage.release(entry)
+            trimHistory()
         }
     }
 
     fun redo(current: HistoryCanvasState): HistoryCanvasState? {
-        // Try in-memory first, then disk
-        val entry = if (redoStack.isNotEmpty()) {
-            redoStack.removeLast()
-        } else {
-            diskStore?.popRedo() ?: return null
-        }
+        val entry = redoStack.pollLast() ?: diskStore?.popRedo()?.also { memoryUsage.retain(it) } ?: return null
 
-        return when (entry) {
-            is CelEditEntry -> {
-                pushUndo(entry)
-                applyCelEdit(entry, current, false)
-            }
-            is UndoEntry -> {
-                val (restoredState, undoEntry) = applyTileEntry(entry, current)
-                if (!undoEntry.isEmpty()) {
-                    pushUndo(undoEntry)
+        return try {
+            when (entry) {
+                is CelEditEntry -> {
+                    pushUndo(entry)
+                    applyCelEdit(entry, current, false)
                 }
-                restoredState
-            }
+                is UndoEntry -> {
+                    val (restoredState, undoEntry) = applyTileEntry(entry, current)
+                    if (!undoEntry.isEmpty()) {
+                        pushUndo(undoEntry)
+                    }
+                    restoredState
+                }
 
-            is OperationEntry -> {
-                pushUndo(entry)
-                deepCopyState(entry.after)
-            }
+                is OperationEntry -> {
+                    pushUndo(entry)
+                    deepCopyState(entry.after)
+                }
 
-            is TransformEntry -> {
-                val transformed = applyTransform(current, entry.transform)
-                pushUndo(entry)
-                transformed
+                is TransformEntry -> {
+                    val transformed = applyTransform(current, entry.transform)
+                    pushUndo(entry)
+                    transformed
+                }
             }
+        } finally {
+            memoryUsage.release(entry)
+            trimHistory()
         }
     }
 
     fun reset() {
         undoStack.clear()
         redoStack.clear()
+        memoryUsage.clear()
         diskStore?.clearAll()
     }
 
@@ -126,19 +120,25 @@ class CanvasHistoryManager(
 
     private fun pushUndo(entry: HistoryEntry) {
         undoStack.addLast(entry)
-        if (diskStore != null) {
-            while (undoStack.size > IN_MEMORY_LIMIT) {
-                diskStore.appendUndo(undoStack.removeFirst())
-            }
-        }
+        memoryUsage.retain(entry)
     }
 
     private fun pushRedo(entry: HistoryEntry) {
         redoStack.addLast(entry)
-        if (diskStore != null) {
-            while (redoStack.size > IN_MEMORY_LIMIT) {
-                diskStore.appendRedo(redoStack.removeFirst())
+        memoryUsage.retain(entry)
+    }
+
+    private fun trimHistory() {
+        while (memoryUsage.bytes > memoryBudgetBytes) {
+            val undo = undoStack.isNotEmpty()
+            val stack = if (undo) undoStack else redoStack
+            val entry = stack.peekFirst() ?: return
+            if (diskStore != null) {
+                val stored = if (undo) diskStore.appendUndo(entry) else diskStore.appendRedo(entry)
+                if (!stored) return
             }
+            stack.removeFirst()
+            memoryUsage.release(entry)
         }
     }
 
