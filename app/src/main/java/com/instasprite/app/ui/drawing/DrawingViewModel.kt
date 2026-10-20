@@ -1,5 +1,8 @@
 package com.instasprite.app.ui.drawing
 
+import android.widget.Toast
+import com.instasprite.app.R
+import com.instasprite.app.utils.CanvasMemoryException
 import android.content.Context
 import android.net.Uri
 import android.os.SystemClock
@@ -105,6 +108,12 @@ class DrawingViewModel @AssistedInject constructor(
     private val drawingScope = CoroutineScope(viewModelScope.coroutineContext + exceptionHandler)
 
     fun handleFatalError(t: Throwable) {
+        if (t is CanvasMemoryException) {
+            drawingScope.launch(Dispatchers.Main) {
+                Toast.makeText(applicationContext, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()
+            }
+            return
+        }
         if (_fatalError.value != null) return
 
         try {
@@ -647,13 +656,16 @@ class DrawingViewModel @AssistedInject constructor(
             commitPendingTool()
             val sprite = pixelCanvasUseCase.getSprite()
             val bmp = ImageExporter.convertToBitmap(
-                sprite.renderFrame(pixelCanvasUseCase.activeFrameId),
-                sprite.width,
-                sprite.height,
+                sprite,
+                pixelCanvasUseCase.activeFrameId,
                 scalePercent
             ) ?: return false
 
-            return fileRepository.saveFile(bmp, folderUri, fileName)
+            return try {
+                fileRepository.saveFile(bmp, folderUri, fileName)
+            } finally {
+                bmp.recycle()
+            }
         } catch (t: Throwable) {
             handleFatalError(t)
             return false

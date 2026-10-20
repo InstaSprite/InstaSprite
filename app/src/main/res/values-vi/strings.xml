@@ -578,4 +578,5 @@
     <string name="animation_expand">Mở rộng dòng thời gian</string>
     <string name="animation_collapse">Thu gọn dòng thời gian</string>
     <string name="animation_add">Thêm khung hình</string>
+    <string name="operation_memory_limit">Không đủ bộ nhớ cho thao tác này. Hãy thử giảm kích thước khung vẽ, ảnh hoặc ảnh xuất.</string>
 </resources>

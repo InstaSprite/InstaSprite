@@ -70,6 +70,10 @@ fun LoadImageScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+    }
+
     LaunchedEffect(uiState.applyPalette, selectedPalette) {
         val paletteList = if (uiState.applyPalette) {
             selectedPalette?.colors ?: loadDefaultColorPalette(context)

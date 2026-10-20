@@ -1,5 +1,6 @@
 package com.instasprite.app.domain.export
 
+import com.instasprite.app.utils.CanvasMemoryGuard
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
@@ -11,35 +12,34 @@ import java.io.FileOutputStream
 
 object ImageExporter {
     fun convertToBitmap(
-        pixelsData: IntArray,
-        canvasWidth: Int,
-        canvasHeight: Int,
+        sprite: Sprite,
+        frameId: String = sprite.animation?.posterFrameId.orEmpty(),
         scalePercent: Int = 100
     ): Bitmap? {
-        if (pixelsData.isEmpty()) return null
+        val (scaledWidth, scaledHeight) = CanvasMemoryGuard.requireExport(sprite.width, sprite.height, scalePercent)
+        val pixels = sprite.renderFrame(frameId)
+        val bitmap = createBitmap(sprite.width, sprite.height, Bitmap.Config.ARGB_8888)
+        bitmap.setPixels(pixels, 0, sprite.width, 0, 0, sprite.width, sprite.height)
 
-        val bitmap = createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(pixelsData, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
-
-        val scale = scalePercent / 100f
-        val scaledWidth = (canvasWidth * scale).toInt().coerceAtLeast(1)
-        val scaledHeight = (canvasHeight * scale).toInt().coerceAtLeast(1)
-
-        return bitmap.scale(scaledWidth, scaledHeight, false)
+        return try {
+            bitmap.scale(scaledWidth, scaledHeight, false).also {
+                if (it !== bitmap) bitmap.recycle()
+            }
+        } catch (e: Exception) {
+            bitmap.recycle()
+            throw e
+        }
     }
 
     fun saveThumbnail(sprite: Sprite, context: Context) {
         try {
-            val bitmap = convertToBitmap(
-                sprite.compositedPixels,
-                sprite.width,
-                sprite.height
-            )
+            val bitmap = convertToBitmap(sprite) ?: return
             val thumbnailFile = File(context.filesDir, "thumbnail_${sprite.id}.png")
-            val outputStream = FileOutputStream(thumbnailFile)
-            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
+            try {
+                FileOutputStream(thumbnailFile).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            } finally {
+                bitmap.recycle()
+            }
         } catch (e: Exception) {
             Log.e("ImageExporter", "Failed to save thumbnail", e)
         }

@@ -1,5 +1,6 @@
 package com.instasprite.app.data.repository
 
+import com.instasprite.app.utils.CanvasMemoryGuard
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.instasprite.app.domain.model.Animation
@@ -261,6 +262,10 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     }
 
     private fun transformImages(newWidth: Int, newHeight: Int, position: (Int, Int) -> Pair<Int, Int>) {
+        CanvasMemoryGuard.requireAvailable(
+            CanvasMemoryGuard.estimatePixels(width, height, 4),
+            CanvasMemoryGuard.estimatePixels(newWidth, newHeight, 24L + 8L * animation.images.size)
+        )
         val oldWidth = width
         val oldHeight = height
         val images = animation.images.mapValues { (_, image) ->

@@ -1,5 +1,6 @@
 package com.instasprite.app.domain.image2pixel
 
+import com.instasprite.app.utils.CanvasMemoryGuard
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -76,6 +77,7 @@ class PixelArtConverter {
     suspend fun process(source: Bitmap, config: PixelArtConfig): Bitmap =
         withContext(Dispatchers.Default) {
             // Cap working resolution to avoid OOM on large inputs
+            CanvasMemoryGuard.requirePixels(source.width, source.height, 32)
             val working = scaledBitmap(source, maxDimension = 2000)
 
             val base: Bitmap = if (config.autoDetect) {
@@ -89,6 +91,7 @@ class PixelArtConverter {
                 pixelateToWidth(working, config.targetWidth)
             }
 
+            CanvasMemoryGuard.requirePixels(base.width, base.height, 64)
             applyColorProcessing(base, config)
             base
         }
@@ -350,6 +353,7 @@ class PixelArtConverter {
     private fun pixelateToWidth(src: Bitmap, targetWidth: Int): Bitmap {
         val tw = targetWidth.coerceAtLeast(1)
         val th = (src.height.toFloat() * tw / src.width).roundToInt().coerceAtLeast(1)
+        CanvasMemoryGuard.requirePixels(tw, th, 64)
         return src.scale(tw, th, false)
     }
 

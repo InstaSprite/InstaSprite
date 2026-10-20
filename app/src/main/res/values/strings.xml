@@ -577,4 +577,5 @@
     <string name="animation_expand">Expand timeline</string>
     <string name="animation_collapse">Collapse timeline</string>
     <string name="animation_add">Add frame</string>
+    <string name="operation_memory_limit">Not enough memory for this operation. Try a smaller canvas, image, or export size.</string>
 </resources>

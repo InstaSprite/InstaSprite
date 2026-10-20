@@ -8,6 +8,7 @@ data class LoadImageUiState(
     val sourceBitmap: Bitmap? = null,
     val processedBitmap: Bitmap? = null,
     val isLoading: Boolean = false,
+    val errorMessage: Int? = null,
     val config: PixelArtConfig = PixelArtConfig(),
     val spriteName: String = "Untitled",
     val applyPalette: Boolean = false,

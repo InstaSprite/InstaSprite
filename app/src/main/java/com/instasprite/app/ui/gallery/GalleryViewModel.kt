@@ -1,5 +1,8 @@
 package com.instasprite.app.ui.gallery
 
+import android.widget.Toast
+import com.instasprite.app.R
+import com.instasprite.app.utils.CanvasMemoryException
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -242,16 +245,21 @@ class GalleryViewModel @Inject constructor(
                 }
                 return@launch
             }
-            val bitmap = ImageExporter.convertToBitmap(
-                sprite.compositedPixels,
-                sprite.width,
-                sprite.height,
-                scalePercent
-            )
-            
-            val success = if (bitmap != null) {
-                fileRepository.saveFile(bitmap, folderUri, fileName)
-            } else false
+            val success = try {
+                val bitmap = ImageExporter.convertToBitmap(sprite, scalePercent = scalePercent)
+                if (bitmap != null) {
+                    try {
+                        fileRepository.saveFile(bitmap, folderUri, fileName)
+                    } finally {
+                        bitmap.recycle()
+                    }
+                } else false
+            } catch (e: CanvasMemoryException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()
+                }
+                false
+            }
 
             withContext(Dispatchers.Main) {
                 if (success) {

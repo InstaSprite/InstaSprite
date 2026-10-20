@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.drawing.dialog
 
+import com.instasprite.app.utils.CanvasMemoryException
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -148,17 +149,19 @@ fun LoadISpriteDialog(
 
                     if (showOverlay) {
                         val bitmapImage = remember(it) {
-                            ImageExporter.convertToBitmap(
-                                it.compositedPixels,
-                                it.width,
-                                it.height,
-                            )?.asImageBitmap()
+                            try {
+                                ImageExporter.convertToBitmap(it)?.asImageBitmap()
+                            } catch (e: CanvasMemoryException) {
+                                null
+                            }
                         }
 
-                        ImageZoomableOverlay(
-                            bitmap = bitmapImage!!,
-                            onDismiss = { showOverlay = false }
-                        )
+                        if (bitmapImage != null) {
+                            ImageZoomableOverlay(
+                                bitmap = bitmapImage,
+                                onDismiss = { showOverlay = false }
+                            )
+                        }
                     }
                 }
                 

@@ -1,5 +1,8 @@
 package com.instasprite.app.ui.gallery
 
+import android.widget.Toast
+import com.instasprite.app.utils.CanvasMemoryGuard
+import com.instasprite.app.utils.CanvasMemoryException
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -138,12 +141,14 @@ fun CreateCanvasScreen(
                 actions = {
                     Button(
                         onClick = {
-                            onConfirm(
-                                inputStates[0].value,
-                                inputStates[1].value.toInt(),
-                                inputStates[2].value.toInt(),
-                                currentPalette
-                            )
+                            try {
+                                val width = inputStates[1].value.toInt()
+                                val height = inputStates[2].value.toInt()
+                                CanvasMemoryGuard.requirePixels(width, height)
+                                onConfirm(inputStates[0].value, width, height, currentPalette)
+                            } catch (e: CanvasMemoryException) {
+                                Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()
+                            }
                         },
                         enabled = isInputValid(),
                         modifier = Modifier.padding(
