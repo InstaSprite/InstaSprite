@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,7 +50,8 @@ import com.instasprite.app.ui.drawing.dialog.LayerOptionsDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
-import com.instasprite.app.utils.inflateCel
+import com.instasprite.app.utils.tilesToPreviewPixels
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,12 +74,15 @@ fun LayerView(
     else
         AppTheme.colors.BackgroundColorDarker
 
-    val previewCel = remember(layer.tiles) { layer.cel }
-    val bitmapImage = remember(previewCel, canvasWidth, canvasHeight) {
+    val previewSize = with(LocalDensity.current) { 66.pixelDp.roundToPx().coerceAtLeast(1) }
+    val bitmapImage = remember(layer.tiles, canvasWidth, canvasHeight, previewSize) {
         if (canvasWidth > 0 && canvasHeight > 0) {
-            val bitmap = createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888)
-            val argbPixels = inflateCel(previewCel, canvasWidth, canvasHeight)
-            bitmap.setPixels(argbPixels, 0, canvasWidth, 0, 0, canvasWidth, canvasHeight)
+            val scale = minOf(1f, previewSize.toFloat() / maxOf(canvasWidth, canvasHeight))
+            val width = (canvasWidth * scale).roundToInt().coerceAtLeast(1)
+            val height = (canvasHeight * scale).roundToInt().coerceAtLeast(1)
+            val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val argbPixels = tilesToPreviewPixels(layer.tiles, canvasWidth, canvasHeight, width, height)
+            bitmap.setPixels(argbPixels, 0, width, 0, 0, width, height)
             bitmap.asImageBitmap()
         } else {
             null

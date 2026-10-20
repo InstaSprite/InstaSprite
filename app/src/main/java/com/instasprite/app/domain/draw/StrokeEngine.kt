@@ -84,6 +84,7 @@ class StrokeEngine(
     }
 
     private fun plotOverlayPixel(row: Int, col: Int, color: Int) {
+        if (bitmapManager.overlayBitmap == null) bitmapManager.ensureOverlayBitmap()
         val bmp = bitmapManager.overlayBitmap ?: return
         if (row !in 0 until bmp.height || col !in 0 until bmp.width) return
         val index = row * bmp.width + col
@@ -174,11 +175,13 @@ class StrokeEngine(
             }
         }
         update.overlayPixels?.let {
-            val bmp = bitmapManager.overlayBitmap ?: return@let
             val w = pixelCanvasUseCase.getCanvasWidth()
             val h = pixelCanvasUseCase.getCanvasHeight()
             if (it.isEmpty()) bitmapManager.clearOverlayBitmap()
-            else bmp.setPixels(it, 0, w, 0, 0, w, h)
+            else {
+                bitmapManager.ensureOverlayBitmap()
+                bitmapManager.overlayBitmap?.setPixels(it, 0, w, 0, 0, w, h)
+            }
             bitmapManager.incrementOverlayVersion()
             applied = true
         }
@@ -225,7 +228,6 @@ class StrokeEngine(
             }
         }
 
-        bitmapManager.ensureOverlayBitmap()
         if (!tool.commitsImmediately) {
             beginOverlayStrokeTracking()
         }
@@ -331,7 +333,7 @@ class StrokeEngine(
                 bitmapManager.refreshSelectionBitmap(finalSel)
             }
             restoreTouchedOverlayInMainBitmap()
-            bitmapManager.clearOverlayBitmap()
+            bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             bitmapManager.incrementDrawVersion()
             strokeTouchedCount = 0
@@ -348,6 +350,7 @@ class StrokeEngine(
         }
 
         strokeTouchedCount = 0
+        if (!tool.staysPendingAfterStroke) bitmapManager.releaseOverlayBitmap()
         return StrokeEndResult(shouldUpdateHistory = !tool.staysPendingAfterStroke)
     }
 
@@ -362,14 +365,14 @@ class StrokeEngine(
         restoreTouchedOverlayInMainBitmap()
         if (pendingUpdate != null) {
             applyStrokeUpdate(pendingUpdate)
-            bitmapManager.clearOverlayBitmap()
+            bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             bitmapManager.incrementDrawVersion()
             return true
         } else {
             tool.cancelStroke()
         }
-        bitmapManager.clearOverlayBitmap()
+        bitmapManager.releaseOverlayBitmap()
         bitmapManager.incrementOverlayVersion()
         bitmapManager.incrementDrawVersion()
         return false
@@ -380,6 +383,7 @@ class StrokeEngine(
         if (update != null) {
             activeMoveCompositor = null
             applyStrokeUpdate(update)
+            bitmapManager.releaseOverlayBitmap()
             return true
         }
         return false

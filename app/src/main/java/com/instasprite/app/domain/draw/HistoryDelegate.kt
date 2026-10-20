@@ -37,7 +37,7 @@ class HistoryDelegate(
         val restoredState = canvasHistoryManager.undo(captureHistoryCanvasState())
         if (restoredState != null) {
             applyHistoryCanvasState(restoredState)
-            bitmapManager.clearOverlayBitmap()
+            bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             refreshCanvasSizeState()
             refreshLayerState()
@@ -54,7 +54,7 @@ class HistoryDelegate(
         val restoredState = canvasHistoryManager.redo(captureHistoryCanvasState())
         if (restoredState != null) {
             applyHistoryCanvasState(restoredState)
-            bitmapManager.clearOverlayBitmap()
+            bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             refreshCanvasSizeState()
             refreshLayerState()

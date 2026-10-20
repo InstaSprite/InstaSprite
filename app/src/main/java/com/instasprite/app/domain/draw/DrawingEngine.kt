@@ -332,7 +332,7 @@ class DrawingEngine(
         if (isBusy) return
         pixelCanvasUseCase.selectFrame(frameId)
         layerId?.let { pixelCanvasUseCase.setActiveLayer(it) }
-        bitmapManager.clearOverlayBitmap()
+        bitmapManager.releaseOverlayBitmap()
         bitmapManager.incrementOverlayVersion()
         refreshFullCanvasState()
     }
