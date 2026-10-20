@@ -42,15 +42,16 @@ class HistoryDiskStore(private val historyDir: File) {
     fun popUndo(): HistoryEntry? {
         if (undoCount == 0) return null
         return try {
-            undoCount--
-            val file = undoFile(undoCount)
+            val file = undoFile(undoCount - 1)
             val proto = FileInputStream(file).use { input ->
                 HistoryEntryProto.parseFrom(input)
             }
-            file.delete()
-            with(HistoryEntryMapper) {
+            val entry = with(HistoryEntryMapper) {
                 proto.toDomain()
             }
+            undoCount--
+            file.delete()
+            entry
         } catch (_: Exception) {
             null
         }
@@ -76,15 +77,16 @@ class HistoryDiskStore(private val historyDir: File) {
     fun popRedo(): HistoryEntry? {
         if (redoCount == 0) return null
         return try {
-            redoCount--
-            val file = redoFile(redoCount)
+            val file = redoFile(redoCount - 1)
             val proto = FileInputStream(file).use { input ->
                 HistoryEntryProto.parseFrom(input)
             }
-            file.delete()
-            with(HistoryEntryMapper) {
+            val entry = with(HistoryEntryMapper) {
                 proto.toDomain()
             }
+            redoCount--
+            file.delete()
+            entry
         } catch (_: Exception) {
             null
         }
