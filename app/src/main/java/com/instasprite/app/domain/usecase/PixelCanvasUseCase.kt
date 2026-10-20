@@ -92,6 +92,21 @@ class PixelCanvasUseCase(
         pixelCanvasRepository.setAllPixels(pixels, ignoreSelection)
     }
 
+    fun setActiveLayerTiles(tiles: Map<TileCoord, IntArray>) {
+        val layer = pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId } ?: return
+        if (layer.isLocked || !layer.isVisible) return
+        tileChangeTracker?.let { tracker ->
+            for (coord in layer.tiles.keys + tiles.keys) {
+                val before = layer.tiles[coord]
+                val after = tiles[coord]
+                if (before == null || after == null || !before.contentEquals(after)) {
+                    tracker.captureIfNeeded(layer.id, coord, before ?: emptyTile())
+                }
+            }
+        }
+        pixelCanvasRepository.setActiveLayerTiles(tiles)
+    }
+
     fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int, blend: Boolean = true) {
         captureBatchPixelChanges(indices, colors.size, count)
         pixelCanvasRepository.batchSetPixels(indices, colors, count, blend)

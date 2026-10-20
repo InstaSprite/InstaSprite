@@ -486,6 +486,15 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         }
     }
 
+    fun setActiveLayerTiles(tiles: Map<TileCoord, IntArray>) {
+        val index = getActiveLayerIndex()
+        val layer = _layers.getOrNull(index) ?: return
+        if (layer.isLocked || !layer.isVisible) return
+        require(tiles.values.all { it.size == TILE_SIZE * TILE_SIZE })
+        replacePixels(index, Layer(layer.id, layer.name, layer.isVisible, layer.isLocked,
+            layer.opacity, layer.blendMode, tiles.toMap()))
+    }
+
     fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int, blend: Boolean = true) {
         val idx = getActiveLayerIndex()
         if (idx !in _layers.indices) return

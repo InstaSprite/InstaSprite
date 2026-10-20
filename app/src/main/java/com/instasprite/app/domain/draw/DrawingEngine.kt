@@ -42,7 +42,7 @@ class DrawingEngine(
     val isBusy get() = isProcessingTool || activeState == DrawingState
 
     override val bitmapManager = BitmapManager(pixelCanvasUseCase)
-    override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope, tools.move) { sel ->
+    override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, tools.move) { sel ->
         _canvasState.value = _canvasState.value.copy(selectionState = sel)
     }
 
