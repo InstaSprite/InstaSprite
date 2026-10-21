@@ -22,4 +22,12 @@ fun LazyListScope.toolOptions(
         is ShapeTool -> ShapeOptions(tool, event, toolSize, onToolSizeChange)
         is SelectionTool -> SelectionOptions(tool as Tool, event)
     }
+    if (tool is PencilTool || tool is EraserTool || tool is ShapeTool) {
+        item {
+            SymmetryOptions(
+                symmetry = uiState.symmetry,
+                onEvent = event.onToolSelectorEvent
+            )
+        }
+    }
 }

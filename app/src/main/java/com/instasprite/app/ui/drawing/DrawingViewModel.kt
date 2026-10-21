@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.drawing
 
+import com.instasprite.app.domain.tool.DrawingSymmetry
 import android.widget.Toast
 import com.instasprite.app.R
 import com.instasprite.app.utils.CanvasMemoryException
@@ -70,6 +71,7 @@ data class DrawingScreenState(
     val isCursorMode: Boolean = false,
     val showCanvasPreview: Boolean = true,
     val isPixelPerfect: Boolean = false,
+    val symmetry: DrawingSymmetry = DrawingSymmetry(),
     val cursorState: CursorState = CursorState()
 )
 
@@ -446,6 +448,31 @@ class DrawingViewModel @AssistedInject constructor(
                     _uiState.value = _uiState.value.copy(
                         isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
                     )
+                }
+                is ToolSelectorEvent.SetSymmetryAxisX, is ToolSelectorEvent.SetSymmetryAxisY -> {
+                    val current = _uiState.value.symmetry
+                    val position = when (event) {
+                        is ToolSelectorEvent.SetSymmetryAxisX -> event.position
+                        is ToolSelectorEvent.SetSymmetryAxisY -> event.position
+                    }
+                    if (!position.isFinite()) return
+                    val next = if (event is ToolSelectorEvent.SetSymmetryAxisX) {
+                        current.copy(axisX = position.coerceIn(0f, pixelCanvasUseCase.getCanvasWidth().toFloat()))
+                    } else {
+                        current.copy(axisY = position.coerceIn(0f, pixelCanvasUseCase.getCanvasHeight().toFloat()))
+                    }
+                    drawingEngine.strokeEngine.symmetry = next
+                    _uiState.value = _uiState.value.copy(symmetry = next)
+                }
+                ToolSelectorEvent.ToggleHorizontalSymmetry, ToolSelectorEvent.ToggleVerticalSymmetry -> {
+                    val current = _uiState.value.symmetry
+                    val next = if (event == ToolSelectorEvent.ToggleHorizontalSymmetry) {
+                        current.copy(horizontal = !current.horizontal)
+                    } else {
+                        current.copy(vertical = !current.vertical)
+                    }
+                    drawingEngine.strokeEngine.symmetry = next
+                    _uiState.value = _uiState.value.copy(symmetry = next)
                 }
                 is ToolSelectorEvent.TogglePixelPerfect -> {
                     togglePixelPerfect()

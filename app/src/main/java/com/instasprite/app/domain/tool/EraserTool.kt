@@ -19,6 +19,8 @@ class EraserTool : StrokeTool {
     private var batchColors: IntArray = IntArray(0)
     private var batchCount: Int = 0
 
+    var symmetry = DrawingSymmetry()
+    private var strokeSymmetry = DrawingSymmetry()
     var brushShape: BrushShape = BrushShape.Square
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
@@ -39,6 +41,7 @@ class EraserTool : StrokeTool {
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
         clearPreviousBatch()
+        strokeSymmetry = symmetry
         lastRow = row
         lastCol = col
         canvasWidth = canvas.getCanvasWidth()
@@ -49,7 +52,8 @@ class EraserTool : StrokeTool {
         if (touchedMask.size != totalPixels) {
             touchedMask = BooleanArray(totalPixels)
         }
-        val bufferSize = minOf(totalPixels, stamp.count * (canvasWidth + canvasHeight))
+        val copies = (if (strokeSymmetry.horizontal) 2 else 1) * (if (strokeSymmetry.vertical) 2 else 1)
+        val bufferSize = minOf(totalPixels.toLong(), stamp.count.toLong() * (canvasWidth.toLong() + canvasHeight) * copies).toInt()
         if (batchIndices.size < bufferSize) {
             batchIndices = IntArray(bufferSize)
             batchColors = IntArray(bufferSize)
@@ -103,13 +107,15 @@ class EraserTool : StrokeTool {
         batchCount = 0
     }
 
-    private inline fun collectBrushPixels(row: Int, col: Int) {
+    private fun collectBrushPixels(row: Int, col: Int) {
         stamp.forEach(row, col, canvasWidth, canvasHeight) { r, c ->
-            val idx = r * canvasWidth + c
-            if (!touchedMask[idx]) {
-                touchedMask[idx] = true
-                batchIndices[batchCount] = idx
-                batchCount++
+            strokeSymmetry.forEachPixel(r, c, canvasWidth, canvasHeight) { mirroredRow, mirroredCol ->
+                val idx = mirroredRow * canvasWidth + mirroredCol
+                if (!touchedMask[idx]) {
+                    touchedMask[idx] = true
+                    batchIndices[batchCount] = idx
+                    batchCount++
+                }
             }
         }
     }

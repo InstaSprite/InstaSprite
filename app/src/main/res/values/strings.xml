@@ -578,4 +578,6 @@
     <string name="animation_collapse">Collapse timeline</string>
     <string name="animation_add">Add frame</string>
     <string name="operation_memory_limit">Not enough memory for this operation. Try a smaller canvas, image, or export size.</string>
+    <string name="mirror_left_right">Mirror drawing left/right</string>
+    <string name="mirror_top_bottom">Mirror drawing top/bottom</string>
 </resources>

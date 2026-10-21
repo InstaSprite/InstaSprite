@@ -579,4 +579,6 @@
     <string name="animation_collapse">Thu gọn dòng thời gian</string>
     <string name="animation_add">Thêm khung hình</string>
     <string name="operation_memory_limit">Không đủ bộ nhớ cho thao tác này. Hãy thử giảm kích thước khung vẽ, ảnh hoặc ảnh xuất.</string>
+    <string name="mirror_left_right">Vẽ đối xứng trái/phải</string>
+    <string name="mirror_top_bottom">Vẽ đối xứng trên/dưới</string>
 </resources>

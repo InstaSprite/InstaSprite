@@ -479,6 +479,13 @@ private fun DrawingScreenContent(
                         cursorState = uiState.cursorState,
                         toolSize = uiState.toolSize,
                         brushShape = uiState.brushShape,
+                        symmetry = uiState.symmetry,
+                        onSymmetryAxisMove = { isXAxis, position ->
+                            event.onToolSelectorEvent(
+                                if (isXAxis) ToolSelectorEvent.SetSymmetryAxisX(position)
+                                else ToolSelectorEvent.SetSymmetryAxisY(position)
+                            )
+                        },
                         activeColor = colorPaletteState.activeColor,
                         onCursorDrawEvent = event.onCursorDrawEvent,
                         onTransform = { centroid, panChange, zoomChange, layoutSize ->

@@ -1,5 +1,8 @@
 package com.instasprite.app.ui.drawing.component
 
+import com.instasprite.app.domain.tool.DrawingSymmetry
+import com.instasprite.app.domain.tool.EraserTool
+import com.instasprite.app.utils.pixelDp
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -14,6 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
@@ -64,9 +69,11 @@ fun PixelCanvas(
     toolSize: Int = 1,
     brushShape: BrushShape = BrushShape.Square,
     activeColor: Color = Color.White,
+    symmetry: DrawingSymmetry = DrawingSymmetry(),
     onCursorDrawEvent: (CursorDrawEvent) -> Unit = {},
     onTransform: (Offset, Offset, Float, IntSize) -> Unit,
-    onEvent: (PixelCanvasEvent) -> Unit
+    onEvent: (PixelCanvasEvent) -> Unit,
+    onSymmetryAxisMove: (Boolean, Float) -> Unit = { _, _ -> }
 ) {
 
     val canvasWidth = pixelCanvasState.width
@@ -94,6 +101,9 @@ fun PixelCanvas(
     var canvasLayoutSize by remember { mutableStateOf(IntSize.Zero) }
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
 
+    val activeSymmetry = if (selectedTool is PencilTool || selectedTool is EraserTool || selectedTool is ShapeTool) {
+        symmetry
+    } else DrawingSymmetry()
     val context = LocalContext.current
 
     // app icon has 1 pixel transparent border (idk why)
@@ -119,6 +129,8 @@ fun PixelCanvas(
         Modifier.cursorPointerInput(
             canvasWidth = canvasWidth,
             canvasHeight = canvasHeight,
+            symmetry = activeSymmetry,
+            onSymmetryAxisMove = onSymmetryAxisMove,
             cursorState = cursorState,
             scale = scale,
             offset = offset,
@@ -136,6 +148,8 @@ fun PixelCanvas(
             canvasHeight = canvasHeight,
             selectedTool = selectedTool,
             scale = scale,
+            symmetry = activeSymmetry,
+            onSymmetryAxisMove = onSymmetryAxisMove,
             onEvent = onEvent,
             onTransform = { centroid, pan, zoom ->
                 onTransform(centroid, pan, zoom, canvasLayoutSize)
@@ -175,6 +189,31 @@ fun PixelCanvas(
                 dstSize = dstSize,
                 filterQuality = FilterQuality.None
             )
+
+            val outlineWidth = 2.pixelDp.toPx() / scale.coerceAtLeast(0.01f)
+            fun axisLine(start: Offset, end: Offset) {
+                drawLine(Color.Black, start, end, outlineWidth)
+                drawLine(Color.White, start, end, outlineWidth / 2)
+            }
+            val handleSize = minOf(10.pixelDp.toPx() / scale.coerceAtLeast(0.01f), size.width / 4, size.height / 4)
+            fun axisHandle(center: Offset) {
+                val topLeft = center - Offset(handleSize / 2, handleSize / 2)
+                drawRect(Color.White, topLeft, Size(handleSize, handleSize))
+                drawRect(Color.Black, topLeft, Size(handleSize, handleSize),
+                    style = Stroke(width = outlineWidth / 2))
+            }
+            if (activeSymmetry.horizontal) {
+                val x = activeSymmetry.x(canvasWidth) * size.width / canvasWidth
+                axisLine(Offset(x, 0f), Offset(x, size.height))
+                axisHandle(Offset(x, handleSize / 2))
+                axisHandle(Offset(x, size.height - handleSize / 2))
+            }
+            if (activeSymmetry.vertical) {
+                val y = activeSymmetry.y(canvasHeight) * size.height / canvasHeight
+                axisLine(Offset(0f, y), Offset(size.width, y))
+                axisHandle(Offset(handleSize / 2, y))
+                axisHandle(Offset(size.width - handleSize / 2, y))
+            }
 
             selectionImageBitmap?.let {
                 drawImage(
@@ -237,7 +276,7 @@ fun PixelCanvas(
     }
 }
 
-@Preview
+@Preview(name = "Custom mirror axes")
 @Composable
 private fun Preview() {
     InstaSpriteTheme {
@@ -248,6 +287,7 @@ private fun Preview() {
             ),
             bitmap = createBitmap(16, 16),
             selectedTool = PencilTool(),
+            symmetry = DrawingSymmetry(horizontal = true, vertical = true, axisX = 5f, axisY = 10f),
             isSelectionAppendMode = false,
             scale = 1f,
             offset = Offset.Zero,

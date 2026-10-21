@@ -38,7 +38,8 @@ internal class DrawingGestureHandler(
     private val size: IntSize,
     private val onEvent: (PixelCanvasEvent) -> Unit,
     private val onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
-    startEvent: PointerInputChange
+    startEvent: PointerInputChange,
+    private var symmetryDrag: SymmetryAxisDrag? = null
 ) {
     private var state = DrawingGestureState.DragOrTap
     private var passedSlop = false
@@ -65,7 +66,16 @@ internal class DrawingGestureHandler(
 
         if (pointerCount > 1 && state != DrawingGestureState.Transforming) {
             cancelDrawing()
+            symmetryDrag = null
             state = DrawingGestureState.Transforming
+        }
+
+        if (symmetryDrag != null && state == DrawingGestureState.DragOrTap) {
+            event.changes.firstOrNull { it.id == pointerId }?.let {
+                symmetryDrag?.move(it.position)
+                it.consume()
+            }
+            return false
         }
 
         when (state) {
@@ -159,7 +169,7 @@ internal class DrawingGestureHandler(
     fun onGestureEnded() {
         when (state) {
             DrawingGestureState.DragOrTap -> {
-                if (!passedSlop) {
+                if (!passedSlop && symmetryDrag == null) {
                     val cell = startPosition.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
                     onEvent(PixelCanvasEvent.OnTapAt(cell.x, cell.y))
                 }

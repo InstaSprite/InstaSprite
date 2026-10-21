@@ -13,4 +13,8 @@ sealed interface ToolSelectorEvent {
     data object OpenDrawingSettingsDialog : ToolSelectorEvent
     data object ToggleAppendSelectionMode : ToolSelectorEvent
     data object TogglePixelPerfect : ToolSelectorEvent
+    data class SetSymmetryAxisX(val position: Float) : ToolSelectorEvent
+    data class SetSymmetryAxisY(val position: Float) : ToolSelectorEvent
+    data object ToggleHorizontalSymmetry : ToolSelectorEvent
+    data object ToggleVerticalSymmetry : ToolSelectorEvent
 }

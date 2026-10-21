@@ -33,7 +33,8 @@ internal class CursorGestureHandler(
     private val getViewportSize: () -> IntSize,
     private val onCursorMove: (cursorX: Float, cursorY: Float) -> Unit,
     private val onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
-    startEvent: PointerInputChange
+    startEvent: PointerInputChange,
+    private var symmetryDrag: SymmetryAxisDrag? = null
 ) {
     private var state = CursorGestureState.Dragging
     private var pointerId = startEvent.id
@@ -61,6 +62,7 @@ internal class CursorGestureHandler(
 
         when {
             pointerCount > 1 && state != CursorGestureState.Transforming -> {
+                symmetryDrag = null
                 state = CursorGestureState.Transforming
             }
             pointerCount == 1 && state == CursorGestureState.Transforming -> {
@@ -69,6 +71,14 @@ internal class CursorGestureHandler(
                 lastPosition = pressedChanges.first().position
                 skipEdgePan = true
             }
+        }
+
+        if (symmetryDrag != null && state == CursorGestureState.Dragging) {
+            event.changes.firstOrNull { it.id == pointerId }?.let {
+                symmetryDrag?.move(it.position)
+                it.consume()
+            }
+            return false
         }
 
         when (state) {

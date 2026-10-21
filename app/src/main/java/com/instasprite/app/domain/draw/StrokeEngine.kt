@@ -1,5 +1,6 @@
 package com.instasprite.app.domain.draw
 
+import com.instasprite.app.domain.tool.DrawingSymmetry
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.get
 import androidx.core.graphics.set
@@ -26,6 +27,19 @@ class StrokeEngine(
     private val moveTool: MoveTool,
     private val onSelectionStateChanged: (SelectionState?) -> Unit
 ) {
+    var symmetry = DrawingSymmetry()
+    private var strokeSymmetry = DrawingSymmetry()
+
+    private fun plotStrokePixel(row: Int, col: Int, color: Int) {
+        val width = pixelCanvasUseCase.getCanvasWidth()
+        val height = pixelCanvasUseCase.getCanvasHeight()
+        strokeSymmetry.forEachPixel(row, col, width, height) { r, c ->
+            if (pixelCanvasUseCase.getSelectionMask()?.get(r * width + c) != false) {
+                plotOverlayPixel(r, c, color)
+            }
+        }
+    }
+
     fun reset() {
         moveTool.reset()
         strokeTouchedCount = 0
@@ -177,6 +191,8 @@ class StrokeEngine(
         selectionState: SelectionState?,
         zoomScale: Float = 1f
     ) {
+        strokeSymmetry = if (tool is PencilTool || tool is ShapeTool || tool is EraserTool) symmetry else DrawingSymmetry()
+        if (tool is EraserTool) tool.symmetry = strokeSymmetry
         if (tool is PencilTool) tool.brushShape = brushShape
         if (tool is EraserTool) tool.brushShape = brushShape
 
@@ -199,7 +215,9 @@ class StrokeEngine(
             col = col,
             color = color,
             scale = scale,
-            plotPreviewPixel = { r, c, argb -> plotOverlayPixel(r, c, argb) },
+            plotPreviewPixel = { r, c, argb ->
+                if (tool is SelectionTool) plotOverlayPixel(r, c, argb) else plotStrokePixel(r, c, argb)
+            },
             onCommittedPixel = { r, c -> applyCommittedPixelToMainBitmap(r, c) }
         )
 
@@ -238,7 +256,9 @@ class StrokeEngine(
             canvas = pixelCanvasUseCase,
             row = row,
             col = col,
-            plotPreviewPixel = { r, c, argb -> plotOverlayPixel(r, c, argb) },
+            plotPreviewPixel = { r, c, argb ->
+                if (tool is SelectionTool) plotOverlayPixel(r, c, argb) else plotStrokePixel(r, c, argb)
+            },
             onCommittedPixel = { _, _ -> }
         )
 

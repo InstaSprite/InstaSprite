@@ -1,5 +1,7 @@
 package com.instasprite.app.utils
 
+import com.instasprite.app.domain.tool.DrawingSymmetry
+import com.instasprite.app.ui.drawing.gesture.SymmetryAxisDrag
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculatePan
@@ -13,6 +15,7 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -83,12 +86,18 @@ fun Modifier.drawingPointerInput(
     selectedTool: Tool?,
     scale: Float,
     onEvent: (PixelCanvasEvent) -> Unit,
-    onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit
+    onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
+    symmetry: DrawingSymmetry = DrawingSymmetry(),
+    onSymmetryAxisMove: (Boolean, Float) -> Unit = { _, _ -> }
 ): Modifier {
     if (canvasWidth == 0 || canvasHeight == 0) return this
 
     val touchSlop = LocalViewConfiguration.current.touchSlop
+    val symmetryHandleRadius = with(LocalDensity.current) { 5.pixelDp.toPx() }
+    val latestSymmetry by rememberUpdatedState(symmetry)
+    val latestAxisMove by rememberUpdatedState(onSymmetryAxisMove)
 
+    val latestScale by rememberUpdatedState(scale)
     return this.pointerInput(canvasWidth, canvasHeight, selectedTool) {
         awaitEachGesture {
             val down = awaitFirstDown(requireUnconsumed = false)
@@ -96,12 +105,14 @@ fun Modifier.drawingPointerInput(
                 canvasWidth = canvasWidth,
                 canvasHeight = canvasHeight,
                 selectedTool = selectedTool,
-                scale = scale,
+                scale = latestScale,
                 touchSlop = touchSlop,
                 size = size,
                 onEvent = onEvent,
                 onTransform = onTransform,
-                startEvent = down
+                startEvent = down,
+                symmetryDrag = SymmetryAxisDrag.start(latestSymmetry, down.position, size,
+                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f), latestAxisMove)
             )
 
             do {
@@ -153,11 +164,16 @@ fun Modifier.cursorPointerInput(
     offset: Offset,
     viewportSize: IntSize,
     onCursorMove: (cursorX: Float, cursorY: Float) -> Unit,
-    onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit
+    onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
+    symmetry: DrawingSymmetry = DrawingSymmetry(),
+    onSymmetryAxisMove: (Boolean, Float) -> Unit = { _, _ -> }
 ): Modifier {
     if (canvasWidth == 0 || canvasHeight == 0) return this
 
     val touchSlop = LocalViewConfiguration.current.touchSlop
+    val symmetryHandleRadius = with(LocalDensity.current) { 5.pixelDp.toPx() }
+    val latestSymmetry by rememberUpdatedState(symmetry)
+    val latestAxisMove by rememberUpdatedState(onSymmetryAxisMove)
     val latestCursorX by rememberUpdatedState(cursorState.cursorX)
     val latestCursorY by rememberUpdatedState(cursorState.cursorY)
     val latestScale by rememberUpdatedState(scale)
@@ -179,7 +195,9 @@ fun Modifier.cursorPointerInput(
                 getViewportSize = { latestViewportSize },
                 onCursorMove = onCursorMove,
                 onTransform = onTransform,
-                startEvent = down
+                startEvent = down,
+                symmetryDrag = SymmetryAxisDrag.start(latestSymmetry, down.position, size,
+                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f), latestAxisMove)
             )
 
             do {
