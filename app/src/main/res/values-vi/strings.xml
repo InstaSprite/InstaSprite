@@ -591,4 +591,9 @@
     <string name="dither_87" formatted="false">87,5%</string>
     <string name="dither_diagonal" formatted="false">Sọc chéo</string>
     <string name="dither_pattern_label">Mẫu</string>
+    <string name="dither_reverse_diagonal">Sọc chéo ngược</string>
+    <string name="dither_horizontal">Sọc ngang</string>
+    <string name="dither_vertical">Sọc dọc</string>
+    <string name="dither_crosshatch">Đan chéo</string>
+    <string name="dither_dots">Chấm</string>
 </resources>

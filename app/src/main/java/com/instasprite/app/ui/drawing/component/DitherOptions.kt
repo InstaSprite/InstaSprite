@@ -17,6 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
 import com.instasprite.app.ui.components.composable.PixelIcon
@@ -53,6 +57,7 @@ import com.instasprite.app.utils.pixelDp
 @Composable
 fun DitherOptions(brush: DitherBrush, foreground: Color, palette: List<Color>, onEvent: (ToolSelectorEvent) -> Unit) {
     var patternsExpanded by remember { mutableStateOf(false) }
+    val patternListState = rememberLazyListState()
     val colors = AppTheme.colors
     val buttonColors = ButtonDefaults.buttonColors(
         containerColor = colors.BackgroundColorDarker, contentColor = colors.TextColorLight)
@@ -71,13 +76,14 @@ fun DitherOptions(brush: DitherBrush, foreground: Color, palette: List<Color>, o
         }
         DropdownMenu(expanded = patternsExpanded, onDismissRequest = { patternsExpanded = false },
             modifier = Modifier.width(200.pixelDp).background(colors.BackgroundColor)) {
-            DitherMenuContent(brush, foreground, palette, onEvent)
+            DitherMenuContent(brush, foreground, palette, onEvent, patternListState)
         }
     }
 }
 
 @Composable
-private fun DitherMenuContent(brush: DitherBrush, foreground: Color, palette: List<Color>, onEvent: (ToolSelectorEvent) -> Unit) {
+private fun DitherMenuContent(brush: DitherBrush, foreground: Color, palette: List<Color>, onEvent: (ToolSelectorEvent) -> Unit,
+    patternListState: LazyListState) {
     val colors = AppTheme.colors
     Column(Modifier.padding(6.pixelDp)) {
         Row(modifier = Modifier.width(188.pixelDp), verticalAlignment = Alignment.CenterVertically) {
@@ -99,25 +105,27 @@ private fun DitherMenuContent(brush: DitherBrush, foreground: Color, palette: Li
         }
 
     }
-    Column(Modifier.padding(6.pixelDp), verticalArrangement = Arrangement.spacedBy(6.pixelDp)) {
-        DitherPattern.entries.chunked(4).forEach { patterns ->
-            Row(horizontalArrangement = Arrangement.spacedBy(6.pixelDp)) {
-                patterns.forEach { pattern ->
-                    val description = stringResource(pattern.nameRes)
-                    Box(
-                        modifier = Modifier.size(26.pixelDp)
-                            .background(colors.BackgroundColorDarker)
-                            .border(1.pixelDp,
-                                if (brush.pattern == pattern) colors.AccentButtonColor else colors.Subtext0Color,
-                                )
-                            .semantics { contentDescription = description }
-                            .selectable(selected = brush.pattern == pattern, role = Role.RadioButton,
-                                onClick = { onEvent(ToolSelectorEvent.SetDitherPattern(pattern)) }),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        DitherPatternPreview(pattern, foreground, Color(brush.secondaryColor), Modifier.size(24.pixelDp))
-                    }
-                }
+    LazyRow(
+        state = patternListState,
+        modifier = Modifier.width(200.pixelDp).height(38.pixelDp),
+        contentPadding = PaddingValues(6.pixelDp),
+        horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        items(DitherPattern.entries, key = { it.name }) { pattern ->
+            val description = stringResource(pattern.nameRes)
+            Box(
+                modifier = Modifier.size(26.pixelDp)
+                    .background(colors.BackgroundColorDarker)
+                    .border(1.pixelDp,
+                        if (brush.pattern == pattern) colors.AccentButtonColor else colors.Subtext0Color,
+                        )
+                    .semantics { contentDescription = description }
+                    .selectable(selected = brush.pattern == pattern, role = Role.RadioButton,
+                        onClick = { onEvent(ToolSelectorEvent.SetDitherPattern(pattern)) }),
+                contentAlignment = Alignment.Center
+            ) {
+                DitherPatternPreview(pattern, foreground, Color(brush.secondaryColor), Modifier.size(24.pixelDp))
             }
         }
     }
@@ -159,7 +167,7 @@ private fun DitherMenuPreview() {
     InstaSpriteTheme {
         Column(Modifier.width(200.pixelDp).background(AppTheme.colors.BackgroundColor)) {
             DitherMenuContent(DitherBrush(DitherPattern.Shade50), Color.Black,
-                listOf(Color.White, Color.Red, Color.Blue), {})
+                listOf(Color.White, Color.Red, Color.Blue), {}, rememberLazyListState())
         }
     }
 }

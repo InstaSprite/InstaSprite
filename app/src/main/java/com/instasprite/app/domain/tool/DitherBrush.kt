@@ -9,11 +9,24 @@ enum class DitherPattern(val nameRes: Int, val threshold: Int) {
     Shade50(R.string.dither_50, 8),
     Shade25(R.string.dither_25, 4),
     Shade12(R.string.dither_12, 2),
-    Diagonal(R.string.dither_diagonal, 8);
+
+    Crosshatch(R.string.dither_crosshatch, 6),
+
+    Dots(R.string.dither_dots, 1),
+    Diagonal(R.string.dither_diagonal, 8),
+    ReverseDiagonal(R.string.dither_reverse_diagonal, 8),
+    Horizontal(R.string.dither_horizontal, 8),
+    Vertical(R.string.dither_vertical, 8);
+
 
     fun usesForeground(row: Int, col: Int): Boolean = when (this) {
         Solid -> true
         Diagonal -> ((row + col) and 3) < 2
+        ReverseDiagonal -> ((row - col) and 3) < 2
+        Horizontal -> (row and 1) == 0
+        Vertical -> (col and 1) == 0
+        Crosshatch -> ((row + col) and 3) == 0 || ((row - col) and 3) == 0
+        Dots -> (row and 3) == 0 && (col and 3) == 0
         else -> BAYER[(row and 3) * 4 + (col and 3)] < threshold
     }
 

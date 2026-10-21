@@ -590,4 +590,9 @@
     <string name="dither_87" formatted="false">87.5%</string>
     <string name="dither_diagonal" formatted="false">Diagonal</string>
     <string name="dither_pattern_label">Pattern</string>
+    <string name="dither_reverse_diagonal">Opposite diagonal</string>
+    <string name="dither_horizontal">Horizontal lines</string>
+    <string name="dither_vertical">Vertical lines</string>
+    <string name="dither_crosshatch">Crosshatch</string>
+    <string name="dither_dots">Dots</string>
 </resources>
