@@ -1,5 +1,6 @@
 package com.instasprite.app.domain.draw
 
+import com.instasprite.app.domain.tool.DitherBrush
 import com.instasprite.app.domain.tool.DrawingSymmetry
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.get
@@ -27,6 +28,8 @@ class StrokeEngine(
     private val moveTool: MoveTool,
     private val onSelectionStateChanged: (SelectionState?) -> Unit
 ) {
+    var dither = DitherBrush()
+    private var strokeDither = DitherBrush()
     var symmetry = DrawingSymmetry()
     private var strokeSymmetry = DrawingSymmetry()
 
@@ -35,7 +38,8 @@ class StrokeEngine(
         val height = pixelCanvasUseCase.getCanvasHeight()
         strokeSymmetry.forEachPixel(row, col, width, height) { r, c ->
             if (pixelCanvasUseCase.getSelectionMask()?.get(r * width + c) != false) {
-                plotOverlayPixel(r, c, color)
+                val patternedColor = strokeDither.colorAt(r, c, color)
+                if (patternedColor ushr 24 != 0) plotOverlayPixel(r, c, patternedColor)
             }
         }
     }
@@ -191,6 +195,7 @@ class StrokeEngine(
         selectionState: SelectionState?,
         zoomScale: Float = 1f
     ) {
+        strokeDither = if (tool is PencilTool) dither else DitherBrush()
         strokeSymmetry = if (tool is PencilTool || tool is ShapeTool || tool is EraserTool) symmetry else DrawingSymmetry()
         if (tool is EraserTool) tool.symmetry = strokeSymmetry
         if (tool is PencilTool) tool.brushShape = brushShape

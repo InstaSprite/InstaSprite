@@ -347,6 +347,8 @@ private fun DrawingScreenContent(
                         ) {
                             toolOptions(
                                 tool = uiState.selectedTool,
+                                paletteColors = colorPaletteState.colorPalette,
+                                activeColor = colorPaletteState.activeColor,
                                 uiState = uiState,
                                 event = event,
                                 toolSize = toolSizeValue,

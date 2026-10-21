@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.drawing.component
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
@@ -12,7 +13,9 @@ fun LazyListScope.PencilOptions(
     uiState: DrawingScreenState,
     event: DrawingScreenEvent,
     toolSize: Int,
-    onToolSizeChange: (Int) -> Unit
+    onToolSizeChange: (Int) -> Unit,
+    paletteColors: List<Color> = emptyList(),
+    activeColor: Color = Color.Black
 ) {
     item {
         BrushShapeSelector(
@@ -25,6 +28,9 @@ fun LazyListScope.PencilOptions(
             toolSize = toolSize,
             onToolSizeChange = onToolSizeChange
         )
+    }
+    item {
+        DitherOptions(uiState.dither, activeColor, paletteColors, event.onToolSelectorEvent)
     }
     item {
         PixelPerfectOption(

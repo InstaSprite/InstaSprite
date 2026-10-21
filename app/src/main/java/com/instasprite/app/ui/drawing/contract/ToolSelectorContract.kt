@@ -1,8 +1,12 @@
 package com.instasprite.app.ui.drawing.contract
 
+import androidx.compose.ui.graphics.Color
+import com.instasprite.app.domain.tool.DitherPattern
 import com.instasprite.app.domain.tool.ToolType
 
 sealed interface ToolSelectorEvent {
+    data class SetDitherPattern(val pattern: DitherPattern) : ToolSelectorEvent
+    data class SetDitherBackground(val color: Color) : ToolSelectorEvent
     data class SelectTool(val tool: ToolType) : ToolSelectorEvent
     data object Undo : ToolSelectorEvent
     data object Redo : ToolSelectorEvent

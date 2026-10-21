@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing
 
+import androidx.compose.ui.graphics.toArgb
+import com.instasprite.app.domain.tool.DitherBrush
 import com.instasprite.app.domain.tool.DrawingSymmetry
 import android.widget.Toast
 import com.instasprite.app.R
@@ -72,6 +74,7 @@ data class DrawingScreenState(
     val showCanvasPreview: Boolean = true,
     val isPixelPerfect: Boolean = false,
     val symmetry: DrawingSymmetry = DrawingSymmetry(),
+    val dither: DitherBrush = DitherBrush(),
     val cursorState: CursorState = CursorState()
 )
 
@@ -448,6 +451,15 @@ class DrawingViewModel @AssistedInject constructor(
                     _uiState.value = _uiState.value.copy(
                         isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
                     )
+                }
+                is ToolSelectorEvent.SetDitherPattern, is ToolSelectorEvent.SetDitherBackground -> {
+                    val current = _uiState.value.dither
+                    val next = when (event) {
+                        is ToolSelectorEvent.SetDitherPattern -> current.copy(pattern = event.pattern)
+                        is ToolSelectorEvent.SetDitherBackground -> current.copy(secondaryColor = event.color.toArgb())
+                    }
+                    drawingEngine.strokeEngine.dither = next
+                    _uiState.value = _uiState.value.copy(dither = next)
                 }
                 is ToolSelectorEvent.SetSymmetryAxisX, is ToolSelectorEvent.SetSymmetryAxisY -> {
                     val current = _uiState.value.symmetry
