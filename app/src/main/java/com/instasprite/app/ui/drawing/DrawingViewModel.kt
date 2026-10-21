@@ -446,6 +446,7 @@ class DrawingViewModel @AssistedInject constructor(
                 is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
                 is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
                 is ToolSelectorEvent.OpenDrawingSettingsDialog -> openDialog(DrawingDialog.DrawingSettings)
+                ToolSelectorEvent.OpenDitherColorWheel -> openDialog(DrawingDialog.DitherColorWheel)
                 is ToolSelectorEvent.SelectTool -> selectTool(type = event.tool)
                 is ToolSelectorEvent.ToggleAppendSelectionMode -> {
                     _uiState.value = _uiState.value.copy(
@@ -456,7 +457,10 @@ class DrawingViewModel @AssistedInject constructor(
                     val current = _uiState.value.dither
                     val next = when (event) {
                         is ToolSelectorEvent.SetDitherPattern -> current.copy(pattern = event.pattern)
-                        is ToolSelectorEvent.SetDitherBackground -> current.copy(secondaryColor = event.color.toArgb())
+                        is ToolSelectorEvent.SetDitherBackground -> {
+                            colorPaletteRepository.addColorToPalette(event.color)
+                            current.copy(secondaryColor = event.color.toArgb())
+                        }
                     }
                     drawingEngine.strokeEngine.dither = next
                     _uiState.value = _uiState.value.copy(dither = next)

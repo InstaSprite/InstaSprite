@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
+import com.instasprite.app.ui.components.composable.PixelIcon
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
@@ -69,10 +71,7 @@ fun DitherOptions(brush: DitherBrush, foreground: Color, palette: List<Color>, o
         }
         DropdownMenu(expanded = patternsExpanded, onDismissRequest = { patternsExpanded = false },
             modifier = Modifier.width(200.pixelDp).background(colors.BackgroundColor)) {
-            DitherMenuContent(brush, foreground, palette) { event ->
-                onEvent(event)
-                if (event is ToolSelectorEvent.SetDitherPattern) patternsExpanded = false
-            }
+            DitherMenuContent(brush, foreground, palette, onEvent)
         }
     }
 }
@@ -81,26 +80,36 @@ fun DitherOptions(brush: DitherBrush, foreground: Color, palette: List<Color>, o
 private fun DitherMenuContent(brush: DitherBrush, foreground: Color, palette: List<Color>, onEvent: (ToolSelectorEvent) -> Unit) {
     val colors = AppTheme.colors
     Column(Modifier.padding(6.pixelDp)) {
-        Text(stringResource(R.string.dither_background), color = colors.TextColorLight, fontSize = 12.sp)
-        ColorPaletteView(
-            colors = (listOf(Color.Transparent) + palette).distinct(),
-            activeColor = Color(brush.secondaryColor),
-            modifier = Modifier.width(188.pixelDp),
-            onColorSelected = { onEvent(ToolSelectorEvent.SetDitherBackground(it)) }
-        )
+        Row(modifier = Modifier.width(188.pixelDp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.dither_background), color = colors.TextColorLight, fontSize = 12.sp,
+                modifier = Modifier.weight(1f))
+
+        }
+
+        Row {
+            IconButton(onClick = { onEvent(ToolSelectorEvent.OpenDitherColorWheel) }, modifier = Modifier.size(24.pixelDp)) {
+                PixelIcon(R.drawable.ic_plus, contentDescription = stringResource(R.string.add_color))
+            }
+            ColorPaletteView(
+                colors = (listOf(Color.Transparent) + palette).distinct(),
+                activeColor = Color(brush.secondaryColor),
+                modifier = Modifier.width(188.pixelDp),
+                onColorSelected = { onEvent(ToolSelectorEvent.SetDitherBackground(it)) }
+            )
+        }
+
     }
-    HorizontalDivider(color = colors.BackgroundColorDarker)
     Column(Modifier.padding(6.pixelDp), verticalArrangement = Arrangement.spacedBy(6.pixelDp)) {
         DitherPattern.entries.chunked(4).forEach { patterns ->
             Row(horizontalArrangement = Arrangement.spacedBy(6.pixelDp)) {
                 patterns.forEach { pattern ->
                     val description = stringResource(pattern.nameRes)
                     Box(
-                        modifier = Modifier.size(32.pixelDp)
-                            .background(colors.BackgroundColorDarker, MaterialTheme.shapes.small)
+                        modifier = Modifier.size(26.pixelDp)
+                            .background(colors.BackgroundColorDarker)
                             .border(1.pixelDp,
                                 if (brush.pattern == pattern) colors.AccentButtonColor else colors.Subtext0Color,
-                                MaterialTheme.shapes.small)
+                                )
                             .semantics { contentDescription = description }
                             .selectable(selected = brush.pattern == pattern, role = Role.RadioButton,
                                 onClick = { onEvent(ToolSelectorEvent.SetDitherPattern(pattern)) }),
@@ -123,7 +132,7 @@ private fun DitherPatternPreview(pattern: DitherPattern, foreground: Color, back
         Bitmap.createBitmap(pixels, 8, 8, Bitmap.Config.ARGB_8888).asImageBitmap()
     }
     Image(bitmap = bitmap, contentDescription = null, filterQuality = FilterQuality.None,
-        modifier = modifier.drawCheckerboard(4, 4))
+        modifier = modifier.drawCheckerboard(8, 8))
 }
 
 @Preview(name = "Dither shading patterns", showBackground = true)

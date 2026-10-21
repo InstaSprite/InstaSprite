@@ -1,5 +1,7 @@
 package com.instasprite.app.ui.drawing
 
+import androidx.compose.ui.graphics.Color
+import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,6 +24,7 @@ sealed interface DrawingDialog : Dialog {
     data object LoadISprite : DrawingDialog
     data object ResizeCanvas : DrawingDialog
     data object ColorWheel : DrawingDialog
+    data object DitherColorWheel : DrawingDialog
     data object DrawingSettings : DrawingDialog
 }
 
@@ -80,14 +83,24 @@ fun DrawingScreenDialogs(
                     onResize = viewModel::resizeCanvas
                 )
 
-            DrawingDialog.ColorWheel ->
+            DrawingDialog.ColorWheel, DrawingDialog.DitherColorWheel -> {
+                val isDither = dialog == DrawingDialog.DitherColorWheel
+                val foreground = viewModel.activeColor.collectAsStateWithLifecycle().value
+                val background = Color(uiState.dither.secondaryColor)
                 ColorWheelDialog(
-                    initialColor = viewModel.activeColor.collectAsStateWithLifecycle().value,
+                    initialColor = if (isDither) {
+                        if (background.alpha == 0f) foreground.copy(alpha = 1f) else background
+                    } else foreground,
                     colorPalette = viewModel.colorPalette.collectAsStateWithLifecycle().value,
                     onDismiss = viewModel::closeTopDialog,
-                    onColorSelected = viewModel::selectColor,
-                    onOpenPaletteScreen = onNavigateToPalette
+                    onColorSelected = { color ->
+                        if (isDither) viewModel.onToolSelectorEvent(ToolSelectorEvent.SetDitherBackground(color))
+                        else viewModel.selectColor(color)
+                    },
+                    onOpenPaletteScreen = onNavigateToPalette,
+                    showChoosePalette = !isDither
                 )
+            }
 
             DrawingDialog.DrawingSettings ->
                 DrawingSettingsDialog(

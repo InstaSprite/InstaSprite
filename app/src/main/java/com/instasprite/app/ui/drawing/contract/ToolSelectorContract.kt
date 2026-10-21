@@ -15,6 +15,7 @@ sealed interface ToolSelectorEvent {
     data object OpenSaveISpriteDialog : ToolSelectorEvent
     data object OpenLoadISpriteDialog : ToolSelectorEvent
     data object OpenDrawingSettingsDialog : ToolSelectorEvent
+    data object OpenDitherColorWheel : ToolSelectorEvent
     data object ToggleAppendSelectionMode : ToolSelectorEvent
     data object TogglePixelPerfect : ToolSelectorEvent
     data class SetSymmetryAxisX(val position: Float) : ToolSelectorEvent
