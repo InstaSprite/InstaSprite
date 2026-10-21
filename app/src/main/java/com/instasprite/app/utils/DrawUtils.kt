@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -88,6 +89,7 @@ fun Modifier.drawingPointerInput(
     onEvent: (PixelCanvasEvent) -> Unit,
     onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
     symmetry: DrawingSymmetry = DrawingSymmetry(),
+    viewportBounds: Rect? = null,
     onSymmetryAxisMove: (Boolean, Float) -> Unit = { _, _ -> }
 ): Modifier {
     if (canvasWidth == 0 || canvasHeight == 0) return this
@@ -95,6 +97,7 @@ fun Modifier.drawingPointerInput(
     val touchSlop = LocalViewConfiguration.current.touchSlop
     val symmetryHandleRadius = with(LocalDensity.current) { 5.pixelDp.toPx() }
     val latestSymmetry by rememberUpdatedState(symmetry)
+    val latestViewportBounds by rememberUpdatedState(viewportBounds)
     val latestAxisMove by rememberUpdatedState(onSymmetryAxisMove)
 
     val latestScale by rememberUpdatedState(scale)
@@ -112,7 +115,9 @@ fun Modifier.drawingPointerInput(
                 onTransform = onTransform,
                 startEvent = down,
                 symmetryDrag = SymmetryAxisDrag.start(latestSymmetry, down.position, size,
-                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f), latestAxisMove)
+                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f),
+                    visibleBounds = latestViewportBounds ?: Rect(0f, 0f, size.width.toFloat(), size.height.toFloat()),
+                    onMove = latestAxisMove)
             )
 
             do {
@@ -166,6 +171,7 @@ fun Modifier.cursorPointerInput(
     onCursorMove: (cursorX: Float, cursorY: Float) -> Unit,
     onTransform: (centroid: Offset, pan: Offset, zoom: Float) -> Unit,
     symmetry: DrawingSymmetry = DrawingSymmetry(),
+    viewportBounds: Rect? = null,
     onSymmetryAxisMove: (Boolean, Float) -> Unit = { _, _ -> }
 ): Modifier {
     if (canvasWidth == 0 || canvasHeight == 0) return this
@@ -173,6 +179,7 @@ fun Modifier.cursorPointerInput(
     val touchSlop = LocalViewConfiguration.current.touchSlop
     val symmetryHandleRadius = with(LocalDensity.current) { 5.pixelDp.toPx() }
     val latestSymmetry by rememberUpdatedState(symmetry)
+    val latestViewportBounds by rememberUpdatedState(viewportBounds)
     val latestAxisMove by rememberUpdatedState(onSymmetryAxisMove)
     val latestCursorX by rememberUpdatedState(cursorState.cursorX)
     val latestCursorY by rememberUpdatedState(cursorState.cursorY)
@@ -197,7 +204,9 @@ fun Modifier.cursorPointerInput(
                 onTransform = onTransform,
                 startEvent = down,
                 symmetryDrag = SymmetryAxisDrag.start(latestSymmetry, down.position, size,
-                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f), latestAxisMove)
+                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f),
+                    visibleBounds = latestViewportBounds ?: Rect(0f, 0f, size.width.toFloat(), size.height.toFloat()),
+                    onMove = latestAxisMove)
             )
 
             do {

@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.drawing.gesture
 
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import com.instasprite.app.domain.tool.DrawingSymmetry
@@ -27,19 +28,29 @@ internal class SymmetryAxisDrag private constructor(
 
     companion object {
         fun start(symmetry: DrawingSymmetry, position: Offset, size: IntSize, width: Int, height: Int,
-            tolerance: Float, onMove: (Boolean, Float) -> Unit): SymmetryAxisDrag? {
+            tolerance: Float, visibleBounds: Rect = Rect(0f, 0f, size.width.toFloat(), size.height.toFloat()),
+            onMove: (Boolean, Float) -> Unit): SymmetryAxisDrag? {
             if (size.width <= 0 || size.height <= 0 || width <= 0 || height <= 0) return null
+            if (visibleBounds.isEmpty) return null
             val cellWidth = size.width.toFloat() / width
             val cellHeight = size.height.toFloat() / height
-            val radius = minOf(tolerance, size.width / 8f, size.height / 8f)
-            val atHorizontalEdge = position.y <= radius * 2 || position.y >= size.height - radius * 2
-            val atVerticalEdge = position.x <= radius * 2 || position.x >= size.width - radius * 2
-            val dx = if (symmetry.horizontal && atHorizontalEdge) abs(position.x - symmetry.x(width) * cellWidth) else Float.POSITIVE_INFINITY
-            val dy = if (symmetry.vertical && atVerticalEdge) abs(position.y - symmetry.y(height) * cellHeight) else Float.POSITIVE_INFINITY
+            val radius = minOf(tolerance, visibleBounds.width / 8f, visibleBounds.height / 8f)
+            val x = (symmetry.x(width) * cellWidth).coerceIn(visibleBounds.left + radius, visibleBounds.right - radius)
+            val y = (symmetry.y(height) * cellHeight).coerceIn(visibleBounds.top + radius, visibleBounds.bottom - radius)
+            val atHorizontalEdge = position.y in visibleBounds.top..(visibleBounds.top + radius * 2) ||
+                position.y in (visibleBounds.bottom - radius * 2)..visibleBounds.bottom
+            val atVerticalEdge = position.x in visibleBounds.left..(visibleBounds.left + radius * 2) ||
+                position.x in (visibleBounds.right - radius * 2)..visibleBounds.right
+            val dx = if (symmetry.horizontal && atHorizontalEdge) abs(position.x - x) else Float.POSITIVE_INFINITY
+            val dy = if (symmetry.vertical && atVerticalEdge) abs(position.y - y) else Float.POSITIVE_INFINITY
             if (minOf(dx, dy) > radius) return null
             val isXAxis = dx <= dy
             return SymmetryAxisDrag(isXAxis, if (isXAxis) position.x else position.y,
-                if (isXAxis) symmetry.x(width) else symmetry.y(height),
+                if (isXAxis) {
+                    (symmetry.x(width) * cellWidth).coerceIn(visibleBounds.left, visibleBounds.right) / cellWidth
+                } else {
+                    (symmetry.y(height) * cellHeight).coerceIn(visibleBounds.top, visibleBounds.bottom) / cellHeight
+                },
                 if (isXAxis) cellWidth else cellHeight, if (isXAxis) width else height, onMove)
         }
     }
