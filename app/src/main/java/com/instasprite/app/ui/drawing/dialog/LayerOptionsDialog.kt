@@ -1,6 +1,11 @@
 package com.instasprite.app.ui.drawing.dialog
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +51,8 @@ fun LayerOptionsDialog(
     canvasWidth: Int,
     canvasHeight: Int,
     canMergeDown: Boolean,
+    canClip: Boolean,
+    onToggleClipping: () -> Unit,
     onBlendModeSelected: (BlendMode) -> Unit,
     onMergeDown: () -> Unit,
     onDismiss: () -> Unit,
@@ -132,6 +139,31 @@ fun LayerOptionsDialog(
 
             Spacer(modifier = Modifier.height(10.pixelDp))
 
+            Row(
+                modifier = Modifier.fillMaxWidth().toggleable(
+                    value = layer.isClipping,
+                    enabled = canClip || layer.isClipping,
+                    role = Role.Checkbox,
+                    onValueChange = { onToggleClipping() }
+                ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.clip_to_layer_below),
+                    color = AppTheme.colors.TextColorLight, modifier = Modifier.weight(1f))
+                Checkbox(
+                    checked = layer.isClipping,
+                    onCheckedChange = null,
+                    enabled = canClip || layer.isClipping,
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = AppTheme.colors.LinkColor,
+                        uncheckedColor = AppTheme.colors.Subtext0Color,
+                        checkmarkColor = AppTheme.colors.TextColorDark
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.pixelDp))
+
             // Merge Down Button
             if (canMergeDown) {
                 Button(
@@ -165,12 +197,15 @@ private fun PreviewLayerOptionsDialog() {
                 id = "1",
                 name = "Test Layer",
                 blendMode = BlendMode.MULTIPLY,
+                isClipping = true,
                 tiles = emptyMap()
             ),
             layerImage = null,
             canvasWidth = 16,
             canvasHeight = 16,
             canMergeDown = true,
+            canClip = true,
+            onToggleClipping = {},
             onBlendModeSelected = {},
             onMergeDown = {},
             onDismiss = {}

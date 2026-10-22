@@ -15,6 +15,7 @@ import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
+import com.instasprite.app.utils.blendPixel
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 data class StrokeEndResult(
@@ -94,7 +95,7 @@ class StrokeEngine(
         bitmapManager.clearOverlayBitmap()
     }
 
-    private fun plotOverlayPixel(row: Int, col: Int, color: Int) {
+    private fun plotOverlayPixel(row: Int, col: Int, color: Int, onTop: Boolean = false) {
         if (bitmapManager.overlayBitmap == null) bitmapManager.ensureOverlayBitmap()
         val bmp = bitmapManager.overlayBitmap ?: return
         if (row !in 0 until bmp.height || col !in 0 until bmp.width) return
@@ -108,7 +109,11 @@ class StrokeEngine(
         bmp[col, row] = color
 
         val mainBmp = bitmapManager.bitmap ?: return
-        mainBmp[col, row] = pixelCanvasUseCase.getPreviewCompositedPixelAt(row, col, color)
+        mainBmp[col, row] = if (onTop) {
+            blendPixel(pixelCanvasUseCase.getCompositedPixelAt(row, col), color, 1f)
+        } else {
+            pixelCanvasUseCase.getPreviewCompositedPixelAt(row, col, color)
+        }
     }
 
     private fun applyCommittedPixelToMainBitmap(row: Int, col: Int) {
@@ -221,7 +226,7 @@ class StrokeEngine(
             color = color,
             scale = scale,
             plotPreviewPixel = { r, c, argb ->
-                if (tool is SelectionTool) plotOverlayPixel(r, c, argb) else plotStrokePixel(r, c, argb)
+                if (tool is SelectionTool) plotOverlayPixel(r, c, argb, onTop = true) else plotStrokePixel(r, c, argb)
             },
             onCommittedPixel = { r, c -> applyCommittedPixelToMainBitmap(r, c) }
         )
@@ -262,7 +267,7 @@ class StrokeEngine(
             row = row,
             col = col,
             plotPreviewPixel = { r, c, argb ->
-                if (tool is SelectionTool) plotOverlayPixel(r, c, argb) else plotStrokePixel(r, c, argb)
+                if (tool is SelectionTool) plotOverlayPixel(r, c, argb, onTop = true) else plotStrokePixel(r, c, argb)
             },
             onCommittedPixel = { _, _ -> }
         )

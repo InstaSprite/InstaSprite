@@ -40,6 +40,17 @@ class LayerDelegate(
         refreshActiveLayerState()
     }
 
+    override fun toggleClipping(layerId: String) {
+        historyManager.recordOperationHistory {
+            pixelCanvasUseCase.toggleClipping(layerId)
+        }
+        refreshLayerState()
+        scope.launch {
+            bitmapManager.refreshBitmapState()
+            syncStateVersions()
+        }
+    }
+
     override fun toggleLock(layerId: String) {
         historyManager.recordOperationHistory {
             pixelCanvasUseCase.toggleLock(layerId)

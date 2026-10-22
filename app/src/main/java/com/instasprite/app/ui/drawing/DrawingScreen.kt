@@ -181,7 +181,8 @@ fun DrawingScreen(
                 canvasWidth = canvasState.width,
                 canvasHeight = canvasState.height,
                 onEvent = event.onLayerEvent,
-                onBack = viewModel::toggleLayerDrawer
+                onBack = viewModel::toggleLayerDrawer,
+                animation = canvasState.animation
             )
         },
         content = {

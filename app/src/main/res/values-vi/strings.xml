@@ -596,4 +596,6 @@
     <string name="dither_vertical">Sọc dọc</string>
     <string name="dither_crosshatch">Đan chéo</string>
     <string name="dither_dots">Chấm</string>
+    <string name="clip_to_layer_below">Cắt theo lớp nền</string>
+    <string name="clipping_layer">Lớp cắt</string>
 </resources>

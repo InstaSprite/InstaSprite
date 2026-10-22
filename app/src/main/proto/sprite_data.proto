@@ -20,6 +20,7 @@ message LayerData {
   CelData cel = 6;
   float opacity = 7;
   string blend_mode = 8;
+  bool is_clipping = 9;
 }
 
 message ISprite {
@@ -37,6 +38,7 @@ message ISprite {
 message AnimationFrameData {
   string id = 1;
   int32 duration_ms = 2;
+  repeated string clipping_layer_ids = 3;
 }
 
 message AnimationCelData {

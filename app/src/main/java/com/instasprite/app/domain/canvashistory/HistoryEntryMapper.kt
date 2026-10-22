@@ -217,6 +217,7 @@ object HistoryEntryMapper {
         isLocked = this@toLayerProto.isLocked
         opacity = this@toLayerProto.opacity
         blendMode = this@toLayerProto.blendMode.name
+        isClipping = this@toLayerProto.isClipping
         tileData = ByteString.copyFrom(
             encodeTilesToByteArray(this@toLayerProto.tiles)
         )
@@ -229,6 +230,7 @@ object HistoryEntryMapper {
         isLocked = isLocked,
         opacity = opacity,
         blendMode = BlendMode.valueOf(blendMode),
+        isClipping = isClipping,
         tiles = decodeTilesFromByteArray(tileData.toByteArray()) ?: emptyMap()
     )
 

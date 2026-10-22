@@ -9,6 +9,8 @@ import com.instasprite.app.domain.model.AnimationFrame
 import com.instasprite.app.domain.model.CelImage
 import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.domain.model.LayerCompositor
+import com.instasprite.app.domain.model.canMergeLayerDown
 import com.instasprite.app.domain.model.PixelCanvas
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.TileCoord
@@ -70,39 +72,6 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return LinkedHashMap<TileCoord, IntArray>(source.size).apply {
             for ((coord, pixels) in source) {
                 put(coord, pixels.copyOf())
-            }
-        }
-    }
-
-    private fun composeTileIntoBuffer(
-        tileCoord: TileCoord,
-        tilePixels: IntArray,
-        buffer: IntArray,
-        bufferWidth: Int,
-        bufferHeight: Int,
-        layerOpacity: Float = 1.0f,
-        blendMode: BlendMode = BlendMode.NORMAL,
-        startRow: Int = 0,
-        startCol: Int = 0,
-        regionWidth: Int = bufferWidth,
-        regionHeight: Int = bufferHeight
-    ) {
-        val originX = tileCoord.x * TILE_SIZE
-        val originY = tileCoord.y * TILE_SIZE
-        val rowStart = maxOf(startRow, originY)
-        val rowEnd = minOf(startRow + regionHeight, originY + TILE_SIZE, bufferHeight)
-        val colStart = maxOf(startCol, originX)
-        val colEnd = minOf(startCol + regionWidth, originX + TILE_SIZE, bufferWidth)
-        if (rowStart >= rowEnd || colStart >= colEnd) return
-
-        for (row in rowStart until rowEnd) {
-            val tileRow = row - originY
-            val dstBase = (row - startRow) * regionWidth
-            val srcBase = tileRow * TILE_SIZE
-            for (col in colStart until colEnd) {
-                val argb = tilePixels[srcBase + (col - originX)]
-                val dstIdx = dstBase + (col - startCol)
-                buffer[dstIdx] = blendPixel(buffer[dstIdx], argb, layerOpacity, blendMode)
             }
         }
     }
@@ -193,7 +162,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             val index = _layers.indexOfFirst { it.id == id }
             if (index != -1) {
                 _layers.removeAt(index)
-                animation = prune(animation.copy(cels = animation.cels.filterNot { it.layerId == id }))
+                animation = prune(animation.copy(cels = animation.cels.filterNot { it.layerId == id },
+                    frames = animation.frames.map { it.copy(clippingLayerIds = it.clippingLayerIds - id) }))
                 if (activeLayerId == id) {
                     activeLayerId = _layers.last().id
                 }
@@ -215,6 +185,19 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         }
     }
 
+    fun toggleClipping(id: String) {
+        val index = _layers.indexOfFirst { it.id == id }
+        if (index < 0 || (index == 0 && !_layers[index].isClipping)) return
+        val layer = _layers[index]
+        val clipping = !layer.isClipping
+        animation = animation.copy(frames = animation.frames.map { frame ->
+            if (frame.id != activeFrameId) frame else frame.copy(clippingLayerIds =
+                if (clipping) frame.clippingLayerIds + id else frame.clippingLayerIds - id)
+        })
+        _layers[index] = Layer(layer.id, layer.name, layer.isVisible, layer.isLocked,
+            layer.opacity, layer.blendMode, layer.tiles, clipping)
+    }
+
     fun toggleLock(id: String) {
         val index = _layers.indexOfFirst { it.id == id }
         if (index != -1) {
@@ -225,7 +208,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
 
     fun mergeLayerDown(id: String) {
         val index = _layers.indexOfFirst { it.id == id }
-        if (index <= 0) return
+        if (!_layers.canMergeLayerDown(id, animation)) return
         val top = _layers[index]
         val bottom = _layers[index - 1]
         val images = animation.images.toMutableMap()
@@ -236,21 +219,40 @@ class PixelCanvasRepository(var model: PixelCanvas) {
             val topCel = animation.cel(top.id, frame.id)
             if (bottomCel == null && topCel == null) continue
             val dataId = mergedIds.getOrPut(bottomCel?.dataId to topCel?.dataId) {
-                val pixels = IntArray(width * height)
-                for (layer in listOf(bottom, top)) {
-                    if (!layer.isVisible) continue
-                    val source = tilesToPixels(animation.tiles(layer.id, frame.id), width, height)
-                    for (i in pixels.indices) pixels[i] = blendPixel(pixels[i], source[i], layer.opacity, layer.blendMode)
+                val frameLayers = listOf(bottom, top).map { layer ->
+                    Layer(layer.id, layer.name, layer.isVisible, layer.isLocked, layer.opacity,
+                        layer.blendMode, animation.tiles(layer.id, frame.id), layer.isClipping)
                 }
-                val image = CelImage(tiles = pixelsToTiles(pixels, width, height))
+                val merged = mutableMapOf<TileCoord, IntArray>()
+                val coordinates = if (top.isClipping) frameLayers[0].tiles.keys
+                    else frameLayers.flatMap { it.tiles.keys }.toSet()
+                for (coord in coordinates) {
+                    val tile = IntArray(TILE_SIZE * TILE_SIZE)
+                    if (top.isClipping) {
+                        frameLayers[0].tiles.getValue(coord).copyInto(tile)
+                        val overlay = frameLayers[1].tiles[coord]
+                        if (top.isVisible && overlay != null) {
+                            for (i in tile.indices) {
+                                tile[i] = LayerCompositor.blendClipped(tile[i], overlay[i], top.opacity, top.blendMode)
+                            }
+                        }
+                    } else {
+                        LayerCompositor.render(frameLayers, width, height, tile,
+                            coord.y * TILE_SIZE, coord.x * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                    }
+                    if (!isTileEmpty(tile)) merged[coord] = tile
+                }
+                val image = CelImage(tiles = merged)
                 images[image.id] = image
                 image.id
             }
             cels.add(AnimationCel(layerId = bottom.id, frameId = frame.id, dataId = dataId))
         }
-        _layers[index - 1] = bottom.copy(isVisible = true, opacity = 1f, blendMode = BlendMode.NORMAL)
+        _layers[index - 1] = if (top.isClipping) bottom else
+            bottom.copy(isVisible = true, opacity = 1f, blendMode = BlendMode.NORMAL)
         _layers.removeAt(index)
-        animation = prune(animation.copy(cels = cels, images = images))
+        animation = prune(animation.copy(cels = cels, images = images,
+            frames = animation.frames.map { it.copy(clippingLayerIds = it.clippingLayerIds - id) }))
         if (activeLayerId == id) activeLayerId = bottom.id
         resolveFrame()
     }
@@ -367,104 +369,29 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         return Color.Transparent
     }
 
-    fun getAllPixels(): IntArray {
-        val composited = IntArray(width * height) { transparentArgb }
-        for (layer in _layers) {
-            if (!layer.isVisible) continue
-            val layerOpacity = layer.opacity
-            val layerBlendMode = layer.blendMode
-            for ((coord, tilePixels) in layer.tiles) {
-                val originX = coord.x * TILE_SIZE
-                val originY = coord.y * TILE_SIZE
-                for (localRow in 0 until TILE_SIZE) {
-                    val canvasRow = originY + localRow
-                    if (canvasRow !in 0 until height) continue
-                    val dstBase = canvasRow * width
-                    val srcBase = localRow * TILE_SIZE
-                    for (localCol in 0 until TILE_SIZE) {
-                        val canvasCol = originX + localCol
-                        if (canvasCol !in 0 until width) continue
-                        val argb = tilePixels[srcBase + localCol]
-                        val dstIdx = dstBase + canvasCol
-                        composited[dstIdx] =
-                            blendPixel(composited[dstIdx], argb, layerOpacity, layerBlendMode)
-                    }
-                }
-            }
-        }
-        return composited
-    }
+    fun getAllPixels(): IntArray = getAllPixelsInRegion(0, 0, height, width)
 
     fun getCompositedPixelAt(row: Int, col: Int): Int {
         if (row !in 0 until height || col !in 0 until width) return transparentArgb
-        var color = transparentArgb
-        for (layer in _layers) {
-            if (!layer.isVisible) continue
-            val argb = tilePixelAt(layer.tiles, row, col)
-            color = blendPixel(color, argb, layer.opacity, layer.blendMode)
-        }
-        return color
+        return LayerCompositor.pixel(_layers) { tilePixelAt(it.tiles, row, col) }
     }
 
     fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int, blend: Boolean = true): Int {
         if (row !in 0 until height || col !in 0 until width) return transparentArgb
-        var color = transparentArgb
-        val activeIdx = getActiveLayerIndex()
-        for (i in _layers.indices) {
-            val layer = _layers[i]
-            if (!layer.isVisible) continue
-            val argb = if (i == activeIdx) {
-                val originalPixel = tilePixelAt(layer.tiles, row, col)
-                if (blend) blendPixel(originalPixel, overlayColor, 1f) else overlayColor
-            } else {
-                tilePixelAt(layer.tiles, row, col)
-            }
-            color = blendPixel(color, argb, layer.opacity, layer.blendMode)
+        return LayerCompositor.pixel(_layers) { layer ->
+            val original = tilePixelAt(layer.tiles, row, col)
+            if (layer.id != activeLayerId) original
+            else if (blend) blendPixel(original, overlayColor, 1f) else overlayColor
         }
-        return color
     }
 
     fun getAllPixelsInRegion(
         startRow: Int, startCol: Int,
         regionHeight: Int, regionWidth: Int
     ): IntArray {
-        val result = IntArray(regionWidth * regionHeight) { transparentArgb }
-        if (regionHeight <= 0 || regionWidth <= 0) return result
-
-        val regionEndRow = startRow + regionHeight
-        val regionEndCol = startCol + regionWidth
-        val firstTileRow = startRow.floorDiv(TILE_SIZE)
-        val firstTileCol = startCol.floorDiv(TILE_SIZE)
-        val lastTileRow = (minOf(regionEndRow, height) - 1).floorDiv(TILE_SIZE)
-        val lastTileCol = (minOf(regionEndCol, width) - 1).floorDiv(TILE_SIZE)
-        if (firstTileRow > lastTileRow || firstTileCol > lastTileCol) return result
-        val regionTileCount = (lastTileRow - firstTileRow + 1).toLong() *
-            (lastTileCol - firstTileCol + 1)
-
-        for (layer in _layers) {
-            if (!layer.isVisible) continue
-            // Small dirty regions use direct lookups; sparse/full redraws keep the cheaper tile scan.
-            if (regionTileCount < layer.tiles.size) {
-                for (tileRow in firstTileRow..lastTileRow) {
-                    for (tileCol in firstTileCol..lastTileCol) {
-                        val coord = TileCoord(tileCol, tileRow)
-                        val tilePixels = layer.tiles[coord] ?: continue
-                        composeTileIntoBuffer(
-                            coord, tilePixels, result, width, height,
-                            layer.opacity, layer.blendMode, startRow, startCol, regionWidth, regionHeight
-                        )
-                    }
-                }
-            } else {
-                for ((coord, tilePixels) in layer.tiles) {
-                    composeTileIntoBuffer(
-                        coord, tilePixels, result, width, height,
-                        layer.opacity, layer.blendMode, startRow, startCol, regionWidth, regionHeight
-                    )
-                }
-            }
-        }
-
+        require(regionWidth >= 0 && regionHeight >= 0)
+        val result = IntArray(Math.multiplyExact(regionWidth, regionHeight))
+        LayerCompositor.render(_layers, width, height, result, startRow, startCol, regionWidth, regionHeight)
         return result
     }
 
@@ -497,7 +424,7 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         if (layer.isLocked || !layer.isVisible) return
         require(tiles.values.all { it.size == TILE_SIZE * TILE_SIZE })
         replacePixels(index, Layer(layer.id, layer.name, layer.isVisible, layer.isLocked,
-            layer.opacity, layer.blendMode, tiles.toMap()))
+            layer.opacity, layer.blendMode, tiles.toMap(), layer.isClipping))
     }
 
     fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int, blend: Boolean = true) {
@@ -607,10 +534,11 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     }
 
     private fun resolveFrame() {
+        val clippingLayerIds = animation.frames.first { it.id == activeFrameId }.clippingLayerIds
         for (i in _layers.indices) {
             val layer = _layers[i]
             _layers[i] = Layer(layer.id, layer.name, layer.isVisible, layer.isLocked,
-                layer.opacity, layer.blendMode, animation.tiles(layer.id, activeFrameId))
+                layer.opacity, layer.blendMode, animation.tiles(layer.id, activeFrameId), layer.id in clippingLayerIds)
         }
     }
 
@@ -623,6 +551,8 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         setCanvasData(sprite.width, sprite.height, sprite.layers)
         animation = sprite.animation?.validated() ?: animation
         require(animation.cels.all { cel -> _layers.any { it.id == cel.layerId } })
+        val layerIds = _layers.map { it.id }.toSet()
+        require(animation.frames.all { layerIds.containsAll(it.clippingLayerIds) })
         activeFrameId = animation.frames.first().id
         resolveFrame()
     }
@@ -636,7 +566,9 @@ class PixelCanvasRepository(var model: PixelCanvas) {
     fun insertFrame(empty: Boolean = false, linked: Boolean = false) {
         if (animation.frames.size >= Animation.MAX_FRAMES) return
         val index = animation.frames.indexOfFirst { it.id == activeFrameId }
-        val frame = AnimationFrame(durationMs = animation.frames[index].durationMs)
+        val sourceFrame = animation.frames[index]
+        val frame = AnimationFrame(durationMs = sourceFrame.durationMs,
+            clippingLayerIds = if (empty) emptySet() else sourceFrame.clippingLayerIds)
         val frames = animation.frames.toMutableList().apply { add(index + 1, frame) }
         val images = animation.images.toMutableMap()
         val cels = animation.cels.toMutableList()

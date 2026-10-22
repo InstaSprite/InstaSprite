@@ -253,6 +253,7 @@ class DrawingEngine(
     override fun addLayer(name: String) = layerDelegate.addLayer(name)
     override fun removeLayer(layerId: String) = layerDelegate.removeLayer(layerId)
     override fun selectLayer(layerId: String) = layerDelegate.selectLayer(layerId)
+    override fun toggleClipping(layerId: String) = layerDelegate.toggleClipping(layerId)
     override fun toggleLock(layerId: String) = layerDelegate.toggleLock(layerId)
     override fun toggleVisibility(layerId: String) = layerDelegate.toggleVisibility(layerId)
     override fun mergeLayerDown(layerId: String) = layerDelegate.mergeLayerDown(layerId)

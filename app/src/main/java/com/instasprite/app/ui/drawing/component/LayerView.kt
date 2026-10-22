@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import com.instasprite.app.utils.pixelDp
-
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,7 +35,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.createBitmap
 import com.instasprite.app.R
@@ -50,6 +47,7 @@ import com.instasprite.app.ui.drawing.dialog.LayerOptionsDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
+import com.instasprite.app.utils.pixelDp
 import com.instasprite.app.utils.tilesToPreviewPixels
 import kotlin.math.roundToInt
 
@@ -66,7 +64,9 @@ fun LayerView(
     onVisibilityToggle: () -> Unit,
     onLockToggle: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    canClip: Boolean = true,
+    canMergeDown: Boolean = true
 ) {
 
     val backgroundColor = if (isActive)
@@ -81,7 +81,8 @@ fun LayerView(
             val width = (canvasWidth * scale).roundToInt().coerceAtLeast(1)
             val height = (canvasHeight * scale).roundToInt().coerceAtLeast(1)
             val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val argbPixels = tilesToPreviewPixels(layer.tiles, canvasWidth, canvasHeight, width, height)
+            val argbPixels =
+                tilesToPreviewPixels(layer.tiles, canvasWidth, canvasHeight, width, height)
             bitmap.setPixels(argbPixels, 0, width, 0, 0, width, height)
             bitmap.asImageBitmap()
         } else {
@@ -101,6 +102,15 @@ fun LayerView(
                 .clickable(enabled = true, onClick = onClick),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (layer.isClipping) {
+                Box(
+                    modifier = Modifier
+                        .height(66.pixelDp)
+                        .width(6.pixelDp)
+                        .background(AppTheme.colors.WarningColor)
+                )
+                Spacer(modifier = Modifier.width(2.pixelDp))
+            }
             Box(
                 modifier = Modifier
                     .height(66.pixelDp)
@@ -221,7 +231,9 @@ fun LayerView(
                             layerImage = bitmapImage,
                             canvasWidth = canvasWidth,
                             canvasHeight = canvasHeight,
-                            canMergeDown = true,
+                            canMergeDown = canMergeDown,
+                            canClip = canClip,
+                            onToggleClipping = { onEvent(LayerEvent.ToggleClipping(layer.id)) },
                             onBlendModeSelected = { mode ->
                                 onEvent(
                                     LayerEvent.SetBlendMode(
@@ -328,6 +340,37 @@ private fun PreviewInactive() {
             canvasWidth = 16,
             canvasHeight = 16,
             isActive = false,
+            onClick = {},
+            onVisibilityToggle = {},
+            onLockToggle = {},
+            onDelete = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewClipping() {
+    InstaSpriteTheme() {
+        LayerView(
+            layer = Layer(
+                id = "test1",
+                name = "Layer 1",
+                cel = Cel(
+                    x = 0,
+                    y = 0,
+                    width = 16,
+                    height = 16,
+                    pixels = IntArray(16 * 16) {
+                        AppTheme.colors.InfoColor.toArgb()
+                    }
+                ),
+                isClipping = true
+            ),
+            onEvent = {},
+            canvasWidth = 16,
+            canvasHeight = 16,
+            isActive = true,
             onClick = {},
             onVisibilityToggle = {},
             onLockToggle = {},

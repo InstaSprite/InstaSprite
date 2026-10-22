@@ -35,6 +35,7 @@ class PixelCanvasUseCase(
     fun removeLayer(id: String) = pixelCanvasRepository.removeLayer(id)
     fun setActiveLayer(id: String) = pixelCanvasRepository.setActiveLayer(id)
     fun toggleVisibility(id: String) = pixelCanvasRepository.toggleVisibility(id)
+    fun toggleClipping(id: String) = pixelCanvasRepository.toggleClipping(id)
     fun toggleLock(id: String) = pixelCanvasRepository.toggleLock(id)
     fun mergeLayerDown(id: String) = pixelCanvasRepository.mergeLayerDown(id)
     fun reorderLayer(fromIndex: Int, toIndex: Int) = pixelCanvasRepository.reorderLayer(fromIndex, toIndex)

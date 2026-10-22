@@ -324,6 +324,7 @@ class DrawingViewModel @AssistedInject constructor(
                 is LayerEvent.AddLayer -> drawingEngine.addLayer("Layer ${drawingEngine.canvasState.value.layers.size + 1}")
                 is LayerEvent.DeleteLayer -> drawingEngine.removeLayer(event.layerId)
                 is LayerEvent.SelectLayer -> drawingEngine.selectLayer(event.layerId)
+                is LayerEvent.ToggleClipping -> drawingEngine.toggleClipping(event.layerId)
                 is LayerEvent.ToggleLock -> drawingEngine.toggleLock(event.layerId)
                 is LayerEvent.ToggleVisibility -> drawingEngine.toggleVisibility(event.layerId)
                 is LayerEvent.MergeLayerDown -> drawingEngine.mergeLayerDown(event.layerId)

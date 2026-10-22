@@ -46,10 +46,11 @@ fun Sprite.toISprite(): ISprite {
 
     this.colorPalette?.let { builder.addAllColorPalette(it) }
     val document = (animation ?: Animation.fromLayers(layers)).validated()
-    builder.setFormatVersion(1)
+    builder.setFormatVersion(if (document.frames.any { it.clippingLayerIds.isNotEmpty() }) 3 else 1)
     builder.setPosterFrameId(document.posterFrameId)
     builder.addAllFrames(document.frames.map {
-        AnimationFrameData.newBuilder().setId(it.id).setDurationMs(it.durationMs).build()
+        AnimationFrameData.newBuilder().setId(it.id).setDurationMs(it.durationMs)
+            .addAllClippingLayerIds(it.clippingLayerIds).build()
     })
     builder.addAllCels(document.cels.map {
         AnimationCelData.newBuilder().setId(it.id).setLayerId(it.layerId)
@@ -63,7 +64,7 @@ fun Sprite.toISprite(): ISprite {
 }
 
 fun ISprite.toSprite(): Sprite {
-    require(formatVersion in 0..1) { "Unsupported sprite format: $formatVersion" }
+    require(formatVersion in 0..3) { "Unsupported sprite format: $formatVersion" }
     require(width > 0 && height > 0 && width.toLong() * height <= 16_777_216) { "Invalid canvas size" }
     require(framesCount <= Animation.MAX_FRAMES)
 
@@ -83,6 +84,7 @@ fun ISprite.toSprite(): Sprite {
             isLocked = layerData.isLocked,
             opacity = opacity,
             blendMode = blendMode,
+            isClipping = layerData.isClipping,
             tiles = when {
                 layerData.hasCel() -> {
                     val decodedTiles = decodeTilesFromByteArray(layerData.cel.pixels.toByteArray())
@@ -110,7 +112,10 @@ fun ISprite.toSprite(): Sprite {
         layers = layers,
         colorPalette = this.colorPaletteList.takeIf { it.isNotEmpty() },
         animation = if (formatVersion == 0) Animation.fromLayers(layers) else Animation(
-            frames = framesList.map { AnimationFrame(it.id, it.durationMs) },
+            frames = framesList.map {
+                AnimationFrame(it.id, it.durationMs, if (formatVersion >= 3) it.clippingLayerIdsList.toSet()
+                    else layers.filter { layer -> layer.isClipping }.map { layer -> layer.id }.toSet())
+            },
             cels = celsList.map { AnimationCel(it.id, it.layerId, it.frameId, it.dataId) },
             images = imagesList.map {
                 CelImage(it.id, requireNotNull(decodeTilesFromByteArray(it.tiles.toByteArray())))
@@ -120,6 +125,8 @@ fun ISprite.toSprite(): Sprite {
         ).validated().also { animation ->
             require(layers.map { it.id }.distinct().size == layers.size)
             require(animation.cels.all { cel -> layers.any { it.id == cel.layerId } })
+            val layerIds = layers.map { it.id }.toSet()
+            require(animation.frames.all { layerIds.containsAll(it.clippingLayerIds) })
         }
     )
 }

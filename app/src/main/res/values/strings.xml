@@ -595,4 +595,6 @@
     <string name="dither_vertical">Vertical lines</string>
     <string name="dither_crosshatch">Crosshatch</string>
     <string name="dither_dots">Dots</string>
+    <string name="clip_to_layer_below">Clip to base layer</string>
+    <string name="clipping_layer">Clipping layer</string>
 </resources>

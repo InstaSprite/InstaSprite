@@ -61,6 +61,11 @@ internal fun TimelineLayerRow(
                 tint = colors.TextColorLight
             )
         }
+        if (layer.isClipping) {
+            PixelIcon(R.drawable.ic_down_arrow,
+                contentDescription = stringResource(R.string.clipping_layer),
+                tint = colors.TextColorLight)
+        }
         Text(
             layer.name, maxLines = 1, overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.labelSmall,
@@ -72,7 +77,7 @@ internal fun TimelineLayerRow(
 @Preview(name = "Active layer", widthDp = 140)
 @Composable
 private fun TimelineLayerRowPreview() {
-    var layer by remember { mutableStateOf(TimelinePreviewData.layers[1]) }
+    var layer by remember { mutableStateOf(TimelinePreviewData.layers[1].copy(isClipping = true)) }
     InstaSpriteTheme {
         TimelineLayerRow(
             layer, true, {},

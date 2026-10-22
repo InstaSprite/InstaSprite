@@ -2,10 +2,15 @@ package com.instasprite.app.domain.model
 
 import java.util.UUID
 
-data class AnimationFrame(val id: String = UUID.randomUUID().toString(), val durationMs: Int = 100) {
+data class AnimationFrame(
+    val id: String = UUID.randomUUID().toString(),
+    val durationMs: Int = 100,
+    val clippingLayerIds: Set<String> = emptySet()
+) {
     init {
         require(id.isNotBlank())
         require(durationMs in 1..60_000)
+        require(clippingLayerIds.all { it.isNotBlank() })
     }
 }
 
@@ -56,7 +61,7 @@ data class Animation(
         const val MAX_FRAMES = 1000
 
         fun fromLayers(layers: List<Layer>): Animation {
-            val frame = AnimationFrame()
+            val frame = AnimationFrame(clippingLayerIds = layers.filter { it.isClipping }.map { it.id }.toSet())
             val images = layers.filter { it.tiles.isNotEmpty() }.associate { layer ->
                 val image = CelImage(tiles = layer.tiles)
                 layer.id to image

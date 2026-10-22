@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.domain.model.Animation
+import com.instasprite.app.domain.model.canMergeLayerDown
 import com.instasprite.app.ui.components.composable.BackButton
 import com.instasprite.app.ui.components.composable.Bar
 import com.instasprite.app.ui.components.composable.PixelIcon
@@ -57,7 +59,8 @@ fun LayerDrawer(
     canvasHeight: Int,
     onEvent: (LayerEvent) -> Unit,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    animation: Animation? = null
 ) {
 
     val lazyListState = rememberLazyListState()
@@ -163,7 +166,9 @@ fun LayerDrawer(
                             onClick = { onEvent(LayerEvent.SelectLayer(layer.id)) },
                             onVisibilityToggle = { onEvent(LayerEvent.ToggleVisibility(layer.id)) },
                             onLockToggle = { onEvent(LayerEvent.ToggleLock(layer.id)) },
-                            onDelete = { onEvent(LayerEvent.DeleteLayer(layer.id)) }
+                            onDelete = { onEvent(LayerEvent.DeleteLayer(layer.id)) },
+                            canClip = layers.indexOfFirst { it.id == layer.id } < layers.lastIndex,
+                            canMergeDown = layers.asReversed().canMergeLayerDown(layer.id, animation)
                         )
                     }
                 }

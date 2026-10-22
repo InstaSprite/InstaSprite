@@ -42,6 +42,7 @@ message LayerProto {
   float opacity = 5;
   string blend_mode = 6;
   bytes tile_data = 7;
+  bool is_clipping = 8;
 }
 
 message HistoryCanvasStateProto {
