@@ -16,26 +16,30 @@ data class SpriteSheetLayout(
 }
 
 object SpriteSheetExporter {
-    fun layout(sprite: Sprite, columns: Int): SpriteSheetLayout {
+    fun layout(sprite: Sprite, columns: Int, scalePercent: Int = 100): SpriteSheetLayout {
         val count = sprite.animation?.frames?.size ?: 1
         require(count in 1..Animation.MAX_FRAMES && columns in 1..count)
-        require(sprite.width > 0 && sprite.height > 0)
-        val width = sprite.width.toLong() * columns
-        val height = sprite.height.toLong() * ((count + columns - 1) / columns)
+        val (frameWidth, frameHeight) = ExportScale.size(sprite.width, sprite.height, scalePercent)
+        val width = frameWidth.toLong() * columns
+        val height = frameHeight.toLong() * ((count + columns - 1) / columns)
         if (width > Int.MAX_VALUE || height > Int.MAX_VALUE) throw CanvasMemoryException()
-        return SpriteSheetLayout(width.toInt(), height.toInt(), columns, sprite.width, sprite.height, count)
+        return SpriteSheetLayout(width.toInt(), height.toInt(), columns, frameWidth, frameHeight, count)
     }
 
-    fun render(sprite: Sprite, columns: Int, consume: (SpriteSheetLayout, Int, IntArray) -> Unit) {
-        val layout = layout(sprite, columns)
+    fun render(sprite: Sprite, columns: Int, scalePercent: Int = 100, consume: (SpriteSheetLayout, Int, IntArray) -> Unit) {
+        val layout = layout(sprite, columns, scalePercent)
+        val resized = layout.frameWidth != sprite.width || layout.frameHeight != sprite.height
         CanvasMemoryGuard.requireAvailable(
             CanvasMemoryGuard.estimatePixels(layout.width, layout.height, 4),
-            CanvasMemoryGuard.estimatePixels(sprite.width, sprite.height, 4)
+            CanvasMemoryGuard.estimatePixels(sprite.width, sprite.height, 4),
+            if (resized) CanvasMemoryGuard.estimatePixels(layout.frameWidth, layout.frameHeight, 4) else 0
         )
         val frameIds = sprite.animation?.validated()?.frames?.map { it.id } ?: listOf("")
-        val pixels = IntArray(Math.multiplyExact(sprite.width, sprite.height))
+        val source = IntArray(Math.multiplyExact(sprite.width, sprite.height))
+        val pixels = if (resized) IntArray(Math.multiplyExact(layout.frameWidth, layout.frameHeight)) else source
         frameIds.forEachIndexed { index, id ->
-            sprite.renderFrame(id, pixels)
+            sprite.renderFrame(id, source)
+            if (resized) ExportScale.copy(source, sprite.width, sprite.height, pixels, layout.frameWidth, layout.frameHeight)
             consume(layout, index, pixels)
         }
     }

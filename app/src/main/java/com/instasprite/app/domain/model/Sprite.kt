@@ -11,8 +11,11 @@ data class Sprite(
 ) {
     fun layersAt(frameId: String): List<Layer> = animation?.let { document ->
         val clippingLayerIds = document.frames.firstOrNull { it.id == frameId }?.clippingLayerIds.orEmpty()
+        val tilesByLayer = document.cels.filter { it.frameId == frameId }.associate { cel ->
+            cel.layerId to document.images[cel.dataId]?.tiles.orEmpty()
+        }
         layers.map { Layer(it.id, it.name, it.isVisible, it.isLocked, it.opacity, it.blendMode,
-            document.tiles(it.id, frameId), it.id in clippingLayerIds) }
+            tilesByLayer[it.id].orEmpty(), it.id in clippingLayerIds) }
     } ?: layers
 
     fun renderFrame(

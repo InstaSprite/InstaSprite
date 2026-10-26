@@ -41,7 +41,9 @@ fun InputDialog(
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
     extraTopContent: @Composable () -> Unit = {},
-    extraBottomContent: @Composable () -> Unit = {}
+    extraBottomContent: @Composable () -> Unit = {},
+    onInputChanged: (List<String>) -> Unit = {},
+    scrollable: Boolean = false
 ) {
     val context = LocalContext.current
 
@@ -53,6 +55,7 @@ fun InputDialog(
 
     CustomDialog(
         title = title,
+        scrollable = scrollable,
         onDismiss = {
             if (!isLoading) onDismiss()
         },
@@ -89,7 +92,10 @@ fun InputDialog(
                     fields.forEachIndexed { index, field ->
                         OutlinedTextField(
                             value = inputStates[index].value,
-                            onValueChange = { inputStates[index].value = it },
+                            onValueChange = {
+                                inputStates[index].value = it
+                                onInputChanged(inputStates.map { state -> state.value })
+                            },
                             label = { Text(field.label, color = AppTheme.colors.SelectedColor) },
                             placeholder = {
                                 if (field.placeholder.isNotBlank())

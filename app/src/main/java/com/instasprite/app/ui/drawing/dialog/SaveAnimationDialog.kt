@@ -14,20 +14,27 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.instasprite.app.domain.export.AnimationExportFormat
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.InputField
+import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.ui.components.dialog.SaveFileDialog
 import kotlinx.coroutines.launch
 
 @Composable
-fun SaveAnimationDialog(format: AnimationExportFormat, frameCount: Int, onDismiss: () -> Unit, folderUri: Uri?, isSaving: Boolean,
-    onFolderSelected: (Uri) -> Unit, onSave: suspend (Uri, String, Int) -> Boolean) {
+fun SaveAnimationDialog(format: AnimationExportFormat, sprite: Sprite, onDismiss: () -> Unit, folderUri: Uri?, isSaving: Boolean,
+    onFolderSelected: (Uri) -> Unit, onSave: suspend (Uri, String, Int, Int) -> Boolean) {
+    val frameCount = sprite.animation?.frames?.size ?: 1
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var name by remember { mutableStateOf("Sprite") }
     val sheet = format == AnimationExportFormat.SPRITE_SHEET
     var columns by remember(frameCount) { mutableStateOf(kotlin.math.ceil(kotlin.math.sqrt(frameCount.toDouble())).toInt().toString()) }
+    var scale by remember { mutableStateOf("100") }
     val fields = listOf(InputField(label = stringResource(R.string.filename), defaultValue = name,
         suffix = ".${format.extension}", validator = { it.isNotBlank() && '/' !in it && '\\' !in it },
-        errorMessage = stringResource(R.string.invalid_export_filename))) + if (sheet) listOf(
+        errorMessage = stringResource(R.string.invalid_export_filename)),
+        InputField(label = stringResource(R.string.scale), defaultValue = scale,
+            suffix = "%", keyboardType = KeyboardType.Number,
+            validator = { it.toIntOrNull()?.let { value -> value in 25..20000 } == true },
+            errorMessage = stringResource(R.string.must_be_between_25_and_20000))) + if (sheet) listOf(
             InputField(label = stringResource(R.string.sheet_columns), defaultValue = columns,
                 keyboardType = KeyboardType.Number,
                 validator = { it.toIntOrNull()?.let { value -> value in 1..frameCount } == true },
@@ -35,11 +42,16 @@ fun SaveAnimationDialog(format: AnimationExportFormat, frameCount: Int, onDismis
     SaveFileDialog(
         title = stringResource(if (sheet) R.string.export_sprite_sheet else R.string.export_gif),
         fields = fields,
-        note = stringResource(if (sheet) R.string.sheet_format_note else R.string.gif_format_note),
+        scrollable = true,
+        preview = {
+            AnimationExportPreviewView(sprite, format,
+                scale.toIntOrNull()?.takeIf { it in 25..20000 },
+                if (sheet) columns.toIntOrNull()?.takeIf { it in 1..frameCount } else 1)
+        },
         lastSavedUri = folderUri, onFolderSelected = onFolderSelected, isSaving = isSaving,
         onSave = {
             if (!isSaving && folderUri != null) scope.launch {
-                val success = onSave(folderUri, name, columns.toIntOrNull() ?: 1)
+                val success = onSave(folderUri, name, columns.toIntOrNull() ?: 1, scale.toIntOrNull() ?: 100)
                 Toast.makeText(context, if (success) R.string.export_saved else R.string.export_failed, Toast.LENGTH_SHORT).show()
                 if (success) onDismiss()
             }
@@ -47,7 +59,8 @@ fun SaveAnimationDialog(format: AnimationExportFormat, frameCount: Int, onDismis
         onDismiss = onDismiss,
         onValuesChanged = { values, _ ->
             name = values.firstOrNull().orEmpty()
-            if (sheet) columns = values.getOrNull(1).orEmpty()
+            scale = values.getOrNull(1).orEmpty()
+            if (sheet) columns = values.getOrNull(2).orEmpty()
         }
     )
 }

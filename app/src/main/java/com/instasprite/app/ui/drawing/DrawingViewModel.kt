@@ -751,14 +751,14 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     suspend fun saveAnimation(format: com.instasprite.app.domain.export.AnimationExportFormat,
-        folderUri: Uri, fileName: String, columns: Int): Boolean {
+        folderUri: Uri, fileName: String, columns: Int, scalePercent: Int): Boolean {
         if (_uiState.value.isSaving || fileName.isBlank()) return false
         _uiState.value = _uiState.value.copy(isSaving = true)
         return try {
             drawingEngine.awaitToolIdle()
             stopPlayback()
             commitPendingTool()
-            fileRepository.saveAnimationFile(pixelCanvasUseCase.getSprite(), format, folderUri, fileName, columns)
+            fileRepository.saveAnimationFile(pixelCanvasUseCase.getSprite(), format, folderUri, fileName, columns, scalePercent)
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {

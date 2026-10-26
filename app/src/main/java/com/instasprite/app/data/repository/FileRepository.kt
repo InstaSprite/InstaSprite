@@ -52,15 +52,15 @@ class FileRepository(val context: Context) {
     }
 
     suspend fun saveAnimationFile(sprite: Sprite, format: com.instasprite.app.domain.export.AnimationExportFormat,
-        folderUri: Uri, fileName: String, columns: Int = 1): Boolean = withContext(Dispatchers.IO) {
+        folderUri: Uri, fileName: String, columns: Int = 1, scalePercent: Int = 100): Boolean = withContext(Dispatchers.IO) {
         val exportContext = kotlinx.coroutines.currentCoroutineContext()
         val name = fileName.removeSuffix(".${format.extension}") + ".${format.extension}"
         writeExportFile(folderUri, name, format.mimeType) { output ->
             when (format) {
                 com.instasprite.app.domain.export.AnimationExportFormat.GIF ->
-                    com.instasprite.app.domain.export.GifExporter.write(sprite, output) { exportContext.ensureActive() }
+                    com.instasprite.app.domain.export.GifExporter.write(sprite, output, scalePercent) { exportContext.ensureActive() }
                 com.instasprite.app.domain.export.AnimationExportFormat.SPRITE_SHEET -> {
-                    val bitmap = com.instasprite.app.domain.export.ImageExporter.convertToSpriteSheet(sprite, columns) {
+                    val bitmap = com.instasprite.app.domain.export.ImageExporter.convertToSpriteSheet(sprite, columns, scalePercent) {
                         exportContext.ensureActive()
                     }
                     try {

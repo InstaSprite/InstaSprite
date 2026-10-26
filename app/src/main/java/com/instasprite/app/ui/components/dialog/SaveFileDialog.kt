@@ -38,7 +38,8 @@ fun SaveFileDialog(
     onDismiss: () -> Unit,
     onValuesChanged: ((values: List<String>, folderUri: Uri?) -> Unit)? = null,
     isSaving: Boolean = false,
-    note: String? = null
+    preview: @Composable () -> Unit = {},
+    scrollable: Boolean = false
 ) {
     val context = LocalContext.current
     var folderUri by remember(lastSavedUri) { mutableStateOf<Uri?>(lastSavedUri) }
@@ -68,6 +69,8 @@ fun SaveFileDialog(
     InputDialog(
         title = title,
         fields = fields,
+        scrollable = scrollable,
+        onInputChanged = { onValuesChanged?.invoke(it, folderUri) },
         confirmButtonText = stringResource(R.string.save),
         isLoading = isSaving,
         onDismiss = onDismiss,
@@ -80,8 +83,8 @@ fun SaveFileDialog(
 //                onDismiss()
             }
         },
-        extraBottomContent = { note?.let { Text(it, color = AppTheme.colors.TextColorLight) } },
         extraTopContent = {
+            preview()
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

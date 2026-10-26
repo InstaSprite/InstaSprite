@@ -5,30 +5,37 @@ import com.instasprite.app.utils.CanvasMemoryGuard
 import java.io.OutputStream
 
 object GifExporter {
-    fun write(sprite: Sprite, output: OutputStream, checkCancelled: () -> Unit = {}) {
-        require(sprite.width in 1..65535 && sprite.height in 1..65535)
-        CanvasMemoryGuard.requirePixels(sprite.width, sprite.height, 5)
+    fun write(sprite: Sprite, output: OutputStream, scalePercent: Int = 100, checkCancelled: () -> Unit = {}) {
+        val (width, height) = ExportScale.size(sprite.width, sprite.height, scalePercent)
+        require(width in 1..65535 && height in 1..65535)
+        val resized = width != sprite.width || height != sprite.height
+        CanvasMemoryGuard.requireAvailable(
+            CanvasMemoryGuard.estimatePixels(sprite.width, sprite.height, 4),
+            CanvasMemoryGuard.estimatePixels(width, height, if (resized) 5 else 1)
+        )
         val frames = requireNotNull(sprite.animation).validated().frames
         output.write("GIF89a".toByteArray(Charsets.US_ASCII))
-        output.word(sprite.width)
-        output.word(sprite.height)
+        output.word(width)
+        output.word(height)
         output.write(byteArrayOf(0xf0.toByte(), 0, 0, 0, 0, 0, 0, 0, 0))
         output.write(byteArrayOf(0x21, 0xff.toByte(), 11))
         output.write("NETSCAPE2.0".toByteArray(Charsets.US_ASCII))
         output.write(byteArrayOf(3, 1, 0, 0, 0))
-        val pixels = IntArray(Math.multiplyExact(sprite.width, sprite.height))
+        val source = IntArray(Math.multiplyExact(sprite.width, sprite.height))
+        val pixels = if (resized) IntArray(Math.multiplyExact(width, height)) else source
         val indices = ByteArray(pixels.size)
         for (frame in frames) {
             checkCancelled()
-            sprite.renderFrame(frame.id, pixels)
+            sprite.renderFrame(frame.id, source)
+            if (resized) ExportScale.copy(source, sprite.width, sprite.height, pixels, width, height)
             val palette = indexPixels(pixels, indices)
             output.write(byteArrayOf(0x21, 0xf9.toByte(), 4, 9))
             output.word(((frame.durationMs + 5) / 10).coerceAtLeast(1))
             output.write(byteArrayOf(0, 0, 0x2c))
             output.word(0)
             output.word(0)
-            output.word(sprite.width)
-            output.word(sprite.height)
+            output.word(width)
+            output.word(height)
             output.write(0x87)
             for (color in palette) {
                 output.write(color ushr 16 and 255)
@@ -40,6 +47,15 @@ object GifExporter {
             output.write(0)
         }
         output.write(0x3b)
+    }
+
+    internal fun applyPreviewPalette(pixels: IntArray) {
+        val indices = ByteArray(pixels.size)
+        val palette = indexPixels(pixels, indices)
+        for (i in pixels.indices) {
+            val index = indices[i].toInt() and 255
+            pixels[i] = if (index == 0) 0 else palette[index] or (0xff shl 24)
+        }
     }
 
     private fun indexPixels(pixels: IntArray, indices: ByteArray): IntArray {

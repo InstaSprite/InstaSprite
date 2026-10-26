@@ -61,12 +61,14 @@ fun DrawingScreenDialogs(
                     else com.instasprite.app.domain.export.AnimationExportFormat.SPRITE_SHEET
                 val canvas = viewModel.canvasState.collectAsStateWithLifecycle().value
                 com.instasprite.app.ui.drawing.dialog.SaveAnimationDialog(
-                    format = format, frameCount = canvas.animation?.frames?.size ?: 1,
+                    format = format,
+                    sprite = com.instasprite.app.domain.model.Sprite(width = canvas.width, height = canvas.height,
+                        layers = canvas.layers, animation = canvas.animation),
                     onDismiss = viewModel::closeTopDialog,
                     folderUri = lastSavedUri,
                     isSaving = uiState.isSaving,
                     onFolderSelected = viewModel::setLastSavedLocation,
-                    onSave = { uri, name, columns -> viewModel.saveAnimation(format, uri, name, columns) }
+                    onSave = { uri, name, columns, scale -> viewModel.saveAnimation(format, uri, name, columns, scale) }
                 )
             }
 

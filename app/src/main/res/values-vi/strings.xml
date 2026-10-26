@@ -601,12 +601,14 @@
     <string name="onion_skin_on">Bóng khung hình: Bật</string>
     <string name="onion_skin_off">Bóng khung hình: Tắt</string>
     <string name="export_gif">Xuất GIF</string>
-    <string name="gif_format_note">Lặp mọi khung ở kích thước gốc. GIF dùng bước thời gian 10 ms và độ trong suốt một bit; màu được giảm khi cần.</string>
     <string name="export_saved">Đã xuất tệp</string>
     <string name="export_failed">Không thể xuất tệp</string>
     <string name="export_sprite_sheet">Xuất sprite sheet</string>
     <string name="sheet_columns">Số cột</string>
     <string name="sheet_columns_range">Nhập từ 1 đến %1$d cột</string>
-    <string name="sheet_format_note">Mọi khung ở kích thước gốc, từ trái sang phải rồi từ trên xuống. Ô trống trong suốt. PNG không lưu thời gian khung hình.</string>
     <string name="invalid_export_filename">Nhập tên tệp hợp lệ</string>
+    <string name="animation_export_preview">Xem trước tệp xuất</string>
+    <string name="export_preview_size">%1$d × %2$d px</string>
+    <string name="export_preview_frame">Khung %1$d / %2$d</string>
+    <string name="export_preview_unavailable">Không thể xem trước với kích thước xuất này</string>
 </resources>

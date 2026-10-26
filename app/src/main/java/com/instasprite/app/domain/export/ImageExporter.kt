@@ -31,14 +31,14 @@ object ImageExporter {
         }
     }
 
-    fun convertToSpriteSheet(sprite: Sprite, columns: Int, checkCancelled: () -> Unit): Bitmap {
+    fun convertToSpriteSheet(sprite: Sprite, columns: Int, scalePercent: Int = 100, checkCancelled: () -> Unit): Bitmap {
         var bitmap: Bitmap? = null
         try {
-            SpriteSheetExporter.render(sprite, columns) { layout, index, pixels ->
+            SpriteSheetExporter.render(sprite, columns, scalePercent) { layout, index, pixels ->
                 checkCancelled()
                 val target = bitmap ?: createBitmap(layout.width, layout.height).also { bitmap = it }
                 val (x, y) = layout.position(index)
-                target.setPixels(pixels, 0, sprite.width, x, y, sprite.width, sprite.height)
+                target.setPixels(pixels, 0, layout.frameWidth, x, y, layout.frameWidth, layout.frameHeight)
             }
             return requireNotNull(bitmap)
         } catch (t: Throwable) {
