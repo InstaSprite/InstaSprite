@@ -63,7 +63,8 @@ fun AnimationTimeline(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     expanded: Boolean = true,
-    onLayerEvent: (LayerEvent) -> Unit = {}
+    onLayerEvent: (LayerEvent) -> Unit = {},
+    onionSkinEnabled: Boolean = false
 ) {
     var menu by remember { mutableStateOf(false) }
     var durationFrameId by remember { mutableStateOf<String?>(null) }
@@ -368,6 +369,9 @@ fun AnimationTimeline(
                             expanded = menu, onDismissRequest = { menu = false },
                             modifier = Modifier.background(colors.BackgroundColor)
                         ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(if (onionSkinEnabled) R.string.onion_skin_on else R.string.onion_skin_off)) },
+                                onClick = { onEvent(TimelineEvent.ToggleOnionSkin) })
                             val actions = listOf(
                                 R.string.animation_duplicate to TimelineEvent.Insert(),
                                 R.string.animation_empty to TimelineEvent.Insert(empty = true),

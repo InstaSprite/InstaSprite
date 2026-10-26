@@ -11,5 +11,6 @@ sealed interface TimelineEvent {
     data object LinkPrevious : TimelineEvent
     data object Unlink : TimelineEvent
     data object SetPoster : TimelineEvent
+    data object ToggleOnionSkin : TimelineEvent
     data object TogglePlayback : TimelineEvent
 }

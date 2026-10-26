@@ -74,7 +74,8 @@ fun PixelCanvas(
     onCursorDrawEvent: (CursorDrawEvent) -> Unit = {},
     onTransform: (Offset, Offset, Float, IntSize) -> Unit,
     onEvent: (PixelCanvasEvent) -> Unit,
-    onSymmetryAxisMove: (Boolean, Float) -> Unit = { _, _ -> }
+    onSymmetryAxisMove: (Boolean, Float) -> Unit = { _, _ -> },
+    onionSkinEnabled: Boolean = false
 ) {
 
     val canvasWidth = pixelCanvasState.width
@@ -84,6 +85,11 @@ fun PixelCanvas(
 
     if (bitmap == null || canvasWidth <= 0 || canvasHeight <= 0) return
 
+    val onionSprite = remember(pixelCanvasState.animation, pixelCanvasState.layers, canvasWidth, canvasHeight) {
+        com.instasprite.app.domain.model.Sprite(width = canvasWidth, height = canvasHeight,
+            layers = pixelCanvasState.layers, animation = pixelCanvasState.animation)
+    }
+    val onionBitmap = rememberOnionSkinBitmap(onionSprite, pixelCanvasState.activeFrameId, onionSkinEnabled)
     val imageBitmap = remember(bitmap, drawVersion) {
         bitmap.asImageBitmap()
     }
@@ -187,6 +193,9 @@ fun PixelCanvas(
         ) {
             val dstSize = IntSize(size.width.toInt(), size.height.toInt())
 
+            onionBitmap?.let {
+                drawImage(it, dstOffset = IntOffset.Zero, dstSize = dstSize, filterQuality = FilterQuality.None)
+            }
             drawImage(
                 image = imageBitmap,
                 dstOffset = IntOffset.Zero,

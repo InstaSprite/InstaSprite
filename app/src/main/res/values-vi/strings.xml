@@ -598,4 +598,6 @@
     <string name="dither_dots">Chấm</string>
     <string name="clip_to_layer_below">Cắt theo lớp nền</string>
     <string name="clipping_layer">Lớp cắt</string>
+    <string name="onion_skin_on">Bóng khung hình: Bật</string>
+    <string name="onion_skin_off">Bóng khung hình: Tắt</string>
 </resources>

@@ -308,7 +308,8 @@ private fun DrawingScreenContent(
                                 timelineMaxHeight,
                                 event.onTimelineEvent,
                                 closeTimeline,
-                                onLayerEvent = event.onLayerEvent
+                                onLayerEvent = event.onLayerEvent,
+                                onionSkinEnabled = uiState.onionSkinEnabled
                             )
                         } else {
                             AnimationTimeline(
@@ -321,7 +322,8 @@ private fun DrawingScreenContent(
                                 { showTimeline = true },
                                 Modifier.height(30.pixelDp),
                                 expanded = false,
-                                onLayerEvent = event.onLayerEvent
+                                onLayerEvent = event.onLayerEvent,
+                                onionSkinEnabled = uiState.onionSkinEnabled
                             )
                         }
                     }
@@ -483,6 +485,7 @@ private fun DrawingScreenContent(
                         toolSize = uiState.toolSize,
                         brushShape = uiState.brushShape,
                         symmetry = uiState.symmetry,
+                        onionSkinEnabled = uiState.onionSkinEnabled && !uiState.isPlaying,
                         onSymmetryAxisMove = { isXAxis, position ->
                             event.onToolSelectorEvent(
                                 if (isXAxis) ToolSelectorEvent.SetSymmetryAxisX(position)

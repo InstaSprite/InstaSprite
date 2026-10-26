@@ -63,6 +63,7 @@ import kotlinx.coroutines.withContext
 
 data class DrawingScreenState(
     val isPlaying: Boolean = false,
+    val onionSkinEnabled: Boolean = false,
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val selectedTool: Tool,
@@ -255,6 +256,10 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onTimelineEvent(event: TimelineEvent) {
+        if (event == TimelineEvent.ToggleOnionSkin) {
+            _uiState.value = _uiState.value.copy(onionSkinEnabled = !_uiState.value.onionSkinEnabled)
+            return
+        }
         if (_uiState.value.isLoading || drawingEngine.isBusy) return
         timelineJob?.cancel()
         val wasPlaying = _uiState.value.isPlaying
@@ -291,7 +296,7 @@ class DrawingViewModel @AssistedInject constructor(
                     TimelineEvent.LinkPrevious -> manager.copyPreviousCel(true)
                     TimelineEvent.Unlink -> manager.unlinkCel()
                     TimelineEvent.SetPoster -> manager.setPosterFrame()
-                    is TimelineEvent.Select, TimelineEvent.TogglePlayback -> Unit
+                    is TimelineEvent.Select, TimelineEvent.TogglePlayback, TimelineEvent.ToggleOnionSkin -> Unit
                 }
             }
         }
