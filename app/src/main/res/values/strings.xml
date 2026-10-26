@@ -603,4 +603,9 @@
     <string name="gif_format_note">Loops all frames at original size. GIF uses 10 ms timing steps and one-bit transparency; colors are reduced when needed.</string>
     <string name="export_saved">Export saved</string>
     <string name="export_failed">Export failed</string>
+    <string name="export_sprite_sheet">Export sprite sheet</string>
+    <string name="sheet_columns">Columns</string>
+    <string name="sheet_columns_range">Enter 1 to %1$d columns</string>
+    <string name="sheet_format_note">All frames at original size, left to right then top to bottom. Empty cells are transparent. PNG does not store frame timing.</string>
+    <string name="invalid_export_filename">Enter a valid filename</string>
 </resources>

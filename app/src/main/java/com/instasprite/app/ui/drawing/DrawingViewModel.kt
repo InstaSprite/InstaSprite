@@ -448,6 +448,7 @@ class DrawingViewModel @AssistedInject constructor(
                     drawingEngine.redo()
                 }
 
+                is ToolSelectorEvent.OpenSaveSheetDialog -> openDialog(DrawingDialog.SaveSheet)
                 is ToolSelectorEvent.OpenSaveGifDialog -> openDialog(DrawingDialog.SaveGif)
                 is ToolSelectorEvent.OpenSaveImageDialog -> openDialog(DrawingDialog.SaveImage)
                 is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
@@ -749,14 +750,15 @@ class DrawingViewModel @AssistedInject constructor(
         }
     }
 
-    suspend fun saveGif(folderUri: Uri, fileName: String): Boolean {
+    suspend fun saveAnimation(format: com.instasprite.app.domain.export.AnimationExportFormat,
+        folderUri: Uri, fileName: String, columns: Int): Boolean {
         if (_uiState.value.isSaving || fileName.isBlank()) return false
         _uiState.value = _uiState.value.copy(isSaving = true)
         return try {
             drawingEngine.awaitToolIdle()
             stopPlayback()
             commitPendingTool()
-            fileRepository.saveGifFile(pixelCanvasUseCase.getSprite(), folderUri, fileName)
+            fileRepository.saveAnimationFile(pixelCanvasUseCase.getSprite(), format, folderUri, fileName, columns)
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {

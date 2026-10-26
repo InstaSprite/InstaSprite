@@ -11,6 +11,7 @@ sealed interface ToolSelectorEvent {
     data object Undo : ToolSelectorEvent
     data object Redo : ToolSelectorEvent
 
+    data object OpenSaveSheetDialog : ToolSelectorEvent
     data object OpenSaveGifDialog : ToolSelectorEvent
     data object OpenSaveImageDialog : ToolSelectorEvent
     data object OpenSaveISpriteDialog : ToolSelectorEvent

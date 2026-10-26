@@ -31,6 +31,22 @@ object ImageExporter {
         }
     }
 
+    fun convertToSpriteSheet(sprite: Sprite, columns: Int, checkCancelled: () -> Unit): Bitmap {
+        var bitmap: Bitmap? = null
+        try {
+            SpriteSheetExporter.render(sprite, columns) { layout, index, pixels ->
+                checkCancelled()
+                val target = bitmap ?: createBitmap(layout.width, layout.height).also { bitmap = it }
+                val (x, y) = layout.position(index)
+                target.setPixels(pixels, 0, sprite.width, x, y, sprite.width, sprite.height)
+            }
+            return requireNotNull(bitmap)
+        } catch (t: Throwable) {
+            bitmap?.recycle()
+            throw t
+        }
+    }
+
     fun saveThumbnail(sprite: Sprite, context: Context) {
         try {
             val bitmap = convertToBitmap(sprite) ?: return
