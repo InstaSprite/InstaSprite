@@ -27,6 +27,7 @@ class HistoryDelegate(
 
     private val canvasHistoryManager = CanvasHistoryManager(historyDiskStore)
     private var pendingState: HistoryCanvasState? = null
+    var onDocumentChanged: () -> Unit = {}
 
     override fun saveState() {
         if (pendingState == null) pendingState = captureHistoryCanvasState()
@@ -37,6 +38,7 @@ class HistoryDelegate(
         val restoredState = canvasHistoryManager.undo(captureHistoryCanvasState())
         if (restoredState != null) {
             applyHistoryCanvasState(restoredState)
+            onDocumentChanged()
             bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             refreshCanvasSizeState()
@@ -54,6 +56,7 @@ class HistoryDelegate(
         val restoredState = canvasHistoryManager.redo(captureHistoryCanvasState())
         if (restoredState != null) {
             applyHistoryCanvasState(restoredState)
+            onDocumentChanged()
             bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             refreshCanvasSizeState()
@@ -97,7 +100,10 @@ class HistoryDelegate(
             newImage?.let { CelImage(it.id, it.tiles.filterKeys { key -> key in changed }) },
             before.selectionState, after.selectionState
         )
-        if (!entry.isEmpty()) canvasHistoryManager.push(entry)
+        if (!entry.isEmpty()) {
+            canvasHistoryManager.push(entry)
+            onDocumentChanged()
+        }
     }
 
     override fun restorePendingHistoryCapture() {
@@ -114,6 +120,7 @@ class HistoryDelegate(
         val after = captureHistoryCanvasState()
         if (before != after) {
             canvasHistoryManager.push(OperationEntry(before = before, after = after))
+            onDocumentChanged()
         }
     }
 

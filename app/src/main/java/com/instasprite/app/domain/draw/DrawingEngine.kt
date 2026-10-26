@@ -151,6 +151,14 @@ class DrawingEngine(
         syncStateVersions()
     }
 
+    fun finishStrokeForSave(isAppendSelectionMode: Boolean) {
+        this.isAppendSelectionMode = isAppendSelectionMode
+        if (activeState == DrawingState) {
+            activeState.onTouchEnd(this)
+            syncStateVersions()
+        }
+    }
+
     fun commitPendingTool(tool: StrokeTool): Boolean {
         this.selectedTool = tool
         val result = activeState.commitPending(this)

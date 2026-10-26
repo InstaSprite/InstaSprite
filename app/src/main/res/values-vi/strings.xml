@@ -611,4 +611,8 @@
     <string name="export_preview_size">%1$d × %2$d px</string>
     <string name="export_preview_frame">Khung %1$d / %2$d</string>
     <string name="export_preview_unavailable">Không thể xem trước với kích thước xuất này</string>
+    <string name="drawing_recovered">Đã khôi phục phiên chỉnh sửa gần nhất.</string>
+    <string name="drawing_autosave_failed">Không thể tự lưu. Nhấn để thử lại.</string>
+    <string name="drawing_recovery_saved">Đã lưu các chỉnh sửa hoàn tất để khôi phục.</string>
+    <string name="drawing_recovery_failed">Không thể lưu dữ liệu khôi phục.</string>
 </resources>

@@ -10,6 +10,7 @@ import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.data.model.SpriteMetaData
 import com.instasprite.app.data.source.ISpriteDatSource
 import com.instasprite.app.domain.export.ImageExporter
+import com.instasprite.app.domain.model.DrawingCheckpoint
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
@@ -26,7 +27,10 @@ class SpriteDatabaseRepository @Inject constructor(
     private val pixelDataSource: ISpriteDatSource,
     @ApplicationContext private val context: android.content.Context
 ) {
-    suspend fun saveSprite(sprite: Sprite) {
+    suspend fun saveSprite(sprite: Sprite) = saveDrawing(DrawingCheckpoint(sprite), true)
+
+    suspend fun saveDrawing(checkpoint: DrawingCheckpoint, updateThumbnail: Boolean) {
+        val sprite = checkpoint.sprite
         Log.d("ISpriteDatabaseRepository", "Saving sprite: ${sprite.id}")
         val now = System.currentTimeMillis()
         val entity = sprite.toEntity()
@@ -38,23 +42,32 @@ class SpriteDatabaseRepository @Inject constructor(
             lastModifiedAt = now
         )
 
-        val proto = sprite.toISprite()
+        val proto = sprite.toISprite().toBuilder()
+            .setUnfinishedSession(checkpoint.unfinishedSession)
+            .setActiveFrameId(checkpoint.activeFrameId)
+            .setActiveLayerId(checkpoint.activeLayerId)
+            .build()
         pixelDataSource.getDataStore(sprite.id).updateData { proto }
 
-        ImageExporter.saveThumbnail(sprite, context)
+        if (updateThumbnail) ImageExporter.saveThumbnail(sprite, context)
 
         dao.insert(entity)
         metaDao.insert(meta)
     }
 
-    suspend fun loadSprite(id: String): Sprite? {
+    suspend fun loadSprite(id: String): Sprite? = loadDrawing(id)?.sprite
+
+    suspend fun loadDrawing(id: String): DrawingCheckpoint? {
         val entity = dao.getById(id) ?: return null
         val proto = pixelDataSource.getDataStore(id).data.firstOrNull()
 
         if (proto != null) {
             val sprite = proto.toSprite()
 
-            return sprite.copy(id = entity.id)
+            return DrawingCheckpoint(
+                sprite.copy(id = entity.id), proto.activeFrameId, proto.activeLayerId,
+                proto.unfinishedSession
+            )
         }
 
         return null

@@ -16,8 +16,10 @@ import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
 import com.instasprite.app.di.DrawingSessionFactory
 import com.instasprite.app.domain.dialog.DialogController
+import com.instasprite.app.domain.draw.CanvasAutosave
 import com.instasprite.app.domain.draw.AnimationPlayback
 import com.instasprite.app.domain.export.ImageExporter
+import com.instasprite.app.domain.model.DrawingCheckpoint
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.domain.tool.DitherBrush
@@ -46,6 +48,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +69,7 @@ data class DrawingScreenState(
     val onionSkinEnabled: Boolean = false,
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
+    val autosaveFailed: Boolean = false,
     val selectedTool: Tool,
     val toolSize: Int,
     val brushShape: BrushShape = BrushShape.Circle,
@@ -199,6 +203,76 @@ class DrawingViewModel @AssistedInject constructor(
         )
     )
 
+    private var autosaveJob: Job? = null
+    private var backgroundSaveJob: Job? = null
+    private var sessionFinished = false
+    private var isForeground = true
+    private var pendingSpriteName: String? = null
+    private val autosave = CanvasAutosave(
+        persist = { checkpoint, thumbnail ->
+            val name = pendingSpriteName
+            withContext(Dispatchers.IO) {
+                spriteDataRepository.saveDrawing(checkpoint, thumbnail)
+                name?.let { spriteDataRepository.changeName(spriteId, it) }
+            }
+            pendingSpriteName = null
+        },
+        onFailure = { failed ->
+            _uiState.value = _uiState.value.copy(autosaveFailed = failed)
+        }
+    )
+
+    private fun captureCheckpoint() {
+        if (_fatalError.value != null) return
+        sessionFinished = false
+        autosave.update(
+            DrawingCheckpoint(
+                pixelCanvasUseCase.getSprite().copy(id = spriteId),
+                pixelCanvasUseCase.activeFrameId, pixelCanvasUseCase.getActiveLayerId()
+            )
+        )
+    }
+
+    fun resumeAutosave() {
+        isForeground = true
+        startAutosave()
+    }
+
+    private fun startAutosave() {
+        if (!isForeground || autosaveJob?.isActive == true || _uiState.value.isLoading) return
+        autosaveJob = drawingScope.launch {
+            while (true) {
+                delay(2_000)
+                if (!sessionFinished && _fatalError.value == null) autosave.flush()
+            }
+        }
+    }
+
+    fun saveInBackground() {
+        isForeground = false
+        stopPlayback()
+        autosaveJob?.cancel()
+        autosaveJob = null
+        if (_uiState.value.isLoading || sessionFinished || _fatalError.value != null) return
+        backgroundSaveJob = drawingScope.launch {
+            drawingEngine.awaitToolIdle()
+            if (sessionFinished || _fatalError.value != null) return@launch
+            if (!isForeground) {
+                onCursorDrawReleased()
+                drawingEngine.finishStrokeForSave(_uiState.value.isAppendSelectionMode)
+                commitPendingTool()
+                captureCheckpoint()
+            }
+            autosave.flush()
+        }
+    }
+
+    fun retryAutosave() {
+        drawingScope.launch { autosave.flush() }
+    }
+
+    suspend fun saveRecovery(): Boolean = autosave.flush()
+
     init {
         try {
             drawingEngine.setCanvasSize(initialCanvasWidth, initialCanvasHeight)
@@ -208,7 +282,18 @@ class DrawingViewModel @AssistedInject constructor(
                 try {
                     loadFromDB()
                     drawingEngine.refreshFullCanvasState()
+                    if (_fatalError.value != null) return@launch
+                    captureCheckpoint()
+                    drawingEngine.historyManager.onDocumentChanged = ::captureCheckpoint
                     _uiState.value = _uiState.value.copy(isLoading = false)
+                    drawingScope.launch {
+                        colorPalette.collect { colors ->
+                            autosave.updatePalette(colors.map { it.toArgb() })
+                        }
+                    }
+                    startAutosave()
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (t: Throwable) {
                     handleFatalError(t)
                 }
@@ -261,12 +346,13 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onTimelineEvent(event: TimelineEvent) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         if (event == TimelineEvent.ToggleOnionSkin) {
             _uiState.value =
                 _uiState.value.copy(onionSkinEnabled = !_uiState.value.onionSkinEnabled)
             return
         }
-        if (_uiState.value.isLoading || drawingEngine.isBusy) return
+        if (drawingEngine.isBusy) return
         timelineJob?.cancel()
         val wasPlaying = _uiState.value.isPlaying
         stopPlayback()
@@ -309,6 +395,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCanvasMenuEvent(event: CanvasMenuEvent) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         if (drawingEngine.isBusy) return
         stopPlayback()
         try {
@@ -327,6 +414,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onLayerEvent(event: LayerEvent) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         if (drawingEngine.isBusy) return
         stopPlayback()
         try {
@@ -360,6 +448,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun resizeCanvas(width: Int, height: Int) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         if (drawingEngine.isBusy) return
         stopPlayback()
         try {
@@ -381,11 +470,12 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCanvasEvent(event: PixelCanvasEvent) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         if (_uiState.value.isPlaying) {
             stopPlayback()
             return
         }
-        if (_uiState.value.isLoading || timelineJob?.isActive == true) return
+        if (timelineJob?.isActive == true) return
         if (drawingEngine.isBusy && event !is PixelCanvasEvent.OnStrokeMove &&
             event !is PixelCanvasEvent.OnStrokeEnd && event !is PixelCanvasEvent.OnStrokeCancel
         ) return
@@ -448,6 +538,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onToolSelectorEvent(event: ToolSelectorEvent) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         if (drawingEngine.isBusy) return
         stopPlayback()
         try {
@@ -593,6 +684,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onCursorDrawEvent(event: CursorDrawEvent) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         if (_uiState.value.isPlaying) {
             stopPlayback()
             return
@@ -719,6 +811,7 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onColorPaletteEvent(event: ColorPaletteEvent) {
+        if (_uiState.value.isSaving || _uiState.value.isLoading) return
         when (event) {
             is ColorPaletteEvent.SelectColor -> colorPaletteRepository.setActiveColor(event.color)
             is ColorPaletteEvent.OpenColorWheelDialog -> openDialog(DrawingDialog.ColorWheel)
@@ -831,50 +924,58 @@ class DrawingViewModel @AssistedInject constructor(
             }
             drawingEngine.resetHistory()
             drawingEngine.refreshFullCanvasState()
+            if (!_uiState.value.isLoading) captureCheckpoint()
+        } catch (e: CancellationException) {
+            throw e
         } catch (t: Throwable) {
             handleFatalError(t)
         }
     }
 
-    suspend fun saveToDB(name: String? = null) {
-        drawingEngine.awaitToolIdle()
-        try {
-            if (_uiState.value.isSaving) return
-
+    suspend fun saveToDB(): Boolean {
+        if (_uiState.value.isSaving || _uiState.value.isLoading || _fatalError.value != null) return false
+        _uiState.value = _uiState.value.copy(isSaving = true)
+        return try {
+            backgroundSaveJob?.join()
+            drawingEngine.awaitToolIdle()
+            onCursorDrawReleased()
+            drawingEngine.finishStrokeForSave(_uiState.value.isAppendSelectionMode)
             commitPendingTool()
-
-            _uiState.value = _uiState.value.copy(isSaving = true)
-            val sprite = pixelCanvasUseCase.getSprite()
-            try {
-                withContext(Dispatchers.IO) {
-                    spriteDataRepository.saveSprite(sprite.copy(id = spriteId))
-                    name?.let {
-                        spriteDataRepository.changeName(spriteId, it)
-                    }
-                }
-            } finally {
-                _uiState.value = _uiState.value.copy(isSaving = false)
-            }
-        } catch (t: Throwable) {
-            handleFatalError(t)
+            captureCheckpoint()
+            val saved = autosave.flush(finished = true)
+            if (saved) sessionFinished = true
+            saved
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(autosaveFailed = true)
+            false
+        } finally {
+            _uiState.value = _uiState.value.copy(isSaving = false)
         }
     }
 
-    suspend fun loadFromDB() {
-        try {
-            val sprite = withContext(Dispatchers.IO) { spriteDataRepository.loadSprite(spriteId) }
-            if (sprite != null) {
-                loadSprite(sprite)
-            } else {
-                saveToDB(spriteName)
+    private suspend fun loadFromDB() {
+        val checkpoint = withContext(Dispatchers.IO) { spriteDataRepository.loadDrawing(spriteId) }
+        if (checkpoint != null) {
+            loadSprite(checkpoint.sprite)
+            if (_fatalError.value != null) return
+            pixelCanvasUseCase.selectFrame(checkpoint.activeFrameId)
+            if (pixelCanvasUseCase.getLayers().any { it.id == checkpoint.activeLayerId }) {
+                pixelCanvasUseCase.setActiveLayer(checkpoint.activeLayerId)
             }
-        } catch (t: Throwable) {
-            handleFatalError(t)
+            if (checkpoint.unfinishedSession) {
+                Toast.makeText(applicationContext, R.string.drawing_recovered, Toast.LENGTH_LONG).show()
+            }
+        } else {
+            pendingSpriteName = spriteName
+            captureCheckpoint()
+            autosave.flush()
         }
     }
 
     fun updateColorPalette(colors: List<Color>) {
-        if (colors.isNotEmpty()) {
+        if (!_uiState.value.isSaving && colors.isNotEmpty()) {
             colorPaletteRepository.updatePalette(colors)
         }
     }

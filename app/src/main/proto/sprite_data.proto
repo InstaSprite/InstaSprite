@@ -33,6 +33,9 @@ message ISprite {
   repeated AnimationCelData cels = 7;
   repeated AnimationImageData images = 8;
   string poster_frame_id = 9;
+  bool unfinished_session = 10;
+  string active_frame_id = 11;
+  string active_layer_id = 12;
 }
 
 message AnimationFrameData {

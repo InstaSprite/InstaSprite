@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -84,6 +86,7 @@ import com.instasprite.app.utils.calculateNewScaleAndOffset
 import com.instasprite.app.utils.pixelDp
 
 data class DrawingScreenEvent(
+    val onRetryAutosave: () -> Unit = {},
     val onTimelineEvent: (TimelineEvent) -> Unit = {},
     val onColorPaletteEvent: (ColorPaletteEvent) -> Unit,
     val onCanvasMenuEvent: (CanvasMenuEvent) -> Unit,
@@ -104,6 +107,8 @@ fun DrawingScreen(
     onNavigateToPalette: () -> Unit,
     viewModel: DrawingViewModel = hiltViewModel()
 ) {
+    LifecycleEventEffect(Lifecycle.Event.ON_START) { viewModel.resumeAutosave() }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.saveInBackground() }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.stopPlayback() }
     BackHandler(onBack = { onNavigateBack(viewModel.spriteId) })
 
@@ -119,16 +124,12 @@ fun DrawingScreen(
             }
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 
-            try {
-                viewModel.saveToDB()
-                Toast.makeText(context, "Recovery save successful!", Toast.LENGTH_SHORT).show()
-            } catch (e: Throwable) {
-                Toast.makeText(
-                    context,
-                    "Recovery save failed: ${e.localizedMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            val recovered = viewModel.saveRecovery()
+            Toast.makeText(
+                context,
+                if (recovered) R.string.drawing_recovery_saved else R.string.drawing_recovery_failed,
+                Toast.LENGTH_LONG
+            ).show()
 
             onNavigateBackDirectly()
         }
@@ -156,6 +157,7 @@ fun DrawingScreen(
 
     val event = remember(viewModel) {
         DrawingScreenEvent(
+            onRetryAutosave = viewModel::retryAutosave,
             onTimelineEvent = viewModel::onTimelineEvent,
             onColorPaletteEvent = viewModel::onColorPaletteEvent,
             onCanvasMenuEvent = viewModel::onCanvasMenuEvent,
@@ -257,6 +259,16 @@ private fun DrawingScreenContent(
         Scaffold(
             topBar = {
                 Column {
+                    if (uiState.autosaveFailed) {
+                        Text(
+                            text = stringResource(R.string.drawing_autosave_failed),
+                            color = AppTheme.colors.TextColorLight,
+                            modifier = Modifier.fillMaxWidth()
+                                .background(AppTheme.colors.BackgroundColorDarker)
+                                .clickable(onClick = event.onRetryAutosave)
+                                .padding(6.pixelDp)
+                        )
+                    }
                     ColorPalette(
                         modifier = Modifier
                             .onGloballyPositioned { coords ->

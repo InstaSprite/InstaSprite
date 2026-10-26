@@ -610,4 +610,8 @@
     <string name="export_preview_size">%1$d × %2$d px</string>
     <string name="export_preview_frame">Frame %1$d / %2$d</string>
     <string name="export_preview_unavailable">Preview unavailable for these export dimensions</string>
+    <string name="drawing_recovered">Restored your last editing session.</string>
+    <string name="drawing_autosave_failed">Autosave failed. Tap to retry.</string>
+    <string name="drawing_recovery_saved">Last completed edits saved for recovery.</string>
+    <string name="drawing_recovery_failed">Could not save recovery data.</string>
 </resources>
