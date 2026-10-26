@@ -30,7 +30,7 @@ object DrawingState : CanvasInteractionState {
     override fun onTouchEnd(ctx: InteractionContext) {
         val tool = ctx.selectedTool as? StrokeTool ?: return
         val currentSelectionState = ctx.mutableCanvasState.value.selectionState
-        
+
         val result = ctx.strokeEngine.onStrokeEnd(
             tool = tool,
             isAppendSelectionMode = ctx.isAppendSelectionMode,
@@ -38,7 +38,8 @@ object DrawingState : CanvasInteractionState {
         )
 
         if (result.updatedSelectionState != null) {
-            ctx.mutableCanvasState.value = ctx.mutableCanvasState.value.copy(selectionState = result.updatedSelectionState)
+            ctx.mutableCanvasState.value =
+                ctx.mutableCanvasState.value.copy(selectionState = result.updatedSelectionState)
         }
 
         if (result.shouldUpdateHistory) {
@@ -52,11 +53,11 @@ object DrawingState : CanvasInteractionState {
     override fun onTouchCancel(ctx: InteractionContext) {
         val tool = ctx.selectedTool as? StrokeTool ?: return
         ctx.strokeEngine.onStrokeCancel(tool)
-        
+
         if (tool !is SelectionTool) {
             ctx.historyManager.restorePendingHistoryCapture()
         }
-        
+
         ctx.transitionTo(StandbyState)
     }
 

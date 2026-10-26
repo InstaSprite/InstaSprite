@@ -15,9 +15,11 @@ import com.instasprite.app.utils.pixelDp
 @Composable
 internal fun TimelineScrollbar(state: LazyListState, itemWidth: Dp, modifier: Modifier = Modifier) {
     val colors = AppTheme.colors
-    Canvas(modifier
-        .fillMaxWidth()
-        .height(2.pixelDp)) {
+    Canvas(
+        modifier
+            .fillMaxWidth()
+            .height(2.pixelDp)
+    ) {
         if (!state.canScrollBackward && !state.canScrollForward) return@Canvas
         val contentWidth = state.layoutInfo.totalItemsCount * itemWidth.toPx()
         val viewportWidth =

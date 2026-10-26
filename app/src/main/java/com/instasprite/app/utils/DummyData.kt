@@ -114,7 +114,7 @@ object DummyData {
     )
 
     object MockClass {
-        class MockColorPaletteDao() : ColorPaletteDao {
+        class MockColorPaletteDao : ColorPaletteDao {
             override suspend fun insert(palette: ColorPaletteData) {
             }
 
@@ -147,7 +147,7 @@ object DummyData {
 
         }
 
-        class MockLospecService() : LospecService {
+        class MockLospecService : LospecService {
             override suspend fun getPalette(paletteName: String): PaletteDto {
                 return PaletteDto()
             }

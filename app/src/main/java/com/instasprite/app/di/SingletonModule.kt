@@ -2,7 +2,8 @@ package com.instasprite.app.di
 
 import android.content.Context
 import com.instasprite.app.data.database.AppDatabase
-import com.instasprite.app.data.repository.*
+import com.instasprite.app.data.repository.SpriteDatabaseRepository
+import com.instasprite.app.data.repository.StorageLocationRepository
 import com.instasprite.app.data.source.ISpriteDatSource
 import dagger.Module
 import dagger.Provides
@@ -24,7 +25,10 @@ object SingletonModule {
 
     @Provides
     @Singleton
-    fun provideSpriteRepository(db: AppDatabase, @ApplicationContext context: Context): SpriteDatabaseRepository {
+    fun provideSpriteRepository(
+        db: AppDatabase,
+        @ApplicationContext context: Context
+    ): SpriteDatabaseRepository {
         return SpriteDatabaseRepository(
             dao = db.spriteDataDao(),
             metaDao = db.spriteMetaDataDao(),

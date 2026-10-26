@@ -39,8 +39,14 @@ object LayerCompositor {
         if (regionWidth == 0 || regionHeight == 0) return
         val firstRow = maxOf(0, startRow).floorDiv(TILE_SIZE)
         val firstCol = maxOf(0, startCol).floorDiv(TILE_SIZE)
-        val lastRow = (minOf(height.toLong(), startRow.toLong() + regionHeight) - 1).floorDiv(TILE_SIZE.toLong()).toInt()
-        val lastCol = (minOf(width.toLong(), startCol.toLong() + regionWidth) - 1).floorDiv(TILE_SIZE.toLong()).toInt()
+        val lastRow = (minOf(
+            height.toLong(),
+            startRow.toLong() + regionHeight
+        ) - 1).floorDiv(TILE_SIZE.toLong()).toInt()
+        val lastCol = (minOf(
+            width.toLong(),
+            startCol.toLong() + regionWidth
+        ) - 1).floorDiv(TILE_SIZE.toLong()).toInt()
         if (firstRow > lastRow || firstCol > lastCol) return
         val regionTiles = (lastRow - firstRow + 1).toLong() * (lastCol - firstCol + 1)
         var scratch = clippingScratch
@@ -60,7 +66,12 @@ object LayerCompositor {
                             if (!clipped.isVisible || clipped.opacity <= 0f) continue
                             val overlay = clipped.tiles[coord] ?: continue
                             for (i in group.indices) {
-                                group[i] = blendClipped(group[i], overlay[i], clipped.opacity, clipped.blendMode)
+                                group[i] = blendClipped(
+                                    group[i],
+                                    overlay[i],
+                                    clipped.opacity,
+                                    clipped.blendMode
+                                )
                             }
                         }
                         group
@@ -68,15 +79,28 @@ object LayerCompositor {
                     val originX = coord.x * TILE_SIZE
                     val originY = coord.y * TILE_SIZE
                     val top = maxOf(0, startRow, originY)
-                    val bottom = minOf(height.toLong(), startRow.toLong() + regionHeight, originY.toLong() + TILE_SIZE).toInt()
+                    val bottom = minOf(
+                        height.toLong(),
+                        startRow.toLong() + regionHeight,
+                        originY.toLong() + TILE_SIZE
+                    ).toInt()
                     val left = maxOf(0, startCol, originX)
-                    val right = minOf(width.toLong(), startCol.toLong() + regionWidth, originX.toLong() + TILE_SIZE).toInt()
+                    val right = minOf(
+                        width.toLong(),
+                        startCol.toLong() + regionWidth,
+                        originX.toLong() + TILE_SIZE
+                    ).toInt()
                     for (row in top until bottom) {
                         val dst = (row - startRow) * regionWidth
                         val src = (row - originY) * TILE_SIZE
                         for (col in left until right) {
                             val offset = dst + col - startCol
-                            pixels[offset] = blendPixel(pixels[offset], tile[src + col - originX], base.opacity, base.blendMode)
+                            pixels[offset] = blendPixel(
+                                pixels[offset],
+                                tile[src + col - originX],
+                                base.opacity,
+                                base.blendMode
+                            )
                         }
                     }
                 }
@@ -101,8 +125,8 @@ fun List<Layer>.canMergeLayerDown(id: String, animation: Animation? = null): Boo
         val topClipping = id in animation.frames.first().clippingLayerIds
         return animation.frames.all { frame ->
             (id in frame.clippingLayerIds) == topClipping &&
-                this[index - 1].id !in frame.clippingLayerIds &&
-                (topClipping || getOrNull(index + 1)?.id !in frame.clippingLayerIds)
+                    this[index - 1].id !in frame.clippingLayerIds &&
+                    (topClipping || getOrNull(index + 1)?.id !in frame.clippingLayerIds)
         }
     }
     return !this[index - 1].isClipping && (this[index].isClipping || getOrNull(index + 1)?.isClipping != true)

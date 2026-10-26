@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.dialog
 
-import com.instasprite.app.utils.pixelDp
-
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -52,15 +50,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toRect
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorItem
 import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.dialog.CustomDialog
-import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import android.graphics.Color as AndroidColor
@@ -195,7 +192,10 @@ fun ColorWheelDialog(
                         modifier = Modifier
                             .padding(start = 6.pixelDp)
                             .size(26.pixelDp)
-                            .border(width = 2.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
+                            .border(
+                                width = 2.pixelDp,
+                                color = AppTheme.colors.BackgroundColorDarker
+                            )
                     )
                 }
 

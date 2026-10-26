@@ -1,9 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import com.instasprite.app.domain.tool.DrawingSymmetry
-import com.instasprite.app.domain.tool.EraserTool
-import com.instasprite.app.utils.visibleCanvasBounds
-import com.instasprite.app.utils.pixelDp
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -18,12 +14,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +29,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.createBitmap
 import com.instasprite.app.R
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.DrawingSymmetry
+import com.instasprite.app.domain.tool.EraserTool
 import com.instasprite.app.domain.tool.EyedropperTool
 import com.instasprite.app.domain.tool.FillTool
 import com.instasprite.app.domain.tool.MoveTool
@@ -51,7 +49,9 @@ import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.drawCursorOverlay
 import com.instasprite.app.utils.drawSelectionOverlay
 import com.instasprite.app.utils.drawingPointerInput
+import com.instasprite.app.utils.pixelDp
 import com.instasprite.app.utils.rememberIconBitmap
+import com.instasprite.app.utils.visibleCanvasBounds
 
 @Composable
 fun PixelCanvas(
@@ -85,11 +85,15 @@ fun PixelCanvas(
 
     if (bitmap == null || canvasWidth <= 0 || canvasHeight <= 0) return
 
-    val onionSprite = remember(pixelCanvasState.animation, pixelCanvasState.layers, canvasWidth, canvasHeight) {
-        com.instasprite.app.domain.model.Sprite(width = canvasWidth, height = canvasHeight,
-            layers = pixelCanvasState.layers, animation = pixelCanvasState.animation)
-    }
-    val onionBitmap = rememberOnionSkinBitmap(onionSprite, pixelCanvasState.activeFrameId, onionSkinEnabled)
+    val onionSprite =
+        remember(pixelCanvasState.animation, pixelCanvasState.layers, canvasWidth, canvasHeight) {
+            com.instasprite.app.domain.model.Sprite(
+                width = canvasWidth, height = canvasHeight,
+                layers = pixelCanvasState.layers, animation = pixelCanvasState.animation
+            )
+        }
+    val onionBitmap =
+        rememberOnionSkinBitmap(onionSprite, pixelCanvasState.activeFrameId, onionSkinEnabled)
     val imageBitmap = remember(bitmap, drawVersion) {
         bitmap.asImageBitmap()
     }
@@ -109,9 +113,10 @@ fun PixelCanvas(
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
 
     val visibleBounds = visibleCanvasBounds(canvasLayoutSize, viewportSize, scale, offset)
-    val activeSymmetry = if (selectedTool is PencilTool || selectedTool is EraserTool || selectedTool is ShapeTool) {
-        symmetry
-    } else DrawingSymmetry()
+    val activeSymmetry =
+        if (selectedTool is PencilTool || selectedTool is EraserTool || selectedTool is ShapeTool) {
+            symmetry
+        } else DrawingSymmetry()
     val context = LocalContext.current
 
     // app icon has 1 pixel transparent border (idk why)
@@ -194,7 +199,12 @@ fun PixelCanvas(
             val dstSize = IntSize(size.width.toInt(), size.height.toInt())
 
             onionBitmap?.let {
-                drawImage(it, dstOffset = IntOffset.Zero, dstSize = dstSize, filterQuality = FilterQuality.None)
+                drawImage(
+                    it,
+                    dstOffset = IntOffset.Zero,
+                    dstSize = dstSize,
+                    filterQuality = FilterQuality.None
+                )
             }
             drawImage(
                 image = imageBitmap,
@@ -208,17 +218,28 @@ fun PixelCanvas(
                 drawLine(Color.Black, start, end, outlineWidth)
                 drawLine(Color.White, start, end, outlineWidth / 2)
             }
-            val handleSize = minOf(10.pixelDp.toPx() / scale.coerceAtLeast(0.01f), visibleBounds.width / 4, visibleBounds.height / 4)
+
+            val handleSize = minOf(
+                10.pixelDp.toPx() / scale.coerceAtLeast(0.01f),
+                visibleBounds.width / 4,
+                visibleBounds.height / 4
+            )
+
             fun axisHandle(center: Offset) {
                 val topLeft = center - Offset(handleSize / 2, handleSize / 2)
                 drawRect(Color.White, topLeft, Size(handleSize, handleSize))
-                drawRect(Color.Black, topLeft, Size(handleSize, handleSize),
-                    style = Stroke(width = outlineWidth / 2))
+                drawRect(
+                    Color.Black, topLeft, Size(handleSize, handleSize),
+                    style = Stroke(width = outlineWidth / 2)
+                )
             }
             if (activeSymmetry.horizontal && !visibleBounds.isEmpty) {
                 val x = (activeSymmetry.x(canvasWidth) * size.width / canvasWidth)
                     .coerceIn(visibleBounds.left, visibleBounds.right)
-                val handleX = x.coerceIn(visibleBounds.left + handleSize / 2, visibleBounds.right - handleSize / 2)
+                val handleX = x.coerceIn(
+                    visibleBounds.left + handleSize / 2,
+                    visibleBounds.right - handleSize / 2
+                )
                 axisLine(Offset(x, visibleBounds.top), Offset(x, visibleBounds.bottom))
                 axisHandle(Offset(handleX, visibleBounds.top + handleSize / 2))
                 axisHandle(Offset(handleX, visibleBounds.bottom - handleSize / 2))
@@ -226,7 +247,10 @@ fun PixelCanvas(
             if (activeSymmetry.vertical && !visibleBounds.isEmpty) {
                 val y = (activeSymmetry.y(canvasHeight) * size.height / canvasHeight)
                     .coerceIn(visibleBounds.top, visibleBounds.bottom)
-                val handleY = y.coerceIn(visibleBounds.top + handleSize / 2, visibleBounds.bottom - handleSize / 2)
+                val handleY = y.coerceIn(
+                    visibleBounds.top + handleSize / 2,
+                    visibleBounds.bottom - handleSize / 2
+                )
                 axisLine(Offset(visibleBounds.left, y), Offset(visibleBounds.right, y))
                 axisHandle(Offset(visibleBounds.left + handleSize / 2, handleY))
                 axisHandle(Offset(visibleBounds.right - handleSize / 2, handleY))

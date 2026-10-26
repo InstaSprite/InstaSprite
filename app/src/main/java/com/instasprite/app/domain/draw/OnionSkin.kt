@@ -28,8 +28,26 @@ object OnionSkin {
                 before = IntArray(sprite.width * rows)
                 after = IntArray(before.size)
             }
-            LayerCompositor.render(previous, sprite.width, sprite.height, before, row, 0, sprite.width, rows)
-            LayerCompositor.render(next, sprite.width, sprite.height, after, row, 0, sprite.width, rows)
+            LayerCompositor.render(
+                previous,
+                sprite.width,
+                sprite.height,
+                before,
+                row,
+                0,
+                sprite.width,
+                rows
+            )
+            LayerCompositor.render(
+                next,
+                sprite.width,
+                sprite.height,
+                after,
+                row,
+                0,
+                sprite.width,
+                rows
+            )
             for (i in before.indices) {
                 before[i] = blendPixel(0, before[i], 0.25f)
                 before[i] = blendPixel(before[i], after[i], 0.25f)

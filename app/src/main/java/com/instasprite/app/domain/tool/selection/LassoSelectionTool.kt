@@ -2,10 +2,10 @@ package com.instasprite.app.domain.tool.selection
 
 import android.graphics.Rect
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.utils.bresenhamLine
 
@@ -40,13 +40,13 @@ class LassoSelectionTool : StrokeTool, SelectionTool {
         canvasHeight = canvas.getCanvasHeight()
 
         points.clear()
-        
+
         // Add start point
         if (row in 0 until canvasHeight && col in 0 until canvasWidth) {
             points.add(row to col)
             plotPreviewPixel(row, col, previewColor)
         }
-        
+
         lastPreviewRow = row
         lastPreviewCol = col
 
@@ -69,7 +69,7 @@ class LassoSelectionTool : StrokeTool, SelectionTool {
                 }
             }
         }
-        
+
         lastPreviewRow = row
         lastPreviewCol = col
 
@@ -98,7 +98,7 @@ class LassoSelectionTool : StrokeTool, SelectionTool {
 
         // 1. Draw boundary directly into mask
         val mask = BooleanArray(canvasWidth * canvasHeight)
-        
+
         var minRow = canvasHeight
         var maxRow = -1
         var minCol = canvasWidth

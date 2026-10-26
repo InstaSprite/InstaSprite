@@ -61,12 +61,16 @@ internal fun TimelineFrameStrip(
     }
     val linkCounts =
         remember(animation.cels) { animation.cels.groupingBy { it.dataId }.eachCount() }
-    Column(modifier
-        .fillMaxWidth()
-        .height(30.pixelDp)) {
-        LazyRow(state = scroll, modifier = Modifier
+    Column(
+        modifier
             .fillMaxWidth()
-            .height(28.pixelDp)) {
+            .height(30.pixelDp)
+    ) {
+        LazyRow(
+            state = scroll, modifier = Modifier
+                .fillMaxWidth()
+                .height(28.pixelDp)
+        ) {
             itemsIndexed(animation.frames, key = { _, frame -> frame.id }) { frameIndex, frame ->
                 var deleteMenu by remember { mutableStateOf(false) }
                 val active = frameIndex == index

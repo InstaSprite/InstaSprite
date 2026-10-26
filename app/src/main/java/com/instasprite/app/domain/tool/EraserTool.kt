@@ -52,8 +52,12 @@ class EraserTool : StrokeTool {
         if (touchedMask.size != totalPixels) {
             touchedMask = BooleanArray(totalPixels)
         }
-        val copies = (if (strokeSymmetry.horizontal) 2 else 1) * (if (strokeSymmetry.vertical) 2 else 1)
-        val bufferSize = minOf(totalPixels.toLong(), stamp.count.toLong() * (canvasWidth.toLong() + canvasHeight) * copies).toInt()
+        val copies =
+            (if (strokeSymmetry.horizontal) 2 else 1) * (if (strokeSymmetry.vertical) 2 else 1)
+        val bufferSize = minOf(
+            totalPixels.toLong(),
+            stamp.count.toLong() * (canvasWidth.toLong() + canvasHeight) * copies
+        ).toInt()
         if (batchIndices.size < bufferSize) {
             batchIndices = IntArray(bufferSize)
             batchColors = IntArray(bufferSize)
@@ -109,7 +113,12 @@ class EraserTool : StrokeTool {
 
     private fun collectBrushPixels(row: Int, col: Int) {
         stamp.forEach(row, col, canvasWidth, canvasHeight) { r, c ->
-            strokeSymmetry.forEachPixel(r, c, canvasWidth, canvasHeight) { mirroredRow, mirroredCol ->
+            strokeSymmetry.forEachPixel(
+                r,
+                c,
+                canvasWidth,
+                canvasHeight
+            ) { mirroredRow, mirroredCol ->
                 val idx = mirroredRow * canvasWidth + mirroredCol
                 if (!touchedMask[idx]) {
                     touchedMask[idx] = true

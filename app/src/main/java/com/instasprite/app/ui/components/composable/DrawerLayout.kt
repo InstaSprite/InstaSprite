@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.components.composable
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
@@ -19,8 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 enum class DrawerSide {
     Start,

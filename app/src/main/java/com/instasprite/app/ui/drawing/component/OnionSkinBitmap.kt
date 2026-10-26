@@ -3,8 +3,8 @@ package com.instasprite.app.ui.drawing.component
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -20,7 +20,11 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
 @Composable
-internal fun rememberOnionSkinBitmap(sprite: Sprite, frameId: String, enabled: Boolean): ImageBitmap? {
+internal fun rememberOnionSkinBitmap(
+    sprite: Sprite,
+    frameId: String,
+    enabled: Boolean
+): ImageBitmap? {
     val context = LocalContext.current
     val state = remember(sprite, frameId, enabled) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(sprite, frameId, enabled) {
@@ -29,7 +33,11 @@ internal fun rememberOnionSkinBitmap(sprite: Sprite, frameId: String, enabled: B
                 state.value = withContext(Dispatchers.Default) {
                     CanvasMemoryGuard.requireAvailable(
                         CanvasMemoryGuard.estimatePixels(sprite.width, sprite.height, 4),
-                        CanvasMemoryGuard.estimatePixels(sprite.width, minOf(TILE_SIZE, sprite.height), 8)
+                        CanvasMemoryGuard.estimatePixels(
+                            sprite.width,
+                            minOf(TILE_SIZE, sprite.height),
+                            8
+                        )
                     )
                     val image = createBitmap(sprite.width, sprite.height)
                     try {

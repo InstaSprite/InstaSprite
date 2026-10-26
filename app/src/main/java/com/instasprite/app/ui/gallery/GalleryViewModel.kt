@@ -1,35 +1,33 @@
 package com.instasprite.app.ui.gallery
 
-import android.widget.Toast
-import com.instasprite.app.R
-import com.instasprite.app.utils.CanvasMemoryException
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.instasprite.app.R
 import com.instasprite.app.data.repository.FileRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
-import com.instasprite.app.domain.dialog.DialogController
 import com.instasprite.app.di.IoDispatcher
+import com.instasprite.app.domain.dialog.DialogController
 import com.instasprite.app.domain.export.ImageExporter
-import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
-
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
 import com.instasprite.app.utils.AppSettings
+import com.instasprite.app.utils.CanvasMemoryException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -122,11 +120,19 @@ class GalleryViewModel @Inject constructor(
 
         when (order) {
             SpriteListOrder.Name -> filtered.sortedBy { it.meta?.spriteName?.lowercase() ?: "" }
-            SpriteListOrder.NameDesc -> filtered.sortedByDescending { it.meta?.spriteName?.lowercase() ?: "" }
+            SpriteListOrder.NameDesc -> filtered.sortedByDescending {
+                it.meta?.spriteName?.lowercase() ?: ""
+            }
+
             SpriteListOrder.DateCreated -> filtered.sortedBy { it.meta?.createdAt ?: 0L }
-            SpriteListOrder.DateCreatedDesc -> filtered.sortedByDescending { it.meta?.createdAt ?: 0L }
+            SpriteListOrder.DateCreatedDesc -> filtered.sortedByDescending {
+                it.meta?.createdAt ?: 0L
+            }
+
             SpriteListOrder.LastModified -> filtered.sortedBy { it.meta?.lastModifiedAt ?: 0L }
-            SpriteListOrder.LastModifiedDesc -> filtered.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
+            SpriteListOrder.LastModifiedDesc -> filtered.sortedByDescending {
+                it.meta?.lastModifiedAt ?: 0L
+            }
         }
     }.stateIn(
         scope = viewModelScope,
@@ -140,7 +146,6 @@ class GalleryViewModel @Inject constructor(
             layoutMode = AppSettings.getGallerySettings(context).layoutMode
         )
     }
-
 
 
     fun onImagePagerEvent(event: ImagePagerEvent) {
@@ -192,7 +197,15 @@ class GalleryViewModel @Inject constructor(
         paletteId: Int? = null
     ) {
         _uiState.update {
-            it.copy(drawingDestination = DrawingDestination(spriteId, width, height, name, paletteId))
+            it.copy(
+                drawingDestination = DrawingDestination(
+                    spriteId,
+                    width,
+                    height,
+                    name,
+                    paletteId
+                )
+            )
         }
     }
 
@@ -247,16 +260,15 @@ class GalleryViewModel @Inject constructor(
             }
             val success = try {
                 val bitmap = ImageExporter.convertToBitmap(sprite, scalePercent = scalePercent)
-                if (bitmap != null) {
-                    try {
-                        fileRepository.saveFile(bitmap, folderUri, fileName)
-                    } finally {
-                        bitmap.recycle()
-                    }
-                } else false
+                bitmap != null && try {
+                    fileRepository.saveFile(bitmap, folderUri, fileName)
+                } finally {
+                    bitmap.recycle()
+                }
             } catch (e: CanvasMemoryException) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG)
+                        .show()
                 }
                 false
             }
@@ -313,10 +325,10 @@ class GalleryViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             val newId = java.util.UUID.randomUUID().toString()
             val newSprite = sprite.copy(id = newId)
-            
+
             spriteDatabaseRepository.saveSprite(newSprite)
             spriteDatabaseRepository.changeName(newId, "Imported Sprite")
-            
+
             withContext(Dispatchers.Main) {
                 openDrawing(newId, newSprite.width, newSprite.height, "Imported Sprite")
             }

@@ -2,10 +2,10 @@ package com.instasprite.app.domain.tool.selection
 
 import android.graphics.Rect
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 interface SelectionTool {
@@ -29,6 +29,7 @@ class RectangleSelectionTool : StrokeTool, SelectionTool {
     enum class ResizeMode {
         NONE, TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, TOP, BOTTOM, LEFT, RIGHT
     }
+
     private var resizeMode = ResizeMode.NONE
     private var originalBounds: Rect? = null
 
@@ -66,7 +67,7 @@ class RectangleSelectionTool : StrokeTool, SelectionTool {
             val bottom = b.bottom - 1
             val midX = (left + right) / 2
             val midY = (top + bottom) / 2
-            
+
             // Handle size is visually 16dp.
             // On a zoomed canvas, 1 canvas pixel = 1 * zoomScale screen pixels.
             // We use half of that for tolerance from the center point.
@@ -75,7 +76,7 @@ class RectangleSelectionTool : StrokeTool, SelectionTool {
             val maxTolY = maxOf(1, (bottom - top) / 3)
             val tolX = minOf(tol, maxTolX)
             val tolY = minOf(tol, maxTolY)
-            
+
             val nearLeft = Math.abs(col - left) <= tolX
             val nearRight = Math.abs(col - right) <= tolX
             val nearTop = Math.abs(row - top) <= tolY
@@ -124,19 +125,43 @@ class RectangleSelectionTool : StrokeTool, SelectionTool {
             var maxR = b.bottom - 1
             var minC = b.left
             var maxC = b.right - 1
-            
+
             when (resizeMode) {
-                ResizeMode.TOP_LEFT -> { minR = row; minC = col }
-                ResizeMode.TOP_RIGHT -> { minR = row; maxC = col }
-                ResizeMode.BOTTOM_LEFT -> { maxR = row; minC = col }
-                ResizeMode.BOTTOM_RIGHT -> { maxR = row; maxC = col }
-                ResizeMode.TOP -> { minR = row }
-                ResizeMode.BOTTOM -> { maxR = row }
-                ResizeMode.LEFT -> { minC = col }
-                ResizeMode.RIGHT -> { maxC = col }
+                ResizeMode.TOP_LEFT -> {
+                    minR = row; minC = col
+                }
+
+                ResizeMode.TOP_RIGHT -> {
+                    minR = row; maxC = col
+                }
+
+                ResizeMode.BOTTOM_LEFT -> {
+                    maxR = row; minC = col
+                }
+
+                ResizeMode.BOTTOM_RIGHT -> {
+                    maxR = row; maxC = col
+                }
+
+                ResizeMode.TOP -> {
+                    minR = row
+                }
+
+                ResizeMode.BOTTOM -> {
+                    maxR = row
+                }
+
+                ResizeMode.LEFT -> {
+                    minC = col
+                }
+
+                ResizeMode.RIGHT -> {
+                    maxC = col
+                }
+
                 else -> {}
             }
-            
+
             startRow = minR
             lastRow = maxR
             startCol = minC
@@ -171,7 +196,7 @@ class RectangleSelectionTool : StrokeTool, SelectionTool {
 
         val w = maxCol - minCol + 1
         val h = maxRow - minRow + 1
-        
+
         if (w <= 0 || h <= 0) {
             currentSelection = null
             return

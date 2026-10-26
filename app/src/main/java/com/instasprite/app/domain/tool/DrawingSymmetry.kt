@@ -8,8 +8,11 @@ data class DrawingSymmetry(
     val axisX: Float? = null,
     val axisY: Float? = null
 ) {
-    fun x(width: Int): Float = axisX?.takeIf { it.isFinite() }?.coerceIn(0f, width.toFloat()) ?: width / 2f
-    fun y(height: Int): Float = axisY?.takeIf { it.isFinite() }?.coerceIn(0f, height.toFloat()) ?: height / 2f
+    fun x(width: Int): Float =
+        axisX?.takeIf { it.isFinite() }?.coerceIn(0f, width.toFloat()) ?: width / 2f
+
+    fun y(height: Int): Float =
+        axisY?.takeIf { it.isFinite() }?.coerceIn(0f, height.toFloat()) ?: height / 2f
 
     inline fun forEachPixel(row: Int, col: Int, width: Int, height: Int, plot: (Int, Int) -> Unit) {
         if (row !in 0 until height || col !in 0 until width) return

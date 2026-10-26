@@ -46,9 +46,10 @@ object PaletteModule {
     @Provides
     fun providePaletteEditorEntry(navigator: Navigator): EntryProviderInstaller = {
         entry<Screen.PaletteEditor> { args ->
-            val viewModel = hiltViewModel<PaletteEditorViewModel, PaletteEditorViewModel.Factory> { factory ->
-                factory.create(args.palette)
-            }
+            val viewModel =
+                hiltViewModel<PaletteEditorViewModel, PaletteEditorViewModel.Factory> { factory ->
+                    factory.create(args.palette)
+                }
 
             PaletteEditorScreen(
                 viewModel = viewModel,

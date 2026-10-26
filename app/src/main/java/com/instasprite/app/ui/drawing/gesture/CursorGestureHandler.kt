@@ -7,7 +7,6 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.unit.IntSize
-import com.instasprite.app.ui.drawing.contract.CursorState
 import kotlin.math.abs
 
 internal enum class CursorGestureState {
@@ -65,6 +64,7 @@ internal class CursorGestureHandler(
                 symmetryDrag = null
                 state = CursorGestureState.Transforming
             }
+
             pointerCount == 1 && state == CursorGestureState.Transforming -> {
                 state = CursorGestureState.Dragging
                 pointerId = pressedChanges.first().id
@@ -83,7 +83,12 @@ internal class CursorGestureHandler(
 
         when (state) {
             CursorGestureState.Dragging -> handleDragging(event, pressedChanges)
-            CursorGestureState.Transforming -> handleTransforming(event, pressedChanges, pointerCount)
+            CursorGestureState.Transforming -> handleTransforming(
+                event,
+                pressedChanges,
+                pointerCount
+            )
+
             CursorGestureState.Canceled -> {}
         }
         return false
@@ -152,12 +157,12 @@ internal class CursorGestureHandler(
         if (overflowX == 0f && overflowY == 0f) return
 
         val panX = when {
-            overflowX < 0f && bounds.minX > 0f       -> -overflowX * cellWidth
+            overflowX < 0f && bounds.minX > 0f -> -overflowX * cellWidth
             overflowX > 0f && bounds.maxX < canvasMaxX -> -overflowX * cellWidth
             else -> 0f
         }
         val panY = when {
-            overflowY < 0f && bounds.minY > 0f       -> -overflowY * cellHeight
+            overflowY < 0f && bounds.minY > 0f -> -overflowY * cellHeight
             overflowY > 0f && bounds.maxY < canvasMaxY -> -overflowY * cellHeight
             else -> 0f
         }
@@ -168,7 +173,11 @@ internal class CursorGestureHandler(
         }
     }
 
-    private fun handleTransforming(event: PointerEvent, pressedChanges: List<PointerInputChange>, pointerCount: Int) {
+    private fun handleTransforming(
+        event: PointerEvent,
+        pressedChanges: List<PointerInputChange>,
+        pointerCount: Int
+    ) {
         if (pointerCount <= 1) return
 
         val zoomChange = event.calculateZoom()

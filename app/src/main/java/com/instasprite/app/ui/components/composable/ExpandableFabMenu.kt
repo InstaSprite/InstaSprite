@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -42,12 +43,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.instasprite.app.R
-import androidx.compose.material3.MaterialTheme
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.Constants.PIXEL_DP
@@ -293,7 +292,7 @@ private fun FabItemView(
 @Preview
 @Composable
 private fun FabItemViewPreview() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         FabItemView(
             item = FabMenuItem(R.drawable.ic_edit, "New Canvas") {},
             animProgress = 1f,
@@ -307,7 +306,7 @@ private fun FabItemViewPreview() {
 @Preview
 @Composable
 private fun Preview() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         Box(
             modifier = Modifier
                 .size(166.pixelDp, 234.pixelDp)

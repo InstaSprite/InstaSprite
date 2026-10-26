@@ -2,9 +2,9 @@ package com.instasprite.app.domain.draw
 
 import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.domain.model.LayerCompositor
 import com.instasprite.app.domain.model.TileCoord
 import com.instasprite.app.utils.TILE_SIZE
-import com.instasprite.app.domain.model.LayerCompositor
 
 class MoveCompositor(
     private val width: Int,
@@ -14,7 +14,8 @@ class MoveCompositor(
     val selectionMask: BooleanArray?
 ) {
     private val originalTiles = layers.first { it.id == activeLayerId }.tiles
-    private val clippingScratch = if (layers.any { it.isClipping }) IntArray(TILE_SIZE * TILE_SIZE) else null
+    private val clippingScratch =
+        if (layers.any { it.isClipping }) IntArray(TILE_SIZE * TILE_SIZE) else null
     private val selectedTiles = mutableMapOf<TileCoord, IntArray>()
     private val clearedTiles = originalTiles.toMutableMap()
     private var destinationTiles: Set<TileCoord> = emptySet()
@@ -71,17 +72,21 @@ class MoveCompositor(
                 if (x !in 0L until width.toLong() || y !in 0L until height.toLong()) continue
                 val destination = TileCoord(x.toInt() / TILE_SIZE, y.toInt() / TILE_SIZE)
                 if (destinations.add(destination)) {
-                    moved[destination] = moved[destination]?.copyOf() ?: IntArray(TILE_SIZE * TILE_SIZE)
+                    moved[destination] =
+                        moved[destination]?.copyOf() ?: IntArray(TILE_SIZE * TILE_SIZE)
                 }
-                moved.getValue(destination)[(y.toInt() % TILE_SIZE) * TILE_SIZE + x.toInt() % TILE_SIZE] = pixel
+                moved.getValue(destination)[(y.toInt() % TILE_SIZE) * TILE_SIZE + x.toInt() % TILE_SIZE] =
+                    pixel
             }
         }
         tiles = moved
         val affected = selectedTiles.keys + destinationTiles + destinations
         destinationTiles = destinations
         val previewLayers = layers.map { layer ->
-            if (layer.id != activeLayerId) layer else Layer(layer.id, layer.name, layer.isVisible,
-                layer.isLocked, layer.opacity, layer.blendMode, tiles, layer.isClipping)
+            if (layer.id != activeLayerId) layer else Layer(
+                layer.id, layer.name, layer.isVisible,
+                layer.isLocked, layer.opacity, layer.blendMode, tiles, layer.isClipping
+            )
         }
         return affected.map { coord ->
             val x = coord.x * TILE_SIZE
@@ -89,7 +94,17 @@ class MoveCompositor(
             val tileWidth = minOf(TILE_SIZE, width - x)
             val tileHeight = minOf(TILE_SIZE, height - y)
             val pixels = IntArray(tileWidth * tileHeight)
-            LayerCompositor.render(previewLayers, width, height, pixels, y, x, tileWidth, tileHeight, clippingScratch)
+            LayerCompositor.render(
+                previewLayers,
+                width,
+                height,
+                pixels,
+                y,
+                x,
+                tileWidth,
+                tileHeight,
+                clippingScratch
+            )
             Cel(x, y, tileWidth, tileHeight, pixels)
         }
     }

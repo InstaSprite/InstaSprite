@@ -1,17 +1,14 @@
 package com.instasprite.app.ui.drawing
 
-import androidx.compose.ui.graphics.toArgb
-import com.instasprite.app.domain.tool.DitherBrush
-import com.instasprite.app.domain.tool.DrawingSymmetry
-import android.widget.Toast
-import com.instasprite.app.R
-import com.instasprite.app.utils.CanvasMemoryException
 import android.content.Context
 import android.net.Uri
 import android.os.SystemClock
+import android.widget.Toast
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.instasprite.app.R
 import com.instasprite.app.data.model.DrawSetting
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.data.repository.FileRepository
@@ -23,6 +20,8 @@ import com.instasprite.app.domain.draw.AnimationPlayback
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.DitherBrush
+import com.instasprite.app.domain.tool.DrawingSymmetry
 import com.instasprite.app.domain.tool.EyedropperTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.StrokeTool
@@ -35,12 +34,13 @@ import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
 import com.instasprite.app.ui.drawing.contract.CursorState
 import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
+import com.instasprite.app.ui.drawing.contract.TimelineEvent
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.drawing.contract.toUiState
-import com.instasprite.app.ui.drawing.contract.TimelineEvent
 import com.instasprite.app.ui.drawing.tutorial.drawingTutorialSequence
 import com.instasprite.app.ui.tutorial.TutorialManager
 import com.instasprite.app.utils.AppSettings
+import com.instasprite.app.utils.CanvasMemoryException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -116,7 +116,11 @@ class DrawingViewModel @AssistedInject constructor(
     fun handleFatalError(t: Throwable) {
         if (t is CanvasMemoryException) {
             drawingScope.launch(Dispatchers.Main) {
-                Toast.makeText(applicationContext, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    applicationContext,
+                    R.string.operation_memory_limit,
+                    Toast.LENGTH_LONG
+                ).show()
             }
             return
         }
@@ -148,7 +152,8 @@ class DrawingViewModel @AssistedInject constructor(
     private val pixelCanvasUseCase = drawingSession.canvas
     private val drawingEngine = drawingSession.engine
     private val initialCanvasWidth = if (width > 0) width else pixelCanvasUseCase.getCanvasWidth()
-    private val initialCanvasHeight = if (height > 0) height else pixelCanvasUseCase.getCanvasHeight()
+    private val initialCanvasHeight =
+        if (height > 0) height else pixelCanvasUseCase.getCanvasHeight()
 
     val bitmap get() = drawingEngine.bitmapManager.bitmap
     val overlayBitmap get() = drawingEngine.bitmapManager.overlayBitmap
@@ -257,7 +262,8 @@ class DrawingViewModel @AssistedInject constructor(
 
     fun onTimelineEvent(event: TimelineEvent) {
         if (event == TimelineEvent.ToggleOnionSkin) {
-            _uiState.value = _uiState.value.copy(onionSkinEnabled = !_uiState.value.onionSkinEnabled)
+            _uiState.value =
+                _uiState.value.copy(onionSkinEnabled = !_uiState.value.onionSkinEnabled)
             return
         }
         if (_uiState.value.isLoading || drawingEngine.isBusy) return
@@ -333,9 +339,20 @@ class DrawingViewModel @AssistedInject constructor(
                 is LayerEvent.ToggleLock -> drawingEngine.toggleLock(event.layerId)
                 is LayerEvent.ToggleVisibility -> drawingEngine.toggleVisibility(event.layerId)
                 is LayerEvent.MergeLayerDown -> drawingEngine.mergeLayerDown(event.layerId)
-                is LayerEvent.ReorderLayer -> drawingEngine.reorderLayer(event.fromIndex, event.toIndex)
-                is LayerEvent.SetLayerOpacity -> drawingEngine.setLayerOpacity(event.layerId, event.opacity)
-                is LayerEvent.SetBlendMode -> drawingEngine.setLayerBlendMode(event.layerId, event.mode)
+                is LayerEvent.ReorderLayer -> drawingEngine.reorderLayer(
+                    event.fromIndex,
+                    event.toIndex
+                )
+
+                is LayerEvent.SetLayerOpacity -> drawingEngine.setLayerOpacity(
+                    event.layerId,
+                    event.opacity
+                )
+
+                is LayerEvent.SetBlendMode -> drawingEngine.setLayerBlendMode(
+                    event.layerId,
+                    event.mode
+                )
             }
         } catch (t: Throwable) {
             handleFatalError(t)
@@ -370,7 +387,8 @@ class DrawingViewModel @AssistedInject constructor(
         }
         if (_uiState.value.isLoading || timelineJob?.isActive == true) return
         if (drawingEngine.isBusy && event !is PixelCanvasEvent.OnStrokeMove &&
-            event !is PixelCanvasEvent.OnStrokeEnd && event !is PixelCanvasEvent.OnStrokeCancel) return
+            event !is PixelCanvasEvent.OnStrokeEnd && event !is PixelCanvasEvent.OnStrokeCancel
+        ) return
         stopPlayback()
         try {
             val tool = _uiState.value.selectedTool
@@ -461,6 +479,7 @@ class DrawingViewModel @AssistedInject constructor(
                         isAppendSelectionMode = !_uiState.value.isAppendSelectionMode
                     )
                 }
+
                 is ToolSelectorEvent.SetDitherPattern, is ToolSelectorEvent.SetDitherBackground -> {
                     val current = _uiState.value.dither
                     val next = when (event) {
@@ -473,6 +492,7 @@ class DrawingViewModel @AssistedInject constructor(
                     drawingEngine.strokeEngine.dither = next
                     _uiState.value = _uiState.value.copy(dither = next)
                 }
+
                 is ToolSelectorEvent.SetSymmetryAxisX, is ToolSelectorEvent.SetSymmetryAxisY -> {
                     val current = _uiState.value.symmetry
                     val position = when (event) {
@@ -481,13 +501,24 @@ class DrawingViewModel @AssistedInject constructor(
                     }
                     if (!position.isFinite()) return
                     val next = if (event is ToolSelectorEvent.SetSymmetryAxisX) {
-                        current.copy(axisX = position.coerceIn(0f, pixelCanvasUseCase.getCanvasWidth().toFloat()))
+                        current.copy(
+                            axisX = position.coerceIn(
+                                0f,
+                                pixelCanvasUseCase.getCanvasWidth().toFloat()
+                            )
+                        )
                     } else {
-                        current.copy(axisY = position.coerceIn(0f, pixelCanvasUseCase.getCanvasHeight().toFloat()))
+                        current.copy(
+                            axisY = position.coerceIn(
+                                0f,
+                                pixelCanvasUseCase.getCanvasHeight().toFloat()
+                            )
+                        )
                     }
                     drawingEngine.strokeEngine.symmetry = next
                     _uiState.value = _uiState.value.copy(symmetry = next)
                 }
+
                 ToolSelectorEvent.ToggleHorizontalSymmetry, ToolSelectorEvent.ToggleVerticalSymmetry -> {
                     val current = _uiState.value.symmetry
                     val next = if (event == ToolSelectorEvent.ToggleHorizontalSymmetry) {
@@ -498,6 +529,7 @@ class DrawingViewModel @AssistedInject constructor(
                     drawingEngine.strokeEngine.symmetry = next
                     _uiState.value = _uiState.value.copy(symmetry = next)
                 }
+
                 is ToolSelectorEvent.TogglePixelPerfect -> {
                     togglePixelPerfect()
                 }
@@ -512,13 +544,13 @@ class DrawingViewModel @AssistedInject constructor(
             commitPendingTool()
             val tool = drawingEngine.tools[type]
             val state = _uiState.value.cursorState
-            
+
             var previewColor: Color? = null
             if (tool is EyedropperTool) {
                 val pixel = pixelCanvasUseCase.getCompositedPixelAt(state.gridY, state.gridX)
                 previewColor = if (pixel != 0) Color(pixel) else Color.Transparent
             }
-            
+
             _uiState.value = _uiState.value.copy(
                 selectedTool = tool,
                 cursorState = state.copy(previewColor = previewColor)
@@ -569,7 +601,11 @@ class DrawingViewModel @AssistedInject constructor(
         stopPlayback()
         try {
             when (event) {
-                is CursorDrawEvent.ToggleCursorMode -> toggleCursorMode(event.cursorX, event.cursorY)
+                is CursorDrawEvent.ToggleCursorMode -> toggleCursorMode(
+                    event.cursorX,
+                    event.cursorY
+                )
+
                 is CursorDrawEvent.MoveCursor -> moveCursor(event.cursorX, event.cursorY)
                 is CursorDrawEvent.DrawButtonPressed -> onCursorDrawPressed()
                 is CursorDrawEvent.DrawButtonReleased -> onCursorDrawReleased()
@@ -587,16 +623,17 @@ class DrawingViewModel @AssistedInject constructor(
             val ch = drawingEngine.canvasState.value.height
             val startX = if (cx >= 0f) cx else (cw / 2f)
             val startY = if (cy >= 0f) cy else (ch / 2f)
-            
+
             val clampedX = startX.coerceIn(0f, cw.toFloat() - 0.01f)
             val clampedY = startY.coerceIn(0f, ch.toFloat() - 0.01f)
-            
+
             var previewColor: Color? = null
             if (current.selectedTool is EyedropperTool) {
-                val pixel = pixelCanvasUseCase.getCompositedPixelAt(clampedY.toInt(), clampedX.toInt())
+                val pixel =
+                    pixelCanvasUseCase.getCompositedPixelAt(clampedY.toInt(), clampedX.toInt())
                 previewColor = if (pixel != 0) Color(pixel) else Color.Transparent
             }
-            
+
             CursorState(
                 cursorX = clampedX,
                 cursorY = clampedY,
@@ -750,15 +787,24 @@ class DrawingViewModel @AssistedInject constructor(
         }
     }
 
-    suspend fun saveAnimation(format: com.instasprite.app.domain.export.AnimationExportFormat,
-        folderUri: Uri, fileName: String, columns: Int, scalePercent: Int): Boolean {
+    suspend fun saveAnimation(
+        format: com.instasprite.app.domain.export.AnimationExportFormat,
+        folderUri: Uri, fileName: String, columns: Int, scalePercent: Int
+    ): Boolean {
         if (_uiState.value.isSaving || fileName.isBlank()) return false
         _uiState.value = _uiState.value.copy(isSaving = true)
         return try {
             drawingEngine.awaitToolIdle()
             stopPlayback()
             commitPendingTool()
-            fileRepository.saveAnimationFile(pixelCanvasUseCase.getSprite(), format, folderUri, fileName, columns, scalePercent)
+            fileRepository.saveAnimationFile(
+                pixelCanvasUseCase.getSprite(),
+                format,
+                folderUri,
+                fileName,
+                columns,
+                scalePercent
+            )
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {

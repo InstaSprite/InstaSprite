@@ -38,6 +38,7 @@ object UiUtils {
             )
         }
     }
+
     @Composable
     fun SetNavigationBarColor(statusBarColor: Color) {
         val systemUiController = rememberSystemUiController()

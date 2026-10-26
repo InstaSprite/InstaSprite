@@ -94,7 +94,7 @@ data class DrawingScreenEvent(
     val onToggleLayerDrawer: () -> Unit,
     val onLayerEvent: (LayerEvent) -> Unit,
     val onCursorDrawEvent: (CursorDrawEvent) -> Unit,
-    val onTutorialEvent: (com.instasprite.app.ui.tutorial.TutorialEvent) -> Unit
+    val onTutorialEvent: (TutorialEvent) -> Unit
 )
 
 @Composable
@@ -244,7 +244,7 @@ private fun DrawingScreenContent(
                 bottom = kotlin.math.max(undoBounds.bottom, redoBounds.bottom)
             )
             event.onTutorialEvent(
-                com.instasprite.app.ui.tutorial.TutorialEvent.OnBoundsChanged(
+                TutorialEvent.OnBoundsChanged(
                     com.instasprite.app.ui.drawing.tutorial.DrawingTutorialStep.UNDO_REDO,
                     merged
                 )
@@ -665,7 +665,7 @@ private fun DrawingScreenPreviewLoading() {
                 activeColor = activeColor.value,
                 recentColors = emptyList()
             ),
-            tutorialState = com.instasprite.app.ui.tutorial.TutorialState(),
+            tutorialState = TutorialState(),
             event = DrawingScreenEvent(
                 onColorPaletteEvent = {},
                 onCanvasMenuEvent = {},

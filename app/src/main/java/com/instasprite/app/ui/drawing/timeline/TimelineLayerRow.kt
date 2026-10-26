@@ -62,9 +62,11 @@ internal fun TimelineLayerRow(
             )
         }
         if (layer.isClipping) {
-            PixelIcon(R.drawable.ic_down_arrow,
+            PixelIcon(
+                R.drawable.ic_down_arrow,
                 contentDescription = stringResource(R.string.clipping_layer),
-                tint = colors.TextColorLight)
+                tint = colors.TextColorLight
+            )
         }
         Text(
             layer.name, maxLines = 1, overflow = TextOverflow.Ellipsis,

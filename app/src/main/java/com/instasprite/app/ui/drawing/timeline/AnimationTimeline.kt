@@ -122,9 +122,11 @@ fun AnimationTimeline(
                         stringResource(R.string.animation_expand), onClose
                     )
                 }
-            } else Row(Modifier
-                .fillMaxWidth()
-                .weight(1f)) {
+            } else Row(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
                 Column(
                     Modifier
                         .width(76.pixelDp)
@@ -183,9 +185,11 @@ fun AnimationTimeline(
                         }
                     }
                 }
-                LazyRow(state = frameScroll, modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()) {
+                LazyRow(
+                    state = frameScroll, modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                ) {
                     itemsIndexed(animation.frames, key = { _, value -> value.id }) { index, value ->
                         var deleteMenu by remember { mutableStateOf(false) }
                         val current = value.id == activeFrameId
@@ -308,9 +312,11 @@ fun AnimationTimeline(
                 }
             }
             if (expanded) {
-                Row(Modifier
-                    .fillMaxWidth()
-                    .height(2.pixelDp)) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(2.pixelDp)
+                ) {
                     Box(Modifier.width(76.pixelDp))
                     TimelineScrollbar(frameScroll, 22.pixelDp, Modifier.weight(1f))
                 }

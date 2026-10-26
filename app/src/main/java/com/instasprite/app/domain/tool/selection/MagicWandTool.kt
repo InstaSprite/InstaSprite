@@ -2,9 +2,9 @@ package com.instasprite.app.domain.tool.selection
 
 import android.graphics.Rect
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.Tool
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import java.util.ArrayDeque
 
@@ -16,7 +16,7 @@ class MagicWandTool : Tool, SelectionTool {
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
         val width = canvas.getCanvasWidth()
         val height = canvas.getCanvasHeight()
-        
+
         if (row !in 0 until height || col !in 0 until width) {
             currentSelection = null
             return
@@ -27,10 +27,10 @@ class MagicWandTool : Tool, SelectionTool {
             return
         }
         val targetColor = pixels[row * width + col]
-        
+
         val mask = BooleanArray(width * height)
         val queue = ArrayDeque<Int>()
-        
+
         val startIndex = row * width + col
         queue.add(startIndex)
         mask[startIndex] = true
@@ -56,7 +56,7 @@ class MagicWandTool : Tool, SelectionTool {
             for (i in 0..3) {
                 val nr = r + dy[i]
                 val nc = c + dx[i]
-                
+
                 if (nr in 0 until height && nc in 0 until width) {
                     val nIndex = nr * width + nc
                     if (!mask[nIndex] && pixels[nIndex] == targetColor) {

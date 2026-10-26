@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,12 +36,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
+import com.instasprite.app.ui.gallery.DrawingNavigationEffect
 import com.instasprite.app.ui.gallery.GalleryDialog
 import com.instasprite.app.ui.gallery.GalleryPageContent
 import com.instasprite.app.ui.gallery.GalleryScreenDialogs
 import com.instasprite.app.ui.gallery.GalleryScreenEvent
-import com.instasprite.app.ui.gallery.DrawingNavigationEffect
 import com.instasprite.app.ui.gallery.GalleryViewModel
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
@@ -131,7 +131,12 @@ fun HomeScreen(
         onNavigate = onNavigateToDrawing
     )
 
-    val galleryEvent = remember(galleryViewModel, onNavigateToDrawing, onNavigateToCreateCanvas, onNavigateToLoadImage) {
+    val galleryEvent = remember(
+        galleryViewModel,
+        onNavigateToDrawing,
+        onNavigateToCreateCanvas,
+        onNavigateToLoadImage
+    ) {
         GalleryScreenEvent(
             onImagePagerEvent = galleryViewModel::onImagePagerEvent,
             onSearchBarEvent = galleryViewModel::onSearchBarEvent,

@@ -49,6 +49,7 @@ object LocalResultEventBus {
         return LocalResultEventBus.provides(bus)
     }
 }
+
 /**
  * An EventBus for passing results between multiple sets of screens.
  *
@@ -71,7 +72,8 @@ class ResultEventBus {
      */
     inline fun <reified T> sendResult(resultKey: String = T::class.toString(), result: T) {
         if (!channelMap.contains(resultKey)) {
-            channelMap[resultKey] = Channel(capacity = BUFFERED, onBufferOverflow = BufferOverflow.SUSPEND)
+            channelMap[resultKey] =
+                Channel(capacity = BUFFERED, onBufferOverflow = BufferOverflow.SUSPEND)
         }
         channelMap[resultKey]?.trySend(result)
     }

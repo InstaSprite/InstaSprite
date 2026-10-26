@@ -26,12 +26,26 @@ object FillTool : Tool {
         color: Color,
     ): FillResult? {
         val pixels = canvas.getActiveLayerPixelsDirect() ?: return null
-        val result = calculate(pixels, canvas.getCanvasWidth(), canvas.getCanvasHeight(), startRow, startCol, color)
+        val result = calculate(
+            pixels,
+            canvas.getCanvasWidth(),
+            canvas.getCanvasHeight(),
+            startRow,
+            startCol,
+            color
+        )
         result?.let { canvas.setAllPixels(it.pixels) }
         return result
     }
 
-    fun calculate(pixels: IntArray, width: Int, height: Int, startRow: Int, startCol: Int, color: Color): FillResult? {
+    fun calculate(
+        pixels: IntArray,
+        width: Int,
+        height: Int,
+        startRow: Int,
+        startCol: Int,
+        color: Color
+    ): FillResult? {
         if (startRow !in 0 until height || startCol !in 0 until width) return null
 
         val targetArgb = pixels[startRow * width + startCol]
@@ -53,6 +67,7 @@ object FillTool : Tool {
         fun push(r: Int, c: Int) {
             stack.addLast((r.toLong() shl 32) or (c.toLong() and 0xFFFFFFFFL))
         }
+
         fun pop(): Long = stack.removeLast()
 
         push(startRow, startCol)
@@ -82,8 +97,8 @@ object FillTool : Tool {
 
             if (seedRow < minRow) minRow = seedRow
             if (seedRow > maxRow) maxRow = seedRow
-            if (left   < minCol) minCol = left
-            if (right  > maxCol) maxCol = right
+            if (left < minCol) minCol = left
+            if (right > maxCol) maxCol = right
 
             var inRunAbove = false
             var inRunBelow = false

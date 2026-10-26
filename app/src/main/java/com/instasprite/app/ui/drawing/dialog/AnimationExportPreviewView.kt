@@ -2,8 +2,8 @@ package com.instasprite.app.ui.drawing.dialog
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -16,8 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -39,10 +39,19 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 
-private data class PreviewFrame(val image: ImageBitmap, val pixels: ExportPreviewPixels, val index: Int)
+private data class PreviewFrame(
+    val image: ImageBitmap,
+    val pixels: ExportPreviewPixels,
+    val index: Int
+)
 
 @Composable
-internal fun AnimationExportPreviewView(sprite: Sprite, format: AnimationExportFormat, scale: Int?, columns: Int?) {
+internal fun AnimationExportPreviewView(
+    sprite: Sprite,
+    format: AnimationExportFormat,
+    scale: Int?,
+    columns: Int?
+) {
     var preview by remember(sprite, format, scale, columns) { mutableStateOf<PreviewFrame?>(null) }
     var failed by remember(sprite, format, scale, columns) { mutableStateOf(false) }
     LaunchedEffect(sprite, format, scale, columns) {
@@ -59,9 +68,24 @@ internal fun AnimationExportPreviewView(sprite: Sprite, format: AnimationExportF
                 val id = playback?.frameAt(withFrameMillis { it } - start).orEmpty()
                 if (id != lastFrame) {
                     preview = withContext(Dispatchers.Default) {
-                        val pixels = AnimationExportPreview.render(sprite, format, scale, columns, id) { ensureActive() }
-                        val bitmap = Bitmap.createBitmap(pixels.pixels, pixels.width, pixels.height, Bitmap.Config.ARGB_8888)
-                        PreviewFrame(bitmap.asImageBitmap(), pixels, frames.indexOfFirst { it.id == id }.coerceAtLeast(0))
+                        val pixels = AnimationExportPreview.render(
+                            sprite,
+                            format,
+                            scale,
+                            columns,
+                            id
+                        ) { ensureActive() }
+                        val bitmap = Bitmap.createBitmap(
+                            pixels.pixels,
+                            pixels.width,
+                            pixels.height,
+                            Bitmap.Config.ARGB_8888
+                        )
+                        PreviewFrame(
+                            bitmap.asImageBitmap(),
+                            pixels,
+                            frames.indexOfFirst { it.id == id }.coerceAtLeast(0)
+                        )
                     }
                     lastFrame = id
                 }
@@ -74,25 +98,49 @@ internal fun AnimationExportPreviewView(sprite: Sprite, format: AnimationExportF
         }
     }
     Column {
-        Text(stringResource(R.string.animation_export_preview), color = AppTheme.colors.TextColorLight)
+        Text(
+            stringResource(R.string.animation_export_preview),
+            color = AppTheme.colors.TextColorLight
+        )
         val image = preview
         if (scale == null || columns == null || failed) {
-            Text(stringResource(R.string.export_preview_unavailable), color = AppTheme.colors.Subtext0Color)
+            Text(
+                stringResource(R.string.export_preview_unavailable),
+                color = AppTheme.colors.Subtext0Color
+            )
         } else if (image == null) {
             CircularProgressIndicator()
         } else {
             BoxWithConstraints(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 val ratio = image.pixels.exportWidth.toFloat() / image.pixels.exportHeight
-                Image(image.image, contentDescription = stringResource(R.string.animation_export_preview),
-                    modifier = Modifier.width(minOf(maxWidth, 96.pixelDp * ratio)).aspectRatio(ratio)
-                        .drawCheckerboard(16, 16),
-                    contentScale = ContentScale.FillBounds, filterQuality = FilterQuality.None)
+                Image(
+                    image.image,
+                    contentDescription = stringResource(R.string.animation_export_preview),
+                    modifier = Modifier
+                        .width(minOf(maxWidth, 96.pixelDp * ratio))
+                        .aspectRatio(ratio)
+                        .drawCheckerboard(),
+                    contentScale = ContentScale.FillBounds,
+                    filterQuality = FilterQuality.None
+                )
             }
-            Text(stringResource(R.string.export_preview_size, image.pixels.exportWidth, image.pixels.exportHeight),
-                color = AppTheme.colors.TextColorLight)
+            Text(
+                stringResource(
+                    R.string.export_preview_size,
+                    image.pixels.exportWidth,
+                    image.pixels.exportHeight
+                ),
+                color = AppTheme.colors.TextColorLight
+            )
             if (format == AnimationExportFormat.GIF) {
-                Text(stringResource(R.string.export_preview_frame, image.index + 1, sprite.animation?.frames?.size ?: 1),
-                    color = AppTheme.colors.Subtext0Color)
+                Text(
+                    stringResource(
+                        R.string.export_preview_frame,
+                        image.index + 1,
+                        sprite.animation?.frames?.size ?: 1
+                    ),
+                    color = AppTheme.colors.Subtext0Color
+                )
             }
         }
     }

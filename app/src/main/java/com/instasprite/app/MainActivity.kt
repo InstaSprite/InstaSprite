@@ -22,12 +22,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.instasprite.app.data.model.SettingPreferences
+import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.di.settingsDataStore
 import com.instasprite.app.navigation.EntryProviderInstaller
 import com.instasprite.app.navigation.Navigator
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
-import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.utils.AppSettings
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: android.content.Context) {
         super.attachBaseContext(AppSettings.onAttach(newBase))
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)

@@ -10,7 +10,8 @@ object CanvasMemoryGuard {
     internal fun estimatePixels(width: Int, height: Int, bytesPerPixel: Long): Long {
         val count = width.toLong() * height
         if (width <= 0 || height <= 0 || count > Int.MAX_VALUE || bytesPerPixel <= 0 ||
-            bytesPerPixel > Long.MAX_VALUE / count) return Long.MAX_VALUE
+            bytesPerPixel > Long.MAX_VALUE / count
+        ) return Long.MAX_VALUE
         return count * bytesPerPixel
     }
 
@@ -32,8 +33,10 @@ object CanvasMemoryGuard {
         val scaledWidth = (width.toLong() * scalePercent / 100).coerceAtLeast(1)
         val scaledHeight = (height.toLong() * scalePercent / 100).coerceAtLeast(1)
         if (scaledWidth > Int.MAX_VALUE || scaledHeight > Int.MAX_VALUE) throw CanvasMemoryException()
-        requireAvailable(estimatePixels(width, height, 8),
-            estimatePixels(scaledWidth.toInt(), scaledHeight.toInt(), 8))
+        requireAvailable(
+            estimatePixels(width, height, 8),
+            estimatePixels(scaledWidth.toInt(), scaledHeight.toInt(), 8)
+        )
         return scaledWidth.toInt() to scaledHeight.toInt()
     }
 }

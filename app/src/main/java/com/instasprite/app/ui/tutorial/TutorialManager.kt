@@ -45,28 +45,31 @@ class TutorialManager(
                 newBounds[event.step] = event.rect
                 _state.value = _state.value.copy(bounds = newBounds)
             }
+
             is TutorialEvent.OnStartTutorial -> {
                 _state.value = _state.value.copy(
                     showWelcomeDialog = false,
                     showTutorial = true
                 )
             }
+
             is TutorialEvent.OnNextStep -> {
                 val currentStep = _state.value.currentStep
                 val currentIndex = sequence.indexOf(currentStep)
-                
+
                 val nextStep = if (currentIndex != -1 && currentIndex < sequence.size - 1) {
                     sequence[currentIndex + 1]
                 } else {
                     null
                 }
-                
+
                 if (nextStep == null) {
                     dismissTutorial()
                 } else {
                     _state.value = _state.value.copy(currentStep = nextStep)
                 }
             }
+
             is TutorialEvent.OnDismiss -> {
                 dismissTutorial()
             }

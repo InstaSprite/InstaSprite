@@ -137,7 +137,9 @@ fun LayerView(
 
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth().height(66.pixelDp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(66.pixelDp)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -291,7 +293,7 @@ fun LayerView(
 @Preview
 @Composable
 private fun PreviewActive() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         LayerView(
             layer = Layer(
                 id = "test1",
@@ -321,7 +323,7 @@ private fun PreviewActive() {
 @Preview
 @Composable
 private fun PreviewInactive() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         LayerView(
             layer = Layer(
                 id = "test1",
@@ -351,7 +353,7 @@ private fun PreviewInactive() {
 @Preview
 @Composable
 private fun PreviewClipping() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         LayerView(
             layer = Layer(
                 id = "test1",

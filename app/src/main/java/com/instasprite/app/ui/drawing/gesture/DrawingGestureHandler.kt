@@ -20,7 +20,12 @@ internal enum class DrawingGestureState {
     Canceled
 }
 
-private fun Offset.toGridCell(canvasWidth: Int, canvasHeight: Int, cols: Int, rows: Int): IntOffset {
+private fun Offset.toGridCell(
+    canvasWidth: Int,
+    canvasHeight: Int,
+    cols: Int,
+    rows: Int
+): IntOffset {
     val cellWidth = canvasWidth.toFloat() / cols.toFloat()
     val cellHeight = canvasHeight.toFloat() / rows.toFloat()
 
@@ -82,9 +87,11 @@ internal class DrawingGestureHandler(
             DrawingGestureState.DragOrTap, DrawingGestureState.Drawing -> {
                 handleDragOrTap(event, pressedChanges)
             }
+
             DrawingGestureState.Transforming -> {
                 handleTransforming(event, pressedChanges, pointerCount)
             }
+
             DrawingGestureState.Canceled -> {}
         }
         return false
@@ -107,12 +114,18 @@ internal class DrawingGestureHandler(
             if (state == DrawingGestureState.DragOrTap) {
                 state = DrawingGestureState.Drawing
                 passedSlop = true
-                val startCell = startPosition.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
+                val startCell =
+                    startPosition.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
                 onEvent(PixelCanvasEvent.OnStrokeStart(startCell.x, startCell.y, scale))
                 lastCell = startCell
             }
 
-            val dragCell = pointerChange.position.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
+            val dragCell = pointerChange.position.toGridCell(
+                size.width,
+                size.height,
+                canvasWidth,
+                canvasHeight
+            )
             if (dragCell != lastCell) {
                 onEvent(PixelCanvasEvent.OnStrokeMove(dragCell.x, dragCell.y, scale))
                 lastCell = dragCell
@@ -128,7 +141,11 @@ internal class DrawingGestureHandler(
         }
     }
 
-    private fun handleTransforming(event: PointerEvent, pressedChanges: List<PointerInputChange>, pointerCount: Int) {
+    private fun handleTransforming(
+        event: PointerEvent,
+        pressedChanges: List<PointerInputChange>,
+        pointerCount: Int
+    ) {
         if (pointerCount <= 1) return
 
         val zoomChange = event.calculateZoom()
@@ -170,13 +187,16 @@ internal class DrawingGestureHandler(
         when (state) {
             DrawingGestureState.DragOrTap -> {
                 if (!passedSlop && symmetryDrag == null) {
-                    val cell = startPosition.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
+                    val cell =
+                        startPosition.toGridCell(size.width, size.height, canvasWidth, canvasHeight)
                     onEvent(PixelCanvasEvent.OnTapAt(cell.x, cell.y))
                 }
             }
+
             DrawingGestureState.Drawing -> {
                 onEvent(PixelCanvasEvent.OnStrokeEnd)
             }
+
             DrawingGestureState.Transforming, DrawingGestureState.Canceled -> {}
         }
     }

@@ -1,33 +1,25 @@
 package com.instasprite.app.utils
 
-import com.instasprite.app.domain.tool.DrawingSymmetry
-import com.instasprite.app.ui.drawing.gesture.SymmetryAxisDrag
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculatePan
-import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.instasprite.app.domain.tool.StrokeTool
+import com.instasprite.app.domain.tool.DrawingSymmetry
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.ui.drawing.contract.CursorState
 import com.instasprite.app.ui.drawing.contract.PixelCanvasEvent
 import com.instasprite.app.ui.drawing.gesture.CursorGestureHandler
 import com.instasprite.app.ui.drawing.gesture.DrawingGestureHandler
+import com.instasprite.app.ui.drawing.gesture.SymmetryAxisDrag
 import kotlin.math.abs
-
 
 
 fun bresenhamLine(x0: Int, y0: Int, x1: Int, y1: Int): List<Pair<Int, Int>> {
@@ -114,10 +106,21 @@ fun Modifier.drawingPointerInput(
                 onEvent = onEvent,
                 onTransform = onTransform,
                 startEvent = down,
-                symmetryDrag = SymmetryAxisDrag.start(latestSymmetry, down.position, size,
-                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f),
-                    visibleBounds = latestViewportBounds ?: Rect(0f, 0f, size.width.toFloat(), size.height.toFloat()),
-                    onMove = latestAxisMove)
+                symmetryDrag = SymmetryAxisDrag.start(
+                    latestSymmetry,
+                    down.position,
+                    size,
+                    canvasWidth,
+                    canvasHeight,
+                    symmetryHandleRadius / latestScale.coerceAtLeast(0.01f),
+                    visibleBounds = latestViewportBounds ?: Rect(
+                        0f,
+                        0f,
+                        size.width.toFloat(),
+                        size.height.toFloat()
+                    ),
+                    onMove = latestAxisMove
+                )
             )
 
             do {
@@ -146,7 +149,8 @@ fun calculateNewScaleAndOffset(
     val centroidFromCenter = centroid - layoutCenter
 
     // The screen pan is panChange * currentScale.
-    val newOffset = currentOffset + panChange * currentScale - centroidFromCenter * (newScale - currentScale)
+    val newOffset =
+        currentOffset + panChange * currentScale - centroidFromCenter * (newScale - currentScale)
 
     val extraWidth = (layoutSize.width * (newScale - 1f)) / 2f
     val extraHeight = (layoutSize.height * (newScale - 1f)) / 2f
@@ -203,10 +207,21 @@ fun Modifier.cursorPointerInput(
                 onCursorMove = onCursorMove,
                 onTransform = onTransform,
                 startEvent = down,
-                symmetryDrag = SymmetryAxisDrag.start(latestSymmetry, down.position, size,
-                    canvasWidth, canvasHeight, symmetryHandleRadius / latestScale.coerceAtLeast(0.01f),
-                    visibleBounds = latestViewportBounds ?: Rect(0f, 0f, size.width.toFloat(), size.height.toFloat()),
-                    onMove = latestAxisMove)
+                symmetryDrag = SymmetryAxisDrag.start(
+                    latestSymmetry,
+                    down.position,
+                    size,
+                    canvasWidth,
+                    canvasHeight,
+                    symmetryHandleRadius / latestScale.coerceAtLeast(0.01f),
+                    visibleBounds = latestViewportBounds ?: Rect(
+                        0f,
+                        0f,
+                        size.width.toFloat(),
+                        size.height.toFloat()
+                    ),
+                    onMove = latestAxisMove
+                )
             )
 
             do {

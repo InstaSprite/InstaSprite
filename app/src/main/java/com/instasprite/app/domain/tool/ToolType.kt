@@ -15,7 +15,15 @@ enum class ToolType(val icon: Int, val nameRes: Int, val descriptionRes: Int) {
     Circle(R.drawable.ic_circle_tool, R.string.tool_circle, R.string.tool_circle_desc),
     Oval(R.drawable.ic_oval_tool, R.string.tool_oval, R.string.tool_oval_desc),
     Diamond(R.drawable.ic_diamond_tool, R.string.tool_diamond, R.string.tool_diamond_desc),
-    RectangleSelection(R.drawable.ic_selection_tool, R.string.tool_rectangle_selection, R.string.tool_rectangle_selection_desc),
-    LassoSelection(R.drawable.ic_lasso_tool, R.string.tool_lasso_selection, R.string.tool_lasso_selection_desc),
+    RectangleSelection(
+        R.drawable.ic_selection_tool,
+        R.string.tool_rectangle_selection,
+        R.string.tool_rectangle_selection_desc
+    ),
+    LassoSelection(
+        R.drawable.ic_lasso_tool,
+        R.string.tool_lasso_selection,
+        R.string.tool_lasso_selection_desc
+    ),
     MagicWand(R.drawable.ic_wand_tool, R.string.tool_magic_wand, R.string.tool_magic_wand_desc)
 }

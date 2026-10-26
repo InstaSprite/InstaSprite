@@ -5,12 +5,12 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import com.instasprite.app.ISprite
-import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.data.mapper.toISprite
+import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.utils.getFormatFromExtension
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.PushbackInputStream
@@ -33,9 +33,11 @@ class FileRepository(val context: Context) {
             counter++
         }
 
-        val file = folder.createFile("application/isprite", uniqueFileName) ?: return@withContext false
+        val file =
+            folder.createFile("application/isprite", uniqueFileName) ?: return@withContext false
 
-        val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return@withContext false
+        val outputStream =
+            context.contentResolver.openOutputStream(file.uri) ?: return@withContext false
 
         try {
             GZIPOutputStream(outputStream).use { gzipStream ->
@@ -51,21 +53,38 @@ class FileRepository(val context: Context) {
         }
     }
 
-    suspend fun saveAnimationFile(sprite: Sprite, format: com.instasprite.app.domain.export.AnimationExportFormat,
-        folderUri: Uri, fileName: String, columns: Int = 1, scalePercent: Int = 100): Boolean = withContext(Dispatchers.IO) {
+    suspend fun saveAnimationFile(
+        sprite: Sprite, format: com.instasprite.app.domain.export.AnimationExportFormat,
+        folderUri: Uri, fileName: String, columns: Int = 1, scalePercent: Int = 100
+    ): Boolean = withContext(Dispatchers.IO) {
         val exportContext = kotlinx.coroutines.currentCoroutineContext()
         val name = fileName.removeSuffix(".${format.extension}") + ".${format.extension}"
         writeExportFile(folderUri, name, format.mimeType) { output ->
             when (format) {
                 com.instasprite.app.domain.export.AnimationExportFormat.GIF ->
-                    com.instasprite.app.domain.export.GifExporter.write(sprite, output, scalePercent) { exportContext.ensureActive() }
+                    com.instasprite.app.domain.export.GifExporter.write(
+                        sprite,
+                        output,
+                        scalePercent
+                    ) { exportContext.ensureActive() }
+
                 com.instasprite.app.domain.export.AnimationExportFormat.SPRITE_SHEET -> {
-                    val bitmap = com.instasprite.app.domain.export.ImageExporter.convertToSpriteSheet(sprite, columns, scalePercent) {
-                        exportContext.ensureActive()
-                    }
+                    val bitmap =
+                        com.instasprite.app.domain.export.ImageExporter.convertToSpriteSheet(
+                            sprite,
+                            columns,
+                            scalePercent
+                        ) {
+                            exportContext.ensureActive()
+                        }
                     try {
                         exportContext.ensureActive()
-                        if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)) throw IOException("PNG export failed")
+                        if (!bitmap.compress(
+                                Bitmap.CompressFormat.PNG,
+                                100,
+                                output
+                            )
+                        ) throw IOException("PNG export failed")
                     } finally {
                         bitmap.recycle()
                     }
@@ -74,8 +93,10 @@ class FileRepository(val context: Context) {
         }
     }
 
-    private fun writeExportFile(folderUri: Uri, fileName: String, mimeType: String,
-        write: (java.io.OutputStream) -> Unit): Boolean {
+    private fun writeExportFile(
+        folderUri: Uri, fileName: String, mimeType: String,
+        write: (java.io.OutputStream) -> Unit
+    ): Boolean {
         val folder = DocumentFile.fromTreeUri(context, folderUri) ?: return false
         val stem = fileName.substringBeforeLast(".", fileName)
         val extension = fileName.substringAfterLast(".", "")

@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,13 +18,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import com.instasprite.app.domain.tool.BrushShape
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun BrushShapeSelector(
@@ -64,7 +61,12 @@ fun BrushShapeSelector(
         ) {
             BrushShape.entries.forEach { shape ->
                 DropdownMenuItem(
-                    text = { Text(stringResource(shape.nameRes), color = AppTheme.colors.TextColorLight) },
+                    text = {
+                        Text(
+                            stringResource(shape.nameRes),
+                            color = AppTheme.colors.TextColorLight
+                        )
+                    },
                     leadingIcon = {
                         PixelIcon(
                             icon = shape.icon,

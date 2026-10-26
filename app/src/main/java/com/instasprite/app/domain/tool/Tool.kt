@@ -9,9 +9,9 @@ interface Tool {
     val nameRes: Int get() = type.nameRes
     val descriptionRes: Int get() = type.descriptionRes
 
-    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color): Unit
+    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color)
 
-    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int): Unit {
+    fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color, scale: Int) {
         apply(canvas, row, col, color)
     }
 }

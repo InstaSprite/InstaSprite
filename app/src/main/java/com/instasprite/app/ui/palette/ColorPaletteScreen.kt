@@ -413,7 +413,7 @@ private fun PaletteTab(
 @Preview
 @Composable
 private fun Preview() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         val data = DummyData.palettes.toMutableList()
 
         ColorPaletteSelectionContent(

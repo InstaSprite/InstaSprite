@@ -1,10 +1,5 @@
 package com.instasprite.app.ui.loadimage
 
-import com.instasprite.app.utils.pixelDp
-
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -18,9 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,20 +28,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.instasprite.app.R
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.domain.image2pixel.PixelArtConfig
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.ui.components.composable.TopBar
-import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.loadimage.component.ImageConfigView
 import com.instasprite.app.ui.loadimage.component.ProcessedImagePreview
 import com.instasprite.app.ui.loadimage.contract.ImageConfigEvent
 import com.instasprite.app.ui.loadimage.contract.LoadImageUiState
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 import kotlinx.coroutines.launch
 
 data class LoadImageScreenEvent(

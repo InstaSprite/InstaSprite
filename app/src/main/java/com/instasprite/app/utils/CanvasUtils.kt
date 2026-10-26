@@ -1,21 +1,19 @@
 package com.instasprite.app.utils
 
-import com.instasprite.app.utils.pixelDp
-
 import android.graphics.BitmapShader
 import android.graphics.Matrix
 import android.graphics.Shader
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -211,13 +209,21 @@ private fun DrawScope.drawColorPreview(
 }
 
 
-internal fun anchorSelectionOutline(outline: Path, bounds: Rect, viewport: Rect, strokeWidth: Float): Path {
-    val clipped = Path().apply { op(outline, Path().apply { addRect(viewport) }, PathOperation.Intersect) }
+internal fun anchorSelectionOutline(
+    outline: Path,
+    bounds: Rect,
+    viewport: Rect,
+    strokeWidth: Float
+): Path {
+    val clipped =
+        Path().apply { op(outline, Path().apply { addRect(viewport) }, PathOperation.Intersect) }
     if (!clipped.isEmpty) return clipped
     var anchored = bounds.anchoredTo(viewport)
     if (anchored.width == 0f && anchored.height == 0f) {
-        anchored = Rect(anchored.left - strokeWidth, anchored.top - strokeWidth,
-            anchored.right + strokeWidth, anchored.bottom + strokeWidth).anchoredTo(viewport)
+        anchored = Rect(
+            anchored.left - strokeWidth, anchored.top - strokeWidth,
+            anchored.right + strokeWidth, anchored.bottom + strokeWidth
+        ).anchoredTo(viewport)
     }
     return Path().apply {
         moveTo(anchored.left, anchored.top)
@@ -250,12 +256,15 @@ fun DrawScope.drawSelectionOverlay(
 
     val outlineWidth = 2.pixelDp.toPx() / scale
     val inset = minOf(outlineWidth / 2, visibleBounds.width / 4, visibleBounds.height / 4)
-    val edgeBounds = Rect(visibleBounds.left + inset, visibleBounds.top + inset,
-        visibleBounds.right - inset, visibleBounds.bottom - inset)
+    val edgeBounds = Rect(
+        visibleBounds.left + inset, visibleBounds.top + inset,
+        visibleBounds.right - inset, visibleBounds.bottom - inset
+    )
     val b = selectionState.bounds
     val selectionBounds = Rect(b.left * pxW, b.top * pxH, b.right * pxW, b.bottom * pxH)
     if (selectionBounds.left < edgeBounds.left || selectionBounds.top < edgeBounds.top ||
-        selectionBounds.right > edgeBounds.right || selectionBounds.bottom > edgeBounds.bottom) {
+        selectionBounds.right > edgeBounds.right || selectionBounds.bottom > edgeBounds.bottom
+    ) {
         scaledPath = anchorSelectionOutline(scaledPath, selectionBounds, edgeBounds, outlineWidth)
     }
 

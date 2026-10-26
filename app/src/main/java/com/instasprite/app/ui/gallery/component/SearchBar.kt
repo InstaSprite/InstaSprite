@@ -1,12 +1,7 @@
 package com.instasprite.app.ui.gallery.component
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -22,7 +17,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.theme.AppTheme
@@ -58,7 +54,12 @@ fun SearchBar(
                 )
             )
         },
-        placeholder = { Text(text = stringResource(R.string.search_sprites), color = AppTheme.colors.Subtext0Color) },
+        placeholder = {
+            Text(
+                text = stringResource(R.string.search_sprites),
+                color = AppTheme.colors.Subtext0Color
+            )
+        },
         singleLine = true,
         trailingIcon = {
             IconButton(

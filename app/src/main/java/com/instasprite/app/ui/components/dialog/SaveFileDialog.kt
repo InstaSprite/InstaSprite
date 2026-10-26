@@ -64,7 +64,8 @@ fun SaveFileDialog(
         }
     )
 
-    val displayPath = folderUri?.let { getFullPathFromTreeUri(it) } ?: stringResource(R.string.tap_to_select_file)
+    val displayPath =
+        folderUri?.let { getFullPathFromTreeUri(it) } ?: stringResource(R.string.tap_to_select_file)
 
     InputDialog(
         title = title,
@@ -76,7 +77,11 @@ fun SaveFileDialog(
         onDismiss = onDismiss,
         onConfirm = { values ->
             if (folderUri == null) {
-                Toast.makeText(context, context.getString(R.string.choose_folder), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.choose_folder),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 onValuesChanged?.invoke(values, folderUri)
                 onSave()
@@ -93,7 +98,12 @@ fun SaveFileDialog(
                 OutlinedTextField(
                     value = displayPath,
                     onValueChange = {},
-                    label = { Text(stringResource(R.string.save_location), color = AppTheme.colors.SelectedColor) },
+                    label = {
+                        Text(
+                            stringResource(R.string.save_location),
+                            color = AppTheme.colors.SelectedColor
+                        )
+                    },
                     supportingText = {},
                     readOnly = true,
                     enabled = false,

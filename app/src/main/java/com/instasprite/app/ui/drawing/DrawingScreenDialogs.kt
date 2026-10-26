@@ -1,15 +1,15 @@
 package com.instasprite.app.ui.drawing
 
-import androidx.compose.ui.graphics.Color
-import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
 import com.instasprite.app.domain.dialog.Dialog
 import com.instasprite.app.ui.drawing.contract.CursorDrawEvent
+import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.drawing.dialog.ColorWheelDialog
 import com.instasprite.app.ui.drawing.dialog.DrawingSettingsDialog
 import com.instasprite.app.ui.drawing.dialog.LoadISpriteDialog
@@ -57,18 +57,29 @@ fun DrawingScreenDialogs(
                 )
 
             DrawingDialog.SaveGif, DrawingDialog.SaveSheet -> {
-                val format = if (dialog == DrawingDialog.SaveGif) com.instasprite.app.domain.export.AnimationExportFormat.GIF
+                val format =
+                    if (dialog == DrawingDialog.SaveGif) com.instasprite.app.domain.export.AnimationExportFormat.GIF
                     else com.instasprite.app.domain.export.AnimationExportFormat.SPRITE_SHEET
                 val canvas = viewModel.canvasState.collectAsStateWithLifecycle().value
                 com.instasprite.app.ui.drawing.dialog.SaveAnimationDialog(
                     format = format,
-                    sprite = com.instasprite.app.domain.model.Sprite(width = canvas.width, height = canvas.height,
-                        layers = canvas.layers, animation = canvas.animation),
+                    sprite = com.instasprite.app.domain.model.Sprite(
+                        width = canvas.width, height = canvas.height,
+                        layers = canvas.layers, animation = canvas.animation
+                    ),
                     onDismiss = viewModel::closeTopDialog,
                     folderUri = lastSavedUri,
                     isSaving = uiState.isSaving,
                     onFolderSelected = viewModel::setLastSavedLocation,
-                    onSave = { uri, name, columns, scale -> viewModel.saveAnimation(format, uri, name, columns, scale) }
+                    onSave = { uri, name, columns, scale ->
+                        viewModel.saveAnimation(
+                            format,
+                            uri,
+                            name,
+                            columns,
+                            scale
+                        )
+                    }
                 )
             }
 
@@ -112,7 +123,11 @@ fun DrawingScreenDialogs(
                     colorPalette = viewModel.colorPalette.collectAsStateWithLifecycle().value,
                     onDismiss = viewModel::closeTopDialog,
                     onColorSelected = { color ->
-                        if (isDither) viewModel.onToolSelectorEvent(ToolSelectorEvent.SetDitherBackground(color))
+                        if (isDither) viewModel.onToolSelectorEvent(
+                            ToolSelectorEvent.SetDitherBackground(
+                                color
+                            )
+                        )
                         else viewModel.selectColor(color)
                     },
                     onOpenPaletteScreen = onNavigateToPalette,

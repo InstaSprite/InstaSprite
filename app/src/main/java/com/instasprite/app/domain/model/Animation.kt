@@ -23,9 +23,8 @@ data class AnimationCel(
 
 class CelImage(val id: String = UUID.randomUUID().toString(), val tiles: Map<TileCoord, IntArray>) {
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return other is CelImage && id == other.id && tiles.size == other.tiles.size &&
-            tiles.all { (coord, pixels) -> other.tiles[coord]?.contentEquals(pixels) == true }
+        return this === other || other is CelImage && id == other.id && tiles.size == other.tiles.size &&
+                tiles.all { (coord, pixels) -> other.tiles[coord]?.contentEquals(pixels) == true }
     }
 
     override fun hashCode(): Int = id.hashCode()
@@ -47,7 +46,9 @@ data class Animation(
         require(cels.all { it.frameId in frameIds && it.dataId in images })
         require(images.all { (id, image) -> id.isNotBlank() && id == image.id })
         require(cels.all { it.id.isNotBlank() && it.layerId.isNotBlank() })
-        require(cels.groupBy { it.dataId }.values.all { group -> group.map { it.layerId }.distinct().size == 1 })
+        require(cels.groupBy { it.dataId }.values.all { group ->
+            group.map { it.layerId }.distinct().size == 1
+        })
         return this
     }
 
@@ -61,7 +62,9 @@ data class Animation(
         const val MAX_FRAMES = 1000
 
         fun fromLayers(layers: List<Layer>): Animation {
-            val frame = AnimationFrame(clippingLayerIds = layers.filter { it.isClipping }.map { it.id }.toSet())
+            val frame =
+                AnimationFrame(clippingLayerIds = layers.filter { it.isClipping }.map { it.id }
+                    .toSet())
             val images = layers.filter { it.tiles.isNotEmpty() }.associate { layer ->
                 val image = CelImage(tiles = layer.tiles)
                 layer.id to image

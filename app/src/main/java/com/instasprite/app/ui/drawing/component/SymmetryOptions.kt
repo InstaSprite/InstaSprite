@@ -25,10 +25,18 @@ import com.instasprite.app.utils.pixelDp
 @Composable
 fun SymmetryOptions(symmetry: DrawingSymmetry, onEvent: (ToolSelectorEvent) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(2.pixelDp)) {
-        SymmetryToggle(R.drawable.ic_hflip, stringResource(R.string.mirror_left_right), symmetry.horizontal) {
+        SymmetryToggle(
+            R.drawable.ic_hflip,
+            stringResource(R.string.mirror_left_right),
+            symmetry.horizontal
+        ) {
             onEvent(ToolSelectorEvent.ToggleHorizontalSymmetry)
         }
-        SymmetryToggle(R.drawable.ic_vflip, stringResource(R.string.mirror_top_bottom), symmetry.vertical) {
+        SymmetryToggle(
+            R.drawable.ic_vflip,
+            stringResource(R.string.mirror_top_bottom),
+            symmetry.vertical
+        ) {
             onEvent(ToolSelectorEvent.ToggleVerticalSymmetry)
         }
     }

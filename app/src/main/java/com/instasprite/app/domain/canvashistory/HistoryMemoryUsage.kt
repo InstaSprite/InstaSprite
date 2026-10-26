@@ -50,20 +50,24 @@ internal class HistoryMemoryUsage {
                 update(value.beforeSelection, retain)
                 update(value.afterSelection, retain)
             }
+
             is UndoEntry -> {
                 update(value.deltas, retain)
                 update(value.beforeSelection, retain)
                 update(value.afterSelection, retain)
             }
+
             is OperationEntry -> {
                 update(value.before, retain)
                 update(value.after, retain)
             }
+
             is TileDelta -> {
                 update(value.layerId, retain)
                 update(value.coord, retain)
                 update(value.before, retain)
             }
+
             is HistoryCanvasState -> {
                 update(value.layers, retain)
                 update(value.sprite, retain)
@@ -71,39 +75,46 @@ internal class HistoryMemoryUsage {
                 update(value.activeLayerId, retain)
                 update(value.activeFrameId, retain)
             }
+
             is Sprite -> {
                 update(value.id, retain)
                 update(value.layers, retain)
                 update(value.animation, retain)
                 update(value.colorPalette, retain)
             }
+
             is Animation -> {
                 update(value.frames, retain)
                 update(value.cels, retain)
                 update(value.images, retain)
                 update(value.posterFrameId, retain)
             }
+
             is AnimationCel -> {
                 update(value.id, retain)
                 update(value.layerId, retain)
                 update(value.frameId, retain)
                 update(value.dataId, retain)
             }
+
             is AnimationFrame -> update(value.id, retain)
             is CelImage -> {
                 update(value.id, retain)
                 update(value.tiles, retain)
             }
+
             is Layer -> {
                 update(value.id, retain)
                 update(value.name, retain)
                 update(value.tiles, retain)
             }
+
             is SelectionState -> update(value.mask, retain)
             is Map<*, *> -> value.forEach { (key, item) ->
                 update(key, retain)
                 update(item, retain)
             }
+
             is List<*> -> value.forEach { update(it, retain) }
         }
     }

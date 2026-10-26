@@ -1,35 +1,30 @@
 package com.instasprite.app.ui.gallery.dialog
 
-import com.instasprite.app.utils.pixelDp
-
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import com.instasprite.app.ui.components.dialog.CustomDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
+import com.instasprite.app.ui.components.dialog.CustomDialog
 import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.gallery.SpriteListOrder
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun DisplayOptionsDialog(
@@ -50,14 +45,16 @@ fun DisplayOptionsDialog(
         stringResource(R.string.sort_date_modified) to SpriteListOrder.LastModified,
         stringResource(R.string.sort_date_modified_desc) to SpriteListOrder.LastModifiedDesc
     )
-    val currentSortLabel = sortOptions.entries.firstOrNull { it.value == selectedSortOrder }?.key ?: ""
+    val currentSortLabel =
+        sortOptions.entries.firstOrNull { it.value == selectedSortOrder }?.key ?: ""
 
     val layoutOptions = mapOf(
         stringResource(R.string.layout_list) to GalleryLayoutMode.List,
         stringResource(R.string.layout_staggered) to GalleryLayoutMode.StaggeredGrid,
         stringResource(R.string.layout_square_grid) to GalleryLayoutMode.SquareGrid
     )
-    val currentLayoutLabel = layoutOptions.entries.firstOrNull { it.value == selectedLayoutMode }?.key ?: ""
+    val currentLayoutLabel =
+        layoutOptions.entries.firstOrNull { it.value == selectedLayoutMode }?.key ?: ""
 
     CustomDialog(
         title = stringResource(R.string.display_options),
@@ -116,7 +113,7 @@ private fun DropdownField(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = AppTheme.colors.outlineTextFieldColors(),
             modifier = Modifier
-                .menuAnchor()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
         )
         ExposedDropdownMenu(

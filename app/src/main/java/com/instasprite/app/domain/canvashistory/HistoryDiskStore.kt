@@ -1,8 +1,6 @@
 package com.instasprite.app.domain.canvashistory
 
 import com.instasprite.app.HistoryEntryProto
-import com.instasprite.app.domain.canvashistory.HistoryEntryMapper.toDomain
-import com.instasprite.app.domain.canvashistory.HistoryEntryMapper.toProto
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

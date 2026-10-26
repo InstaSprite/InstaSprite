@@ -78,9 +78,18 @@ private inline fun blendWithMode(dst: Int, src: Int, modeFunc: (dstC: Int, srcC:
     val dstG = (dst ushr 8) and 0xFF
     val dstB = dst and 0xFF
 
-    val r = (modeFunc(dstR, srcR) * srcA * dstA / 255 + srcR * srcA * invDstA / 255 + dstR * dstA * invSrcA / 255 + outA / 2) / outA
-    val g = (modeFunc(dstG, srcG) * srcA * dstA / 255 + srcG * srcA * invDstA / 255 + dstG * dstA * invSrcA / 255 + outA / 2) / outA
-    val b = (modeFunc(dstB, srcB) * srcA * dstA / 255 + srcB * srcA * invDstA / 255 + dstB * dstA * invSrcA / 255 + outA / 2) / outA
+    val r = (modeFunc(
+        dstR,
+        srcR
+    ) * srcA * dstA / 255 + srcR * srcA * invDstA / 255 + dstR * dstA * invSrcA / 255 + outA / 2) / outA
+    val g = (modeFunc(
+        dstG,
+        srcG
+    ) * srcA * dstA / 255 + srcG * srcA * invDstA / 255 + dstG * dstA * invSrcA / 255 + outA / 2) / outA
+    val b = (modeFunc(
+        dstB,
+        srcB
+    ) * srcA * dstA / 255 + srcB * srcA * invDstA / 255 + dstB * dstA * invSrcA / 255 + outA / 2) / outA
 
     return (outA.coerceIn(0, 255) shl 24) or
             (r.coerceIn(0, 255) shl 16) or

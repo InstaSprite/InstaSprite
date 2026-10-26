@@ -2,8 +2,8 @@ package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.domain.draw.PixelPerfectFilter
+import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.utils.bresenhamLine
 
 class PencilTool : StrokeTool {

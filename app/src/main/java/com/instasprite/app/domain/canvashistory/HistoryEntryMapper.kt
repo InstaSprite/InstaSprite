@@ -75,8 +75,10 @@ object HistoryEntryMapper {
     private fun CelImage.toImageProto(): AnimationImageData = AnimationImageData.newBuilder()
         .setId(id).setTiles(ByteString.copyFrom(encodeTilesToByteArray(tiles))).build()
 
-    private fun AnimationImageData.toImage() = CelImage(id,
-        requireNotNull(decodeTilesFromByteArray(tiles.toByteArray())))
+    private fun AnimationImageData.toImage() = CelImage(
+        id,
+        requireNotNull(decodeTilesFromByteArray(tiles.toByteArray()))
+    )
 
     private fun CelEditEntry.toCelEditProto(): CelEditEntryProto {
         val builder = CelEditEntryProto.newBuilder().setLayerId(layerId).setFrameId(frameId)
@@ -89,13 +91,15 @@ object HistoryEntryMapper {
         return builder.build()
     }
 
-    private fun CelEditEntryProto.toCelEdit() = CelEditEntry(layerId, frameId,
+    private fun CelEditEntryProto.toCelEdit() = CelEditEntry(
+        layerId, frameId,
         if (hasBeforeCel()) beforeCel.toCel() else null,
         if (hasAfterCel()) afterCel.toCel() else null,
         if (hasBeforeImage()) beforeImage.toImage() else null,
         if (hasAfterImage()) afterImage.toImage() else null,
         if (hasBeforeSelection()) beforeSelection.toDomainSelectionState() else null,
-        if (hasAfterSelection()) afterSelection.toDomainSelectionState() else null)
+        if (hasAfterSelection()) afterSelection.toDomainSelectionState() else null
+    )
 
     private fun UndoEntry.toUndoEntryProto(): UndoEntryProto = undoEntryProto {
         deltas.addAll(this@toUndoEntryProto.deltas.map { it.toTileDeltaProto() })
@@ -200,7 +204,8 @@ object HistoryEntryMapper {
             width = width,
             height = height,
             layers = layersList.map { it.toDomainLayer() },
-            sprite = if (spriteDocument.isEmpty) null else ISprite.parseFrom(spriteDocument).toSprite(),
+            sprite = if (spriteDocument.isEmpty) null else ISprite.parseFrom(spriteDocument)
+                .toSprite(),
             activeFrameId = activeFrameId,
             activeLayerId = activeLayerId,
             selectionState = if (hasSelectionState) {

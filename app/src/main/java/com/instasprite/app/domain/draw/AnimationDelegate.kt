@@ -8,7 +8,9 @@ class AnimationDelegate(
     private val history: IHistoryManager,
     private val refresh: suspend () -> Unit
 ) {
-    suspend fun insertFrame(empty: Boolean, linked: Boolean) = edit { canvas.insertFrame(empty, linked) }
+    suspend fun insertFrame(empty: Boolean, linked: Boolean) =
+        edit { canvas.insertFrame(empty, linked) }
+
     suspend fun appendFrame() {
         if (canvas.animation.frames.size >= Animation.MAX_FRAMES) return
         edit {
@@ -16,6 +18,7 @@ class AnimationDelegate(
             canvas.insertFrame(empty = true)
         }
     }
+
     suspend fun deleteFrame() = edit { canvas.deleteFrame() }
     suspend fun setDuration(milliseconds: Int) = edit { canvas.setFrameDuration(milliseconds) }
     suspend fun clearCel() = edit { canvas.clearCel() }

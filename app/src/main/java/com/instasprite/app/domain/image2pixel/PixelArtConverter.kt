@@ -1,16 +1,19 @@
 package com.instasprite.app.domain.image2pixel
 
-import com.instasprite.app.utils.CanvasMemoryGuard
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlin.math.*
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
+import com.instasprite.app.utils.CanvasMemoryGuard
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.math.exp
+import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Configuration
@@ -265,7 +268,10 @@ class PixelArtConverter {
         sy: Int,
         bs: Int,
     ): Double {
-        var sumR = 0.0; var sumG = 0.0; var sumB = 0.0; var count = 0
+        var sumR = 0.0
+        var sumG = 0.0
+        var sumB = 0.0
+        var count = 0
 
         for (y in sy until minOf(sy + bs, h)) {
             for (x in sx until minOf(sx + bs, w)) {
@@ -276,7 +282,9 @@ class PixelArtConverter {
         }
         if (count == 0) return 0.0
 
-        val ar = sumR / count; val ag = sumG / count; val ab = sumB / count
+        val ar = sumR / count
+        val ag = sumG / count
+        val ab = sumB / count
         var variance = 0.0
         for (y in sy until minOf(sy + bs, h)) {
             for (x in sx until minOf(sx + bs, w)) {
@@ -337,7 +345,11 @@ class PixelArtConverter {
         startY: Int,
         blockSize: Int,
     ): Int {
-        var r = 0L; var g = 0L; var b = 0L; var a = 0L; var count = 0
+        var r = 0L
+        var g = 0L
+        var b = 0L
+        var a = 0L
+        var count = 0
         for (y in startY until minOf(startY + blockSize, h)) {
             for (x in startX until minOf(startX + blockSize, w)) {
                 val c = pixels[y * w + x]
@@ -346,7 +358,12 @@ class PixelArtConverter {
             }
         }
         if (count == 0) return Color.TRANSPARENT
-        return Color.argb((a / count).toInt(), (r / count).toInt(), (g / count).toInt(), (b / count).toInt())
+        return Color.argb(
+            (a / count).toInt(),
+            (r / count).toInt(),
+            (g / count).toInt(),
+            (b / count).toInt()
+        )
     }
 
     /** Scale [src] down to [targetWidth] pixels wide using nearest-neighbour. */
@@ -378,7 +395,13 @@ class PixelArtConverter {
         }
 
         if (config.enableDithering) {
-            pixels = floydSteinbergDither(pixels, bmp.width, bmp.height, config.colorCount, config.customPalette)
+            pixels = floydSteinbergDither(
+                pixels,
+                bmp.width,
+                bmp.height,
+                config.colorCount,
+                config.customPalette
+            )
         }
 
         bmp.setPixels(pixels, 0, bmp.width, 0, 0, bmp.width, bmp.height)
@@ -410,7 +433,10 @@ class PixelArtConverter {
                 val cG = Color.green(center).toDouble()
                 val cB = Color.blue(center).toDouble()
 
-                var sumR = 0.0; var sumG = 0.0; var sumB = 0.0; var sumWeight = 0.0
+                var sumR = 0.0
+                var sumG = 0.0
+                var sumB = 0.0
+                var sumWeight = 0.0
 
                 for (dy in -radius..radius) {
                     for (dx in -radius..radius) {
@@ -507,14 +533,20 @@ class PixelArtConverter {
                     colorDistanceSq(Color.rgb(oldR, oldG, oldB), it)
                 } ?: Color.rgb(oldR, oldG, oldB)
 
-                out[idx] = Color.argb(Color.alpha(pixels[idx]), Color.red(quantColor), Color.green(quantColor), Color.blue(quantColor))
+                out[idx] = Color.argb(
+                    Color.alpha(pixels[idx]),
+                    Color.red(quantColor),
+                    Color.green(quantColor),
+                    Color.blue(quantColor)
+                )
 
                 val errR = oldR - Color.red(quantColor).toFloat()
                 val errG = oldG - Color.green(quantColor).toFloat()
                 val errB = oldB - Color.blue(quantColor).toFloat()
 
                 fun spread(dx: Int, dy: Int, factor: Float) {
-                    val nx = x + dx; val ny = y + dy
+                    val nx = x + dx
+                    val ny = y + dy
                     if (nx in 0 until w && ny in 0 until h) {
                         val ni = ny * w + nx
                         rBuf[ni] += errR * factor
@@ -522,10 +554,10 @@ class PixelArtConverter {
                         bBuf[ni] += errB * factor
                     }
                 }
-                spread( 1,  0, 7f / 16)
-                spread(-1,  1, 3f / 16)
-                spread( 0,  1, 5f / 16)
-                spread( 1,  1, 1f / 16)
+                spread(1, 0, 7f / 16)
+                spread(-1, 1, 3f / 16)
+                spread(0, 1, 5f / 16)
+                spread(1, 1, 1f / 16)
             }
         }
         return out
@@ -556,9 +588,13 @@ class PixelArtConverter {
             style = Paint.Style.STROKE
         }
         var x = 0f
-        while (x <= w) { canvas.drawLine(x, 0f, x, h.toFloat(), paint); x += pixelSize }
+        while (x <= w) {
+            canvas.drawLine(x, 0f, x, h.toFloat(), paint); x += pixelSize
+        }
         var y = 0f
-        while (y <= h) { canvas.drawLine(0f, y, w.toFloat(), y, paint); y += pixelSize }
+        while (y <= h) {
+            canvas.drawLine(0f, y, w.toFloat(), y, paint); y += pixelSize
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -593,16 +629,22 @@ private class ColorBox(private val pixels: MutableList<Int>) {
 
     private var splitChannel: Int = 0
 
-    init { recompute() }
+    init {
+        recompute()
+    }
 
     private fun recompute() {
-        var minR = 255; var minG = 255; var minB = 255
-        var maxR = 0;   var maxG = 0;   var maxB = 0
+        var minR = 255
+        var minG = 255
+        var minB = 255
+        var maxR = 0
+        var maxG = 0
+        var maxB = 0
 
         for (p in pixels) {
-            minR = minOf(minR, Color.red(p));   maxR = maxOf(maxR, Color.red(p))
+            minR = minOf(minR, Color.red(p)); maxR = maxOf(maxR, Color.red(p))
             minG = minOf(minG, Color.green(p)); maxG = maxOf(maxG, Color.green(p))
-            minB = minOf(minB, Color.blue(p));  maxB = maxOf(maxB, Color.blue(p))
+            minB = minOf(minB, Color.blue(p)); maxB = maxOf(maxB, Color.blue(p))
         }
 
         val rangeR = maxR - minR
@@ -613,13 +655,16 @@ private class ColorBox(private val pixels: MutableList<Int>) {
         splitChannel = when (largestRange) {
             rangeR -> 0
             rangeG -> 1
-            else   -> 2
+            else -> 2
         }
     }
 
     fun averageColor(): Int {
         if (pixels.isEmpty()) return Color.BLACK
-        var r = 0L; var g = 0L; var b = 0L; var a = 0L
+        var r = 0L
+        var g = 0L
+        var b = 0L
+        var a = 0L
         for (p in pixels) {
             r += Color.red(p); g += Color.green(p)
             b += Color.blue(p); a += Color.alpha(p)
@@ -634,7 +679,9 @@ private class ColorBox(private val pixels: MutableList<Int>) {
         if (pixels.size < 2) return null
         val ch = splitChannel
         pixels.sortBy { p ->
-            when (ch) { 0 -> Color.red(p); 1 -> Color.green(p); else -> Color.blue(p) }
+            when (ch) {
+                0 -> Color.red(p); 1 -> Color.green(p); else -> Color.blue(p)
+            }
         }
         val mid = pixels.size / 2
         return listOf(

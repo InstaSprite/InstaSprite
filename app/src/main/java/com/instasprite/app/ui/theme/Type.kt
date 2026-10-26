@@ -26,7 +26,10 @@ val DeterminationFont = FontFamily(
     Font(R.font.svn_determination, FontWeight.Normal)
 )
 
-fun buildCatppuccinTypography(colors: AppColors, appFont: AppFont = AppFont.DETERMINATION): Typography {
+fun buildCatppuccinTypography(
+    colors: AppColors,
+    appFont: AppFont = AppFont.DETERMINATION
+): Typography {
     val selectedFont = when (appFont) {
         AppFont.DETERMINATION -> DeterminationFont
         AppFont.RETRON -> RetronFont

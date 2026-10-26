@@ -1,11 +1,5 @@
 package com.instasprite.app.ui.components.composable
 
-import com.instasprite.app.utils.CanvasMemoryException
-import com.instasprite.app.utils.pixelDp
-
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,10 +15,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.CanvasMemoryException
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun CanvasPreviewer(

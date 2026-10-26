@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -19,8 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.instasprite.app.R
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.Tool
 import com.instasprite.app.ui.theme.AppTheme

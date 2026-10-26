@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,13 +21,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.domain.tool.Tool
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun ToolSelector(

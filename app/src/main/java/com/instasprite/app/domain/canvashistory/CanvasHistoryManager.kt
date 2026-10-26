@@ -7,11 +7,13 @@ import com.instasprite.app.utils.TILE_SIZE
 import com.instasprite.app.utils.pixelsToTiles
 import com.instasprite.app.utils.tilesToPixels
 import java.util.ArrayDeque
-import java.util.LinkedHashMap
 
 class CanvasHistoryManager(
     private val diskStore: HistoryDiskStore? = null,
-    private val memoryBudgetBytes: Long = minOf(32L * 1024 * 1024, Runtime.getRuntime().maxMemory() / 8)
+    private val memoryBudgetBytes: Long = minOf(
+        32L * 1024 * 1024,
+        Runtime.getRuntime().maxMemory() / 8
+    )
 ) {
     private val undoStack: ArrayDeque<HistoryEntry> = ArrayDeque()
     private val redoStack: ArrayDeque<HistoryEntry> = ArrayDeque()
@@ -34,7 +36,8 @@ class CanvasHistoryManager(
     }
 
     fun undo(current: HistoryCanvasState): HistoryCanvasState? {
-        val entry = undoStack.pollLast() ?: diskStore?.popUndo()?.also { memoryUsage.retain(it) } ?: return null
+        val entry = undoStack.pollLast() ?: diskStore?.popUndo()?.also { memoryUsage.retain(it) }
+        ?: return null
 
         return try {
             when (entry) {
@@ -42,6 +45,7 @@ class CanvasHistoryManager(
                     pushRedo(entry)
                     applyCelEdit(entry, current, true)
                 }
+
                 is UndoEntry -> {
                     val (restoredState, redoEntry) = applyTileEntry(entry, current)
                     if (!redoEntry.isEmpty()) {
@@ -68,7 +72,8 @@ class CanvasHistoryManager(
     }
 
     fun redo(current: HistoryCanvasState): HistoryCanvasState? {
-        val entry = redoStack.pollLast() ?: diskStore?.popRedo()?.also { memoryUsage.retain(it) } ?: return null
+        val entry = redoStack.pollLast() ?: diskStore?.popRedo()?.also { memoryUsage.retain(it) }
+        ?: return null
 
         return try {
             when (entry) {
@@ -76,6 +81,7 @@ class CanvasHistoryManager(
                     pushUndo(entry)
                     applyCelEdit(entry, current, false)
                 }
+
                 is UndoEntry -> {
                     val (restoredState, undoEntry) = applyTileEntry(entry, current)
                     if (!undoEntry.isEmpty()) {
@@ -197,27 +203,40 @@ class CanvasHistoryManager(
         return Pair(next, UndoEntry(redoDeltas))
     }
 
-    private fun applyCelEdit(entry: CelEditEntry, state: HistoryCanvasState, undo: Boolean): HistoryCanvasState {
+    private fun applyCelEdit(
+        entry: CelEditEntry,
+        state: HistoryCanvasState,
+        undo: Boolean
+    ): HistoryCanvasState {
         val sprite = requireNotNull(state.sprite)
         val animation = requireNotNull(sprite.animation)
         val cel = if (undo) entry.beforeCel else entry.afterCel
         val image = if (undo) entry.beforeImagePatch else entry.afterImagePatch
-        val cels = animation.cels.filterNot { it.layerId == entry.layerId && it.frameId == entry.frameId } + listOfNotNull(cel)
+        val cels =
+            animation.cels.filterNot { it.layerId == entry.layerId && it.frameId == entry.frameId } + listOfNotNull(
+                cel
+            )
         val images = animation.images.toMutableMap()
         image?.let {
             val tiles = images[it.id]?.tiles?.toMutableMap() ?: mutableMapOf()
             val touched = (entry.beforeImagePatch?.tiles?.keys ?: emptySet()) +
-                (entry.afterImagePatch?.tiles?.keys ?: emptySet())
+                    (entry.afterImagePatch?.tiles?.keys ?: emptySet())
             touched.forEach { coord -> tiles.remove(coord) }
             tiles.putAll(it.tiles)
             images[it.id] = CelImage(it.id, tiles)
         }
         val referenced = cels.map { it.dataId }.toSet()
-        val nextAnimation = animation.copy(cels = cels, images = images.filterKeys { it in referenced })
+        val nextAnimation =
+            animation.copy(cels = cels, images = images.filterKeys { it in referenced })
         val nextSprite = sprite.copy(animation = nextAnimation)
         val selection = if (undo) entry.beforeSelection else entry.afterSelection
-        return state.copy(sprite = nextSprite, layers = nextSprite.layersAt(entry.frameId),
-            activeFrameId = entry.frameId, activeLayerId = entry.layerId, selectionState = selection?.deepCopy())
+        return state.copy(
+            sprite = nextSprite,
+            layers = nextSprite.layersAt(entry.frameId),
+            activeFrameId = entry.frameId,
+            activeLayerId = entry.layerId,
+            selectionState = selection?.deepCopy()
+        )
     }
 
     private fun deepCopyState(state: HistoryCanvasState): HistoryCanvasState {

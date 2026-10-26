@@ -1,39 +1,38 @@
 package com.instasprite.app.ui.loadimage
 
-import android.graphics.BitmapFactory
-import com.instasprite.app.R
-import com.instasprite.app.utils.CanvasMemoryGuard
-import com.instasprite.app.utils.CanvasMemoryException
-import kotlinx.coroutines.CancellationException
-import java.io.IOException
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.instasprite.app.R
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.domain.image2pixel.PixelArtConfig
 import com.instasprite.app.domain.image2pixel.PixelArtConverter
 import com.instasprite.app.domain.model.Cel
+import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
+import com.instasprite.app.ui.loadimage.contract.ImageConfigEvent
+import com.instasprite.app.ui.loadimage.contract.LoadImageUiState
+import com.instasprite.app.utils.CanvasMemoryException
+import com.instasprite.app.utils.CanvasMemoryGuard
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
-import com.instasprite.app.ui.loadimage.contract.ImageConfigEvent
-import com.instasprite.app.domain.model.ColorPalette
-import com.instasprite.app.ui.loadimage.contract.LoadImageUiState
 
 @HiltViewModel
 class LoadImageViewModel @Inject constructor(
@@ -54,7 +53,13 @@ class LoadImageViewModel @Inject constructor(
         when (event) {
             is ImageConfigEvent.SpriteNameChange -> _uiState.update { it.copy(spriteName = event.name) }
             is ImageConfigEvent.ApplyPaletteChange -> _uiState.update { it.copy(applyPalette = event.apply) }
-            is ImageConfigEvent.TargetWidthChange -> updateConfig { it.copy(targetWidth = event.width, autoDetect = false) }
+            is ImageConfigEvent.TargetWidthChange -> updateConfig {
+                it.copy(
+                    targetWidth = event.width,
+                    autoDetect = false
+                )
+            }
+
             is ImageConfigEvent.ColorCountChange -> updateConfig { it.copy(colorCount = event.count) }
             is ImageConfigEvent.AutoDetectChange -> updateConfig { it.copy(autoDetect = event.autoDetect) }
             is ImageConfigEvent.DitheringChange -> updateConfig { it.copy(enableDithering = event.enabled) }
@@ -65,20 +70,34 @@ class LoadImageViewModel @Inject constructor(
     fun loadImage(context: Context, uri: Uri) {
         processingJob?.cancel()
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null, sourceBitmap = null, processedBitmap = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    sourceBitmap = null,
+                    processedBitmap = null
+                )
+            }
             try {
                 val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->
+                    ImageDecoder.decodeBitmap(
+                        ImageDecoder.createSource(
+                            context.contentResolver,
+                            uri
+                        )
+                    ) { decoder, info, _ ->
                         CanvasMemoryGuard.requirePixels(info.size.width, info.size.height, 32)
                         decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
                         decoder.isMutableRequired = true
                     }
                 } else {
                     val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                    context.contentResolver.openInputStream(uri).use { BitmapFactory.decodeStream(it, null, options) }
+                    context.contentResolver.openInputStream(uri)
+                        .use { BitmapFactory.decodeStream(it, null, options) }
                     CanvasMemoryGuard.requirePixels(options.outWidth, options.outHeight, 32)
                     options.inJustDecodeBounds = false
-                    context.contentResolver.openInputStream(uri).use { BitmapFactory.decodeStream(it, null, options) }
+                    context.contentResolver.openInputStream(uri)
+                        .use { BitmapFactory.decodeStream(it, null, options) }
                         ?: throw IOException("Unable to decode image")
                 }
                 val safeBitmap = try {
@@ -100,7 +119,13 @@ class LoadImageViewModel @Inject constructor(
     }
 
     private fun updateConfig(update: (PixelArtConfig) -> PixelArtConfig) {
-        _uiState.update { it.copy(config = update(it.config), processedBitmap = null, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                config = update(it.config),
+                processedBitmap = null,
+                errorMessage = null
+            )
+        }
         processImage()
     }
 
@@ -109,12 +134,12 @@ class LoadImageViewModel @Inject constructor(
     private fun processImage() {
         val src = _uiState.value.sourceBitmap ?: return
         val currentConfig = _uiState.value.config
-        
+
         processingJob?.cancel()
         processingJob = viewModelScope.launch {
             delay(100) // Debounce rapid slider/button changes
             if (!isActive) return@launch
-            
+
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val result = converter.process(src, currentConfig)

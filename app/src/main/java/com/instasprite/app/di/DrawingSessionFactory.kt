@@ -4,8 +4,8 @@ import android.content.Context
 import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.data.repository.PixelCanvasRepository
 import com.instasprite.app.domain.canvashistory.HistoryDiskStore
-import com.instasprite.app.domain.draw.DrawingSession
 import com.instasprite.app.domain.draw.DrawingEngine
+import com.instasprite.app.domain.draw.DrawingSession
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope

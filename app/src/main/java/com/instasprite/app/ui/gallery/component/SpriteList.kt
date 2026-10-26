@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.gallery.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -32,7 +30,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -48,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
@@ -60,6 +56,7 @@ import com.instasprite.app.ui.gallery.contract.SpriteListEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.DummyData
+import com.instasprite.app.utils.pixelDp
 
 
 @Composable
@@ -92,7 +89,12 @@ fun SpriteList(
                     ) { (sprite, meta) ->
                         SpriteCard(
                             onDelete = {
-                                onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id))
+                                onSpriteListEvent(
+                                    SpriteListEvent.OpenDeleteDialog(
+                                        meta!!.spriteName,
+                                        sprite.id
+                                    )
+                                )
                             },
                             onRename = {
                                 onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
@@ -133,7 +135,14 @@ fun SpriteList(
                             layoutMode = GalleryLayoutMode.StaggeredGrid,
                             onEdit = { onOpenDrawing(sprite, meta?.spriteName) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
-                            onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
+                            onDelete = {
+                                onSpriteListEvent(
+                                    SpriteListEvent.OpenDeleteDialog(
+                                        meta!!.spriteName,
+                                        sprite.id
+                                    )
+                                )
+                            },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
                             modifier = Modifier.animateItem()
                         )
@@ -163,7 +172,14 @@ fun SpriteList(
                             layoutMode = GalleryLayoutMode.SquareGrid,
                             onEdit = { onOpenDrawing(sprite, meta?.spriteName) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
-                            onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
+                            onDelete = {
+                                onSpriteListEvent(
+                                    SpriteListEvent.OpenDeleteDialog(
+                                        meta!!.spriteName,
+                                        sprite.id
+                                    )
+                                )
+                            },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
                             modifier = Modifier.animateItem()
                         )
@@ -225,7 +241,7 @@ private fun SpriteCard(
                             .size(26.pixelDp)
                     ) {
                         PixelIcon(
-                            icon =R.drawable.ic_three_dots,
+                            icon = R.drawable.ic_three_dots,
                             contentDescription = stringResource(R.string.options),
                             tint = AppTheme.colors.TextColorLight
                         )

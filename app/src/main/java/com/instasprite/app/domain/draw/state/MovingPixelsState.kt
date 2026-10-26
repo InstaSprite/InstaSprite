@@ -6,7 +6,7 @@ object MovingPixelsState : CanvasInteractionState {
     override fun onTouchStart(row: Int, col: Int, ctx: InteractionContext) {
         val tool = ctx.selectedTool as? StrokeTool ?: return
         ctx.historyManager.saveState()
-        
+
         ctx.strokeEngine.onStrokeStart(
             tool = tool,
             row = row,
@@ -26,7 +26,7 @@ object MovingPixelsState : CanvasInteractionState {
 
     override fun onTouchEnd(ctx: InteractionContext) {
         val tool = ctx.selectedTool as? StrokeTool ?: return
-        
+
         ctx.strokeEngine.onStrokeEnd(
             tool = tool,
             isAppendSelectionMode = ctx.isAppendSelectionMode,

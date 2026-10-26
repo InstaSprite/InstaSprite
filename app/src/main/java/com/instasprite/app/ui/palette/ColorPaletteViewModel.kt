@@ -7,21 +7,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.instasprite.app.R
 import com.instasprite.app.data.repository.ColorPaletteRepository
+import com.instasprite.app.di.settingsDataStore
 import com.instasprite.app.domain.dialog.DialogController
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.utils.AppSettings
 import com.instasprite.app.utils.getFileName
-import com.instasprite.app.di.settingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -60,12 +60,12 @@ class ColorPaletteViewModel @Inject constructor(
         } else {
             list.filter {
                 it.name.contains(query, ignoreCase = true) ||
-                it.author.contains(query, ignoreCase = true)
+                        it.author.contains(query, ignoreCase = true)
             }
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
@@ -79,12 +79,12 @@ class ColorPaletteViewModel @Inject constructor(
         } else {
             favorites.filter {
                 it.name.contains(query, ignoreCase = true) ||
-                it.author.contains(query, ignoreCase = true)
+                        it.author.contains(query, ignoreCase = true)
             }
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
@@ -92,7 +92,7 @@ class ColorPaletteViewModel @Inject constructor(
         .map { it.defaultPaletteId }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = AppSettings.getDefaultPaletteId(context)
         )
 

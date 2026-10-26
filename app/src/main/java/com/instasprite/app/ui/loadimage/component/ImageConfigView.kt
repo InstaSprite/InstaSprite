@@ -1,10 +1,5 @@
 package com.instasprite.app.ui.loadimage.component
 
-import com.instasprite.app.utils.pixelDp
-
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,17 +20,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.instasprite.app.R
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
-import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.components.composable.NumberStepper
+import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.loadimage.LoadImageScreenEvent
 import com.instasprite.app.ui.loadimage.contract.ImageConfigEvent
 import com.instasprite.app.ui.loadimage.contract.LoadImageUiState
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 
 
 @Composable

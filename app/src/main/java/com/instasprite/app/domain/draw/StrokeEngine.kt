@@ -1,22 +1,22 @@
 package com.instasprite.app.domain.draw
 
-import com.instasprite.app.domain.tool.DitherBrush
-import com.instasprite.app.domain.tool.DrawingSymmetry
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.get
 import androidx.core.graphics.set
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.DitherBrush
+import com.instasprite.app.domain.tool.DrawingSymmetry
 import com.instasprite.app.domain.tool.EraserTool
+import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
-import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
-import com.instasprite.app.utils.blendPixel
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
+import com.instasprite.app.utils.blendPixel
 
 data class StrokeEndResult(
     val updatedSelectionState: SelectionState? = null,
@@ -49,6 +49,7 @@ class StrokeEngine(
         moveTool.reset()
         strokeTouchedCount = 0
     }
+
     // Reused stroke buffers to avoid per-move allocations.
     private var strokeTouchMarks: IntArray = IntArray(0)
     private var strokeTouchedIndices: IntArray = IntArray(0)
@@ -157,7 +158,7 @@ class StrokeEngine(
 
     private fun applyStrokeUpdate(update: StrokeUpdate): Boolean {
         var applied = false
-        
+
         update.mainLayerTiles?.let {
             pixelCanvasUseCase.setActiveLayerTiles(it)
             bitmapManager.incrementDrawVersion()
@@ -167,7 +168,15 @@ class StrokeEngine(
             val bitmap = bitmapManager.bitmap
             if (bitmap != null) {
                 for (region in regions) {
-                    bitmap.setPixels(region.pixels, 0, region.width, region.x, region.y, region.width, region.height)
+                    bitmap.setPixels(
+                        region.pixels,
+                        0,
+                        region.width,
+                        region.x,
+                        region.y,
+                        region.width,
+                        region.height
+                    )
                 }
             }
             bitmapManager.incrementDrawVersion()
@@ -201,7 +210,8 @@ class StrokeEngine(
         zoomScale: Float = 1f
     ) {
         strokeDither = if (tool is PencilTool) dither else DitherBrush()
-        strokeSymmetry = if (tool is PencilTool || tool is ShapeTool || tool is EraserTool) symmetry else DrawingSymmetry()
+        strokeSymmetry =
+            if (tool is PencilTool || tool is ShapeTool || tool is EraserTool) symmetry else DrawingSymmetry()
         if (tool is EraserTool) tool.symmetry = strokeSymmetry
         if (tool is PencilTool) tool.brushShape = brushShape
         if (tool is EraserTool) tool.brushShape = brushShape
@@ -226,7 +236,12 @@ class StrokeEngine(
             color = color,
             scale = scale,
             plotPreviewPixel = { r, c, argb ->
-                if (tool is SelectionTool) plotOverlayPixel(r, c, argb, onTop = true) else plotStrokePixel(r, c, argb)
+                if (tool is SelectionTool) plotOverlayPixel(
+                    r,
+                    c,
+                    argb,
+                    onTop = true
+                ) else plotStrokePixel(r, c, argb)
             },
             onCommittedPixel = { r, c -> applyCommittedPixelToMainBitmap(r, c) }
         )
@@ -267,7 +282,12 @@ class StrokeEngine(
             row = row,
             col = col,
             plotPreviewPixel = { r, c, argb ->
-                if (tool is SelectionTool) plotOverlayPixel(r, c, argb, onTop = true) else plotStrokePixel(r, c, argb)
+                if (tool is SelectionTool) plotOverlayPixel(
+                    r,
+                    c,
+                    argb,
+                    onTop = true
+                ) else plotStrokePixel(r, c, argb)
             },
             onCommittedPixel = { _, _ -> }
         )

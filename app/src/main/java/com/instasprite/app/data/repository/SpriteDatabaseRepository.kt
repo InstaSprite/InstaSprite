@@ -5,8 +5,8 @@ import com.instasprite.app.data.database.SpriteDataDao
 import com.instasprite.app.data.database.SpriteMetaDataDao
 import com.instasprite.app.data.mapper.toDomain
 import com.instasprite.app.data.mapper.toEntity
-import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.data.mapper.toISprite
+import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.data.model.SpriteMetaData
 import com.instasprite.app.data.source.ISpriteDatSource
 import com.instasprite.app.domain.export.ImageExporter

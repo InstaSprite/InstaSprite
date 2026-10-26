@@ -1,7 +1,7 @@
 package com.instasprite.app.ui.drawing.component
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.ui.graphics.Color
 import com.instasprite.app.domain.tool.EraserTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
@@ -20,7 +20,15 @@ fun LazyListScope.toolOptions(
     activeColor: Color = Color.Black
 ) {
     when (tool) {
-        is PencilTool -> PencilOptions(uiState, event, toolSize, onToolSizeChange, paletteColors, activeColor)
+        is PencilTool -> PencilOptions(
+            uiState,
+            event,
+            toolSize,
+            onToolSizeChange,
+            paletteColors,
+            activeColor
+        )
+
         is EraserTool -> EraserOptions(uiState, event, toolSize, onToolSizeChange)
         is ShapeTool -> ShapeOptions(tool, event, toolSize, onToolSizeChange)
         is SelectionTool -> SelectionOptions(tool as Tool, event)

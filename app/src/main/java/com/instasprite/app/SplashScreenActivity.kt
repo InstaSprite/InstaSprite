@@ -58,7 +58,7 @@ fun SplashScreen() {
     {
         Image(
             painter = rememberPixelPainter(R.drawable.ic_splash),
-                    modifier = Modifier
+            modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .fillMaxHeight(0.7f),
             contentDescription = stringResource(R.string.splash_screen),

@@ -27,10 +27,15 @@ class MoveTool : StrokeTool {
         onCommittedPixel: (Int, Int) -> Unit
     ): StrokeUpdate {
         val current = session ?: run {
-            val layer = canvas.getLayers().firstOrNull { it.id == canvas.getActiveLayerId() } ?: return StrokeUpdate()
+            val layer = canvas.getLayers().firstOrNull { it.id == canvas.getActiveLayerId() }
+                ?: return StrokeUpdate()
             if (layer.isLocked || !layer.isVisible) return StrokeUpdate()
-            MoveSession(MoveCompositor(canvas.getCanvasWidth(), canvas.getCanvasHeight(),
-                canvas.getLayers().toList(), layer.id, canvas.getSelectionMask())).also { session = it }
+            MoveSession(
+                MoveCompositor(
+                    canvas.getCanvasWidth(), canvas.getCanvasHeight(),
+                    canvas.getLayers().toList(), layer.id, canvas.getSelectionMask()
+                )
+            ).also { session = it }
         }
         current.startCol = col
         current.startRow = row

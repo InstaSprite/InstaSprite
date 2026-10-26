@@ -70,7 +70,8 @@ fun ISprite.toSprite(): Sprite {
 
     val layers = this.layersList.map { layerData ->
         // Backward compatibility: pb defaults float to 0.0 and string to ""
-        val opacity = if (formatVersion >= 1 || layerData.blendMode.isNotEmpty() || layerData.opacity > 0f) layerData.opacity else 1.0f
+        val opacity =
+            if (formatVersion >= 1 || layerData.blendMode.isNotEmpty() || layerData.opacity > 0f) layerData.opacity else 1.0f
         val blendMode = try {
             if (layerData.blendMode.isNotEmpty()) BlendMode.valueOf(layerData.blendMode) else BlendMode.NORMAL
         } catch (_: IllegalArgumentException) {
@@ -113,8 +114,13 @@ fun ISprite.toSprite(): Sprite {
         colorPalette = this.colorPaletteList.takeIf { it.isNotEmpty() },
         animation = if (formatVersion == 0) Animation.fromLayers(layers) else Animation(
             frames = framesList.map {
-                AnimationFrame(it.id, it.durationMs, if (formatVersion >= 3) it.clippingLayerIdsList.toSet()
-                    else layers.filter { layer -> layer.isClipping }.map { layer -> layer.id }.toSet())
+                AnimationFrame(
+                    it.id,
+                    it.durationMs,
+                    if (formatVersion >= 3) it.clippingLayerIdsList.toSet()
+                    else layers.filter { layer -> layer.isClipping }.map { layer -> layer.id }
+                        .toSet()
+                )
             },
             cels = celsList.map { AnimationCel(it.id, it.layerId, it.frameId, it.dataId) },
             images = imagesList.map {

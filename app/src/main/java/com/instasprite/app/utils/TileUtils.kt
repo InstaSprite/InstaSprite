@@ -92,7 +92,10 @@ fun tilesToPreviewPixels(
     return IntArray(Math.multiplyExact(previewWidth, previewHeight)) { index ->
         val x = ((2L * (index % previewWidth) + 1) * canvasWidth / (2L * previewWidth)).toInt()
         val y = ((2L * (index / previewWidth) + 1) * canvasHeight / (2L * previewHeight)).toInt()
-        tiles[TileCoord(x / TILE_SIZE, y / TILE_SIZE)]?.get((y % TILE_SIZE) * TILE_SIZE + x % TILE_SIZE) ?: 0
+        tiles[TileCoord(
+            x / TILE_SIZE,
+            y / TILE_SIZE
+        )]?.get((y % TILE_SIZE) * TILE_SIZE + x % TILE_SIZE) ?: 0
     }
 }
 
@@ -173,7 +176,8 @@ fun encodeTilesToByteArray(tiles: Map<TileCoord, IntArray>): ByteArray {
 
     for ((coord, tilePixels) in tiles) {
         val runs = encodeRle(tilePixels)
-        val tileBuffer = ByteBuffer.allocate(4 * 5 + 4 + runs.size * 8).order(ByteOrder.LITTLE_ENDIAN)
+        val tileBuffer =
+            ByteBuffer.allocate(4 * 5 + 4 + runs.size * 8).order(ByteOrder.LITTLE_ENDIAN)
         tileBuffer.putInt(coord.x)
         tileBuffer.putInt(coord.y)
         tileBuffer.putInt(TILE_SIZE)

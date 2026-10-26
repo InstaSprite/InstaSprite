@@ -202,7 +202,7 @@ private fun BottomBar(
                 .align(Alignment.TopStart)
                 .padding(8.pixelDp)
         ) {
-            Text(text =  stringResource(R.string.name) + ": " + spriteName)
+            Text(text = stringResource(R.string.name) + ": " + spriteName)
             Text(text = stringResource(R.string.sort_date_created) + ": " + dateCreated)
 
             Spacer(modifier = Modifier.height(8.pixelDp))

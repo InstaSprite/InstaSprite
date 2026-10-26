@@ -1,18 +1,17 @@
 package com.instasprite.app.ui.gallery
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.instasprite.app.R
 import com.instasprite.app.domain.dialog.Dialog
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
+import com.instasprite.app.ui.drawing.dialog.LoadISpriteDialog
+import com.instasprite.app.ui.gallery.dialog.DisplayOptionsDialog
 import com.instasprite.app.ui.gallery.dialog.RenameDialog
 import com.instasprite.app.ui.gallery.dialog.SaveImageDialog
-import com.instasprite.app.ui.gallery.dialog.DisplayOptionsDialog
-import com.instasprite.app.ui.drawing.dialog.LoadISpriteDialog
 import com.instasprite.app.ui.theme.AppTheme
 
 
@@ -54,6 +53,7 @@ fun GalleryScreenDialogs(
                     },
                     onDismiss = viewModel::closeTopDialog
                 )
+
             is GalleryDialog.Rename ->
                 RenameDialog(
                     spriteId = dialog.spriteId,

@@ -1,13 +1,10 @@
 package com.instasprite.app.ui.drawing.component
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.instasprite.app.ui.drawing.DrawingScreenEvent
 import com.instasprite.app.ui.drawing.DrawingScreenState
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
-import com.instasprite.app.utils.pixelDp
 
 fun LazyListScope.PencilOptions(
     uiState: DrawingScreenState,

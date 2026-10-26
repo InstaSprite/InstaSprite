@@ -1,6 +1,5 @@
 package com.instasprite.app.ui.drawing.dialog
 
-import com.instasprite.app.utils.CanvasMemoryException
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,23 +12,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.material3.CircularProgressIndicator
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import androidx.compose.runtime.rememberCoroutineScope
 import com.instasprite.app.R
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
@@ -38,8 +34,12 @@ import com.instasprite.app.ui.components.composable.ImageZoomableOverlay
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.CustomDialog
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.CanvasMemoryException
 import com.instasprite.app.utils.getFileName
 import com.instasprite.app.utils.pixelDp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoadISpriteDialog(
@@ -67,7 +67,8 @@ fun LoadISpriteDialog(
                             isLoading = false
                             spriteData = result
                             if (result == null) {
-                                Toast.makeText(context, "Error loading file", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Error loading file", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         }
                     }
@@ -77,7 +78,8 @@ fun LoadISpriteDialog(
             }
         })
 
-    val displayPath = fileUri?.let { getFileName(context, it) } ?: stringResource(R.string.tap_to_select_file)
+    val displayPath =
+        fileUri?.let { getFileName(context, it) } ?: stringResource(R.string.tap_to_select_file)
     val spriteWidth = spriteData?.width ?: ""
     val spriteHeight = spriteData?.height ?: ""
 
@@ -164,7 +166,7 @@ fun LoadISpriteDialog(
                         }
                     }
                 }
-                
+
                 if (isLoading) {
                     Spacer(Modifier.height(16.pixelDp))
                     CircularProgressIndicator(

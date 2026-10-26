@@ -1,8 +1,7 @@
 package com.instasprite.app.ui.drawing.tutorial
 
-import com.instasprite.app.ui.tutorial.TutorialStep
-
 import com.instasprite.app.R
+import com.instasprite.app.ui.tutorial.TutorialStep
 
 enum class DrawingTutorialStep(
     override val titleRes: Int,

@@ -21,8 +21,9 @@ data class CelEditEntry(
     val beforeSelection: SelectionState?,
     val afterSelection: SelectionState?
 ) : HistoryEntry {
-    override fun isEmpty(): Boolean = beforeCel == afterCel && beforeImagePatch == afterImagePatch &&
-        beforeSelection == afterSelection
+    override fun isEmpty(): Boolean =
+        beforeCel == afterCel && beforeImagePatch == afterImagePatch &&
+                beforeSelection == afterSelection
 }
 
 @Suppress("ArrayInDataClass")

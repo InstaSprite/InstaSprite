@@ -191,7 +191,10 @@ fun SpotlightOverlay(
                                 contentColor = Color.White
                             )
                         ) {
-                            val btnText = if (isLastStep) stringResource(R.string.tut_btn_finish) else stringResource(R.string.tut_btn_next)
+                            val btnText =
+                                if (isLastStep) stringResource(R.string.tut_btn_finish) else stringResource(
+                                    R.string.tut_btn_next
+                                )
                             Text(text = btnText, color = AppTheme.colors.TextColorDark)
                         }
                     }

@@ -46,9 +46,7 @@ interface StrokeTool : Tool {
     fun cancelPending(canvas: PixelCanvasUseCase): StrokeUpdate? = null
 }
 
-interface ShapeTool : StrokeTool {
-
-}
+interface ShapeTool : StrokeTool
 
 inline fun forEachBrushPixel(
     row: Int,

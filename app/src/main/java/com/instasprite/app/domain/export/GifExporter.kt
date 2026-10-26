@@ -5,7 +5,12 @@ import com.instasprite.app.utils.CanvasMemoryGuard
 import java.io.OutputStream
 
 object GifExporter {
-    fun write(sprite: Sprite, output: OutputStream, scalePercent: Int = 100, checkCancelled: () -> Unit = {}) {
+    fun write(
+        sprite: Sprite,
+        output: OutputStream,
+        scalePercent: Int = 100,
+        checkCancelled: () -> Unit = {}
+    ) {
         val (width, height) = ExportScale.size(sprite.width, sprite.height, scalePercent)
         require(width in 1..65535 && height in 1..65535)
         val resized = width != sprite.width || height != sprite.height
@@ -27,7 +32,14 @@ object GifExporter {
         for (frame in frames) {
             checkCancelled()
             sprite.renderFrame(frame.id, source)
-            if (resized) ExportScale.copy(source, sprite.width, sprite.height, pixels, width, height)
+            if (resized) ExportScale.copy(
+                source,
+                sprite.width,
+                sprite.height,
+                pixels,
+                width,
+                height
+            )
             val palette = indexPixels(pixels, indices)
             output.write(byteArrayOf(0x21, 0xf9.toByte(), 4, 9))
             output.word(((frame.durationMs + 5) / 10).coerceAtLeast(1))
@@ -65,7 +77,9 @@ object GifExporter {
             if (pixel ushr 24 < 128) continue
             val rgb = pixel and 0xffffff
             if (rgb !in colors) {
-                if (colors.size == 255) { exact = false; break }
+                if (colors.size == 255) {
+                    exact = false; break
+                }
                 colors[rgb] = colors.size + 1
             }
         }
@@ -83,7 +97,7 @@ object GifExporter {
                 pixel ushr 24 < 128 -> 0
                 exact -> colors.getValue(pixel and 0xffffff)
                 else -> 1 + ((pixel ushr 16 and 255) * 5 + 127) / 255 * 36 +
-                    ((pixel ushr 8 and 255) * 5 + 127) / 255 * 6 + ((pixel and 255) * 5 + 127) / 255
+                        ((pixel ushr 8 and 255) * 5 + 127) / 255 * 6 + ((pixel and 255) * 5 + 127) / 255
             }.toByte()
         }
         return palette
@@ -105,6 +119,7 @@ object GifExporter {
                 blockSize = 0
             }
         }
+
         fun code(value: Int) {
             buffer = buffer or (value shl bufferedBits)
             bufferedBits += codeBits

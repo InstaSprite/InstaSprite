@@ -1,19 +1,18 @@
 package com.instasprite.app.ui.drawing.dialog
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -33,6 +32,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.BlendMode
@@ -140,16 +140,20 @@ fun LayerOptionsDialog(
             Spacer(modifier = Modifier.height(10.pixelDp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().toggleable(
-                    value = layer.isClipping,
-                    enabled = canClip || layer.isClipping,
-                    role = Role.Checkbox,
-                    onValueChange = { onToggleClipping() }
-                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = layer.isClipping,
+                        enabled = canClip || layer.isClipping,
+                        role = Role.Checkbox,
+                        onValueChange = { onToggleClipping() }
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.clip_to_layer_below),
-                    color = AppTheme.colors.TextColorLight, modifier = Modifier.weight(1f))
+                Text(
+                    stringResource(R.string.clip_to_layer_below),
+                    color = AppTheme.colors.TextColorLight, modifier = Modifier.weight(1f)
+                )
                 Checkbox(
                     checked = layer.isClipping,
                     onCheckedChange = null,

@@ -51,9 +51,11 @@ fun TimelineSheet(
     val minimum = 72.pixelDp.coerceAtMost(limit)
     val height = requestedHeight.pixelDp.coerceIn(minimum, limit)
 
-    Surface(modifier
-        .height(height)
-        .fillMaxWidth(), color = AppTheme.colors.BackgroundColor) {
+    Surface(
+        modifier
+            .height(height)
+            .fillMaxWidth(), color = AppTheme.colors.BackgroundColor
+    ) {
         Column {
             Box(
                 Modifier
@@ -79,7 +81,7 @@ fun TimelineSheet(
             AnimationTimeline(
                 animation, layers, activeFrameId, activeLayerId, isPlaying,
                 onEvent, onClose, Modifier.weight(1f), onLayerEvent = onLayerEvent,
-            onionSkinEnabled = onionSkinEnabled
+                onionSkinEnabled = onionSkinEnabled
             )
         }
     }

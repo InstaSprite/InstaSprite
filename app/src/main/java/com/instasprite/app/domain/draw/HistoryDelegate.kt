@@ -85,15 +85,18 @@ class HistoryDelegate(
         val newCel = newAnimation.cel(before.activeLayerId, before.activeFrameId)
         val oldImage = oldCel?.let { oldAnimation.images[it.dataId] }
         val newImage = newCel?.let { newAnimation.images[it.dataId] }
-        val changed = ((oldImage?.tiles?.keys ?: emptySet()) + (newImage?.tiles?.keys ?: emptySet())).filter { coord ->
+        val changed = ((oldImage?.tiles?.keys ?: emptySet()) + (newImage?.tiles?.keys
+            ?: emptySet())).filter { coord ->
             val old = oldImage?.tiles?.get(coord)
             val new = newImage?.tiles?.get(coord)
             if (old == null) new != null else new == null || !old.contentEquals(new)
         }.toSet()
-        val entry = CelEditEntry(before.activeLayerId, before.activeFrameId, oldCel, newCel,
+        val entry = CelEditEntry(
+            before.activeLayerId, before.activeFrameId, oldCel, newCel,
             oldImage?.let { CelImage(it.id, it.tiles.filterKeys { key -> key in changed }) },
             newImage?.let { CelImage(it.id, it.tiles.filterKeys { key -> key in changed }) },
-            before.selectionState, after.selectionState)
+            before.selectionState, after.selectionState
+        )
         if (!entry.isEmpty()) canvasHistoryManager.push(entry)
     }
 

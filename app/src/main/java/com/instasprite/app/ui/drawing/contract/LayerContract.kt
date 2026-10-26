@@ -12,5 +12,8 @@ sealed interface LayerEvent {
     data class MergeLayerDown(val layerId: String) : LayerEvent
     data class ReorderLayer(val fromIndex: Int, val toIndex: Int) : LayerEvent
     data class SetLayerOpacity(val layerId: String, val opacity: Float) : LayerEvent
-    data class SetBlendMode(val layerId: String, val mode: com.instasprite.app.domain.model.BlendMode) : LayerEvent
+    data class SetBlendMode(
+        val layerId: String,
+        val mode: com.instasprite.app.domain.model.BlendMode
+    ) : LayerEvent
 }

@@ -380,7 +380,7 @@ fun CursorModePage(
 //                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
-                        .aspectRatio(3/4f)
+                        .aspectRatio(3 / 4f)
                         .clip(MaterialTheme.shapes.small)
                         .background(colors.Foreground1Color)
                 )

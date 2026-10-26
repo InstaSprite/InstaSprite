@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -24,13 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun ToolSizeWheelPopup(
@@ -158,11 +156,10 @@ fun ToolSizeWheelPicker(
 }
 
 
-
 @Preview
 @Composable
 private fun PreviewWheel() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         ToolSizeWheelPopup(
             toolSize = 1,
             itemHeight = 24.pixelDp,

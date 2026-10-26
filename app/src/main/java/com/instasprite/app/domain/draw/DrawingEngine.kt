@@ -3,7 +3,10 @@ package com.instasprite.app.domain.draw
 import androidx.compose.ui.graphics.Color
 import com.instasprite.app.domain.canvashistory.HistoryDiskStore
 import com.instasprite.app.domain.canvashistory.TransformType
-import com.instasprite.app.domain.draw.state.*
+import com.instasprite.app.domain.draw.state.CanvasInteractionState
+import com.instasprite.app.domain.draw.state.DrawingState
+import com.instasprite.app.domain.draw.state.InteractionContext
+import com.instasprite.app.domain.draw.state.StandbyState
 import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.model.Sprite
@@ -36,7 +39,9 @@ class DrawingEngine(
 ) : ILayerManager, ITransformManager, IHistoryManager, InteractionContext {
 
     private var processingJob: Job? = null
-    suspend fun awaitToolIdle() { processingJob?.join() }
+    suspend fun awaitToolIdle() {
+        processingJob?.join()
+    }
 
     private var isProcessingTool = false
     val isBusy get() = isProcessingTool || activeState == DrawingState
@@ -82,7 +87,8 @@ class DrawingEngine(
         syncStateVersions = ::syncStateVersions
     )
 
-    val animationManager = AnimationDelegate(pixelCanvasUseCase, historyManager, ::refreshFullCanvasState)
+    val animationManager =
+        AnimationDelegate(pixelCanvasUseCase, historyManager, ::refreshFullCanvasState)
 
     private val layerDelegate = LayerDelegate(
         pixelCanvasUseCase = pixelCanvasUseCase,
@@ -257,16 +263,22 @@ class DrawingEngine(
     override fun toggleLock(layerId: String) = layerDelegate.toggleLock(layerId)
     override fun toggleVisibility(layerId: String) = layerDelegate.toggleVisibility(layerId)
     override fun mergeLayerDown(layerId: String) = layerDelegate.mergeLayerDown(layerId)
-    override fun reorderLayer(fromIndex: Int, toIndex: Int) = layerDelegate.reorderLayer(fromIndex, toIndex)
-    override fun setLayerOpacity(layerId: String, opacity: Float) = layerDelegate.setLayerOpacity(layerId, opacity)
-    override fun setLayerBlendMode(layerId: String, mode: BlendMode) = layerDelegate.setLayerBlendMode(layerId, mode)
+    override fun reorderLayer(fromIndex: Int, toIndex: Int) =
+        layerDelegate.reorderLayer(fromIndex, toIndex)
+
+    override fun setLayerOpacity(layerId: String, opacity: Float) =
+        layerDelegate.setLayerOpacity(layerId, opacity)
+
+    override fun setLayerBlendMode(layerId: String, mode: BlendMode) =
+        layerDelegate.setLayerBlendMode(layerId, mode)
 
     // =========== TRANSFORM ===========
 
     override fun rotate() = transformDelegate.rotate()
     override fun hFlip() = transformDelegate.hFlip()
     override fun vFlip() = transformDelegate.vFlip()
-    override fun resizeCanvas(width: Int, height: Int) = transformDelegate.resizeCanvas(width, height)
+    override fun resizeCanvas(width: Int, height: Int) =
+        transformDelegate.resizeCanvas(width, height)
 
     // =========== HISTORY ===========
 
@@ -277,8 +289,11 @@ class DrawingEngine(
     override fun discardHistoryCapture() = historyManager.discardHistoryCapture()
     override fun updateHistoryCurrentState() = historyManager.updateHistoryCurrentState()
     override fun restorePendingHistoryCapture() = historyManager.restorePendingHistoryCapture()
-    override fun recordOperationHistory(operation: () -> Unit) = historyManager.recordOperationHistory(operation)
-    override fun recordTransformHistory(transform: TransformType, operation: () -> Unit) = historyManager.recordTransformHistory(transform, operation)
+    override fun recordOperationHistory(operation: () -> Unit) =
+        historyManager.recordOperationHistory(operation)
+
+    override fun recordTransformHistory(transform: TransformType, operation: () -> Unit) =
+        historyManager.recordTransformHistory(transform, operation)
 
     // =========== HELPER ===========
 
