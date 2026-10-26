@@ -600,4 +600,8 @@
     <string name="clipping_layer">Lớp cắt</string>
     <string name="onion_skin_on">Bóng khung hình: Bật</string>
     <string name="onion_skin_off">Bóng khung hình: Tắt</string>
+    <string name="export_gif">Xuất GIF</string>
+    <string name="gif_format_note">Lặp mọi khung ở kích thước gốc. GIF dùng bước thời gian 10 ms và độ trong suốt một bit; màu được giảm khi cần.</string>
+    <string name="export_saved">Đã xuất tệp</string>
+    <string name="export_failed">Không thể xuất tệp</string>
 </resources>

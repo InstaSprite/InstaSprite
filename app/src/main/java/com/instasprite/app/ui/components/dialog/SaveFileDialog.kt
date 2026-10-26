@@ -37,7 +37,8 @@ fun SaveFileDialog(
     onSave: () -> Unit,
     onDismiss: () -> Unit,
     onValuesChanged: ((values: List<String>, folderUri: Uri?) -> Unit)? = null,
-    isSaving: Boolean = false
+    isSaving: Boolean = false,
+    note: String? = null
 ) {
     val context = LocalContext.current
     var folderUri by remember(lastSavedUri) { mutableStateOf<Uri?>(lastSavedUri) }
@@ -79,6 +80,7 @@ fun SaveFileDialog(
 //                onDismiss()
             }
         },
+        extraBottomContent = { note?.let { Text(it, color = AppTheme.colors.TextColorLight) } },
         extraTopContent = {
             Box(
                 modifier = Modifier

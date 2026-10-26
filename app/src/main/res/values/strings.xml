@@ -599,4 +599,8 @@
     <string name="clipping_layer">Clipping layer</string>
     <string name="onion_skin_on">Onion skin: On</string>
     <string name="onion_skin_off">Onion skin: Off</string>
+    <string name="export_gif">Export GIF</string>
+    <string name="gif_format_note">Loops all frames at original size. GIF uses 10 ms timing steps and one-bit transparency; colors are reduced when needed.</string>
+    <string name="export_saved">Export saved</string>
+    <string name="export_failed">Export failed</string>
 </resources>

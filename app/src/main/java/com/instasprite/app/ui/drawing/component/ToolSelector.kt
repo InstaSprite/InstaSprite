@@ -144,6 +144,13 @@ fun ToolSelector(
                 )
 
                 DropdownMenuItem(
+                    text = { Text(stringResource(R.string.export_gif)) },
+                    onClick = {
+                        onToolSelectorEvent(ToolSelectorEvent.OpenSaveGifDialog)
+                        menuListVisible = false
+                    }
+                )
+                DropdownMenuItem(
                     text = { Text(text = stringResource(R.string.export_image)) },
                     onClick = {
                         onToolSelectorEvent(ToolSelectorEvent.OpenSaveImageDialog)

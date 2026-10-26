@@ -448,6 +448,7 @@ class DrawingViewModel @AssistedInject constructor(
                     drawingEngine.redo()
                 }
 
+                is ToolSelectorEvent.OpenSaveGifDialog -> openDialog(DrawingDialog.SaveGif)
                 is ToolSelectorEvent.OpenSaveImageDialog -> openDialog(DrawingDialog.SaveImage)
                 is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
                 is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
@@ -745,6 +746,24 @@ class DrawingViewModel @AssistedInject constructor(
         } catch (t: Throwable) {
             handleFatalError(t)
             return false
+        }
+    }
+
+    suspend fun saveGif(folderUri: Uri, fileName: String): Boolean {
+        if (_uiState.value.isSaving || fileName.isBlank()) return false
+        _uiState.value = _uiState.value.copy(isSaving = true)
+        return try {
+            drawingEngine.awaitToolIdle()
+            stopPlayback()
+            commitPendingTool()
+            fileRepository.saveGifFile(pixelCanvasUseCase.getSprite(), folderUri, fileName)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFatalError(e)
+            false
+        } finally {
+            _uiState.value = _uiState.value.copy(isSaving = false)
         }
     }
 

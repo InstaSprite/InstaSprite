@@ -19,6 +19,7 @@ import com.instasprite.app.ui.drawing.dialog.SaveImageDialog
 import kotlinx.coroutines.launch
 
 sealed interface DrawingDialog : Dialog {
+    data object SaveGif : DrawingDialog
     data object SaveImage : DrawingDialog
     data object SaveISprite : DrawingDialog
     data object LoadISprite : DrawingDialog
@@ -52,6 +53,15 @@ fun DrawingScreenDialogs(
                     isSaving = uiState.isSaving,
                     onFolderSelected = viewModel::setLastSavedLocation,
                     onSave = { uri, name -> viewModel.saveISprite(uri, name) }
+                )
+
+            DrawingDialog.SaveGif ->
+                com.instasprite.app.ui.drawing.dialog.SaveGifDialog(
+                    onDismiss = viewModel::closeTopDialog,
+                    folderUri = lastSavedUri,
+                    isSaving = uiState.isSaving,
+                    onFolderSelected = viewModel::setLastSavedLocation,
+                    onSave = viewModel::saveGif
                 )
 
             DrawingDialog.SaveImage ->

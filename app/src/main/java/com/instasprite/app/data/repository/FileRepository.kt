@@ -9,6 +9,7 @@ import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.data.mapper.toISprite
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.utils.getFormatFromExtension
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -47,6 +48,36 @@ class FileRepository(val context: Context) {
             if (e is kotlinx.coroutines.CancellationException) throw e
             e.printStackTrace()
             false
+        }
+    }
+
+    suspend fun saveGifFile(sprite: Sprite, folderUri: Uri, fileName: String): Boolean = withContext(Dispatchers.IO) {
+        val exportContext = kotlinx.coroutines.currentCoroutineContext()
+        writeExportFile(folderUri, fileName.removeSuffix(".gif") + ".gif", "image/gif") { output ->
+            com.instasprite.app.domain.export.GifExporter.write(sprite, output) { exportContext.ensureActive() }
+        }
+    }
+
+    private fun writeExportFile(folderUri: Uri, fileName: String, mimeType: String,
+        write: (java.io.OutputStream) -> Unit): Boolean {
+        val folder = DocumentFile.fromTreeUri(context, folderUri) ?: return false
+        val stem = fileName.substringBeforeLast(".", fileName)
+        val extension = fileName.substringAfterLast(".", "")
+        var uniqueName = fileName
+        var counter = 1
+        while (folder.findFile(uniqueName) != null) uniqueName = "$stem (${counter++}).$extension"
+        val file = folder.createFile(mimeType, uniqueName) ?: return false
+        var complete = false
+        try {
+            val stream = context.contentResolver.openOutputStream(file.uri) ?: return false
+            stream.use { write(it); it.flush() }
+            complete = true
+            return true
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            return false
+        } finally {
+            if (!complete) file.delete()
         }
     }
 
