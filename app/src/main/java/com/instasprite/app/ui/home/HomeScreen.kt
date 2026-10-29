@@ -124,6 +124,8 @@ fun HomeScreen(
             onImagePagerEvent = galleryViewModel::onImagePagerEvent,
             spriteList = sortedSprites,
             startIndex = galleryViewModel.currentSelectedSpriteIndex,
+            playingSpriteId = galleryUiState.playingSpriteId,
+            playbackSprite = galleryUiState.playbackSprite,
             onDismiss = { lastSpriteSeen ->
                 galleryViewModel.toggleImagePager(null)
                 galleryViewModel.lastSpriteSeenInPager = lastSpriteSeen

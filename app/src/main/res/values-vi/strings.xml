@@ -618,4 +618,9 @@
     <string name="animation_insert_empty">Chèn khung hình trống sau khung hiện tại</string>
     <string name="animation_move_earlier">Di chuyển khung hình về trước</string>
     <string name="animation_move_later">Di chuyển khung hình về sau</string>
+    <string name="export_title">Xuất</string>
+    <string name="export_option_image">Ảnh (PNG)</string>
+    <string name="export_option_gif">Ảnh động GIF</string>
+    <string name="export_option_sheet">Sprite sheet (PNG)</string>
+    <string name="export_option_project">Dự án sprite (.isprite)</string>
 </resources>

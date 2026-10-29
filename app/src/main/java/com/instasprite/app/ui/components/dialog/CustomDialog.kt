@@ -24,15 +24,16 @@ import com.instasprite.app.ui.theme.AppTheme
 fun CustomDialog(
     title: String? = null,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: (() -> Unit)?,
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
     confirmButtonColor: Color = AppTheme.colors.AccentButtonColor,
     scrollable: Boolean = false,
+    dismissEnabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (dismissEnabled) onDismiss() },
         containerColor = AppTheme.colors.DialogColor,
         title = {
             if (title != null) {
@@ -61,7 +62,7 @@ fun CustomDialog(
             }
         },
         confirmButton = {
-            Button(
+            if (onConfirm != null) Button(
                 onClick = onConfirm,
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor)
@@ -70,7 +71,7 @@ fun CustomDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss, enabled = dismissEnabled) {
                 Text(dismissButtonText, color = AppTheme.colors.TextColorLight)
             }
         }

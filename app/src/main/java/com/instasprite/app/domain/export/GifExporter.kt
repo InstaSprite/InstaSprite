@@ -1,5 +1,8 @@
 package com.instasprite.app.domain.export
 
+import com.instasprite.app.domain.model.LayerCompositor
+import com.instasprite.app.domain.model.TileCoord
+import com.instasprite.app.utils.TILE_SIZE
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.utils.CanvasMemoryGuard
 import java.io.OutputStream
@@ -61,19 +64,45 @@ object GifExporter {
         output.write(0x3b)
     }
 
-    internal fun applyPreviewPalette(pixels: IntArray) {
+    internal fun requiresQuantization(
+        sprite: Sprite,
+        frameId: String,
+        scalePercent: Int,
+        checkCancelled: () -> Unit = {}
+    ): Boolean {
+        val (width, height) = ExportScale.size(sprite.width, sprite.height, scalePercent)
+        val sampleWidth = minOf(width, sprite.width)
+        val sampleHeight = minOf(height, sprite.height)
+        val layers = sprite.layersAt(frameId)
+        val colors = HashSet<Int>()
+        for (y in 0 until sampleHeight) {
+            checkCancelled()
+            val sourceY = ExportScale.sourceIndex(y, sprite.height, sampleHeight)
+            for (x in 0 until sampleWidth) {
+                if (x and 4095 == 0) checkCancelled()
+                val sourceX = ExportScale.sourceIndex(x, sprite.width, sampleWidth)
+                val tile = TileCoord(sourceX / TILE_SIZE, sourceY / TILE_SIZE)
+                val offset = sourceY % TILE_SIZE * TILE_SIZE + sourceX % TILE_SIZE
+                val pixel = LayerCompositor.pixel(layers) { it.tiles[tile]?.get(offset) ?: 0 }
+                if (pixel ushr 24 >= 128 && colors.add(pixel and 0xffffff) && colors.size > 255) return true
+            }
+        }
+        return false
+    }
+
+    internal fun applyPreviewPalette(pixels: IntArray, quantized: Boolean) {
         val indices = ByteArray(pixels.size)
-        val palette = indexPixels(pixels, indices)
+        val palette = indexPixels(pixels, indices, quantized)
         for (i in pixels.indices) {
             val index = indices[i].toInt() and 255
             pixels[i] = if (index == 0) 0 else palette[index] or (0xff shl 24)
         }
     }
 
-    private fun indexPixels(pixels: IntArray, indices: ByteArray): IntArray {
+    private fun indexPixels(pixels: IntArray, indices: ByteArray, quantized: Boolean = false): IntArray {
         val colors = LinkedHashMap<Int, Int>()
-        var exact = true
-        for (pixel in pixels) {
+        var exact = !quantized
+        if (exact) for (pixel in pixels) {
             if (pixel ushr 24 < 128) continue
             val rgb = pixel and 0xffffff
             if (rgb !in colors) {

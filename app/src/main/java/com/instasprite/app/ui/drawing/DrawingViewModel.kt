@@ -62,6 +62,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
 data class DrawingScreenState(
@@ -838,53 +839,54 @@ class DrawingViewModel @AssistedInject constructor(
         }
     }
 
-    fun saveImage(folderUri: Uri, fileName: String, scalePercent: Int = 100): Boolean {
-        if (drawingEngine.isBusy) return false
-        try {
-            if (fileName.isBlank()) return false
+    suspend fun saveImage(folderUri: Uri, fileName: String, scalePercent: Int = 100): Boolean {
+        if (_uiState.value.isSaving || fileName.isBlank()) return false
+        _uiState.value = _uiState.value.copy(isSaving = true)
+        return try {
+            drawingEngine.awaitToolIdle()
             commitPendingTool()
             val sprite = pixelCanvasUseCase.getSprite()
-            val bmp = ImageExporter.convertToBitmap(
-                sprite,
-                pixelCanvasUseCase.activeFrameId,
-                scalePercent
-            ) ?: return false
-
-            return try {
-                fileRepository.saveFile(bmp, folderUri, fileName)
-            } finally {
-                bmp.recycle()
+            val frameId = pixelCanvasUseCase.activeFrameId
+            withContext(Dispatchers.IO) {
+                val bitmap = ImageExporter.convertToBitmap(sprite, frameId, scalePercent)
+                    ?: return@withContext false
+                try {
+                    kotlinx.coroutines.currentCoroutineContext().ensureActive()
+                    fileRepository.saveFile(bitmap, folderUri, fileName)
+                } finally {
+                    bitmap.recycle()
+                }
             }
-        } catch (t: Throwable) {
-            handleFatalError(t)
-            return false
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            if (e is CanvasMemoryException) handleFatalError(e)
+            false
+        } catch (e: OutOfMemoryError) {
+            handleFatalError(e)
+            false
+        } finally {
+            _uiState.value = _uiState.value.copy(isSaving = false)
         }
     }
 
     suspend fun saveISprite(folderUri: Uri, fileName: String): Boolean {
-        drawingEngine.awaitToolIdle()
-        try {
-            if (fileName.isBlank()) return false
-            if (_uiState.value.isSaving) return false
-
+        if (_uiState.value.isSaving || fileName.isBlank()) return false
+        _uiState.value = _uiState.value.copy(isSaving = true)
+        return try {
+            drawingEngine.awaitToolIdle()
             commitPendingTool()
-
-            _uiState.value = _uiState.value.copy(isSaving = true)
-            val sprite = pixelCanvasUseCase.getSprite()
-            return try {
-                withContext(Dispatchers.IO) {
-                    fileRepository.saveISpriteFile(
-                        sprite,
-                        folderUri,
-                        fileName
-                    )
-                }
-            } finally {
-                _uiState.value = _uiState.value.copy(isSaving = false)
-            }
-        } catch (t: Throwable) {
-            handleFatalError(t)
-            return false
+            fileRepository.saveISpriteFile(pixelCanvasUseCase.getSprite(), folderUri, fileName)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            if (e is CanvasMemoryException) handleFatalError(e)
+            false
+        } catch (e: OutOfMemoryError) {
+            handleFatalError(e)
+            false
+        } finally {
+            _uiState.value = _uiState.value.copy(isSaving = false)
         }
     }
 
@@ -909,6 +911,9 @@ class DrawingViewModel @AssistedInject constructor(
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {
+            if (e is CanvasMemoryException) handleFatalError(e)
+            false
+        } catch (e: OutOfMemoryError) {
             handleFatalError(e)
             false
         } finally {

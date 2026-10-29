@@ -88,7 +88,8 @@ fun DrawingScreenDialogs(
                     onDismiss = viewModel::closeTopDialog,
                     folderUri = lastSavedUri,
                     onFolderSelected = viewModel::setLastSavedLocation,
-                    onSave = { uri, name, scale -> viewModel.saveImage(uri, name, scale) }
+                    onSave = { uri, name, scale -> viewModel.saveImage(uri, name, scale) },
+                    isSaving = uiState.isSaving
                 )
 
             DrawingDialog.LoadISprite ->

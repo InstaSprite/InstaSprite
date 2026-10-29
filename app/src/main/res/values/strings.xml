@@ -617,4 +617,9 @@
     <string name="animation_insert_empty">Insert empty frame after current frame</string>
     <string name="animation_move_earlier">Move frame earlier</string>
     <string name="animation_move_later">Move frame later</string>
+    <string name="export_title">Export</string>
+    <string name="export_option_image">Image (PNG)</string>
+    <string name="export_option_gif">Animated GIF</string>
+    <string name="export_option_sheet">Sprite sheet (PNG)</string>
+    <string name="export_option_project">Sprite project (.isprite)</string>
 </resources>

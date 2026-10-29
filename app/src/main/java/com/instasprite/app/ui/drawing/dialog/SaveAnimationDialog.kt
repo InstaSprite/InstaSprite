@@ -26,12 +26,13 @@ fun SaveAnimationDialog(
     folderUri: Uri?,
     isSaving: Boolean,
     onFolderSelected: (Uri) -> Unit,
-    onSave: suspend (Uri, String, Int, Int) -> Boolean
+    onSave: suspend (Uri, String, Int, Int) -> Boolean,
+    initialName: String = "Sprite"
 ) {
     val frameCount = sprite.animation?.frames?.size ?: 1
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var name by remember { mutableStateOf("Sprite") }
+    var name by remember { mutableStateOf(initialName) }
     val sheet = format == AnimationExportFormat.SPRITE_SHEET
     var columns by remember(frameCount) {
         mutableStateOf(

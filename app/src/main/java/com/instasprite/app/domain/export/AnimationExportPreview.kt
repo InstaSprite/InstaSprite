@@ -27,7 +27,7 @@ object AnimationExportPreview {
             cels = animation.cels.filter { it.frameId == frameId },
             posterFrameId = frameId
         ))
-        return render(singleFrame, AnimationExportFormat.SPRITE_SHEET, 100, 1, frameId, checkCancelled)
+        return render(singleFrame, AnimationExportFormat.SPRITE_SHEET, 100, 1, frameId, checkCancelled = checkCancelled)
     }
 
     fun render(
@@ -36,6 +36,7 @@ object AnimationExportPreview {
         scalePercent: Int,
         columns: Int,
         frameId: String,
+        gifQuantized: Boolean? = null,
         checkCancelled: () -> Unit = {}
     ): ExportPreviewPixels {
         val (cellWidth, cellHeight) = ExportScale.size(sprite.width, sprite.height, scalePercent)
@@ -70,7 +71,10 @@ object AnimationExportPreview {
                     if (sheet) pixel else if (pixel ushr 24 < 128) 0 else pixel or (0xff shl 24)
             }
         }
-        if (!sheet) GifExporter.applyPreviewPalette(pixels)
+        if (!sheet) GifExporter.applyPreviewPalette(
+            pixels,
+            gifQuantized ?: GifExporter.requiresQuantization(sprite, frameId, scalePercent, checkCancelled)
+        )
         return ExportPreviewPixels(width, height, exportWidth, exportHeight, pixels)
     }
 }

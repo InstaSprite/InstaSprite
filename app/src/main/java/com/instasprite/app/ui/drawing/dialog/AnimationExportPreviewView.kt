@@ -27,6 +27,7 @@ import com.instasprite.app.R
 import com.instasprite.app.domain.draw.AnimationPlayback
 import com.instasprite.app.domain.export.AnimationExportFormat
 import com.instasprite.app.domain.export.AnimationExportPreview
+import com.instasprite.app.domain.export.GifExporter
 import com.instasprite.app.domain.export.ExportPreviewPixels
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.ui.theme.AppTheme
@@ -64,16 +65,23 @@ internal fun AnimationExportPreviewView(
             val playback = frames.firstOrNull()?.let { AnimationPlayback(frames, it.id) }
             val start = withFrameMillis { it }
             var lastFrame: String? = null
+            val quantizedFrames = mutableMapOf<String, Boolean>()
             while (isActive) {
                 val id = playback?.frameAt(withFrameMillis { it } - start).orEmpty()
                 if (id != lastFrame) {
                     preview = withContext(Dispatchers.Default) {
+                        val quantized = if (format == AnimationExportFormat.GIF) {
+                            quantizedFrames.getOrPut(id) {
+                                GifExporter.requiresQuantization(sprite, id, scale) { ensureActive() }
+                            }
+                        } else null
                         val pixels = AnimationExportPreview.render(
                             sprite,
                             format,
                             scale,
                             columns,
-                            id
+                            id,
+                            quantized
                         ) { ensureActive() }
                         val bitmap = Bitmap.createBitmap(
                             pixels.pixels,

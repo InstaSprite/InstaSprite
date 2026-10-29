@@ -16,6 +16,10 @@ import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
 import com.instasprite.app.di.IoDispatcher
 import com.instasprite.app.domain.dialog.DialogController
+import com.instasprite.app.domain.export.AnimationExportFormat
+import com.instasprite.app.domain.model.Animation
+import com.instasprite.app.ui.gallery.contract.GalleryExportFormat
+import kotlinx.coroutines.ensureActive
 import com.instasprite.app.domain.export.ImageExporter
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
@@ -67,7 +71,8 @@ data class GalleryState(
     val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List,
     val drawingDestination: DrawingDestination? = null,
     val playingSpriteId: String? = null,
-    val playbackSprite: Sprite? = null
+    val playbackSprite: Sprite? = null,
+    val isExporting: Boolean = false
 )
 
 @HiltViewModel
@@ -154,6 +159,10 @@ class GalleryViewModel @Inject constructor(
 
     fun onImagePagerEvent(event: ImagePagerEvent) {
         when (event) {
+            is ImagePagerEvent.TogglePlayback -> togglePreview(event.spriteId)
+            is ImagePagerEvent.StopPlayback -> {
+                if (_uiState.value.playingSpriteId == event.spriteId) stopPreview()
+            }
             is ImagePagerEvent.OpenDeleteDialog -> openDialog(
                 GalleryDialog.DeleteSpriteConfirm(
                     spriteName = event.spriteName,
@@ -161,7 +170,10 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenSaveImageDialog -> openDialog(GalleryDialog.SaveImage(event.sprite))
+            is ImagePagerEvent.OpenExportDialog -> {
+                stopPreview()
+                openDialog(GalleryDialog.ExportOptions(event.sprite))
+            }
         }
     }
 
@@ -284,45 +296,68 @@ class GalleryViewModel @Inject constructor(
         }
     }
 
-    fun saveImage(
-        spriteId: String,
-        folderUri: Uri,
-        fileName: String,
-        scalePercent: Int = 100,
-        onResult: (Boolean) -> Unit
-    ) {
-        viewModelScope.launch(ioDispatcher) {
-            val sprite = spriteDatabaseRepository.loadSprite(spriteId)
-            if (sprite == null) {
-                Log.e("SaveFile", "Sprite not found: $spriteId")
-                withContext(Dispatchers.Main) {
-                    onResult(false)
-                }
-                return@launch
+    suspend fun prepareExport(item: SpriteWithMeta, format: GalleryExportFormat) {
+        if (_uiState.value.isExporting || (format == GalleryExportFormat.SPRITE_SHEET && !item.hasAnimation)) return
+        _uiState.update { it.copy(isExporting = true) }
+        try {
+            val sprite = withContext(ioDispatcher) {
+                requireNotNull(spriteDatabaseRepository.loadSprite(item.sprite.id))
             }
-            val success = try {
-                val bitmap = ImageExporter.convertToBitmap(sprite, scalePercent = scalePercent)
-                bitmap != null && try {
-                    fileRepository.saveFile(bitmap, folderUri, fileName)
-                } finally {
-                    bitmap.recycle()
-                }
-            } catch (e: CanvasMemoryException) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG)
-                        .show()
-                }
-                false
-            }
+            require(format != GalleryExportFormat.SPRITE_SHEET || (sprite.animation?.frames?.size ?: 0) > 1)
+            closeTopDialog()
+            openDialog(GalleryDialog.ExportFile(sprite, item.meta?.spriteName.orEmpty(), format))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("GalleryViewModel", "Failed to prepare export", e)
+            Toast.makeText(context, R.string.export_failed, Toast.LENGTH_SHORT).show()
+        } finally {
+            _uiState.update { it.copy(isExporting = false) }
+        }
+    }
 
-            withContext(Dispatchers.Main) {
-                if (success) {
-                    onResult(true)
-                } else {
-                    Log.e("SaveFile", "Failed to save file")
-                    onResult(false)
+    suspend fun exportSprite(
+        sprite: Sprite, format: GalleryExportFormat, folderUri: Uri,
+        fileName: String, scalePercent: Int = 100, columns: Int = 1
+    ): Boolean {
+        if (_uiState.value.isExporting || fileName.isBlank() ||
+            (format == GalleryExportFormat.SPRITE_SHEET && (sprite.animation?.frames?.size ?: 0) < 2)
+        ) return false
+        _uiState.update { it.copy(isExporting = true) }
+        return try {
+            withContext(ioDispatcher) {
+                when (format) {
+                    GalleryExportFormat.IMAGE -> {
+                        val bitmap = ImageExporter.convertToBitmap(sprite, scalePercent = scalePercent)
+                            ?: return@withContext false
+                        try {
+                            ensureActive()
+                            fileRepository.saveFile(bitmap, folderUri, fileName)
+                        } finally {
+                            bitmap.recycle()
+                        }
+                    }
+                    GalleryExportFormat.PROJECT -> fileRepository.saveISpriteFile(sprite, folderUri, fileName)
+                    GalleryExportFormat.GIF, GalleryExportFormat.SPRITE_SHEET -> {
+                        val animation = sprite.animation ?: Animation.fromLayers(sprite.layers)
+                        fileRepository.saveAnimationFile(
+                            sprite.copy(animation = animation),
+                            if (format == GalleryExportFormat.GIF) AnimationExportFormat.GIF else AnimationExportFormat.SPRITE_SHEET,
+                            folderUri, fileName, columns, scalePercent
+                        )
+                    }
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("GalleryViewModel", "Failed to export sprite", e)
+            if (e is CanvasMemoryException) {
+                Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()
+            }
+            false
+        } finally {
+            _uiState.update { it.copy(isExporting = false) }
         }
     }
 

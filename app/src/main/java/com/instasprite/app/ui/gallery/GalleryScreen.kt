@@ -136,6 +136,8 @@ fun GalleryScreen(
             onImagePagerEvent = viewModel::onImagePagerEvent,
             spriteList = sortedSprites,
             startIndex = viewModel.currentSelectedSpriteIndex,
+            playingSpriteId = uiState.playingSpriteId,
+            playbackSprite = uiState.playbackSprite,
             onDismiss = { lastSpriteSeen ->
                 viewModel.toggleImagePager(null)
                 viewModel.lastSpriteSeenInPager = lastSpriteSeen
@@ -194,8 +196,8 @@ fun GalleryPageContent(
                 onOpenDrawing = event.onOpenDrawing,
                 spriteList = spriteList,
                 layoutMode = uiState.layoutMode,
-                playingSpriteId = uiState.playingSpriteId,
-                playbackSprite = uiState.playbackSprite,
+                playingSpriteId = uiState.playingSpriteId.takeUnless { uiState.showImagePager },
+                playbackSprite = uiState.playbackSprite.takeUnless { uiState.showImagePager },
                 onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
                 modifier = Modifier.padding(horizontal = 6.pixelDp, vertical = 4.pixelDp)
@@ -274,8 +276,8 @@ private fun GalleryScreenContent(
                     onOpenDrawing = event.onOpenDrawing,
                     spriteList = spriteList,
                     layoutMode = uiState.layoutMode,
-                    playingSpriteId = uiState.playingSpriteId,
-                    playbackSprite = uiState.playbackSprite,
+                    playingSpriteId = uiState.playingSpriteId.takeUnless { uiState.showImagePager },
+                    playbackSprite = uiState.playbackSprite.takeUnless { uiState.showImagePager },
                     onIsScrolledChange = { isScrolled = it },
                     lazyListState = lazyListState,
                     modifier = Modifier.padding(horizontal = 6.pixelDp)

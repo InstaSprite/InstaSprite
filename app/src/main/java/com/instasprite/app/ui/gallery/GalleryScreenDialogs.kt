@@ -2,6 +2,14 @@ package com.instasprite.app.ui.gallery
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.instasprite.app.domain.model.Sprite
+import com.instasprite.app.domain.export.AnimationExportFormat
+import com.instasprite.app.ui.gallery.contract.GalleryExportFormat
+import com.instasprite.app.ui.gallery.dialog.ExportOptionsDialog
+import com.instasprite.app.ui.drawing.dialog.SaveAnimationDialog
+import com.instasprite.app.ui.drawing.dialog.SaveISpriteDialog
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
@@ -11,12 +19,13 @@ import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.ui.drawing.dialog.LoadISpriteDialog
 import com.instasprite.app.ui.gallery.dialog.DisplayOptionsDialog
 import com.instasprite.app.ui.gallery.dialog.RenameDialog
-import com.instasprite.app.ui.gallery.dialog.SaveImageDialog
+import com.instasprite.app.ui.drawing.dialog.SaveImageDialog
 import com.instasprite.app.ui.theme.AppTheme
 
 
 sealed interface GalleryDialog : Dialog {
-    data class SaveImage(val sprite: SpriteWithMeta) : GalleryDialog
+    data class ExportOptions(val sprite: SpriteWithMeta) : GalleryDialog
+    data class ExportFile(val sprite: Sprite, val name: String, val format: GalleryExportFormat) : GalleryDialog
     data class Rename(val spriteId: String) : GalleryDialog
     data class DeleteSpriteConfirm(val spriteName: String, val spriteId: String) : GalleryDialog
     data object DisplayOptions : GalleryDialog
@@ -30,7 +39,9 @@ fun GalleryScreenDialogs(
 ) {
     var lastSavedUri = viewModel.lastSavedLocation.collectAsStateWithLifecycle().value
     val spriteListOrder = viewModel.spriteListOrder.collectAsStateWithLifecycle().value
-    val layoutMode = viewModel.uiState.collectAsStateWithLifecycle().value.layoutMode
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val layoutMode = uiState.layoutMode
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         lastSavedUri = viewModel.getLastSavedLocation()
@@ -61,17 +72,50 @@ fun GalleryScreenDialogs(
                     onDismiss = viewModel::closeTopDialog
                 )
 
-            is GalleryDialog.SaveImage ->
-                SaveImageDialog(
-                    spriteName = dialog.sprite.meta!!.spriteName,
-                    spriteId = dialog.sprite.sprite.id,
-                    lastSavedUri = lastSavedUri,
-                    onFolderSelected = viewModel::setLastSavedLocation,
-                    onSaved = { spriteId, uri, fileName, scale, onResult ->
-                        viewModel.saveImage(spriteId, uri, fileName, scale, onResult)
-                    },
-                    onDismiss = viewModel::closeTopDialog
-                )
+            is GalleryDialog.ExportOptions -> ExportOptionsDialog(
+                hasAnimation = dialog.sprite.hasAnimation,
+                isLoading = uiState.isExporting,
+                onDismiss = viewModel::closeTopDialog,
+                onSelect = { format -> scope.launch { viewModel.prepareExport(dialog.sprite, format) } }
+            )
+
+            is GalleryDialog.ExportFile -> {
+                val name = dialog.name.ifBlank { "Sprite" }
+                when (dialog.format) {
+                    GalleryExportFormat.IMAGE -> SaveImageDialog(
+                        onDismiss = viewModel::closeTopDialog,
+                        folderUri = lastSavedUri,
+                        onFolderSelected = viewModel::setLastSavedLocation,
+                        isSaving = uiState.isExporting,
+                        initialName = name,
+                        onSave = { uri, fileName, scale ->
+                            viewModel.exportSprite(dialog.sprite, dialog.format, uri, fileName, scale)
+                        }
+                    )
+                    GalleryExportFormat.PROJECT -> SaveISpriteDialog(
+                        onDismiss = viewModel::closeTopDialog,
+                        folderUri = lastSavedUri,
+                        onFolderSelected = viewModel::setLastSavedLocation,
+                        isSaving = uiState.isExporting,
+                        initialName = name,
+                        onSave = { uri, fileName ->
+                            viewModel.exportSprite(dialog.sprite, dialog.format, uri, fileName)
+                        }
+                    )
+                    GalleryExportFormat.GIF, GalleryExportFormat.SPRITE_SHEET -> SaveAnimationDialog(
+                        format = if (dialog.format == GalleryExportFormat.GIF) AnimationExportFormat.GIF else AnimationExportFormat.SPRITE_SHEET,
+                        sprite = dialog.sprite,
+                        onDismiss = viewModel::closeTopDialog,
+                        folderUri = lastSavedUri,
+                        isSaving = uiState.isExporting,
+                        initialName = name,
+                        onFolderSelected = viewModel::setLastSavedLocation,
+                        onSave = { uri, fileName, columns, scale ->
+                            viewModel.exportSprite(dialog.sprite, dialog.format, uri, fileName, scale, columns)
+                        }
+                    )
+                }
+            }
 
             is GalleryDialog.DisplayOptions ->
                 DisplayOptionsDialog(

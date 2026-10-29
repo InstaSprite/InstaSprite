@@ -54,12 +54,16 @@ fun SaveFileDialog(
         contract = ActivityResultContracts.OpenDocumentTree(),
         onResult = { uri ->
             uri?.let {
-                context.contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
-                folderUri = it
-                onFolderSelected(it)
+                try {
+                    context.contentResolver.takePersistableUriPermission(
+                        it,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                    folderUri = it
+                    onFolderSelected(it)
+                } catch (_: SecurityException) {
+                    Toast.makeText(context, R.string.export_failed, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     )

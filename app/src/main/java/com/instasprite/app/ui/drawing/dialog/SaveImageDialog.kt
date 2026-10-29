@@ -5,6 +5,8 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -19,23 +21,27 @@ fun SaveImageDialog(
     onDismiss: () -> Unit,
     folderUri: Uri?,
     onFolderSelected: (Uri) -> Unit,
-    onSave: (folderUri: Uri, fileName: String, scale: Int) -> Boolean
+    onSave: suspend (folderUri: Uri, fileName: String, scale: Int) -> Boolean,
+    isSaving: Boolean = false,
+    initialName: String = "Sprite"
 ) {
     val context = LocalContext.current
-    var fileName by remember { mutableStateOf("Sprite") }
+    val scope = rememberCoroutineScope()
+    var fileName by remember { mutableStateOf(initialName) }
     var scalePercent by remember { mutableStateOf("100") }
 
     SaveFileDialog(
         title = stringResource(R.string.export_image),
+        isSaving = isSaving,
         fields = listOf(
             InputField(
                 label = stringResource(R.string.filename),
                 placeholder = "Sprite",
                 keyboardType = KeyboardType.Text,
                 suffix = ".png",
-                validator = { it.isNotBlank() },
-                errorMessage = stringResource(R.string.must_not_be_empty),
-                defaultValue = "Sprite"
+                validator = { it.isNotBlank() && '/' !in it && '\\' !in it },
+                errorMessage = stringResource(R.string.invalid_export_filename),
+                defaultValue = initialName
             ),
             InputField(
                 label = stringResource(R.string.scale),
@@ -50,14 +56,12 @@ fun SaveImageDialog(
         lastSavedUri = folderUri,
         onFolderSelected = onFolderSelected,
         onSave = {
-            folderUri?.let { uri ->
-                val scale = scalePercent.toIntOrNull()?.coerceIn(25, 20000) ?: 100
-                val success = onSave(uri, "$fileName.png", scale)
-                Toast.makeText(
-                    context,
-                    if (success) "Image saved successfully!" else "Failed to save image",
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (!isSaving && folderUri != null) scope.launch {
+                val scale = scalePercent.toIntOrNull() ?: 100
+                val success = onSave(folderUri, "${fileName.removeSuffix(".png")}.png", scale)
+                Toast.makeText(context,
+                    if (success) R.string.export_saved else R.string.export_failed,
+                    Toast.LENGTH_SHORT).show()
                 if (success) onDismiss()
             }
         },
