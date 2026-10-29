@@ -66,6 +66,7 @@ import kotlinx.coroutines.withContext
 
 data class DrawingScreenState(
     val isPlaying: Boolean = false,
+    val timelineReorderReset: Int = 0,
     val onionSkinEnabled: Boolean = false,
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
@@ -346,13 +347,19 @@ class DrawingViewModel @AssistedInject constructor(
     }
 
     fun onTimelineEvent(event: TimelineEvent) {
-        if (_uiState.value.isSaving || _uiState.value.isLoading) return
+        if (_uiState.value.isSaving || _uiState.value.isLoading ||
+            (drawingEngine.isBusy && event != TimelineEvent.ToggleOnionSkin)
+        ) {
+            if (event is TimelineEvent.Reorder) {
+                _uiState.value = _uiState.value.copy(timelineReorderReset = _uiState.value.timelineReorderReset + 1)
+            }
+            return
+        }
         if (event == TimelineEvent.ToggleOnionSkin) {
             _uiState.value =
                 _uiState.value.copy(onionSkinEnabled = !_uiState.value.onionSkinEnabled)
             return
         }
-        if (drawingEngine.isBusy) return
         timelineJob?.cancel()
         val wasPlaying = _uiState.value.isPlaying
         stopPlayback()
@@ -380,6 +387,7 @@ class DrawingViewModel @AssistedInject constructor(
                 val manager = drawingEngine.animationManager
                 when (event) {
                     is TimelineEvent.Insert -> manager.insertFrame(event.empty, event.linked)
+                    is TimelineEvent.Reorder -> manager.reorderFrame(event.frameId, event.toIndex)
                     TimelineEvent.Append -> manager.appendFrame()
                     is TimelineEvent.Duration -> manager.setDuration(event.milliseconds)
                     TimelineEvent.Delete -> manager.deleteFrame()

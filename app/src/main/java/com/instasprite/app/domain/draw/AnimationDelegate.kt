@@ -19,6 +19,9 @@ class AnimationDelegate(
         }
     }
 
+    suspend fun reorderFrame(frameId: String, toIndex: Int) =
+        edit { canvas.reorderFrame(frameId, toIndex) }
+
     suspend fun deleteFrame() = edit { canvas.deleteFrame() }
     suspend fun setDuration(milliseconds: Int) = edit { canvas.setFrameDuration(milliseconds) }
     suspend fun clearCel() = edit { canvas.clearCel() }

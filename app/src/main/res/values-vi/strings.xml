@@ -616,4 +616,6 @@
     <string name="drawing_recovery_saved">Đã lưu các chỉnh sửa hoàn tất để khôi phục.</string>
     <string name="drawing_recovery_failed">Không thể lưu dữ liệu khôi phục.</string>
     <string name="animation_insert_empty">Chèn khung hình trống sau khung hiện tại</string>
+    <string name="animation_move_earlier">Di chuyển khung hình về trước</string>
+    <string name="animation_move_later">Di chuyển khung hình về sau</string>
 </resources>

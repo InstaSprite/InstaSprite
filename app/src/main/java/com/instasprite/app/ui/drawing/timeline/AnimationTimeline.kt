@@ -2,7 +2,6 @@ package com.instasprite.app.ui.drawing.timeline
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +50,8 @@ import com.instasprite.app.ui.drawing.contract.TimelineEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.pixelDp
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun AnimationTimeline(
@@ -64,13 +65,20 @@ fun AnimationTimeline(
     modifier: Modifier = Modifier,
     expanded: Boolean = true,
     onLayerEvent: (LayerEvent) -> Unit = {},
-    onionSkinEnabled: Boolean = false
+    onionSkinEnabled: Boolean = false,
+    reorderReset: Int = 0
 ) {
     var menu by remember { mutableStateOf(false) }
     var durationFrameId by remember { mutableStateOf<String?>(null) }
-    val activeIndex = animation.frames.indexOfFirst { it.id == activeFrameId }.coerceAtLeast(0)
-    val frame = animation.frames[activeIndex]
+    val frameDrag = remember { TimelineFrameDragState(animation.frames) }
+    LaunchedEffect(animation.frames, reorderReset) { frameDrag.sync(animation.frames, reorderReset) }
+    val frames = frameDrag.frames
+    val activeIndex = frames.indexOfFirst { it.id == activeFrameId }.coerceAtLeast(0)
+    val frame = frames[activeIndex]
     val frameScroll = rememberLazyListState()
+    val reorderState = rememberReorderableLazyListState(frameScroll) { from, to ->
+        frameDrag.move(from.key, to.key)
+    }
     val layerScroll = rememberLazyListState()
     val rows = remember(layers) { layers.asReversed() }
     val linkCounts =
@@ -78,7 +86,8 @@ fun AnimationTimeline(
     val cells = remember(animation.cels) { animation.cels.associateBy { it.layerId to it.frameId } }
     val colors = AppTheme.colors
 
-    LaunchedEffect(activeIndex) {
+
+    LaunchedEffect(activeFrameId) {
         if (frameScroll.layoutInfo.visibleItemsInfo.none { it.index == activeIndex }) {
             frameScroll.scrollToItem(activeIndex)
         }
@@ -114,9 +123,10 @@ fun AnimationTimeline(
                     TimelineFrameStrip(
                         animation, activeFrameId, activeLayerId, isPlaying,
                         onSelect = { onEvent(TimelineEvent.Select(it)) },
-                        onDelete = { onEvent(TimelineEvent.Delete) },
                         onAdd = { onEvent(TimelineEvent.Append) },
                         onInsertEmpty = { onEvent(TimelineEvent.Insert(empty = true)) },
+                        onReorder = { onEvent(it) },
+                        reorderReset = reorderReset,
                         modifier = Modifier.weight(1f)
                     )
                     TimelineToolbarButton(
@@ -147,7 +157,7 @@ fun AnimationTimeline(
                         TimelineToolbarButton(
                             R.drawable.ic_left_arrow,
                             stringResource(R.string.animation_previous),
-                            { onEvent(TimelineEvent.Select(animation.frames[activeIndex - 1].id)) },
+                            { onEvent(TimelineEvent.Select(frames[activeIndex - 1].id)) },
                             enabled = !isPlaying && activeIndex > 0
                         )
                         TimelineToolbarButton(
@@ -160,7 +170,7 @@ fun AnimationTimeline(
                         TimelineToolbarButton(
                             R.drawable.ic_right_arrow,
                             stringResource(R.string.animation_next),
-                            { onEvent(TimelineEvent.Select(animation.frames[activeIndex + 1].id)) },
+                            { onEvent(TimelineEvent.Select(frames[activeIndex + 1].id)) },
                             enabled = !isPlaying && activeIndex < animation.frames.lastIndex
                         )
                     }
@@ -192,122 +202,123 @@ fun AnimationTimeline(
                         .weight(1f)
                         .fillMaxHeight()
                 ) {
-                    itemsIndexed(animation.frames, key = { _, value -> value.id }) { index, value ->
-                        var deleteMenu by remember { mutableStateOf(false) }
-                        var celMenuLayerId by remember { mutableStateOf<String?>(null) }
-                        val current = value.id == activeFrameId
-                        Column(
-                            Modifier
-                                .width(22.pixelDp)
-                                .fillMaxHeight()
-                                .timelineGridBorder(
-                                    colors.Foreground0Color,
-                                    topColor = if (current) colors.SelectedColor else colors.Foreground0Color,
-                                    top = true
-                                )
-                        ) {
-                            Box(
+                    itemsIndexed(frames, key = { _, value -> value.id }) { index, value ->
+                        ReorderableItem(reorderState, key = value.id, enabled = !isPlaying) { _ ->
+
+                            var celMenuLayerId by remember { mutableStateOf<String?>(null) }
+                            val current = value.id == activeFrameId
+                            Column(
                                 Modifier
-                                    .fillMaxWidth()
-                                    .height(22.pixelDp)
-                                    .background(colors.BackgroundColor)
-                                    .timelineGridBorder(colors.Foreground0Color)
-                                    .combinedClickable(
-                                        onClick = { onEvent(TimelineEvent.Select(value.id)) },
-                                        onLongClick = {
-                                            onEvent(TimelineEvent.Select(value.id))
-                                            deleteMenu = true
-                                        }),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    (index + 1).toString(),
-                                    color = colors.TextColorLight,
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                TimelineFrameDeleteMenu(
-                                    deleteMenu, current && animation.frames.size > 1,
-                                    onDismiss = { deleteMenu = false },
-                                    onDelete = { onEvent(TimelineEvent.Delete) }
-                                )
-                            }
-                            SubcomposeLayout(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f)
-                                    .clipToBounds()
-                                    .scrollable(
-                                        layerScroll,
-                                        Orientation.Vertical,
-                                        reverseDirection = true
+                                    .width(22.pixelDp)
+                                    .fillMaxHeight()
+                                    .timelineGridBorder(
+                                        colors.Foreground0Color,
+                                        topColor = if (current) colors.SelectedColor else colors.Foreground0Color,
+                                        top = true
                                     )
-                            ) { constraints ->
-                                val rowPlaceables =
-                                    layerScroll.layoutInfo.visibleItemsInfo.mapNotNull { row ->
-                                        val layer =
-                                            rows.getOrNull(row.index) ?: return@mapNotNull null
-                                        val placeable = subcompose(row.key) {
-                                            val cel = cells[layer.id to value.id]
-                                            val linked =
-                                                cel != null && (linkCounts[cel.dataId] ?: 0) > 1
-                                            val selected = current && layer.id == activeLayerId
-                                            val description = stringResource(
-                                                R.string.animation_cell, layer.name, index + 1,
-                                                stringResource(
-                                                    if (cel == null) R.string.animation_cell_empty else if (linked)
-                                                        R.string.animation_cell_linked else R.string.animation_cell_filled
-                                                )
-                                            )
-                                            val previous = animation.frames.getOrNull(index - 1)
-                                                ?.let { cells[layer.id to it.id] }
-                                            val next = animation.frames.getOrNull(index + 1)
-                                                ?.let { cells[layer.id to it.id] }
-                                            Box(propagateMinConstraints = true) {
-                                                TimelineCelCell(
-                                                    hasCel = cel != null,
-                                                    isLinked = linked,
-                                                    linkLeft = cel != null && previous?.dataId == cel.dataId,
-                                                    linkRight = cel != null && next?.dataId == cel.dataId,
-                                                    isSelected = selected,
-                                                    description = description,
-                                                    onLongClick = {
-                                                        if (!isPlaying) {
-                                                            onEvent(TimelineEvent.Select(value.id, layer.id))
-                                                            celMenuLayerId = layer.id
-                                                        }
-                                                    },
-                                                    onClick = {
-                                                        onEvent(
-                                                            TimelineEvent.Select(
-                                                                value.id,
-                                                                layer.id
-                                                            )
-                                                        )
-                                                    },
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                )
-                                                TimelineCelMenu(
-                                                    expanded = celMenuLayerId == layer.id && !isPlaying,
-                                                    enabled = selected && !layer.isLocked,
-                                                    hasCel = cel != null,
-                                                    isLinked = linked,
-                                                    hasPreviousCel = previous != null,
-                                                    onDismiss = { celMenuLayerId = null },
-                                                    onEvent = onEvent
-                                                )
-                                            }
-                                        }.single().measure(
-                                            Constraints.fixed(
-                                                constraints.maxWidth,
-                                                row.size
-                                            )
+                            ) {
+                                Box(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(22.pixelDp)
+                                        .background(colors.BackgroundColor)
+                                        .timelineGridBorder(colors.Foreground0Color)
+                                        .frameReorderActions(value.id, index, frames.size, !isPlaying) {
+                                            onEvent(it)
+                                        }
+                                        .longPressDraggableHandle(
+                                            enabled = !isPlaying,
+                                            onDragStarted = { frameDrag.start(value.id) },
+                                            onDragStopped = { frameDrag.stop()?.let(onEvent) }
                                         )
-                                        placeable to row.offset
-                                    }
-                                layout(constraints.maxWidth, constraints.maxHeight) {
-                                    rowPlaceables.forEach { (placeable, offset) ->
-                                        placeable.placeRelative(0, offset)
+                                        .clickable { onEvent(TimelineEvent.Select(value.id)) },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        (index + 1).toString(),
+                                        color = colors.TextColorLight,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+
+                                }
+                                SubcomposeLayout(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f)
+                                        .clipToBounds()
+                                        .scrollable(
+                                            layerScroll,
+                                            Orientation.Vertical,
+                                            reverseDirection = true
+                                        )
+                                ) { constraints ->
+                                    val rowPlaceables =
+                                        layerScroll.layoutInfo.visibleItemsInfo.mapNotNull { row ->
+                                            val layer =
+                                                rows.getOrNull(row.index) ?: return@mapNotNull null
+                                            val placeable = subcompose(row.key) {
+                                                val cel = cells[layer.id to value.id]
+                                                val linked =
+                                                    cel != null && (linkCounts[cel.dataId] ?: 0) > 1
+                                                val selected = current && layer.id == activeLayerId
+                                                val description = stringResource(
+                                                    R.string.animation_cell, layer.name, index + 1,
+                                                    stringResource(
+                                                        if (cel == null) R.string.animation_cell_empty else if (linked)
+                                                            R.string.animation_cell_linked else R.string.animation_cell_filled
+                                                    )
+                                                )
+                                                val previous = frames.getOrNull(index - 1)
+                                                    ?.let { cells[layer.id to it.id] }
+                                                val next = frames.getOrNull(index + 1)
+                                                    ?.let { cells[layer.id to it.id] }
+                                                Box(propagateMinConstraints = true) {
+                                                    TimelineCelCell(
+                                                        hasCel = cel != null,
+                                                        isLinked = linked,
+                                                        linkLeft = cel != null && previous?.dataId == cel.dataId,
+                                                        linkRight = cel != null && next?.dataId == cel.dataId,
+                                                        isSelected = selected,
+                                                        description = description,
+                                                        onLongClick = {
+                                                            if (!isPlaying) {
+                                                                onEvent(TimelineEvent.Select(value.id, layer.id))
+                                                                celMenuLayerId = layer.id
+                                                            }
+                                                        },
+                                                        onClick = {
+                                                            onEvent(
+                                                                TimelineEvent.Select(
+                                                                    value.id,
+                                                                    layer.id
+                                                                )
+                                                            )
+                                                        },
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                    )
+                                                    TimelineCelMenu(
+                                                        expanded = celMenuLayerId == layer.id && !isPlaying,
+                                                        enabled = selected && !layer.isLocked,
+                                                        hasCel = cel != null,
+                                                        isLinked = linked,
+                                                        hasPreviousCel = previous != null,
+                                                        onDismiss = { celMenuLayerId = null },
+                                                        onEvent = onEvent
+                                                    )
+                                                }
+                                            }.single().measure(
+                                                Constraints.fixed(
+                                                    constraints.maxWidth,
+                                                    row.size
+                                                )
+                                            )
+                                            placeable to row.offset
+                                        }
+                                    layout(constraints.maxWidth, constraints.maxHeight) {
+                                        rowPlaceables.forEach { (placeable, offset) ->
+                                            placeable.placeRelative(0, offset)
+                                        }
                                     }
                                 }
                             }
@@ -394,10 +405,12 @@ fun AnimationTimeline(
                             val actions = listOf(
                                 R.string.animation_duplicate to TimelineEvent.Insert(),
                                 R.string.animation_linked to TimelineEvent.Insert(linked = true),
-                                R.string.animation_poster to TimelineEvent.SetPoster
+                                R.string.animation_poster to TimelineEvent.SetPoster,
+                                R.string.animation_delete to TimelineEvent.Delete
                             )
                             actions.forEach { (label, event) ->
                                 val enabled = when (event) {
+                                    TimelineEvent.Delete -> animation.frames.size > 1
                                     is TimelineEvent.Insert -> animation.frames.size < Animation.MAX_FRAMES
                                     else -> true
                                 }

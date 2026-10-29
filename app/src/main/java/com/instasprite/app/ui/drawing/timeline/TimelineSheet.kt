@@ -40,7 +40,8 @@ fun TimelineSheet(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     onLayerEvent: (LayerEvent) -> Unit = {},
-    onionSkinEnabled: Boolean = false
+    onionSkinEnabled: Boolean = false,
+    reorderReset: Int = 0
 ) {
     val density = LocalDensity.current
     val pixelScale = PIXEL_DP.toFloat()
@@ -81,7 +82,7 @@ fun TimelineSheet(
             AnimationTimeline(
                 animation, layers, activeFrameId, activeLayerId, isPlaying,
                 onEvent, onClose, Modifier.weight(1f), onLayerEvent = onLayerEvent,
-                onionSkinEnabled = onionSkinEnabled
+                onionSkinEnabled = onionSkinEnabled, reorderReset = reorderReset
             )
         }
     }

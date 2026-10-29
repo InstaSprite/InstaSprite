@@ -321,7 +321,8 @@ private fun DrawingScreenContent(
                                 event.onTimelineEvent,
                                 closeTimeline,
                                 onLayerEvent = event.onLayerEvent,
-                                onionSkinEnabled = uiState.onionSkinEnabled
+                                onionSkinEnabled = uiState.onionSkinEnabled,
+                                reorderReset = uiState.timelineReorderReset
                             )
                         } else {
                             AnimationTimeline(
@@ -335,7 +336,8 @@ private fun DrawingScreenContent(
                                 Modifier.height(30.pixelDp),
                                 expanded = false,
                                 onLayerEvent = event.onLayerEvent,
-                                onionSkinEnabled = uiState.onionSkinEnabled
+                                onionSkinEnabled = uiState.onionSkinEnabled,
+                                reorderReset = uiState.timelineReorderReset
                             )
                         }
                     }

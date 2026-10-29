@@ -23,6 +23,9 @@ class PixelCanvasUseCase(
     fun insertFrame(empty: Boolean = false, linked: Boolean = false) =
         pixelCanvasRepository.insertFrame(empty, linked)
 
+    fun reorderFrame(frameId: String, toIndex: Int) =
+        pixelCanvasRepository.reorderFrame(frameId, toIndex)
+
     fun deleteFrame() = pixelCanvasRepository.deleteFrame()
     fun setFrameDuration(value: Int) = pixelCanvasRepository.setFrameDuration(value)
     fun setPosterFrame() = pixelCanvasRepository.setPosterFrame()

@@ -653,6 +653,15 @@ class PixelCanvasRepository(var model: PixelCanvas) {
         selectFrame(frame.id)
     }
 
+    fun reorderFrame(frameId: String, toIndex: Int) {
+        val fromIndex = animation.frames.indexOfFirst { it.id == frameId }
+        if (fromIndex < 0 || toIndex !in animation.frames.indices || fromIndex == toIndex) return
+        val frames = animation.frames.toMutableList().apply {
+            add(toIndex, removeAt(fromIndex))
+        }
+        animation = animation.copy(frames = frames)
+    }
+
     fun deleteFrame() {
         if (animation.frames.size == 1) return
         val index = animation.frames.indexOfFirst { it.id == activeFrameId }
