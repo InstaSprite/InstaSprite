@@ -1,9 +1,8 @@
 package com.instasprite.app.ui.palette
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
-
-import androidx.compose.runtime.Composable
 import com.instasprite.app.domain.dialog.Dialog
 import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog

@@ -22,12 +22,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.instasprite.app.data.model.SettingPreferences
+import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.di.settingsDataStore
 import com.instasprite.app.navigation.EntryProviderInstaller
 import com.instasprite.app.navigation.Navigator
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
-import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.utils.AppSettings
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -44,32 +44,14 @@ class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: android.content.Context) {
         super.attachBaseContext(AppSettings.onAttach(newBase))
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-                androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
-            ) { isGranted ->
-                if (!isGranted) {
-                    android.util.Log.w("MainActivity", "Notification permission denied")
-                }
-            }
-
             LaunchedEffect(Unit) {
                 ColorPaletteRepository.prepopulatePalettesIfNeeded(this@MainActivity)
-
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                    val permission = android.Manifest.permission.POST_NOTIFICATIONS
-                    if (androidx.core.content.ContextCompat.checkSelfPermission(
-                            this@MainActivity,
-                            permission
-                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-                    ) {
-                        permissionLauncher.launch(permission)
-                    }
-                }
             }
 
             val settings by settingsDataStore.data.collectAsState(

@@ -1,13 +1,15 @@
 package com.instasprite.app.ui.drawing.tutorial
 
-import com.instasprite.app.ui.tutorial.TutorialStep
-
 import com.instasprite.app.R
+import com.instasprite.app.ui.tutorial.TutorialStep
 
 enum class DrawingTutorialStep(
     override val titleRes: Int,
     override val descriptionRes: Int
 ) : TutorialStep {
+    TIMELINE_FRAMES(R.string.tut_timeline_frames_title, R.string.tut_timeline_frames_desc),
+    TIMELINE_CELS(R.string.tut_timeline_cels_title, R.string.tut_timeline_cels_desc),
+    TIMELINE_PLAYBACK(R.string.tut_timeline_playback_title, R.string.tut_timeline_playback_desc),
     CANVAS(R.string.tut_canvas_title, R.string.tut_canvas_desc),
     COLOR_PALETTE(R.string.tut_color_palette_title, R.string.tut_color_palette_desc),
     COLOR_WHEEL(R.string.tut_color_wheel_title, R.string.tut_color_wheel_desc),
@@ -28,5 +30,8 @@ val drawingTutorialSequence = listOf(
     DrawingTutorialStep.TOOL_OPTION,
     DrawingTutorialStep.LAYER_TOGGLE,
     DrawingTutorialStep.UNDO_REDO,
+    DrawingTutorialStep.TIMELINE_FRAMES,
+    DrawingTutorialStep.TIMELINE_CELS,
+    DrawingTutorialStep.TIMELINE_PLAYBACK,
     DrawingTutorialStep.PROJECT_MENU,
 )

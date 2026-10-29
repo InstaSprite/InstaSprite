@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.components.dialog
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,11 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,11 +33,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun OtpDialog(
@@ -124,7 +118,8 @@ fun OtpDialog(
                                 }
 
                                 // Move focus to the last filled field or the last field
-                                val lastFilledIndex = (digitsToFill.length - 1).coerceAtMost(otpLength - 1)
+                                val lastFilledIndex =
+                                    (digitsToFill.length - 1).coerceAtMost(otpLength - 1)
                                 focusRequesters[lastFilledIndex].requestFocus()
                             } else {
                                 // Single character input (normal typing)

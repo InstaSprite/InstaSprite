@@ -5,7 +5,10 @@ import android.graphics.Color
 import androidx.core.graphics.createBitmap
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
+import com.instasprite.app.utils.TILE_SIZE
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 class BitmapManager(
@@ -46,6 +49,11 @@ class BitmapManager(
         _overlayBitmap?.eraseColor(Color.TRANSPARENT)
     }
 
+    fun releaseOverlayBitmap() {
+        _overlayBitmap = null
+        overlayVersion++
+    }
+
     fun incrementOverlayVersion() {
         overlayVersion++
     }
@@ -59,50 +67,57 @@ class BitmapManager(
         }
     }
 
-    private fun clearSelectionBitmap() {
-        _selectionBitmap?.eraseColor(Color.TRANSPARENT)
-    }
-
     fun refreshSelectionBitmap(selectionState: SelectionState?) {
-        ensureSelectionBitmap()
         if (selectionState != null) {
+            ensureSelectionBitmap()
             val bmp = _selectionBitmap ?: return
             val mask = selectionState.mask
             val w = bmp.width
             val h = bmp.height
-            val dimTint = 0x60000000 // dim background
-            val pixels = IntArray(w * h)
-
-            for (i in 0 until w * h) {
-                if (!mask[i]) {
-                    pixels[i] = dimTint
+            val blockHeight = minOf(TILE_SIZE, h)
+            val pixels = IntArray(w * blockHeight)
+            for (row in 0 until h step blockHeight) {
+                val rows = minOf(blockHeight, h - row)
+                for (i in 0 until w * rows) {
+                    pixels[i] = if (mask[row * w + i]) 0 else 0x60000000
                 }
+                bmp.setPixels(pixels, 0, w, 0, row, w, rows)
             }
-
-            bmp.setPixels(pixels, 0, w, 0, 0, w, h)
         } else {
-            clearSelectionBitmap()
+            _selectionBitmap = null
         }
         selectionVersion++
     }
 
+    private var renderRequest = 0L
+    private val renderMutex = Mutex()
+    private var renderPixels = IntArray(0)
+
     suspend fun refreshBitmapState(): Long {
-        val w = pixelCanvasUseCase.getCanvasWidth()
-        val h = pixelCanvasUseCase.getCanvasHeight()
+        val request = ++renderRequest
+        val snapshot = pixelCanvasUseCase.getSprite()
+        val frameId = pixelCanvasUseCase.activeFrameId
+        val w = snapshot.width
+        val h = snapshot.height
 
-        val pixels = withContext(Dispatchers.Default) {
-            pixelCanvasUseCase.getAllPixels()
-        }
-
-        ensureBitmap(w, h)
-        if (pixels.size == w * h) {
+        return renderMutex.withLock {
+            if (request != renderRequest || frameId != pixelCanvasUseCase.activeFrameId) return@withLock drawVersion
+            val pixelCount = Math.multiplyExact(w, h)
+            if (renderPixels.size != pixelCount) renderPixels = IntArray(pixelCount)
+            val pixels = renderPixels
+            withContext(Dispatchers.Default) {
+                snapshot.renderFrame(frameId, pixels)
+            }
+            if (request != renderRequest || frameId != pixelCanvasUseCase.activeFrameId) return@withLock drawVersion
+            ensureBitmap(w, h)
             _bitmap?.setPixels(pixels, 0, w, 0, 0, w, h)
+            drawVersion++
+            drawVersion
         }
-        drawVersion++
-        return drawVersion
     }
 
     fun refreshBitmapRegion(startRow: Int, startCol: Int, endRow: Int, endCol: Int): Long {
+        renderRequest++
         val bmp = _bitmap ?: return drawVersion
         val w = pixelCanvasUseCase.getCanvasWidth()
         val h = pixelCanvasUseCase.getCanvasHeight()
@@ -123,10 +138,13 @@ class BitmapManager(
     }
 
     fun incrementDrawVersion() {
+        renderRequest++
         drawVersion++
     }
 
     fun release() {
+        renderRequest++
+        renderPixels = IntArray(0)
         _bitmap?.recycle()
         _bitmap = null
         _overlayBitmap?.recycle()

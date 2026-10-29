@@ -41,15 +41,8 @@ object HomeModule {
                 },
                 onNavigateToCreateCanvas = { navigator.goTo(Screen.CreateCanvas) },
                 onNavigateToLoadImage = { navigator.goTo(Screen.LoadImage) },
-                onNavigateToHashtag = { navigator.goTo(Screen.Hashtag(it)) },
-                onLoginClick = { navigator.goTo(Screen.Auth) },
-                onOpenComments = { postId -> navigator.goTo(Screen.Comments(postId)) },
-                onOpenProfile = { userId -> navigator.goTo(Screen.Profile(userId)) },
-                onOpenNotifications = { navigator.goTo(Screen.Notification) },
-                onOpenSearch = { navigator.goTo(Screen.Search) },
                 onOpenSetting = { navigator.goTo(Screen.Setting) },
                 onOpenAbout = { navigator.goTo(Screen.About) },
-                onNavigateToCreatePost = { navigator.goTo(Screen.CreatePost) },
                 onNavigateToPalette = { navigator.goTo(Screen.Palette(clickToReturn = false)) },
             )
         }

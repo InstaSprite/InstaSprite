@@ -3,27 +3,36 @@ package com.instasprite.app.ui.gallery
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.instasprite.app.R
 import com.instasprite.app.data.repository.FileRepository
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import com.instasprite.app.data.repository.StorageLocationRepository
+import com.instasprite.app.di.IoDispatcher
 import com.instasprite.app.domain.dialog.DialogController
+import com.instasprite.app.domain.export.AnimationExportFormat
+import com.instasprite.app.domain.model.Animation
+import com.instasprite.app.ui.gallery.contract.GalleryExportFormat
+import kotlinx.coroutines.ensureActive
 import com.instasprite.app.domain.export.ImageExporter
-import com.instasprite.app.domain.model.ColorPalette
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
-
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
 import com.instasprite.app.utils.AppSettings
+import com.instasprite.app.utils.CanvasMemoryException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,10 +57,22 @@ enum class SpriteListOrder {
 
 enum class GalleryLayoutMode { List, StaggeredGrid, SquareGrid }
 
+data class DrawingDestination(
+    val spriteId: String,
+    val width: Int,
+    val height: Int,
+    val name: String?,
+    val paletteId: Int? = null
+)
+
 data class GalleryState(
     val showSearchBar: Boolean = false,
     val showImagePager: Boolean = false,
-    val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List
+    val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List,
+    val drawingDestination: DrawingDestination? = null,
+    val playingSpriteId: String? = null,
+    val playbackSprite: Sprite? = null,
+    val isExporting: Boolean = false
 )
 
 @HiltViewModel
@@ -60,7 +81,8 @@ class GalleryViewModel @Inject constructor(
     private val storageLocationRepository: StorageLocationRepository,
     private val fileRepository: FileRepository,
     private val dialogController: DialogController<GalleryDialog>,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(),
     DialogController<GalleryDialog> by dialogController {
 
@@ -89,7 +111,6 @@ class GalleryViewModel @Inject constructor(
     var lastEditedSpriteId by mutableStateOf<String?>(null)
     var currentSelectedSpriteIndex by mutableIntStateOf(0)
     var lastSpriteSeenInPager by mutableStateOf<Sprite?>(null)
-    var onOpenDrawing: (id: String, width: Int, height: Int, name: String?, paletteId: Int?) -> Unit = { _, _, _, _, _ -> }
 
 
     val sortedAndFilteredSprites: StateFlow<List<SpriteWithMeta>> = combine(
@@ -108,11 +129,19 @@ class GalleryViewModel @Inject constructor(
 
         when (order) {
             SpriteListOrder.Name -> filtered.sortedBy { it.meta?.spriteName?.lowercase() ?: "" }
-            SpriteListOrder.NameDesc -> filtered.sortedByDescending { it.meta?.spriteName?.lowercase() ?: "" }
+            SpriteListOrder.NameDesc -> filtered.sortedByDescending {
+                it.meta?.spriteName?.lowercase() ?: ""
+            }
+
             SpriteListOrder.DateCreated -> filtered.sortedBy { it.meta?.createdAt ?: 0L }
-            SpriteListOrder.DateCreatedDesc -> filtered.sortedByDescending { it.meta?.createdAt ?: 0L }
+            SpriteListOrder.DateCreatedDesc -> filtered.sortedByDescending {
+                it.meta?.createdAt ?: 0L
+            }
+
             SpriteListOrder.LastModified -> filtered.sortedBy { it.meta?.lastModifiedAt ?: 0L }
-            SpriteListOrder.LastModifiedDesc -> filtered.sortedByDescending { it.meta?.lastModifiedAt ?: 0L }
+            SpriteListOrder.LastModifiedDesc -> filtered.sortedByDescending {
+                it.meta?.lastModifiedAt ?: 0L
+            }
         }
     }.stateIn(
         scope = viewModelScope,
@@ -128,9 +157,12 @@ class GalleryViewModel @Inject constructor(
     }
 
 
-
     fun onImagePagerEvent(event: ImagePagerEvent) {
         when (event) {
+            is ImagePagerEvent.TogglePlayback -> togglePreview(event.spriteId)
+            is ImagePagerEvent.StopPlayback -> {
+                if (_uiState.value.playingSpriteId == event.spriteId) stopPreview()
+            }
             is ImagePagerEvent.OpenDeleteDialog -> openDialog(
                 GalleryDialog.DeleteSpriteConfirm(
                     spriteName = event.spriteName,
@@ -138,15 +170,10 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenDrawingActivity -> onOpenDrawing(
-                event.sprite.id,
-                event.sprite.width,
-                event.sprite.height,
-                event.name,
-                null
-            )
-
-            is ImagePagerEvent.OpenSaveImageDialog -> openDialog(GalleryDialog.SaveImage(event.sprite))
+            is ImagePagerEvent.OpenExportDialog -> {
+                stopPreview()
+                openDialog(GalleryDialog.ExportOptions(event.sprite))
+            }
         }
     }
 
@@ -157,8 +184,43 @@ class GalleryViewModel @Inject constructor(
         }
     }
 
+    private var playbackLoadJob: Job? = null
+
+    fun stopPreview() {
+        playbackLoadJob?.cancel()
+        playbackLoadJob = null
+        _uiState.update { it.copy(playingSpriteId = null, playbackSprite = null) }
+    }
+
+    private fun togglePreview(spriteId: String) {
+        val stop = _uiState.value.playingSpriteId == spriteId
+        stopPreview()
+        if (stop) return
+        _uiState.update { it.copy(playingSpriteId = spriteId) }
+        playbackLoadJob = viewModelScope.launch {
+            try {
+                val sprite = withContext(ioDispatcher) {
+                    spriteDatabaseRepository.loadSprite(spriteId)
+                }
+                requireNotNull(sprite)
+                require((sprite.animation?.frames?.size ?: 0) > 1)
+                _uiState.update { it.copy(playbackSprite = sprite) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e("GalleryViewModel", "Failed to load animation", e)
+                _uiState.update { it.copy(playingSpriteId = null, playbackSprite = null) }
+                Toast.makeText(context, R.string.error_action_failed, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     fun onSpriteListEvent(event: SpriteListEvent) {
         when (event) {
+            is SpriteListEvent.TogglePlayback -> togglePreview(event.spriteId)
+            is SpriteListEvent.StopPlayback -> {
+                if (_uiState.value.playingSpriteId == event.spriteId) stopPreview()
+            }
             is SpriteListEvent.OpenDeleteDialog ->
                 openDialog(
                     GalleryDialog.DeleteSpriteConfirm(
@@ -167,15 +229,10 @@ class GalleryViewModel @Inject constructor(
                     )
                 )
 
-            is SpriteListEvent.OpenDrawingScreen -> onOpenDrawing(
-                event.sprite.id,
-                event.sprite.width,
-                event.sprite.height,
-                event.name,
-                null
-            )
-
-            is SpriteListEvent.OpenPager -> toggleImagePager(event.sprite)
+            is SpriteListEvent.OpenPager -> {
+                stopPreview()
+                toggleImagePager(event.sprite)
+            }
             is SpriteListEvent.OpenRenameDialog -> openDialog(GalleryDialog.Rename(event.spriteId))
         }
     }
@@ -184,6 +241,32 @@ class GalleryViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             showSearchBar = !_uiState.value.showSearchBar
         )
+    }
+
+    private fun openDrawing(
+        spriteId: String,
+        width: Int,
+        height: Int,
+        name: String?,
+        paletteId: Int? = null
+    ) {
+        _uiState.update {
+            it.copy(
+                drawingDestination = DrawingDestination(
+                    spriteId,
+                    width,
+                    height,
+                    name,
+                    paletteId
+                )
+            )
+        }
+    }
+
+    fun onDrawingNavigationHandled(destination: DrawingDestination) {
+        _uiState.update {
+            if (it.drawingDestination == destination) it.copy(drawingDestination = null) else it
+        }
     }
 
     fun setLayoutMode(mode: GalleryLayoutMode) {
@@ -213,46 +296,73 @@ class GalleryViewModel @Inject constructor(
         }
     }
 
-    fun saveImage(
-        spriteId: String,
-        folderUri: Uri,
-        fileName: String,
-        scalePercent: Int = 100,
-        onResult: (Boolean) -> Unit
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val sprite = spriteDatabaseRepository.loadSprite(spriteId)
-            if (sprite == null) {
-                Log.e("SaveFile", "Sprite not found: $spriteId")
-                withContext(Dispatchers.Main) {
-                    onResult(false)
-                }
-                return@launch
+    suspend fun prepareExport(item: SpriteWithMeta, format: GalleryExportFormat) {
+        if (_uiState.value.isExporting || (format == GalleryExportFormat.SPRITE_SHEET && !item.hasAnimation)) return
+        _uiState.update { it.copy(isExporting = true) }
+        try {
+            val sprite = withContext(ioDispatcher) {
+                requireNotNull(spriteDatabaseRepository.loadSprite(item.sprite.id))
             }
-            val bitmap = ImageExporter.convertToBitmap(
-                sprite.compositedPixels,
-                sprite.width,
-                sprite.height,
-                scalePercent
-            )
-            
-            val success = if (bitmap != null) {
-                fileRepository.saveFile(bitmap, folderUri, fileName)
-            } else false
+            require(format != GalleryExportFormat.SPRITE_SHEET || (sprite.animation?.frames?.size ?: 0) > 1)
+            closeTopDialog()
+            openDialog(GalleryDialog.ExportFile(sprite, item.meta?.spriteName.orEmpty(), format))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("GalleryViewModel", "Failed to prepare export", e)
+            Toast.makeText(context, R.string.export_failed, Toast.LENGTH_SHORT).show()
+        } finally {
+            _uiState.update { it.copy(isExporting = false) }
+        }
+    }
 
-            withContext(Dispatchers.Main) {
-                if (success) {
-                    onResult(true)
-                } else {
-                    Log.e("SaveFile", "Failed to save file")
-                    onResult(false)
+    suspend fun exportSprite(
+        sprite: Sprite, format: GalleryExportFormat, folderUri: Uri,
+        fileName: String, scalePercent: Int = 100, columns: Int = 1
+    ): Boolean {
+        if (_uiState.value.isExporting || fileName.isBlank() ||
+            (format == GalleryExportFormat.SPRITE_SHEET && (sprite.animation?.frames?.size ?: 0) < 2)
+        ) return false
+        _uiState.update { it.copy(isExporting = true) }
+        return try {
+            withContext(ioDispatcher) {
+                when (format) {
+                    GalleryExportFormat.IMAGE -> {
+                        val bitmap = ImageExporter.convertToBitmap(sprite, scalePercent = scalePercent)
+                            ?: return@withContext false
+                        try {
+                            ensureActive()
+                            fileRepository.saveFile(bitmap, folderUri, fileName)
+                        } finally {
+                            bitmap.recycle()
+                        }
+                    }
+                    GalleryExportFormat.PROJECT -> fileRepository.saveISpriteFile(sprite, folderUri, fileName)
+                    GalleryExportFormat.GIF, GalleryExportFormat.SPRITE_SHEET -> {
+                        val animation = sprite.animation ?: Animation.fromLayers(sprite.layers)
+                        fileRepository.saveAnimationFile(
+                            sprite.copy(animation = animation),
+                            if (format == GalleryExportFormat.GIF) AnimationExportFormat.GIF else AnimationExportFormat.SPRITE_SHEET,
+                            folderUri, fileName, columns, scalePercent
+                        )
+                    }
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("GalleryViewModel", "Failed to export sprite", e)
+            if (e is CanvasMemoryException) {
+                Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()
+            }
+            false
+        } finally {
+            _uiState.update { it.copy(isExporting = false) }
         }
     }
 
     fun deleteSpriteById(spriteId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             try {
                 spriteDatabaseRepository.deleteSpriteById(spriteId)
             } catch (e: Exception) {
@@ -262,14 +372,14 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun deleteSpriteByIdDelay(spriteId: String, duration: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             delay(duration)
             deleteSpriteById(spriteId)
         }
     }
 
     fun renameSprite(spriteId: String, newName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             spriteDatabaseRepository.changeName(spriteId, newName)
         }
     }
@@ -289,15 +399,15 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun importSprite(sprite: Sprite) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val newId = java.util.UUID.randomUUID().toString()
             val newSprite = sprite.copy(id = newId)
-            
+
             spriteDatabaseRepository.saveSprite(newSprite)
             spriteDatabaseRepository.changeName(newId, "Imported Sprite")
-            
+
             withContext(Dispatchers.Main) {
-                onOpenDrawing(newId, newSprite.width, newSprite.height, "Imported Sprite", null)
+                openDrawing(newId, newSprite.width, newSprite.height, "Imported Sprite")
             }
         }
     }

@@ -2,32 +2,21 @@ package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.instasprite.app.R
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 object FillTool : Tool {
-    override val icon: Int = R.drawable.ic_fill_tool
-    override val nameRes: Int = R.string.fill
-    override val descriptionRes: Int = R.string.tool_fill_desc
+    override val type = ToolType.Fill
 
     data class FillResult(
+        val pixels: IntArray,
         val dirtyMinRow: Int,
         val dirtyMinCol: Int,
         val dirtyMaxRow: Int,
         val dirtyMaxCol: Int,
     )
 
-    var dirtyMinRow: Int = 0; private set
-    var dirtyMinCol: Int = 0; private set
-    var dirtyMaxRow: Int = 0; private set
-    var dirtyMaxCol: Int = 0; private set
-
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
-        val result = fillDirect(canvas, row, col, color) ?: return
-        dirtyMinRow = result.dirtyMinRow
-        dirtyMinCol = result.dirtyMinCol
-        dirtyMaxRow = result.dirtyMaxRow
-        dirtyMaxCol = result.dirtyMaxCol
+        fillDirect(canvas, row, col, color)
     }
 
     fun fillDirect(
@@ -36,12 +25,28 @@ object FillTool : Tool {
         startCol: Int,
         color: Color,
     ): FillResult? {
-        val width = canvas.getCanvasWidth()
-        val height = canvas.getCanvasHeight()
-
-        if (startRow !in 0 until height || startCol !in 0 until width) return null
-
         val pixels = canvas.getActiveLayerPixelsDirect() ?: return null
+        val result = calculate(
+            pixels,
+            canvas.getCanvasWidth(),
+            canvas.getCanvasHeight(),
+            startRow,
+            startCol,
+            color
+        )
+        result?.let { canvas.setAllPixels(it.pixels) }
+        return result
+    }
+
+    fun calculate(
+        pixels: IntArray,
+        width: Int,
+        height: Int,
+        startRow: Int,
+        startCol: Int,
+        color: Color
+    ): FillResult? {
+        if (startRow !in 0 until height || startCol !in 0 until width) return null
 
         val targetArgb = pixels[startRow * width + startCol]
         val fillArgb = color.toArgb()
@@ -62,6 +67,7 @@ object FillTool : Tool {
         fun push(r: Int, c: Int) {
             stack.addLast((r.toLong() shl 32) or (c.toLong() and 0xFFFFFFFFL))
         }
+
         fun pop(): Long = stack.removeLast()
 
         push(startRow, startCol)
@@ -91,8 +97,8 @@ object FillTool : Tool {
 
             if (seedRow < minRow) minRow = seedRow
             if (seedRow > maxRow) maxRow = seedRow
-            if (left   < minCol) minCol = left
-            if (right  > maxCol) maxCol = right
+            if (left < minCol) minCol = left
+            if (right > maxCol) maxCol = right
 
             var inRunAbove = false
             var inRunBelow = false
@@ -128,10 +134,8 @@ object FillTool : Tool {
             }
         }
 
-        // Persist back into the active layer since the repository now returns an inflated buffer.
-        canvas.setAllPixels(pixels)
-
         return FillResult(
+            pixels = pixels,
             dirtyMinRow = minRow,
             dirtyMinCol = minCol,
             dirtyMaxRow = maxRow,

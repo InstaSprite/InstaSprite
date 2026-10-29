@@ -1,17 +1,13 @@
 package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.R
-import com.instasprite.app.domain.draw.StrokeEngine
+import com.instasprite.app.domain.draw.MoveCompositor
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
-object MoveTool : StrokeTool {
-    override val icon: Int = R.drawable.ic_move_tool
-    override val nameRes: Int = R.string.move
-    override val descriptionRes: Int = R.string.tool_move_desc
-    override val commitsImmediately: Boolean = false
-    override val staysPendingAfterStroke: Boolean = true
-
+class MoveTool : StrokeTool {
+    override val type = ToolType.Move
+    override val commitsImmediately = false
+    override val staysPendingAfterStroke = true
     private var session: MoveSession? = null
     val isMoving: Boolean get() = session != null
 
@@ -27,162 +23,74 @@ object MoveTool : StrokeTool {
         col: Int,
         color: Color,
         scale: Int,
-        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
-        onCommittedPixel: (row: Int, col: Int) -> Unit
+        plotPreviewPixel: (Int, Int, Int) -> Unit,
+        onCommittedPixel: (Int, Int) -> Unit
     ): StrokeUpdate {
-        val existing = session
-        if (existing != null) {
-            existing.startCol = col
-            existing.startRow = row
-            existing.accumulatedOffsetX = existing.offsetX
-            existing.accumulatedOffsetY = existing.offsetY
-            
-            StrokeEngine.activeMoveCompositor?.composite(existing.offsetX, existing.offsetY)
-
-            return StrokeUpdate(
-                isFullPreview = true,
-                overlayPixels = IntArray(0),
-                mainLayerPixels = existing.computeClearedPixels(),
-                updatedSelectionMask = existing.computeShiftedMask()
-            )
+        val current = session ?: run {
+            val layer = canvas.getLayers().firstOrNull { it.id == canvas.getActiveLayerId() }
+                ?: return StrokeUpdate()
+            if (layer.isLocked || !layer.isVisible) return StrokeUpdate()
+            MoveSession(
+                MoveCompositor(
+                    canvas.getCanvasWidth(), canvas.getCanvasHeight(),
+                    canvas.getLayers().toList(), layer.id, canvas.getSelectionMask()
+                )
+            ).also { session = it }
         }
-        val w = canvas.getCanvasWidth()
-        val h = canvas.getCanvasHeight()
-        val pixels = canvas.getActiveLayerPixelsDirect() ?: return StrokeUpdate()
-        val mask = canvas.getSelectionMask()
-        val s = MoveSession(pixels.copyOf(), mask, w, h, startCol = col, startRow = row)
-        session = s
-
-        StrokeEngine.activeMoveCompositor?.composite(0, 0)
-
-        return StrokeUpdate(
-            isFullPreview = true,
-            overlayPixels = IntArray(0),
-            mainLayerPixels = s.computeClearedPixels(),
-            updatedSelectionMask = s.computeShiftedMask()
-        )
+        current.startCol = col
+        current.startRow = row
+        current.accumulatedOffsetX = current.offsetX
+        current.accumulatedOffsetY = current.offsetY
+        return current.preview()
     }
 
     override fun updateStroke(
         canvas: PixelCanvasUseCase,
         row: Int,
         col: Int,
-        plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
-        onCommittedPixel: (row: Int, col: Int) -> Unit
+        plotPreviewPixel: (Int, Int, Int) -> Unit,
+        onCommittedPixel: (Int, Int) -> Unit
     ): StrokeUpdate {
-        val s = session ?: return StrokeUpdate()
-        s.offsetX = s.accumulatedOffsetX + (col - s.startCol)
-        s.offsetY = s.accumulatedOffsetY + (row - s.startRow)
-
-        StrokeEngine.activeMoveCompositor?.composite(s.offsetX, s.offsetY)
-
-        return StrokeUpdate(
-            isFullPreview = true,
-            overlayPixels = IntArray(0),
-            mainLayerPixels = s.computeClearedPixels(),
-            updatedSelectionMask = s.computeShiftedMask()
-        )
+        val current = session ?: return StrokeUpdate()
+        val offsetX = current.accumulatedOffsetX + (col - current.startCol)
+        val offsetY = current.accumulatedOffsetY + (row - current.startRow)
+        if (offsetX == current.offsetX && offsetY == current.offsetY) return StrokeUpdate()
+        current.offsetX = offsetX
+        current.offsetY = offsetY
+        return current.preview()
     }
 
     override fun endStroke() {}
 
-    override fun cancelStroke() {
-        session = null
-    }
+    override fun cancelStroke() = reset()
 
     override fun commitPending(canvas: PixelCanvasUseCase): StrokeUpdate? {
-        val s = session ?: return null
-        val result = StrokeUpdate(
-            mainLayerPixels = s.computeShiftedPixels(),
-            updatedSelectionMask = s.computeShiftedMask(),
-            overlayPixels = IntArray(0)
-        )
+        val current = session ?: return null
         session = null
-        return result
+        return StrokeUpdate(mainLayerTiles = current.compositor.tiles)
     }
 
     override fun cancelPending(canvas: PixelCanvasUseCase): StrokeUpdate? {
-        val s = session ?: return null
-        val result = StrokeUpdate(
-            mainLayerPixels = s.originalPixels,
-            updatedSelectionMask = s.selectionMask,
-            overlayPixels = IntArray(0)
-        )
+        val current = session ?: return null
         session = null
-        return result
+        return StrokeUpdate(
+            previewRegions = current.compositor.composite(0, 0),
+            updatedSelectionMask = current.compositor.selectionMask
+        )
     }
 
     private class MoveSession(
-        val originalPixels: IntArray,
-        val selectionMask: BooleanArray?,
-        val canvasWidth: Int,
-        val canvasHeight: Int,
-        var startCol: Int,
-        var startRow: Int,
+        val compositor: MoveCompositor,
+        var startCol: Int = 0,
+        var startRow: Int = 0,
         var offsetX: Int = 0,
         var offsetY: Int = 0,
         var accumulatedOffsetX: Int = 0,
         var accumulatedOffsetY: Int = 0
     ) {
-        fun computeShiftedPixels(): IntArray {
-            val w = canvasWidth
-            val h = canvasHeight
-            val result = if (selectionMask != null) {
-                originalPixels.copyOf().also { r ->
-                    for (i in selectionMask.indices) {
-                        if (selectionMask[i]) r[i] = 0
-                    }
-                }
-            } else {
-                IntArray(w * h)
-            }
-            for (srcY in 0 until h) {
-                for (srcX in 0 until w) {
-                    val srcIdx = srcY * w + srcX
-                    if (selectionMask != null && !selectionMask[srcIdx]) continue
-                    val pixel = originalPixels[srcIdx]
-                    if (pixel == 0) continue
-                    val dstX = srcX + offsetX
-                    val dstY = srcY + offsetY
-                    if (dstX in 0 until w && dstY in 0 until h) {
-                        result[dstY * w + dstX] = pixel
-                    }
-                }
-            }
-            return result
-        }
-
-        fun computeClearedPixels(): IntArray {
-            val w = canvasWidth
-            val h = canvasHeight
-            val result = originalPixels.copyOf()
-            if (selectionMask != null) {
-                for (i in selectionMask.indices) {
-                    if (selectionMask[i]) result[i] = 0
-                }
-            } else {
-                result.fill(0)
-            }
-            return result
-        }
-
-        fun computeShiftedMask(): BooleanArray? {
-            val mask = selectionMask ?: return null
-            val w = canvasWidth
-            val h = canvasHeight
-            val result = BooleanArray(w * h)
-            for (srcY in 0 until h) {
-                for (srcX in 0 until w) {
-                    val srcIdx = srcY * w + srcX
-                    if (!mask[srcIdx]) continue
-                    val dstX = srcX + offsetX
-                    val dstY = srcY + offsetY
-                    if (dstX in 0 until w && dstY in 0 until h) {
-                        result[dstY * w + dstX] = true
-                    }
-                }
-            }
-            return result
-        }
+        fun preview() = StrokeUpdate(
+            previewRegions = compositor.composite(offsetX, offsetY),
+            updatedSelectionMask = compositor.shiftedSelectionMask(offsetX, offsetY)
+        )
     }
 }

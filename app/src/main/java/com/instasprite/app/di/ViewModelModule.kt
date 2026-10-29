@@ -12,12 +12,12 @@ import com.instasprite.app.domain.model.PixelCanvas
 import com.instasprite.app.ui.drawing.DrawingDialog
 import com.instasprite.app.ui.gallery.GalleryDialog
 import com.instasprite.app.ui.palette.ColorPaletteDialog
-import com.instasprite.app.ui.social.feed.FeedDialog
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ViewModelScoped
 
 
 @Module
@@ -25,6 +25,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 object ViewModelModule {
 
     @Provides
+    @ViewModelScoped
     fun provideColorPaletteRepository(
         @ApplicationContext context: Context, db: AppDatabase, lospecService: LospecService
     ): ColorPaletteRepository {
@@ -32,6 +33,7 @@ object ViewModelModule {
     }
 
     @Provides
+    @ViewModelScoped
     fun providePixelCanvasRepository(): PixelCanvasRepository {
         // Default 16x16, viewModel will resize this based on the Intent extras.
         return PixelCanvasRepository(PixelCanvas(16, 16))
@@ -54,11 +56,6 @@ object ViewModelModule {
 
     @Provides
     fun provideColorPaletteDialogController(): DialogController<ColorPaletteDialog> {
-        return DialogControllerImpl()
-    }
-
-    @Provides
-    fun provideFeedDialogController(): DialogController<FeedDialog> {
         return DialogControllerImpl()
     }
 }

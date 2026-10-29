@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.gallery.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Cel
@@ -38,16 +34,20 @@ import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
-import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun SpriteGridCard(
     spriteWithMeta: SpriteWithMeta,
     layoutMode: GalleryLayoutMode,
+    playing: Boolean = false,
+    playbackSprite: Sprite? = null,
+    onPlay: () -> Unit = {},
+    onStop: () -> Unit = {},
     onEdit: () -> Unit = {},
     onRename: () -> Unit = {},
     onDelete: () -> Unit = {},
@@ -83,11 +83,13 @@ fun SpriteGridCard(
                     .fillMaxWidth()
                     .background(AppTheme.colors.BackgroundColor.copy(0.9f))
             ) {
-                Box(
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .padding(horizontal = 6.pixelDp, vertical = 2.pixelDp)
+                        .weight(1f)
+                        .padding(horizontal = 6.pixelDp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (spriteWithMeta.hasAnimation) SpritePlaybackButton(playing, onPlay)
                     Text(
                         text = meta?.spriteName ?: stringResource(R.string.untitled),
                         color = Color.White,
@@ -95,14 +97,14 @@ fun SpriteGridCard(
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.align(Alignment.CenterStart)
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 Box {
                     IconButton(
                         onClick = { showDropdown = true },
                         modifier = Modifier.size(24.pixelDp),
-                        ) {
+                    ) {
                         PixelIcon(
                             icon = R.drawable.ic_three_dots,
                             contentDescription = stringResource(R.string.options),
@@ -119,7 +121,10 @@ fun SpriteGridCard(
                 }
             }
 
-            AsyncCanvasPreviewer(
+            GallerySpritePreview(
+                playing = playing,
+                playbackSprite = playbackSprite,
+                onStop = onStop,
                 sprite = sprite,
                 meta = meta,
                 modifier = Modifier
@@ -148,9 +153,15 @@ private fun SpriteGridCardStaggeredPreview() {
                                 y = 0,
                                 width = 16,
                                 height = 24,
-                                pixels = IntArray(16 * 24) { AppTheme.colors.SelectedColor.hashCode() })))),
-                meta = SpriteMeta(spriteId = "1", spriteName = "My Sprite")),
-            layoutMode = GalleryLayoutMode.StaggeredGrid)
+                                pixels = IntArray(16 * 24) { AppTheme.colors.SelectedColor.hashCode() })
+                        )
+                    )
+                ),
+                meta = SpriteMeta(spriteId = "1", spriteName = "My Sprite"),
+                hasAnimation = true
+            ),
+            layoutMode = GalleryLayoutMode.StaggeredGrid
+        )
     }
 }
 
@@ -171,10 +182,15 @@ private fun SpriteGridCardSquarePreview() {
                                 y = 0,
                                 width = 32,
                                 height = 32,
-                                pixels = IntArray(32 * 32) { AppTheme.colors.AccentButtonColor.hashCode() })))),
+                                pixels = IntArray(32 * 32) { AppTheme.colors.AccentButtonColor.hashCode() })
+                        )
+                    )
+                ),
                 meta = SpriteMeta(
                     spriteId = "2",
                     spriteName = "Long ahh name asdkjasdlkajsdlkasjdaslkdjad askldjaslkdjasdlkasjdalkdjas"
-                )), layoutMode = GalleryLayoutMode.SquareGrid)
+                )
+            ), layoutMode = GalleryLayoutMode.SquareGrid
+        )
     }
 }

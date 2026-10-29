@@ -26,9 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,15 +42,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
-import com.instasprite.app.ui.components.composable.ColorPaletteConfig
-import com.instasprite.app.ui.components.composable.PalettePreview
-import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.domain.model.InputField
+import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.InputTextField
+import com.instasprite.app.ui.components.composable.PalettePreview
 import com.instasprite.app.ui.components.composable.PixelIcon
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.drawing.dialog.ColorWheelDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
@@ -88,7 +84,9 @@ fun PaletteEditorScreen(
     }
 
     PaletteEditorContent(
-        title = if (viewModel.initialPalette == null) stringResource(R.string.create_palette) else stringResource(R.string.edit_palette),
+        title = if (viewModel.initialPalette == null) stringResource(R.string.create_palette) else stringResource(
+            R.string.edit_palette
+        ),
         name = name,
         author = author,
         colors = colors,
@@ -230,7 +228,11 @@ private fun PaletteEditorContent(
                         .padding(bottom = 16.pixelDp)
                         .clip(MaterialTheme.shapes.small)
                         .background(AppTheme.colors.BackgroundColor)
-                        .border(1.pixelDp, AppTheme.colors.Foreground2Color, MaterialTheme.shapes.small)
+                        .border(
+                            1.pixelDp,
+                            AppTheme.colors.Foreground2Color,
+                            MaterialTheme.shapes.small
+                        )
                         .clickable { onAddColorClick() }
                         .padding(vertical = 8.pixelDp),
                     horizontalArrangement = Arrangement.Center,
@@ -297,7 +299,10 @@ private fun ReorderableColorsList(
                     if (matchIndex != -1) {
                         oldItems.removeAt(matchIndex)
                     } else {
-                        ColorItemWithId(id = java.util.UUID.randomUUID().toString(), color = newColor)
+                        ColorItemWithId(
+                            id = java.util.UUID.randomUUID().toString(),
+                            color = newColor
+                        )
                     }
                 }
                 uiColorsList = newItems
@@ -426,7 +431,9 @@ private fun ReorderableColorsList(
 
                     IconButton(
                         onClick = { onColorDelete(itemIndex) },
-                        modifier = Modifier.size(24.pixelDp).weight(1f)
+                        modifier = Modifier
+                            .size(24.pixelDp)
+                            .weight(1f)
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_trash,

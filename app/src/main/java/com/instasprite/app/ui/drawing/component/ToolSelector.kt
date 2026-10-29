@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,19 +21,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
-import com.instasprite.app.domain.tool.EraserTool
-import com.instasprite.app.domain.tool.EyedropperTool
-import com.instasprite.app.domain.tool.FillTool
-import com.instasprite.app.domain.tool.MoveTool
-import com.instasprite.app.domain.tool.PencilTool
-import com.instasprite.app.domain.tool.ShapeToolPlaceholder
 import com.instasprite.app.domain.tool.Tool
-import com.instasprite.app.domain.tool.selection.SelectionToolPlaceholder
+import com.instasprite.app.domain.tool.ToolType
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.drawing.contract.ToolSelectorEvent
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun ToolSelector(
@@ -51,13 +43,13 @@ fun ToolSelector(
     var menuListVisible by remember { mutableStateOf(false) }
 
     val tools = listOf(
-        PencilTool,
-        ShapeToolPlaceholder,
-        SelectionToolPlaceholder,
-        EraserTool,
-        FillTool,
-        EyedropperTool,
-        MoveTool
+        ToolType.Pencil,
+        ToolType.Shape,
+        ToolType.Selection,
+        ToolType.Eraser,
+        ToolType.Fill,
+        ToolType.Eyedropper,
+        ToolType.Move
     )
 
     Row(
@@ -90,13 +82,7 @@ fun ToolSelector(
                         },
                         text = { Text(stringResource(id = tool.nameRes)) },
                         onClick = {
-                            if (tool == ShapeToolPlaceholder) {
-                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(com.instasprite.app.domain.tool.shape.LineTool))
-                            } else if (tool == SelectionToolPlaceholder) {
-                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(com.instasprite.app.domain.tool.selection.RectangleSelectionTool))
-                            } else {
-                                onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
-                            }
+                            onToolSelectorEvent(ToolSelectorEvent.SelectTool(tool))
                             toolListVisible = false
                         }
                     )
@@ -142,6 +128,13 @@ fun ToolSelector(
                 onDismissRequest = { menuListVisible = false }
             ) {
                 DropdownMenuItem(
+                    text = { Text(stringResource(R.string.tut_btn_show)) },
+                    onClick = {
+                        menuListVisible = false
+                        onToolSelectorEvent(ToolSelectorEvent.ShowTutorial)
+                    }
+                )
+                DropdownMenuItem(
                     text = { Text(text = stringResource(R.string.save)) },
                     onClick = {
                         onToolSelectorEvent(ToolSelectorEvent.OpenSaveISpriteDialog)
@@ -155,6 +148,20 @@ fun ToolSelector(
                     }
                 )
 
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.export_sprite_sheet)) },
+                    onClick = {
+                        onToolSelectorEvent(ToolSelectorEvent.OpenSaveSheetDialog)
+                        menuListVisible = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.export_gif)) },
+                    onClick = {
+                        onToolSelectorEvent(ToolSelectorEvent.OpenSaveGifDialog)
+                        menuListVisible = false
+                    }
+                )
                 DropdownMenuItem(
                     text = { Text(text = stringResource(R.string.export_image)) },
                     onClick = {

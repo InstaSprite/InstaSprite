@@ -1,4 +1,5 @@
 @file:Suppress("PropertyName", "ClassName", "unused")
+
 package com.instasprite.app.ui.theme
 
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -11,7 +12,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ThemeFlavour(val label: String) {
-//    LATTE("Latte"),
+    //    LATTE("Latte"),
     FRAPPE("Frappé"),
     MACCHIATO("Macchiato"),
     MOCHA("Mocha")

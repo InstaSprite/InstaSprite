@@ -21,6 +21,7 @@ sealed class TutorialEvent {
     data class OnBoundsChanged(val step: TutorialStep, val rect: Rect) : TutorialEvent()
     object OnStartTutorial : TutorialEvent()
     object OnNextStep : TutorialEvent()
+    object OnPreviousStep : TutorialEvent()
     object OnDismiss : TutorialEvent()
 }
 
@@ -45,28 +46,39 @@ class TutorialManager(
                 newBounds[event.step] = event.rect
                 _state.value = _state.value.copy(bounds = newBounds)
             }
+
             is TutorialEvent.OnStartTutorial -> {
                 _state.value = _state.value.copy(
                     showWelcomeDialog = false,
-                    showTutorial = true
+                    showTutorial = sequence.isNotEmpty(),
+                    currentStep = sequence.firstOrNull()
                 )
             }
+
+            is TutorialEvent.OnPreviousStep -> {
+                if (!_state.value.showTutorial) return
+                val index = sequence.indexOf(_state.value.currentStep)
+                if (index > 0) _state.value = _state.value.copy(currentStep = sequence[index - 1])
+            }
+
             is TutorialEvent.OnNextStep -> {
+                if (!_state.value.showTutorial) return
                 val currentStep = _state.value.currentStep
                 val currentIndex = sequence.indexOf(currentStep)
-                
+
                 val nextStep = if (currentIndex != -1 && currentIndex < sequence.size - 1) {
                     sequence[currentIndex + 1]
                 } else {
                     null
                 }
-                
+
                 if (nextStep == null) {
                     dismissTutorial()
                 } else {
                     _state.value = _state.value.copy(currentStep = nextStep)
                 }
             }
+
             is TutorialEvent.OnDismiss -> {
                 dismissTutorial()
             }

@@ -1,14 +1,11 @@
 package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.R
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 import com.instasprite.app.utils.bresenhamLine
 
-object EraserTool : StrokeTool {
-    override val icon: Int = R.drawable.ic_eraser_tool
-    override val nameRes: Int = R.string.eraser
-    override val descriptionRes: Int = R.string.tool_eraser_desc
+class EraserTool : StrokeTool {
+    override val type = ToolType.Eraser
     override val commitsImmediately: Boolean = true
 
     private var lastRow = 0
@@ -22,6 +19,8 @@ object EraserTool : StrokeTool {
     private var batchColors: IntArray = IntArray(0)
     private var batchCount: Int = 0
 
+    var symmetry = DrawingSymmetry()
+    private var strokeSymmetry = DrawingSymmetry()
     var brushShape: BrushShape = BrushShape.Square
 
     override fun apply(canvas: PixelCanvasUseCase, row: Int, col: Int, color: Color) {
@@ -41,6 +40,8 @@ object EraserTool : StrokeTool {
         plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
+        clearPreviousBatch()
+        strokeSymmetry = symmetry
         lastRow = row
         lastCol = col
         canvasWidth = canvas.getCanvasWidth()
@@ -51,14 +52,17 @@ object EraserTool : StrokeTool {
         if (touchedMask.size != totalPixels) {
             touchedMask = BooleanArray(totalPixels)
         }
-        val bufferSize = minOf(totalPixels, stamp.count * (canvasWidth + canvasHeight))
+        val copies =
+            (if (strokeSymmetry.horizontal) 2 else 1) * (if (strokeSymmetry.vertical) 2 else 1)
+        val bufferSize = minOf(
+            totalPixels.toLong(),
+            stamp.count.toLong() * (canvasWidth.toLong() + canvasHeight) * copies
+        ).toInt()
         if (batchIndices.size < bufferSize) {
             batchIndices = IntArray(bufferSize)
             batchColors = IntArray(bufferSize)
         }
 
-        batchCount = 0
-        touchedMask.fill(false)
         collectBrushPixels(row, col)
 
         if (batchCount > 0) {
@@ -76,8 +80,7 @@ object EraserTool : StrokeTool {
         plotPreviewPixel: (row: Int, col: Int, color: Int) -> Unit,
         onCommittedPixel: (row: Int, col: Int) -> Unit
     ): StrokeUpdate {
-        batchCount = 0
-        touchedMask.fill(false)
+        clearPreviousBatch()
 
         bresenhamLine(lastCol, lastRow, col, row) { px, py ->
             collectBrushPixels(py, px)
@@ -100,13 +103,28 @@ object EraserTool : StrokeTool {
         lastCol = 0
     }
 
-    private inline fun collectBrushPixels(row: Int, col: Int) {
+    private fun clearPreviousBatch() {
+        // Only these entries were marked by the previous update.
+        for (i in 0 until batchCount) {
+            touchedMask[batchIndices[i]] = false
+        }
+        batchCount = 0
+    }
+
+    private fun collectBrushPixels(row: Int, col: Int) {
         stamp.forEach(row, col, canvasWidth, canvasHeight) { r, c ->
-            val idx = r * canvasWidth + c
-            if (!touchedMask[idx]) {
-                touchedMask[idx] = true
-                batchIndices[batchCount] = idx
-                batchCount++
+            strokeSymmetry.forEachPixel(
+                r,
+                c,
+                canvasWidth,
+                canvasHeight
+            ) { mirroredRow, mirroredCol ->
+                val idx = mirroredRow * canvasWidth + mirroredCol
+                if (!touchedMask[idx]) {
+                    touchedMask[idx] = true
+                    batchIndices[batchCount] = idx
+                    batchCount++
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ interface ILayerManager {
     fun addLayer(name: String)
     fun removeLayer(layerId: String)
     fun selectLayer(layerId: String)
+    fun toggleClipping(layerId: String)
     fun toggleLock(layerId: String)
     fun toggleVisibility(layerId: String)
     fun mergeLayerDown(layerId: String)

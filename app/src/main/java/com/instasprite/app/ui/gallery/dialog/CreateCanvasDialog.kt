@@ -8,9 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import com.instasprite.app.R
 import com.instasprite.app.data.repository.loadDefaultColorPalette
 import com.instasprite.app.domain.model.ColorPalette
@@ -18,7 +17,6 @@ import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
 import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.dialog.InputDialog
-
 
 
 @Composable
@@ -75,7 +73,7 @@ fun CreateCanvasDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     var palette = loadDefaultColorPalette(LocalContext.current)
-                    if (selectedPalette != null) palette = selectedPalette!!.colors
+                    if (selectedPalette != null) palette = selectedPalette.colors
 
                     ColorPaletteView(
                         colors = palette,

@@ -20,9 +20,9 @@ fun AsyncImageView(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.FillWidth,
     altText: String = "Image",
-    placeHolder : Painter? = null,
-    fallback : Painter? = null,
-    error : Painter? = null,
+    placeHolder: Painter? = null,
+    fallback: Painter? = null,
+    error: Painter? = null,
     onLoading: ((AsyncImagePainter.State.Loading) -> Unit)? = null,
     onSuccess: ((AsyncImagePainter.State.Success) -> Unit)? = null,
     onError: ((AsyncImagePainter.State.Error) -> Unit)? = null

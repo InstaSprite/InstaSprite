@@ -1,8 +1,8 @@
 package com.instasprite.app.ui.gallery.dialog
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.dialog.InputDialog

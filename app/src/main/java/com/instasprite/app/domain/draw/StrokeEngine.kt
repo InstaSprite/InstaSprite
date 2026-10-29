@@ -5,17 +5,18 @@ import androidx.core.graphics.get
 import androidx.core.graphics.set
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.DitherBrush
+import com.instasprite.app.domain.tool.DrawingSymmetry
 import com.instasprite.app.domain.tool.EraserTool
+import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.ShapeTool
-import com.instasprite.app.domain.tool.MoveTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.StrokeUpdate
 import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.instasprite.app.utils.blendPixel
 
 data class StrokeEndResult(
     val updatedSelectionState: SelectionState? = null,
@@ -25,12 +26,30 @@ data class StrokeEndResult(
 class StrokeEngine(
     private val pixelCanvasUseCase: PixelCanvasUseCase,
     private val bitmapManager: BitmapManager,
-    private val scope: CoroutineScope,
+    private val moveTool: MoveTool,
     private val onSelectionStateChanged: (SelectionState?) -> Unit
 ) {
-    companion object {
-        var activeMoveCompositor: MoveCompositor? = null
+    var dither = DitherBrush()
+    private var strokeDither = DitherBrush()
+    var symmetry = DrawingSymmetry()
+    private var strokeSymmetry = DrawingSymmetry()
+
+    private fun plotStrokePixel(row: Int, col: Int, color: Int) {
+        val width = pixelCanvasUseCase.getCanvasWidth()
+        val height = pixelCanvasUseCase.getCanvasHeight()
+        strokeSymmetry.forEachPixel(row, col, width, height) { r, c ->
+            if (pixelCanvasUseCase.getSelectionMask()?.get(r * width + c) != false) {
+                val patternedColor = strokeDither.colorAt(r, c, color)
+                if (patternedColor ushr 24 != 0) plotOverlayPixel(r, c, patternedColor)
+            }
+        }
     }
+
+    fun reset() {
+        moveTool.reset()
+        strokeTouchedCount = 0
+    }
+
     // Reused stroke buffers to avoid per-move allocations.
     private var strokeTouchMarks: IntArray = IntArray(0)
     private var strokeTouchedIndices: IntArray = IntArray(0)
@@ -77,7 +96,8 @@ class StrokeEngine(
         bitmapManager.clearOverlayBitmap()
     }
 
-    private fun plotOverlayPixel(row: Int, col: Int, color: Int) {
+    private fun plotOverlayPixel(row: Int, col: Int, color: Int, onTop: Boolean = false) {
+        if (bitmapManager.overlayBitmap == null) bitmapManager.ensureOverlayBitmap()
         val bmp = bitmapManager.overlayBitmap ?: return
         if (row !in 0 until bmp.height || col !in 0 until bmp.width) return
         val index = row * bmp.width + col
@@ -90,7 +110,11 @@ class StrokeEngine(
         bmp[col, row] = color
 
         val mainBmp = bitmapManager.bitmap ?: return
-        mainBmp[col, row] = pixelCanvasUseCase.getPreviewCompositedPixelAt(row, col, color)
+        mainBmp[col, row] = if (onTop) {
+            blendPixel(pixelCanvasUseCase.getCompositedPixelAt(row, col), color, 1f)
+        } else {
+            pixelCanvasUseCase.getPreviewCompositedPixelAt(row, col, color)
+        }
     }
 
     private fun applyCommittedPixelToMainBitmap(row: Int, col: Int) {
@@ -134,46 +158,28 @@ class StrokeEngine(
 
     private fun applyStrokeUpdate(update: StrokeUpdate): Boolean {
         var applied = false
-        
-        val compositor = activeMoveCompositor
-        if (compositor != null && update.mainLayerPixels != null) {
-            val bmp = bitmapManager.bitmap
-            val w = pixelCanvasUseCase.getCanvasWidth()
-            val h = pixelCanvasUseCase.getCanvasHeight()
-            if (bmp != null && bmp.width == w && bmp.height == h) {
-                bmp.setPixels(compositor.compositedBuffer, 0, w, 0, 0, w, h)
-                bitmapManager.incrementDrawVersion()
-                applied = true
-            }
-        } else {
-            update.mainLayerPixels?.let { pixels ->
-                pixelCanvasUseCase.setAllPixels(pixels, ignoreSelection = true)
-                val bmp = bitmapManager.bitmap
-                val w = pixelCanvasUseCase.getCanvasWidth()
-                val h = pixelCanvasUseCase.getCanvasHeight()
-                if (bmp != null && bmp.width == w && bmp.height == h && pixels.size == w * h) {
-                    val composited = IntArray(w * h)
-                    for (r in 0 until h) {
-                        val offset = r * w
-                        for (c in 0 until w) {
-                            composited[offset + c] = pixelCanvasUseCase.getCompositedPixelAt(r, c)
-                        }
-                    }
-                    bmp.setPixels(composited, 0, w, 0, 0, w, h)
-                    bitmapManager.incrementDrawVersion()
-                } else {
-                    scope.launch { bitmapManager.refreshBitmapState() }
-                }
-                applied = true
-            }
+
+        update.mainLayerTiles?.let {
+            pixelCanvasUseCase.setActiveLayerTiles(it)
+            bitmapManager.incrementDrawVersion()
+            applied = true
         }
-        update.overlayPixels?.let {
-            val bmp = bitmapManager.overlayBitmap ?: return@let
-            val w = pixelCanvasUseCase.getCanvasWidth()
-            val h = pixelCanvasUseCase.getCanvasHeight()
-            if (it.isEmpty()) bitmapManager.clearOverlayBitmap()
-            else bmp.setPixels(it, 0, w, 0, 0, w, h)
-            bitmapManager.incrementOverlayVersion()
+        update.previewRegions?.let { regions ->
+            val bitmap = bitmapManager.bitmap
+            if (bitmap != null) {
+                for (region in regions) {
+                    bitmap.setPixels(
+                        region.pixels,
+                        0,
+                        region.width,
+                        region.x,
+                        region.y,
+                        region.width,
+                        region.height
+                    )
+                }
+            }
+            bitmapManager.incrementDrawVersion()
             applied = true
         }
         update.updatedSelectionMask?.let { mask ->
@@ -203,24 +209,14 @@ class StrokeEngine(
         selectionState: SelectionState?,
         zoomScale: Float = 1f
     ) {
+        strokeDither = if (tool is PencilTool) dither else DitherBrush()
+        strokeSymmetry =
+            if (tool is PencilTool || tool is ShapeTool || tool is EraserTool) symmetry else DrawingSymmetry()
+        if (tool is EraserTool) tool.symmetry = strokeSymmetry
         if (tool is PencilTool) tool.brushShape = brushShape
         if (tool is EraserTool) tool.brushShape = brushShape
 
-        if (tool is MoveTool) {
-            val activePixels = pixelCanvasUseCase.getActiveLayerPixelsDirect()
-            if (activePixels != null && activeMoveCompositor == null) {
-                activeMoveCompositor = MoveCompositor(
-                    width = pixelCanvasUseCase.getCanvasWidth(),
-                    height = pixelCanvasUseCase.getCanvasHeight(),
-                    layers = pixelCanvasUseCase.getLayers(),
-                    activeLayerId = pixelCanvasUseCase.getActiveLayerId(),
-                    selectionState = selectionState
-                )
-            }
-        }
-
-        bitmapManager.ensureOverlayBitmap()
-        if (!tool.commitsImmediately) {
+        if (!tool.commitsImmediately && tool !is MoveTool) {
             beginOverlayStrokeTracking()
         }
 
@@ -239,7 +235,14 @@ class StrokeEngine(
             col = col,
             color = color,
             scale = scale,
-            plotPreviewPixel = { r, c, argb -> plotOverlayPixel(r, c, argb) },
+            plotPreviewPixel = { r, c, argb ->
+                if (tool is SelectionTool) plotOverlayPixel(
+                    r,
+                    c,
+                    argb,
+                    onTop = true
+                ) else plotStrokePixel(r, c, argb)
+            },
             onCommittedPixel = { r, c -> applyCommittedPixelToMainBitmap(r, c) }
         )
 
@@ -278,7 +281,14 @@ class StrokeEngine(
             canvas = pixelCanvasUseCase,
             row = row,
             col = col,
-            plotPreviewPixel = { r, c, argb -> plotOverlayPixel(r, c, argb) },
+            plotPreviewPixel = { r, c, argb ->
+                if (tool is SelectionTool) plotOverlayPixel(
+                    r,
+                    c,
+                    argb,
+                    onTop = true
+                ) else plotStrokePixel(r, c, argb)
+            },
             onCommittedPixel = { _, _ -> }
         )
 
@@ -293,9 +303,6 @@ class StrokeEngine(
         isAppendSelectionMode: Boolean,
         currentSelectionState: SelectionState?
     ): StrokeEndResult {
-        if (!tool.staysPendingAfterStroke) {
-            activeMoveCompositor = null
-        }
         tool.endStroke()
 
         if (tool is SelectionTool) {
@@ -325,7 +332,7 @@ class StrokeEngine(
                 bitmapManager.refreshSelectionBitmap(finalSel)
             }
             restoreTouchedOverlayInMainBitmap()
-            bitmapManager.clearOverlayBitmap()
+            bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             bitmapManager.incrementDrawVersion()
             strokeTouchedCount = 0
@@ -342,28 +349,27 @@ class StrokeEngine(
         }
 
         strokeTouchedCount = 0
+        if (!tool.staysPendingAfterStroke) bitmapManager.releaseOverlayBitmap()
         return StrokeEndResult(shouldUpdateHistory = !tool.staysPendingAfterStroke)
     }
 
     fun onStrokeCancel(tool: StrokeTool) {
-        activeMoveCompositor = null
         cancelPendingTool(tool)
     }
 
     fun cancelPendingTool(tool: StrokeTool): Boolean {
-        activeMoveCompositor = null
         val pendingUpdate = tool.cancelPending(pixelCanvasUseCase)
         restoreTouchedOverlayInMainBitmap()
         if (pendingUpdate != null) {
             applyStrokeUpdate(pendingUpdate)
-            bitmapManager.clearOverlayBitmap()
+            bitmapManager.releaseOverlayBitmap()
             bitmapManager.incrementOverlayVersion()
             bitmapManager.incrementDrawVersion()
             return true
         } else {
             tool.cancelStroke()
         }
-        bitmapManager.clearOverlayBitmap()
+        bitmapManager.releaseOverlayBitmap()
         bitmapManager.incrementOverlayVersion()
         bitmapManager.incrementDrawVersion()
         return false
@@ -372,8 +378,8 @@ class StrokeEngine(
     fun commitPendingTool(tool: StrokeTool): Boolean {
         val update = tool.commitPending(pixelCanvasUseCase)
         if (update != null) {
-            activeMoveCompositor = null
             applyStrokeUpdate(update)
+            bitmapManager.releaseOverlayBitmap()
             return true
         }
         return false

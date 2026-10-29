@@ -1,8 +1,5 @@
 package com.instasprite.app.ui.palette.dialogs
 
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -23,8 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import com.instasprite.app.ui.components.composable.ColorPaletteView
+import androidx.compose.ui.res.stringResource
+import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.ColorPaletteConfig
+import com.instasprite.app.ui.components.composable.ColorPaletteView
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.dialog.InputDialog
 import com.instasprite.app.ui.theme.AppTheme
@@ -61,7 +60,11 @@ fun FileImportDialog(
                     try {
                         val colors = onImportPaletteFromFile(it)
                         if (colors.isEmpty()) {
-                            Toast.makeText(context, context.getString(R.string.no_colors_found_in_file), Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.no_colors_found_in_file),
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                             previewColors = null
                         } else {
@@ -92,10 +95,18 @@ fun FileImportDialog(
         onConfirm = {
             if (previewColors != null && previewColors!!.isNotEmpty()) {
                 onImport(previewColors!!)
-                Toast.makeText(context, context.getString(R.string.palette_imported_successfully), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.palette_imported_successfully),
+                    Toast.LENGTH_SHORT
+                ).show()
                 onDismiss()
             } else {
-                Toast.makeText(context, context.getString(R.string.please_select_a_file_first), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.please_select_a_file_first),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         },
         confirmButtonText = stringResource(R.string.import_button),
@@ -109,7 +120,12 @@ fun FileImportDialog(
                 OutlinedTextField(
                     value = selectedFileName ?: stringResource(R.string.no_file_selected),
                     onValueChange = {},
-                    label = { Text(stringResource(R.string.import_location), color = AppTheme.colors.SelectedColor) },
+                    label = {
+                        Text(
+                            stringResource(R.string.import_location),
+                            color = AppTheme.colors.SelectedColor
+                        )
+                    },
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {

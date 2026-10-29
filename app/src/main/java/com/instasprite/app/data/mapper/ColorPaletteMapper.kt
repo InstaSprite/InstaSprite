@@ -4,7 +4,7 @@ import com.instasprite.app.data.model.ColorPaletteData
 import com.instasprite.app.domain.model.ColorPalette
 
 
-fun ColorPaletteData.toDomain() : ColorPalette {
+fun ColorPaletteData.toDomain(): ColorPalette {
     return ColorPalette(
         id = this.id,
         name = this.name,
@@ -14,7 +14,7 @@ fun ColorPaletteData.toDomain() : ColorPalette {
     )
 }
 
-fun ColorPalette.toData() : ColorPaletteData {
+fun ColorPalette.toData(): ColorPaletteData {
     return ColorPaletteData(
         id = this.id,
         name = this.name,

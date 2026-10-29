@@ -22,6 +22,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +41,6 @@ import androidx.compose.ui.window.DialogWindowProvider
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
-import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay
 import com.instasprite.app.ui.components.composable.IntColorPaletteView
 import com.instasprite.app.ui.components.composable.PixelIcon
@@ -56,19 +57,26 @@ fun ImagePagerOverlay(
     onImagePagerEvent: (ImagePagerEvent) -> Unit,
     spriteList: List<SpriteWithMeta>,
     startIndex: Int,
-    onDismiss: (Sprite?) -> Unit
+    onDismiss: (Sprite?) -> Unit,
+    onOpenDrawing: (Sprite, String?) -> Unit,
+    playingSpriteId: String? = null,
+    playbackSprite: Sprite? = null
 ) {
-    val context = LocalContext.current
 
     if (spriteList.isEmpty()) {
         return
     }
 
     val pagerState = rememberPagerState(
-        initialPage = startIndex,
+        initialPage = startIndex.coerceIn(spriteList.indices),
         pageCount = { spriteList.size })
 
     val currentSprite = spriteList.getOrNull(pagerState.currentPage)
+    val onEvent by rememberUpdatedState(onImagePagerEvent)
+    DisposableEffect(currentSprite?.sprite?.id) {
+        val id = currentSprite?.sprite?.id
+        onDispose { if (id != null) onEvent(ImagePagerEvent.StopPlayback(id)) }
+    }
 
     var zoomedPageIndex by remember { mutableStateOf<Int?>(null) }
 
@@ -89,6 +97,13 @@ fun ImagePagerOverlay(
                     title = currentSprite?.meta?.spriteName ?: "",
                     onBackClick = { onDismiss(currentSprite?.sprite) },
                     actions = {
+                        if (currentSprite?.hasAnimation == true) {
+                            Box(Modifier.padding(horizontal = 8.pixelDp)) {
+                                SpritePlaybackButton(playingSpriteId == currentSprite.sprite.id) {
+                                    onImagePagerEvent(ImagePagerEvent.TogglePlayback(currentSprite.sprite.id))
+                                }
+                            }
+                        }
                         Box {
                             IconButton(
                                 onClick = { dropdownMenuVisible = true }
@@ -122,17 +137,11 @@ fun ImagePagerOverlay(
                 BottomBar(
                     onEditButtonTap = {
                         currentSprite?.let {
-                            onImagePagerEvent(
-                                ImagePagerEvent.OpenDrawingActivity(
-                                    it.meta?.spriteName,
-                                    it.sprite,
-                                    context
-                                )
-                            )
+                            onOpenDrawing(it.sprite, it.meta?.spriteName)
                         }
                     },
-                    onSaveImageTap = {
-                        onImagePagerEvent(ImagePagerEvent.OpenSaveImageDialog(currentSprite!!))
+                    onExportTap = {
+                        currentSprite?.let { onImagePagerEvent(ImagePagerEvent.OpenExportDialog(it)) }
                     },
                     spriteWithMetaData = currentSprite,
                     modifier = Modifier
@@ -151,13 +160,19 @@ fun ImagePagerOverlay(
             ) { page ->
                 val spriteWithMeta = spriteList[page]
 
-                AsyncCanvasPreviewer(
+                GallerySpritePreview(
+                    playing = playingSpriteId == spriteWithMeta.sprite.id && page == pagerState.currentPage,
+                    playbackSprite = playbackSprite?.takeIf { it.id == spriteWithMeta.sprite.id && page == pagerState.currentPage },
+                    onStop = { onImagePagerEvent(ImagePagerEvent.StopPlayback(spriteWithMeta.sprite.id)) },
                     sprite = spriteWithMeta.sprite,
                     meta = spriteWithMeta.meta,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    onClick = { zoomedPageIndex = page }
+                    onClick = {
+                        onImagePagerEvent(ImagePagerEvent.StopPlayback(spriteWithMeta.sprite.id))
+                        zoomedPageIndex = page
+                    }
                 )
 
                 if (zoomedPageIndex == page) {
@@ -183,7 +198,7 @@ fun ImagePagerOverlay(
 @Composable
 private fun BottomBar(
     spriteWithMetaData: SpriteWithMeta?,
-    onSaveImageTap: () -> Unit,
+    onExportTap: () -> Unit,
     onEditButtonTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -208,7 +223,7 @@ private fun BottomBar(
                 .align(Alignment.TopStart)
                 .padding(8.pixelDp)
         ) {
-            Text(text =  stringResource(R.string.name) + ": " + spriteName)
+            Text(text = stringResource(R.string.name) + ": " + spriteName)
             Text(text = stringResource(R.string.sort_date_created) + ": " + dateCreated)
 
             Spacer(modifier = Modifier.height(8.pixelDp))
@@ -228,7 +243,7 @@ private fun BottomBar(
                     .fillMaxSize()
             ) {
                 Button(
-                    onClick = onSaveImageTap,
+                    onClick = onExportTap,
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppTheme.colors.SelectedColor
@@ -239,12 +254,12 @@ private fun BottomBar(
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_down_arrow,
-                            contentDescription = stringResource(R.string.save_as_image_1),
+                            contentDescription = stringResource(R.string.export_title),
                             tint = AppTheme.colors.TextColorDark,
                         )
                         Spacer(modifier = Modifier.width(6.pixelDp))
                         Text(
-                            text = stringResource(R.string.save_as_image),
+                            text = stringResource(R.string.export_title),
                             color = AppTheme.colors.TextColorDark
                         )
                     }

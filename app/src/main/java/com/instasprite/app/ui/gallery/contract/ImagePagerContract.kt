@@ -1,13 +1,14 @@
 package com.instasprite.app.ui.gallery.contract
 
-import android.content.Context
-import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
 
 sealed interface ImagePagerEvent {
+    data class TogglePlayback(val spriteId: String) : ImagePagerEvent
+    data class StopPlayback(val spriteId: String) : ImagePagerEvent
     data class OpenDeleteDialog(val spriteName: String, val spriteId: String) : ImagePagerEvent
-    data class OpenSaveImageDialog(val sprite: SpriteWithMeta) : ImagePagerEvent
-    data class OpenDrawingActivity(val name: String?, val sprite: Sprite, val context: Context) : ImagePagerEvent
+    data class OpenExportDialog(val sprite: SpriteWithMeta) : ImagePagerEvent
 }
 
 
+
+enum class GalleryExportFormat { IMAGE, GIF, SPRITE_SHEET, PROJECT }

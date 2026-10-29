@@ -3,25 +3,11 @@ package com.instasprite.app.data.database
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.instasprite.app.data.model.MutationType
-import com.instasprite.app.data.network.model.ActorSummaryDto
-import com.instasprite.app.data.network.model.CommentDto
-import com.instasprite.app.data.network.model.FollowingMemberFollowItemDto
-import com.instasprite.app.data.network.model.MemberImageDto
-import com.instasprite.app.data.network.model.PostImageDto
+import java.nio.ByteBuffer
 
 class AppTypeConverters {
     private val gson = Gson()
 
-    @TypeConverter
-    fun fromMutationType(value: MutationType?): String? {
-        return value?.name
-    }
-
-    @TypeConverter
-    fun toMutationType(value: String?): MutationType? {
-        return value?.let { enumValueOf<MutationType>(it) }
-    }
 
     @TypeConverter
     fun fromStringList(value: List<String>?): String? {
@@ -37,64 +23,21 @@ class AppTypeConverters {
     }
 
     @TypeConverter
-    fun fromPostImageDtoList(value: List<PostImageDto>?): String? {
-        return value?.let { gson.toJson(it) }
+    fun fromIntList(list: List<Int>?): ByteArray? {
+        if (list == null) return null
+        val buffer = ByteBuffer.allocate(list.size * 4)
+        list.forEach { buffer.putInt(it) }
+        return buffer.array()
     }
 
     @TypeConverter
-    fun toPostImageDtoList(value: String?): List<PostImageDto>? {
-        return value?.let {
-            val type = object : TypeToken<List<PostImageDto>>() {}.type
-            gson.fromJson(it, type)
+    fun toIntList(bytes: ByteArray?): List<Int>? {
+        if (bytes == null) return null
+        val buffer = ByteBuffer.wrap(bytes)
+        val list = mutableListOf<Int>()
+        while (buffer.hasRemaining()) {
+            list.add(buffer.int)
         }
-    }
-
-    @TypeConverter
-    fun fromCommentDtoList(value: List<CommentDto>?): String? {
-        return value?.let { gson.toJson(it) }
-    }
-
-    @TypeConverter
-    fun toCommentDtoList(value: String?): List<CommentDto>? {
-        return value?.let {
-            val type = object : TypeToken<List<CommentDto>>() {}.type
-            gson.fromJson(it, type)
-        }
-    }
-
-    @TypeConverter
-    fun fromActorSummaryDtoList(value: List<ActorSummaryDto>?): String? {
-        return value?.let { gson.toJson(it) }
-    }
-
-    @TypeConverter
-    fun toActorSummaryDtoList(value: String?): List<ActorSummaryDto>? {
-        return value?.let {
-            val type = object : TypeToken<List<ActorSummaryDto>>() {}.type
-            gson.fromJson(it, type)
-        }
-    }
-
-    @TypeConverter
-    fun fromMemberImageDto(value: MemberImageDto?): String? {
-        return value?.let { gson.toJson(it) }
-    }
-
-    @TypeConverter
-    fun toMemberImageDto(value: String?): MemberImageDto? {
-        return value?.let { gson.fromJson(it, MemberImageDto::class.java) }
-    }
-
-    @TypeConverter
-    fun fromFollowingMemberFollowItemDtoList(value: List<FollowingMemberFollowItemDto>?): String? {
-        return value?.let { gson.toJson(it) }
-    }
-
-    @TypeConverter
-    fun toFollowingMemberFollowItemDtoList(value: String?): List<FollowingMemberFollowItemDto>? {
-        return value?.let {
-            val type = object : TypeToken<List<FollowingMemberFollowItemDto>>() {}.type
-            gson.fromJson(it, type)
-        }
+        return list
     }
 }

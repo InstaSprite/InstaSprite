@@ -48,8 +48,7 @@ object DrawingModule {
                 },
                 onNavigateBack = { spriteId ->
                     scope.launch {
-                        viewModel.saveToDB()
-                        navigator.goBackWithResult(spriteId)
+                        if (viewModel.saveToDB()) navigator.goBackWithResult(spriteId)
                     }
                 },
                 onNavigateBackDirectly = {

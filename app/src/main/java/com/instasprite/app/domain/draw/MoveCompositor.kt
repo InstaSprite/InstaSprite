@@ -1,116 +1,127 @@
 package com.instasprite.app.domain.draw
 
-import com.instasprite.app.domain.model.BlendMode
+import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
-import com.instasprite.app.domain.model.SelectionState
-import com.instasprite.app.utils.blendPixel
-import com.instasprite.app.utils.tilesToPixels
+import com.instasprite.app.domain.model.LayerCompositor
+import com.instasprite.app.domain.model.TileCoord
+import com.instasprite.app.utils.TILE_SIZE
 
 class MoveCompositor(
     private val width: Int,
     private val height: Int,
-    layers: List<Layer>,
-    activeLayerId: String,
-    selectionState: SelectionState?
+    private val layers: List<Layer>,
+    private val activeLayerId: String,
+    val selectionMask: BooleanArray?
 ) {
-    private val transparentArgb = 0
-    private val totalPixels = width * height
-
-    val compositedBuffer = IntArray(totalPixels)
-    private val staticBackground = IntArray(totalPixels)
-
-    private val selectionMask = selectionState?.mask ?: BooleanArray(totalPixels) { true }
-    private val selectionBounds = selectionState?.bounds ?: android.graphics.Rect(0, 0, width, height)
-    private var originalSelectionPixels = IntArray(totalPixels)
-
-    private class AboveLayerCache(
-        val pixels: IntArray,
-        val opacity: Float,
-        val blendMode: BlendMode
-    )
-    private val aboveLayers = mutableListOf<AboveLayerCache>()
-
-    private var activeOpacity = 1.0f
-    private var activeBlendMode = BlendMode.NORMAL
+    private val originalTiles = layers.first { it.id == activeLayerId }.tiles
+    private val clippingScratch =
+        if (layers.any { it.isClipping }) IntArray(TILE_SIZE * TILE_SIZE) else null
+    private val selectedTiles = mutableMapOf<TileCoord, IntArray>()
+    private val clearedTiles = originalTiles.toMutableMap()
+    private var destinationTiles: Set<TileCoord> = emptySet()
+    private var maskLeft = width
+    private var maskTop = height
+    private var maskRight = 0
+    private var maskBottom = 0
+    var tiles: Map<TileCoord, IntArray> = originalTiles
+        private set
 
     init {
-        val activeIdx = layers.indexOfFirst { it.id == activeLayerId }
-        val belowComposited = IntArray(totalPixels)
-        for (i in 0 until activeIdx) {
-            val layer = layers[i]
-            if (!layer.isVisible) continue
-            val layerPixels = tilesToPixels(layer.tiles, width, height)
-            for (idx in 0 until totalPixels) {
-                belowComposited[idx] = blendPixel(belowComposited[idx], layerPixels[idx], layer.opacity, layer.blendMode)
+        require(width > 0 && height > 0)
+        require(selectionMask == null || selectionMask.size.toLong() == width.toLong() * height)
+        selectionMask?.forEachIndexed { index, selected ->
+            if (selected) {
+                val x = index % width
+                val y = index / width
+                maskLeft = minOf(maskLeft, x)
+                maskTop = minOf(maskTop, y)
+                maskRight = maxOf(maskRight, x + 1)
+                maskBottom = maxOf(maskBottom, y + 1)
             }
         }
-
-        if (activeIdx in layers.indices) {
-            val activeLayer = layers[activeIdx]
-            activeOpacity = activeLayer.opacity
-            activeBlendMode = activeLayer.blendMode
-            
-            val activePixels = tilesToPixels(activeLayer.tiles, width, height)
-            val clearedActive = activePixels.copyOf()
-            
-            for (i in 0 until totalPixels) {
-                if (i < selectionMask.size && selectionMask[i]) {
-                    originalSelectionPixels[i] = activePixels[i]
-                    clearedActive[i] = 0
-                }
+        for ((coord, pixels) in originalTiles) {
+            var selected: IntArray? = null
+            var remaining: IntArray? = null
+            for (index in pixels.indices) {
+                val x = coord.x.toLong() * TILE_SIZE + index % TILE_SIZE
+                val y = coord.y.toLong() * TILE_SIZE + index / TILE_SIZE
+                if (x !in 0L until width.toLong() || y !in 0L until height.toLong()) continue
+                if (pixels[index] == 0 || selectionMask?.get(y.toInt() * width + x.toInt()) == false) continue
+                if (selected == null) selected = IntArray(TILE_SIZE * TILE_SIZE)
+                if (remaining == null) remaining = pixels.copyOf()
+                selected[index] = pixels[index]
+                remaining[index] = 0
             }
-
-            System.arraycopy(belowComposited, 0, staticBackground, 0, totalPixels)
-            for (i in 0 until totalPixels) {
-                staticBackground[i] = blendPixel(staticBackground[i], clearedActive[i], activeOpacity, activeBlendMode)
+            if (selected != null) {
+                selectedTiles[coord] = selected
+                if (remaining!!.all { it == 0 }) clearedTiles.remove(coord)
+                else clearedTiles[coord] = remaining
             }
-        } else {
-            System.arraycopy(belowComposited, 0, staticBackground, 0, totalPixels)
-        }
-
-        for (i in (activeIdx + 1) until layers.size) {
-            val layer = layers[i]
-            if (!layer.isVisible) continue
-            val layerPixels = tilesToPixels(layer.tiles, width, height)
-            aboveLayers.add(AboveLayerCache(layerPixels, layer.opacity, layer.blendMode))
         }
     }
 
-    fun composite(offsetX: Int, offsetY: Int): IntArray {
-        System.arraycopy(staticBackground, 0, compositedBuffer, 0, totalPixels)
+    fun composite(offsetX: Int, offsetY: Int): List<Cel> {
+        val moved = clearedTiles.toMutableMap()
+        val destinations = mutableSetOf<TileCoord>()
+        for ((coord, pixels) in selectedTiles) {
+            for (index in pixels.indices) {
+                val pixel = pixels[index]
+                if (pixel == 0) continue
+                val x = coord.x.toLong() * TILE_SIZE + index % TILE_SIZE + offsetX
+                val y = coord.y.toLong() * TILE_SIZE + index / TILE_SIZE + offsetY
+                if (x !in 0L until width.toLong() || y !in 0L until height.toLong()) continue
+                val destination = TileCoord(x.toInt() / TILE_SIZE, y.toInt() / TILE_SIZE)
+                if (destinations.add(destination)) {
+                    moved[destination] =
+                        moved[destination]?.copyOf() ?: IntArray(TILE_SIZE * TILE_SIZE)
+                }
+                moved.getValue(destination)[(y.toInt() % TILE_SIZE) * TILE_SIZE + x.toInt() % TILE_SIZE] =
+                    pixel
+            }
+        }
+        tiles = moved
+        val affected = selectedTiles.keys + destinationTiles + destinations
+        destinationTiles = destinations
+        val previewLayers = layers.map { layer ->
+            if (layer.id != activeLayerId) layer else Layer(
+                layer.id, layer.name, layer.isVisible,
+                layer.isLocked, layer.opacity, layer.blendMode, tiles, layer.isClipping
+            )
+        }
+        return affected.map { coord ->
+            val x = coord.x * TILE_SIZE
+            val y = coord.y * TILE_SIZE
+            val tileWidth = minOf(TILE_SIZE, width - x)
+            val tileHeight = minOf(TILE_SIZE, height - y)
+            val pixels = IntArray(tileWidth * tileHeight)
+            LayerCompositor.render(
+                previewLayers,
+                width,
+                height,
+                pixels,
+                y,
+                x,
+                tileWidth,
+                tileHeight,
+                clippingScratch
+            )
+            Cel(x, y, tileWidth, tileHeight, pixels)
+        }
+    }
 
-        val bounds = selectionBounds
-        val rStart = bounds.top.coerceIn(0, height)
-        val rEnd = bounds.bottom.coerceIn(0, height)
-        val cStart = bounds.left.coerceIn(0, width)
-        val cEnd = bounds.right.coerceIn(0, width)
-
-        for (srcY in rStart until rEnd) {
-            val srcOffset = srcY * width
-            for (srcX in cStart until cEnd) {
-                val srcIdx = srcOffset + srcX
-                if (srcIdx >= selectionMask.size || !selectionMask[srcIdx]) continue
-                val pixel = originalSelectionPixels[srcIdx]
-                if (pixel == transparentArgb) continue
-
-                val dstX = srcX + offsetX
-                val dstY = srcY + offsetY
-                if (dstX in 0 until width && dstY in 0 until height) {
-                    val dstIdx = dstY * width + dstX
-                    compositedBuffer[dstIdx] = blendPixel(compositedBuffer[dstIdx], pixel, activeOpacity, activeBlendMode)
+    fun shiftedSelectionMask(offsetX: Int, offsetY: Int): BooleanArray? {
+        val mask = selectionMask ?: return null
+        val shifted = BooleanArray(mask.size)
+        for (y in maskTop until maskBottom) {
+            for (x in maskLeft until maskRight) {
+                if (!mask[y * width + x]) continue
+                val destinationX = x.toLong() + offsetX
+                val destinationY = y.toLong() + offsetY
+                if (destinationX in 0L until width.toLong() && destinationY in 0L until height.toLong()) {
+                    shifted[destinationY.toInt() * width + destinationX.toInt()] = true
                 }
             }
         }
-
-        for (above in aboveLayers) {
-            val abovePixels = above.pixels
-            val op = above.opacity
-            val bm = above.blendMode
-            for (i in 0 until totalPixels) {
-                compositedBuffer[i] = blendPixel(compositedBuffer[i], abovePixels[i], op, bm)
-            }
-        }
-
-        return compositedBuffer
+        return shifted
     }
 }

@@ -10,7 +10,8 @@ class Layer(
     val isLocked: Boolean = false,
     val opacity: Float = 1.0f,
     val blendMode: BlendMode = BlendMode.NORMAL,
-    val tiles: Map<TileCoord, IntArray>
+    val tiles: Map<TileCoord, IntArray>,
+    val isClipping: Boolean = false
 ) {
     constructor(
         id: String,
@@ -19,7 +20,8 @@ class Layer(
         isLocked: Boolean = false,
         opacity: Float = 1.0f,
         blendMode: BlendMode = BlendMode.NORMAL,
-        cel: Cel
+        cel: Cel,
+        isClipping: Boolean = false
     ) : this(
         id = id,
         name = name,
@@ -27,7 +29,8 @@ class Layer(
         isLocked = isLocked,
         opacity = opacity,
         blendMode = blendMode,
-        tiles = celToTiles(cel)
+        tiles = celToTiles(cel),
+        isClipping = isClipping
     )
 
     val cel: Cel
@@ -41,14 +44,15 @@ class Layer(
         opacity: Float = this.opacity,
         blendMode: BlendMode = this.blendMode,
         tiles: Map<TileCoord, IntArray>? = null,
-        cel: Cel? = null
+        cel: Cel? = null,
+        isClipping: Boolean = this.isClipping
     ): Layer {
         val nextTiles = when {
             tiles != null -> deepCopyTiles(tiles)
             cel != null -> celToTiles(cel)
             else -> deepCopyTiles(this.tiles)
         }
-        return Layer(id, name, isVisible, isLocked, opacity, blendMode, nextTiles)
+        return Layer(id, name, isVisible, isLocked, opacity, blendMode, nextTiles, isClipping)
     }
 
     private fun deepCopyTiles(source: Map<TileCoord, IntArray>): Map<TileCoord, IntArray> {
@@ -60,7 +64,7 @@ class Layer(
         if (this === other) return true
         if (other !is Layer) return false
         if (id != other.id || name != other.name || isVisible != other.isVisible || isLocked != other.isLocked) return false
-        if (opacity != other.opacity || blendMode != other.blendMode) return false
+        if (opacity != other.opacity || blendMode != other.blendMode || isClipping != other.isClipping) return false
         if (tiles.size != other.tiles.size) return false
         for ((coord, pixels) in tiles) {
             val otherPixels = other.tiles[coord] ?: return false
@@ -76,6 +80,7 @@ class Layer(
         result = 31 * result + isLocked.hashCode()
         result = 31 * result + opacity.hashCode()
         result = 31 * result + blendMode.hashCode()
+        result = 31 * result + isClipping.hashCode()
         for ((coord, pixels) in tiles) {
             result = 31 * result + coord.hashCode()
             result = 31 * result + pixels.contentHashCode()
@@ -84,5 +89,5 @@ class Layer(
     }
 
     override fun toString(): String =
-        "Layer(id='$id', name='$name', isVisible=$isVisible, isLocked=$isLocked, opacity=$opacity, blendMode=$blendMode, tiles=${tiles.size}, cel=$cel)"
+        "Layer(id='$id', name='$name', isVisible=$isVisible, isLocked=$isLocked, opacity=$opacity, blendMode=$blendMode, isClipping=$isClipping, tiles=${tiles.size}, cel=$cel)"
 }

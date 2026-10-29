@@ -5,11 +5,12 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import com.instasprite.app.ISprite
-import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.data.mapper.toISprite
+import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.utils.getFormatFromExtension
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.PushbackInputStream
@@ -22,31 +23,82 @@ class FileRepository(val context: Context) {
         folderUri: Uri,
         fileName: String
     ): Boolean = withContext(Dispatchers.IO) {
-        val folder = DocumentFile.fromTreeUri(context, folderUri) ?: return@withContext false
-
-        val nameWithoutExt = fileName.removeSuffix(".isprite")
-        var uniqueFileName = "$nameWithoutExt.isprite"
-        var counter = 1
-        while (folder.findFile(uniqueFileName) != null) {
-            uniqueFileName = "$nameWithoutExt ($counter).isprite"
-            counter++
-        }
-
-        val file = folder.createFile("application/isprite", uniqueFileName) ?: return@withContext false
-
-        val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return@withContext false
-
-        try {
-            GZIPOutputStream(outputStream).use { gzipStream ->
+        val exportContext = kotlinx.coroutines.currentCoroutineContext()
+        val name = fileName.removeSuffix(".isprite") + ".isprite"
+        writeExportFile(folderUri, name, "application/isprite") { output ->
+            exportContext.ensureActive()
+            GZIPOutputStream(output).use { gzip ->
                 val proto = sprite.toISprite()
-                proto.writeTo(gzipStream)
-                gzipStream.finish()
+                exportContext.ensureActive()
+                proto.writeTo(gzip)
+                exportContext.ensureActive()
             }
-            true
+        }
+    }
+
+    suspend fun saveAnimationFile(
+        sprite: Sprite, format: com.instasprite.app.domain.export.AnimationExportFormat,
+        folderUri: Uri, fileName: String, columns: Int = 1, scalePercent: Int = 100
+    ): Boolean = withContext(Dispatchers.IO) {
+        val exportContext = kotlinx.coroutines.currentCoroutineContext()
+        val name = fileName.removeSuffix(".${format.extension}") + ".${format.extension}"
+        writeExportFile(folderUri, name, format.mimeType) { output ->
+            when (format) {
+                com.instasprite.app.domain.export.AnimationExportFormat.GIF ->
+                    com.instasprite.app.domain.export.GifExporter.write(
+                        sprite,
+                        output,
+                        scalePercent
+                    ) { exportContext.ensureActive() }
+
+                com.instasprite.app.domain.export.AnimationExportFormat.SPRITE_SHEET -> {
+                    val bitmap =
+                        com.instasprite.app.domain.export.ImageExporter.convertToSpriteSheet(
+                            sprite,
+                            columns,
+                            scalePercent
+                        ) {
+                            exportContext.ensureActive()
+                        }
+                    try {
+                        exportContext.ensureActive()
+                        if (!bitmap.compress(
+                                Bitmap.CompressFormat.PNG,
+                                100,
+                                output
+                            )
+                        ) throw IOException("PNG export failed")
+                    } finally {
+                        bitmap.recycle()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun writeExportFile(
+        folderUri: Uri, fileName: String, mimeType: String,
+        write: (java.io.OutputStream) -> Unit
+    ): Boolean {
+        var file: DocumentFile? = null
+        var complete = false
+        try {
+            val folder = DocumentFile.fromTreeUri(context, folderUri) ?: return false
+            val stem = fileName.substringBeforeLast(".", fileName)
+            val extension = fileName.substringAfterLast(".", "")
+            var uniqueName = fileName
+            var counter = 1
+            while (folder.findFile(uniqueName) != null) uniqueName = "$stem (${counter++}).$extension"
+            file = folder.createFile(mimeType, uniqueName) ?: return false
+            val stream = context.contentResolver.openOutputStream(file.uri) ?: return false
+            stream.use { write(it) }
+            complete = true
+            return true
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
-            e.printStackTrace()
-            false
+            return false
+        } finally {
+            if (!complete) runCatching { file?.delete() }
         }
     }
 
@@ -87,31 +139,8 @@ class FileRepository(val context: Context) {
         val formatInfo = getFormatFromExtension(fileName) ?: return false
         val (compressFormat, mimeType) = formatInfo
 
-        val folder = DocumentFile.fromTreeUri(context, folderUri) ?: return false
-
-        val nameWithoutExt = fileName.substringBeforeLast(".")
-        val extension = if (fileName.contains(".")) fileName.substringAfterLast(".") else ""
-        val extStr = if (extension.isNotEmpty()) ".$extension" else ""
-
-        var uniqueFileName = fileName
-        var counter = 1
-        while (folder.findFile(uniqueFileName) != null) {
-            uniqueFileName = "$nameWithoutExt ($counter)$extStr"
-            counter++
-        }
-
-        val file = folder.createFile(mimeType, uniqueFileName) ?: return false
-        val outputStream = context.contentResolver.openOutputStream(file.uri) ?: return false
-
-        return try {
-            bitmap.compress(compressFormat, 100, outputStream)
-            outputStream.flush()
-            true
-        } catch (e: IOException) {
-            e.printStackTrace()
-            false
-        } finally {
-            outputStream.close()
+        return writeExportFile(folderUri, fileName, mimeType) { output ->
+            if (!bitmap.compress(compressFormat, 100, output)) throw IOException("Image export failed")
         }
     }
 }

@@ -1,13 +1,18 @@
 package com.instasprite.app.domain.canvashistory
 
 import com.instasprite.app.HistoryEntryProto
-import com.instasprite.app.domain.canvashistory.HistoryEntryMapper.toDomain
-import com.instasprite.app.domain.canvashistory.HistoryEntryMapper.toProto
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
 class HistoryDiskStore(private val historyDir: File) {
+
+    init {
+        val historyFileName = Regex("(undo|redo)_\\d+\\.pb")
+        historyDir.listFiles()?.forEach { file ->
+            if (file.isFile && historyFileName.matches(file.name)) file.delete()
+        }
+    }
 
     var undoCount: Int = 0
         private set
@@ -15,8 +20,8 @@ class HistoryDiskStore(private val historyDir: File) {
     var redoCount: Int = 0
         private set
 
-    fun appendUndo(entry: HistoryEntry) {
-        try {
+    fun appendUndo(entry: HistoryEntry): Boolean {
+        return try {
             historyDir.mkdirs()
             val file = undoFile(undoCount)
             FileOutputStream(file).use { output ->
@@ -25,29 +30,33 @@ class HistoryDiskStore(private val historyDir: File) {
                 }
             }
             undoCount++
+            true
         } catch (_: Exception) {
+            undoFile(undoCount).delete()
+            false
         }
     }
 
     fun popUndo(): HistoryEntry? {
         if (undoCount == 0) return null
         return try {
-            undoCount--
-            val file = undoFile(undoCount)
+            val file = undoFile(undoCount - 1)
             val proto = FileInputStream(file).use { input ->
                 HistoryEntryProto.parseFrom(input)
             }
-            file.delete()
-            with(HistoryEntryMapper) {
+            val entry = with(HistoryEntryMapper) {
                 proto.toDomain()
             }
+            undoCount--
+            file.delete()
+            entry
         } catch (_: Exception) {
             null
         }
     }
 
-    fun appendRedo(entry: HistoryEntry) {
-        try {
+    fun appendRedo(entry: HistoryEntry): Boolean {
+        return try {
             historyDir.mkdirs()
             val file = redoFile(redoCount)
             FileOutputStream(file).use { output ->
@@ -56,22 +65,26 @@ class HistoryDiskStore(private val historyDir: File) {
                 }
             }
             redoCount++
+            true
         } catch (_: Exception) {
+            redoFile(redoCount).delete()
+            false
         }
     }
 
     fun popRedo(): HistoryEntry? {
         if (redoCount == 0) return null
         return try {
-            redoCount--
-            val file = redoFile(redoCount)
+            val file = redoFile(redoCount - 1)
             val proto = FileInputStream(file).use { input ->
                 HistoryEntryProto.parseFrom(input)
             }
-            file.delete()
-            with(HistoryEntryMapper) {
+            val entry = with(HistoryEntryMapper) {
                 proto.toDomain()
             }
+            redoCount--
+            file.delete()
+            entry
         } catch (_: Exception) {
             null
         }

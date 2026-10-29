@@ -9,8 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.InputField
 import com.instasprite.app.ui.components.dialog.SaveFileDialog
@@ -22,11 +22,12 @@ fun SaveISpriteDialog(
     folderUri: Uri?,
     isSaving: Boolean,
     onFolderSelected: (Uri) -> Unit,
-    onSave: suspend (folderUri: Uri, fileName: String) -> Boolean
+    onSave: suspend (folderUri: Uri, fileName: String) -> Boolean,
+    initialName: String = "Sprite"
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var fileName by remember { mutableStateOf("Sprite") }
+    var fileName by remember { mutableStateOf(initialName) }
 
     SaveFileDialog(
         title = stringResource(R.string.save_isprite),
@@ -37,8 +38,8 @@ fun SaveISpriteDialog(
                 defaultValue = fileName,
                 keyboardType = KeyboardType.Text,
                 suffix = ".isprite",
-                validator = { it.isNotBlank() },
-                errorMessage = stringResource(R.string.must_not_be_empty)
+                validator = { it.isNotBlank() && '/' !in it && '\\' !in it },
+                errorMessage = stringResource(R.string.invalid_export_filename)
             ),
         ),
         isSaving = isSaving,

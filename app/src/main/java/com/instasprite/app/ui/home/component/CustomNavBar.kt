@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.home.component
 
-import com.instasprite.app.utils.pixelDp
-
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
+import com.instasprite.app.utils.pixelDp
 
 @Preview(showBackground = true, name = "BottomNavPanel Preview")
 @Composable

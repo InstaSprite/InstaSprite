@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.drawing.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,18 +32,19 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instasprite.app.R
+import com.instasprite.app.domain.model.Animation
 import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.Layer
+import com.instasprite.app.domain.model.canMergeLayerDown
 import com.instasprite.app.ui.components.composable.BackButton
 import com.instasprite.app.ui.components.composable.Bar
 import com.instasprite.app.ui.components.composable.PixelIcon
-import com.instasprite.app.ui.components.shape.PixelShape
 import com.instasprite.app.ui.drawing.contract.LayerEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.utils.pixelDp
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -57,7 +56,8 @@ fun LayerDrawer(
     canvasHeight: Int,
     onEvent: (LayerEvent) -> Unit,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    animation: Animation? = null
 ) {
 
     val lazyListState = rememberLazyListState()
@@ -110,13 +110,13 @@ fun LayerDrawer(
         ) {
             items(layersList, key = { it.id }) { layer ->
 
-                val dragIndicatorBgColor = if (layer.id == activeLayerId ){
+                val dragIndicatorBgColor = if (layer.id == activeLayerId) {
                     AppTheme.colors.LinkColor
                 } else {
                     AppTheme.colors.BackgroundColor
                 }
 
-                val dragIndicatorColor = if (layer.id == activeLayerId ){
+                val dragIndicatorColor = if (layer.id == activeLayerId) {
                     AppTheme.colors.TextColorDark
                 } else {
                     AppTheme.colors.TextColorLight
@@ -132,7 +132,12 @@ fun LayerDrawer(
                             val currentIndex = layersList.indexOf(layer)
                             val originalIndex = layers.indexOf(layer)
                             if (currentIndex != -1 && originalIndex != -1 && currentIndex != originalIndex) {
-                                onEvent(LayerEvent.ReorderLayer((layers.size - 1) - originalIndex, (layers.size - 1) - currentIndex))
+                                onEvent(
+                                    LayerEvent.ReorderLayer(
+                                        (layers.size - 1) - originalIndex,
+                                        (layers.size - 1) - currentIndex
+                                    )
+                                )
                             }
                         }
                     }
@@ -163,7 +168,10 @@ fun LayerDrawer(
                             onClick = { onEvent(LayerEvent.SelectLayer(layer.id)) },
                             onVisibilityToggle = { onEvent(LayerEvent.ToggleVisibility(layer.id)) },
                             onLockToggle = { onEvent(LayerEvent.ToggleLock(layer.id)) },
-                            onDelete = { onEvent(LayerEvent.DeleteLayer(layer.id)) }
+                            onDelete = { onEvent(LayerEvent.DeleteLayer(layer.id)) },
+                            canClip = layers.indexOfFirst { it.id == layer.id } < layers.lastIndex,
+                            canMergeDown = layers.asReversed()
+                                .canMergeLayerDown(layer.id, animation)
                         )
                     }
                 }
@@ -206,7 +214,7 @@ fun LayerDrawer(
 )
 @Composable
 private fun Preview() {
-    InstaSpriteTheme() {
+    InstaSpriteTheme {
         LayerDrawer(
             layers = listOf(
                 Layer(

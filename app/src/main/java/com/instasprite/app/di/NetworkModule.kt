@@ -3,18 +3,7 @@ package com.instasprite.app.di
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.instasprite.app.data.network.AuthInterceptor
-import com.instasprite.app.data.network.api.AlarmApi
-import com.instasprite.app.data.network.api.AuthApi
-import com.instasprite.app.data.network.api.CommentApi
-import com.instasprite.app.data.network.api.FollowApi
-import com.instasprite.app.data.network.api.MemberPostApi
-import com.instasprite.app.data.network.api.NotificationApi
-import com.instasprite.app.data.network.api.PostApi
-import com.instasprite.app.data.network.api.ProfileApi
-import com.instasprite.app.data.network.api.SearchApi
 import com.instasprite.app.data.network.lospec.LospecService
-import com.instasprite.app.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,10 +19,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class MainApi
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -61,7 +46,6 @@ object OkHttpModule {
     fun provideOkHttpClient(
         @ApplicationContext context: Context,
         loggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: AuthInterceptor
     ): OkHttpClient {
 
         val cache = Cache(File(context.cacheDir, "http_cache"), CACHE_SIZE)
@@ -72,7 +56,6 @@ object OkHttpModule {
             .writeTimeout(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .callTimeout(CALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(authInterceptor)
             .cache(cache)
             .build()
     }
@@ -83,16 +66,6 @@ object OkHttpModule {
 object RetrofitModule {
 
     val gson: Gson = GsonBuilder().create()
-
-    @Provides
-    @Singleton
-    @MainApi
-    fun provideMainRetrofit(client: OkHttpClient): Retrofit =
-        Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
 
     @Provides
     @Singleton
@@ -108,52 +81,6 @@ object RetrofitModule {
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiModule {
-
-    @Provides
-    @Singleton
-    fun provideAuthApi(@MainApi retrofit: Retrofit): AuthApi =
-        retrofit.create(AuthApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideProfileApi(@MainApi retrofit: Retrofit): ProfileApi =
-        retrofit.create(ProfileApi::class.java)
-
-    @Provides
-    @Singleton
-    fun providePostApi(@MainApi retrofit: Retrofit): PostApi =
-        retrofit.create(PostApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideSearchApi(@MainApi retrofit: Retrofit): SearchApi =
-        retrofit.create(SearchApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideFollowApi(@MainApi retrofit: Retrofit): FollowApi =
-        retrofit.create(FollowApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideCommentApi(@MainApi retrofit: Retrofit): CommentApi =
-        retrofit.create(CommentApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideMemberPostApi(@MainApi retrofit: Retrofit): MemberPostApi =
-        retrofit.create(MemberPostApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideNotificationApi(@MainApi retrofit: Retrofit): NotificationApi =
-        retrofit.create(NotificationApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideAlarmApi(@MainApi retrofit: Retrofit): AlarmApi =
-        retrofit.create(AlarmApi::class.java)
-
 
     @Provides
     @Singleton

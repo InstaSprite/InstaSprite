@@ -1,24 +1,26 @@
 package com.instasprite.app.ui.drawing.dialog
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import com.instasprite.app.ui.components.dialog.CustomDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,15 +32,16 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.Layer
-import com.instasprite.app.ui.components.shape.PixelShape
+import com.instasprite.app.ui.components.dialog.CustomDialog
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
+import com.instasprite.app.utils.pixelDp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +51,8 @@ fun LayerOptionsDialog(
     canvasWidth: Int,
     canvasHeight: Int,
     canMergeDown: Boolean,
+    canClip: Boolean,
+    onToggleClipping: () -> Unit,
     onBlendModeSelected: (BlendMode) -> Unit,
     onMergeDown: () -> Unit,
     onDismiss: () -> Unit,
@@ -107,7 +112,7 @@ fun LayerOptionsDialog(
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = AppTheme.colors.outlineTextFieldColors(),
                     modifier = Modifier
-                        .menuAnchor()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
@@ -130,6 +135,35 @@ fun LayerOptionsDialog(
                         )
                     }
                 }
+            }
+
+            Spacer(modifier = Modifier.height(10.pixelDp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = layer.isClipping,
+                        enabled = canClip || layer.isClipping,
+                        role = Role.Checkbox,
+                        onValueChange = { onToggleClipping() }
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    stringResource(R.string.clip_to_layer_below),
+                    color = AppTheme.colors.TextColorLight, modifier = Modifier.weight(1f)
+                )
+                Checkbox(
+                    checked = layer.isClipping,
+                    onCheckedChange = null,
+                    enabled = canClip || layer.isClipping,
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = AppTheme.colors.LinkColor,
+                        uncheckedColor = AppTheme.colors.Subtext0Color,
+                        checkmarkColor = AppTheme.colors.TextColorDark
+                    )
+                )
             }
 
             Spacer(modifier = Modifier.height(10.pixelDp))
@@ -167,12 +201,15 @@ private fun PreviewLayerOptionsDialog() {
                 id = "1",
                 name = "Test Layer",
                 blendMode = BlendMode.MULTIPLY,
+                isClipping = true,
                 tiles = emptyMap()
             ),
             layerImage = null,
             canvasWidth = 16,
             canvasHeight = 16,
             canMergeDown = true,
+            canClip = true,
+            onToggleClipping = {},
             onBlendModeSelected = {},
             onMergeDown = {},
             onDismiss = {}

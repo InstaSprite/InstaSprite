@@ -1,15 +1,15 @@
 package com.instasprite.app.utils
 
 import android.content.Context
-import com.instasprite.app.ui.theme.ThemeFlavour
 import android.content.res.Configuration
 import com.instasprite.app.data.model.DrawSetting
-import com.instasprite.app.ui.theme.AppFont
 import com.instasprite.app.data.model.GallerySettings
 import com.instasprite.app.data.model.SettingPreferences
 import com.instasprite.app.di.settingsDataStore
 import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.gallery.SpriteListOrder
+import com.instasprite.app.ui.theme.AppFont
+import com.instasprite.app.ui.theme.ThemeFlavour
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
@@ -113,9 +113,10 @@ object AppSettings {
         context.settingsDataStore.data.first()
     }
 
-    private fun persist(context: Context, transform: (SettingPreferences) -> SettingPreferences) = runBlocking {
-        context.settingsDataStore.updateData(transform)
-    }
+    private fun persist(context: Context, transform: (SettingPreferences) -> SettingPreferences) =
+        runBlocking {
+            context.settingsDataStore.updateData(transform)
+        }
 
     private fun updateResources(context: Context, language: String): Context {
         val locale = Locale(language)

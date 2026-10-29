@@ -6,7 +6,7 @@ import com.instasprite.app.utils.convertHexToColor
 
 class PaletteDto {
     @SerializedName("name")
-    val name: String = "";
+    val name: String = ""
 
     @SerializedName("author")
     val author: String = ""

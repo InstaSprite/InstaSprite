@@ -1,27 +1,25 @@
 package com.instasprite.app.domain.draw
 
 import androidx.compose.ui.graphics.Color
-import com.instasprite.app.data.repository.ColorPaletteRepository
 import com.instasprite.app.domain.canvashistory.HistoryDiskStore
 import com.instasprite.app.domain.canvashistory.TransformType
-import com.instasprite.app.domain.draw.state.*
+import com.instasprite.app.domain.draw.state.CanvasInteractionState
+import com.instasprite.app.domain.draw.state.DrawingState
+import com.instasprite.app.domain.draw.state.InteractionContext
+import com.instasprite.app.domain.draw.state.StandbyState
 import com.instasprite.app.domain.model.BlendMode
 import com.instasprite.app.domain.model.SelectionState
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.tool.BrushShape
+import com.instasprite.app.domain.tool.DrawingTools
 import com.instasprite.app.domain.tool.FillTool
-import com.instasprite.app.domain.tool.MoveTool
-import com.instasprite.app.domain.tool.PencilTool
 import com.instasprite.app.domain.tool.StrokeTool
 import com.instasprite.app.domain.tool.Tool
-import com.instasprite.app.domain.tool.selection.LassoSelectionTool
-import com.instasprite.app.domain.tool.selection.MagicWandTool
-import com.instasprite.app.domain.tool.selection.RectangleSelectionTool
 import com.instasprite.app.domain.tool.selection.SelectionTool
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
-import com.instasprite.app.ui.drawing.contract.PixelCanvasState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,30 +33,36 @@ sealed class TapResult {
 
 class DrawingEngine(
     override val pixelCanvasUseCase: PixelCanvasUseCase,
-    private val colorPaletteRepository: ColorPaletteRepository,
     private val scope: CoroutineScope,
-    historyDiskStore: HistoryDiskStore? = null
+    historyDiskStore: HistoryDiskStore? = null,
+    val tools: DrawingTools = DrawingTools()
 ) : ILayerManager, ITransformManager, IHistoryManager, InteractionContext {
 
+    private var processingJob: Job? = null
+    suspend fun awaitToolIdle() {
+        processingJob?.join()
+    }
+
     private var isProcessingTool = false
+    val isBusy get() = isProcessingTool || activeState == DrawingState
 
     override val bitmapManager = BitmapManager(pixelCanvasUseCase)
-    override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, scope) { sel ->
+    override val strokeEngine = StrokeEngine(pixelCanvasUseCase, bitmapManager, tools.move) { sel ->
         _canvasState.value = _canvasState.value.copy(selectionState = sel)
     }
 
     private val _canvasState = MutableStateFlow(
-        PixelCanvasState(
+        DrawingCanvasState(
             width = pixelCanvasUseCase.getCanvasWidth(),
             height = pixelCanvasUseCase.getCanvasHeight(),
             layers = pixelCanvasUseCase.getLayers().toList(),
             activeLayerId = pixelCanvasUseCase.getActiveLayerId()
         )
     )
-    override val mutableCanvasState: MutableStateFlow<PixelCanvasState> = _canvasState
-    val canvasState: StateFlow<PixelCanvasState> = _canvasState.asStateFlow()
+    override val mutableCanvasState: MutableStateFlow<DrawingCanvasState> = _canvasState
+    val canvasState: StateFlow<DrawingCanvasState> = _canvasState.asStateFlow()
 
-    override var selectedTool: Tool = PencilTool
+    override var selectedTool: Tool = tools.pencil
     override var activeColor: Color = Color.Black
     override var toolSize: Int = 1
     override var brushShape: BrushShape = BrushShape.Circle
@@ -82,6 +86,9 @@ class DrawingEngine(
         refreshActiveLayerState = ::refreshActiveLayerState,
         syncStateVersions = ::syncStateVersions
     )
+
+    val animationManager =
+        AnimationDelegate(pixelCanvasUseCase, historyManager, ::refreshFullCanvasState)
 
     private val layerDelegate = LayerDelegate(
         pixelCanvasUseCase = pixelCanvasUseCase,
@@ -144,6 +151,14 @@ class DrawingEngine(
         syncStateVersions()
     }
 
+    fun finishStrokeForSave(isAppendSelectionMode: Boolean) {
+        this.isAppendSelectionMode = isAppendSelectionMode
+        if (activeState == DrawingState) {
+            activeState.onTouchEnd(this)
+            syncStateVersions()
+        }
+    }
+
     fun commitPendingTool(tool: StrokeTool): Boolean {
         this.selectedTool = tool
         val result = activeState.commitPending(this)
@@ -176,13 +191,17 @@ class DrawingEngine(
         if (tool is FillTool) {
             isProcessingTool = true
             saveState()
-            scope.launch {
+            val pixels = pixelCanvasUseCase.getActiveLayerPixelsDirect()
+            val width = pixelCanvasUseCase.getCanvasWidth()
+            val height = pixelCanvasUseCase.getCanvasHeight()
+            processingJob = scope.launch {
                 try {
                     val result = withContext(Dispatchers.Default) {
-                        FillTool.fillDirect(pixelCanvasUseCase, row, col, color)
+                        pixels?.let { FillTool.calculate(it, width, height, row, col, color) }
                     }
 
                     if (result != null) {
+                        pixelCanvasUseCase.setAllPixels(result.pixels)
                         bitmapManager.refreshBitmapRegion(
                             result.dirtyMinRow, result.dirtyMinCol,
                             result.dirtyMaxRow, result.dirtyMaxCol
@@ -248,19 +267,26 @@ class DrawingEngine(
     override fun addLayer(name: String) = layerDelegate.addLayer(name)
     override fun removeLayer(layerId: String) = layerDelegate.removeLayer(layerId)
     override fun selectLayer(layerId: String) = layerDelegate.selectLayer(layerId)
+    override fun toggleClipping(layerId: String) = layerDelegate.toggleClipping(layerId)
     override fun toggleLock(layerId: String) = layerDelegate.toggleLock(layerId)
     override fun toggleVisibility(layerId: String) = layerDelegate.toggleVisibility(layerId)
     override fun mergeLayerDown(layerId: String) = layerDelegate.mergeLayerDown(layerId)
-    override fun reorderLayer(fromIndex: Int, toIndex: Int) = layerDelegate.reorderLayer(fromIndex, toIndex)
-    override fun setLayerOpacity(layerId: String, opacity: Float) = layerDelegate.setLayerOpacity(layerId, opacity)
-    override fun setLayerBlendMode(layerId: String, mode: BlendMode) = layerDelegate.setLayerBlendMode(layerId, mode)
+    override fun reorderLayer(fromIndex: Int, toIndex: Int) =
+        layerDelegate.reorderLayer(fromIndex, toIndex)
+
+    override fun setLayerOpacity(layerId: String, opacity: Float) =
+        layerDelegate.setLayerOpacity(layerId, opacity)
+
+    override fun setLayerBlendMode(layerId: String, mode: BlendMode) =
+        layerDelegate.setLayerBlendMode(layerId, mode)
 
     // =========== TRANSFORM ===========
 
     override fun rotate() = transformDelegate.rotate()
     override fun hFlip() = transformDelegate.hFlip()
     override fun vFlip() = transformDelegate.vFlip()
-    override fun resizeCanvas(width: Int, height: Int) = transformDelegate.resizeCanvas(width, height)
+    override fun resizeCanvas(width: Int, height: Int) =
+        transformDelegate.resizeCanvas(width, height)
 
     // =========== HISTORY ===========
 
@@ -271,8 +297,11 @@ class DrawingEngine(
     override fun discardHistoryCapture() = historyManager.discardHistoryCapture()
     override fun updateHistoryCurrentState() = historyManager.updateHistoryCurrentState()
     override fun restorePendingHistoryCapture() = historyManager.restorePendingHistoryCapture()
-    override fun recordOperationHistory(operation: () -> Unit) = historyManager.recordOperationHistory(operation)
-    override fun recordTransformHistory(transform: TransformType, operation: () -> Unit) = historyManager.recordTransformHistory(transform, operation)
+    override fun recordOperationHistory(operation: () -> Unit) =
+        historyManager.recordOperationHistory(operation)
+
+    override fun recordTransformHistory(transform: TransformType, operation: () -> Unit) =
+        historyManager.recordTransformHistory(transform, operation)
 
     // =========== HELPER ===========
 
@@ -286,16 +315,18 @@ class DrawingEngine(
     }
 
     suspend fun refreshFullCanvasState() {
+        bitmapManager.refreshBitmapState()
         refreshCanvasSizeState()
         refreshLayerState()
         refreshActiveLayerState()
-        bitmapManager.refreshBitmapState()
         syncStateVersions()
     }
 
     override fun refreshLayerState() {
         _canvasState.value = _canvasState.value.copy(
-            layers = pixelCanvasUseCase.getLayers().toList()
+            layers = pixelCanvasUseCase.getLayers().toList(),
+            animation = pixelCanvasUseCase.animation,
+            activeFrameId = pixelCanvasUseCase.activeFrameId
         )
     }
 
@@ -315,16 +346,28 @@ class DrawingEngine(
     private fun syncStateVersions() {
         _canvasState.value = _canvasState.value.copy(
             drawVersion = bitmapManager.drawVersion,
-            overlayVersion = bitmapManager.overlayVersion
+            overlayVersion = bitmapManager.overlayVersion,
+            animation = pixelCanvasUseCase.animation,
+            activeFrameId = pixelCanvasUseCase.activeFrameId
         )
     }
 
+    suspend fun selectFrame(frameId: String, layerId: String? = null) {
+        if (isBusy) return
+        pixelCanvasUseCase.selectFrame(frameId)
+        layerId?.let { pixelCanvasUseCase.setActiveLayer(it) }
+        bitmapManager.releaseOverlayBitmap()
+        bitmapManager.incrementOverlayVersion()
+        refreshFullCanvasState()
+    }
+
     fun release() {
+        processingJob?.cancel()
+        processingJob = null
+        isProcessingTool = false
         bitmapManager.release()
-        MoveTool.reset()
-        RectangleSelectionTool.clearSelection()
-        LassoSelectionTool.clearSelection()
-        MagicWandTool.clearSelection()
+        tools.reset()
+        strokeEngine.reset()
         activeState = StandbyState
     }
 }

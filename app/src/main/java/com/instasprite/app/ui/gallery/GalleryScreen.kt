@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.gallery
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.scaleIn
@@ -10,9 +8,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
-import com.instasprite.app.ui.components.composable.TopBar
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,9 +18,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,26 +33,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
+import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.JumpToTopButton
+import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
 import com.instasprite.app.ui.gallery.component.SpriteList
-
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
 import com.instasprite.app.ui.gallery.contract.SearchBarContract
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
-import com.instasprite.app.ui.home.component.HomeBottomBar
 import com.instasprite.app.ui.home.component.HomeFab
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.DummyData
 import com.instasprite.app.utils.UiUtils
+import com.instasprite.app.utils.pixelDp
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -65,6 +63,7 @@ data class GalleryScreenEvent(
     val onCreateNewCanvas: () -> Unit,
     val onLoadCanvas: () -> Unit,
     val onLoadImage: () -> Unit,
+    val onOpenDrawing: (Sprite, String?) -> Unit
 )
 
 @Composable
@@ -78,11 +77,19 @@ fun GalleryScreen(
     UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
     UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
 
-    val uiState by viewModel.uiState.collectAsState()
-    val dialogState by viewModel.dialogState.collectAsState()
-    val sprites by viewModel.sprites.collectAsState()
-    val sortedSprites by viewModel.sortedAndFilteredSprites.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.stopPreview() }
+    DisposableEffect(viewModel) { onDispose { viewModel.stopPreview() } }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
+    val sprites by viewModel.sprites.collectAsStateWithLifecycle()
+    val sortedSprites by viewModel.sortedAndFilteredSprites.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+
+    DrawingNavigationEffect(
+        state = viewModel.uiState,
+        onHandled = viewModel::onDrawingNavigationHandled,
+        onNavigate = onNavigateToDrawing
+    )
 
     val scope = rememberCoroutineScope()
 
@@ -123,9 +130,14 @@ fun GalleryScreen(
 
     if (uiState.showImagePager) {
         ImagePagerOverlay(
+            onOpenDrawing = { sprite, name ->
+                onNavigateToDrawing(sprite.id, sprite.width, sprite.height, name, null)
+            },
             onImagePagerEvent = viewModel::onImagePagerEvent,
             spriteList = sortedSprites,
             startIndex = viewModel.currentSelectedSpriteIndex,
+            playingSpriteId = uiState.playingSpriteId,
+            playbackSprite = uiState.playbackSprite,
             onDismiss = { lastSpriteSeen ->
                 viewModel.toggleImagePager(null)
                 viewModel.lastSpriteSeenInPager = lastSpriteSeen
@@ -135,18 +147,20 @@ fun GalleryScreen(
 
     GalleryScreenDialogs(dialogState, viewModel)
 
-    val event = remember(viewModel) {
-        viewModel.onOpenDrawing = onNavigateToDrawing
-
-        GalleryScreenEvent(
-            onImagePagerEvent = viewModel::onImagePagerEvent,
-            onSearchBarEvent = viewModel::onSearchBarEvent,
-            onSpriteListEvent = viewModel::onSpriteListEvent,
-            onCreateNewCanvas = onNavigateToCreateCanvas,
-            onLoadCanvas = { viewModel.openDialog(GalleryDialog.LoadISprite) },
-            onLoadImage = onNavigateToLoadImage,
-        )
-    }
+    val event =
+        remember(viewModel, onNavigateToDrawing, onNavigateToCreateCanvas, onNavigateToLoadImage) {
+            GalleryScreenEvent(
+                onImagePagerEvent = viewModel::onImagePagerEvent,
+                onSearchBarEvent = viewModel::onSearchBarEvent,
+                onSpriteListEvent = viewModel::onSpriteListEvent,
+                onCreateNewCanvas = onNavigateToCreateCanvas,
+                onLoadCanvas = { viewModel.openDialog(GalleryDialog.LoadISprite) },
+                onLoadImage = onNavigateToLoadImage,
+                onOpenDrawing = { sprite, name ->
+                    onNavigateToDrawing(sprite.id, sprite.width, sprite.height, name, null)
+                },
+            )
+        }
 
     GalleryScreenContent(
         uiState = uiState,
@@ -179,8 +193,11 @@ fun GalleryPageContent(
         if (spriteList.isNotEmpty()) {
             SpriteList(
                 onSpriteListEvent = event.onSpriteListEvent,
+                onOpenDrawing = event.onOpenDrawing,
                 spriteList = spriteList,
                 layoutMode = uiState.layoutMode,
+                playingSpriteId = uiState.playingSpriteId.takeUnless { uiState.showImagePager },
+                playbackSprite = uiState.playbackSprite.takeUnless { uiState.showImagePager },
                 onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
                 modifier = Modifier.padding(horizontal = 6.pixelDp, vertical = 4.pixelDp)
@@ -256,8 +273,11 @@ private fun GalleryScreenContent(
             ) {
                 SpriteList(
                     onSpriteListEvent = event.onSpriteListEvent,
+                    onOpenDrawing = event.onOpenDrawing,
                     spriteList = spriteList,
                     layoutMode = uiState.layoutMode,
+                    playingSpriteId = uiState.playingSpriteId.takeUnless { uiState.showImagePager },
+                    playbackSprite = uiState.playbackSprite.takeUnless { uiState.showImagePager },
                     onIsScrolledChange = { isScrolled = it },
                     lazyListState = lazyListState,
                     modifier = Modifier.padding(horizontal = 6.pixelDp)
@@ -311,6 +331,7 @@ private fun GalleryScreenPreview() {
                 onCreateNewCanvas = {},
                 onLoadCanvas = {},
                 onLoadImage = {},
+                onOpenDrawing = { _, _ -> },
             )
         )
     }
@@ -332,6 +353,7 @@ private fun GalleryScreenPreviewStaggeredLayout() {
                 onCreateNewCanvas = {},
                 onLoadCanvas = {},
                 onLoadImage = {},
+                onOpenDrawing = { _, _ -> },
             )
         )
     }
@@ -353,6 +375,7 @@ private fun GalleryScreenPreviewSquareLayout() {
                 onCreateNewCanvas = {},
                 onLoadCanvas = {},
                 onLoadImage = {},
+                onOpenDrawing = { _, _ -> },
             )
         )
     }

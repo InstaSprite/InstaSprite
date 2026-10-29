@@ -37,7 +37,9 @@ fun SaveFileDialog(
     onSave: () -> Unit,
     onDismiss: () -> Unit,
     onValuesChanged: ((values: List<String>, folderUri: Uri?) -> Unit)? = null,
-    isSaving: Boolean = false
+    isSaving: Boolean = false,
+    preview: @Composable () -> Unit = {},
+    scrollable: Boolean = false
 ) {
     val context = LocalContext.current
     var folderUri by remember(lastSavedUri) { mutableStateOf<Uri?>(lastSavedUri) }
@@ -52,27 +54,38 @@ fun SaveFileDialog(
         contract = ActivityResultContracts.OpenDocumentTree(),
         onResult = { uri ->
             uri?.let {
-                context.contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
-                folderUri = it
-                onFolderSelected(it)
+                try {
+                    context.contentResolver.takePersistableUriPermission(
+                        it,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                    folderUri = it
+                    onFolderSelected(it)
+                } catch (_: SecurityException) {
+                    Toast.makeText(context, R.string.export_failed, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     )
 
-    val displayPath = folderUri?.let { getFullPathFromTreeUri(it) } ?: stringResource(R.string.tap_to_select_file)
+    val displayPath =
+        folderUri?.let { getFullPathFromTreeUri(it) } ?: stringResource(R.string.tap_to_select_file)
 
     InputDialog(
         title = title,
         fields = fields,
+        scrollable = scrollable,
+        onInputChanged = { onValuesChanged?.invoke(it, folderUri) },
         confirmButtonText = stringResource(R.string.save),
         isLoading = isSaving,
         onDismiss = onDismiss,
         onConfirm = { values ->
             if (folderUri == null) {
-                Toast.makeText(context, context.getString(R.string.choose_folder), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.choose_folder),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 onValuesChanged?.invoke(values, folderUri)
                 onSave()
@@ -80,6 +93,7 @@ fun SaveFileDialog(
             }
         },
         extraTopContent = {
+            preview()
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +102,12 @@ fun SaveFileDialog(
                 OutlinedTextField(
                     value = displayPath,
                     onValueChange = {},
-                    label = { Text(stringResource(R.string.save_location), color = AppTheme.colors.SelectedColor) },
+                    label = {
+                        Text(
+                            stringResource(R.string.save_location),
+                            color = AppTheme.colors.SelectedColor
+                        )
+                    },
                     supportingText = {},
                     readOnly = true,
                     enabled = false,

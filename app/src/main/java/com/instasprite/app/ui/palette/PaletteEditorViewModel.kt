@@ -31,10 +31,12 @@ class PaletteEditorViewModel @AssistedInject constructor(
     private val _paletteAuthor = MutableStateFlow(initialPalette?.author ?: "Anonymous")
     val paletteAuthor: StateFlow<String> = _paletteAuthor.asStateFlow()
 
-    private val _paletteColors = MutableStateFlow<List<Color>>(initialPalette?.colors?.toList() ?: emptyList())
+    private val _paletteColors =
+        MutableStateFlow<List<Color>>(initialPalette?.colors?.toList() ?: emptyList())
     val paletteColors: StateFlow<List<Color>> = _paletteColors.asStateFlow()
 
-    private val _editingColorIndex = MutableStateFlow<Int?>(null) // null = closed, -1 = adding new color, >= 0 = index of color being edited
+    private val _editingColorIndex =
+        MutableStateFlow<Int?>(null) // null = closed, -1 = adding new color, >= 0 = index of color being edited
     val editingColorIndex: StateFlow<Int?> = _editingColorIndex.asStateFlow()
 
     private val _isSaving = MutableStateFlow(false)

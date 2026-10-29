@@ -1,10 +1,5 @@
 package com.instasprite.app.ui.components.composable
 
-import com.instasprite.app.utils.pixelDp
-
-import androidx.compose.ui.res.stringResource
-import com.instasprite.app.R
-
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -19,15 +14,17 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.core.graphics.createBitmap
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.instasprite.app.R
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.drawCheckerboard
+import com.instasprite.app.utils.pixelDp
 import java.io.File
 
 @Composable
@@ -91,7 +88,15 @@ private fun PreviewImage(
 ) {
     val bitmapImage = remember(sprite.compositedPixels, sprite.width, sprite.height) {
         val bitmap = createBitmap(sprite.width, sprite.height, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(sprite.compositedPixels, 0, sprite.width, 0, 0, sprite.width, sprite.height)
+        bitmap.setPixels(
+            sprite.compositedPixels,
+            0,
+            sprite.width,
+            0,
+            0,
+            sprite.width,
+            sprite.height
+        )
         bitmap.asImageBitmap()
     }
     Image(

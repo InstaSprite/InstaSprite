@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "sprite_data.proto";
+
 option java_package = "com.instasprite.app";
 option java_multiple_files = true;
 
@@ -40,6 +42,7 @@ message LayerProto {
   float opacity = 5;
   string blend_mode = 6;
   bytes tile_data = 7;
+  bool is_clipping = 8;
 }
 
 message HistoryCanvasStateProto {
@@ -49,6 +52,8 @@ message HistoryCanvasStateProto {
   string active_layer_id = 4;
   SelectionStateProto selection_state = 5;
   bool has_selection_state = 6;
+  bytes sprite_document = 7;
+  string active_frame_id = 8;
 }
 
 message OperationEntryProto {
@@ -72,5 +77,17 @@ message HistoryEntryProto {
     UndoEntryProto undo_entry = 1;
     OperationEntryProto operation_entry = 2;
     TransformEntryProto transform_entry = 3;
+    CelEditEntryProto cel_edit_entry = 4;
   }
+}
+
+message CelEditEntryProto {
+  string layer_id = 1;
+  string frame_id = 2;
+  AnimationCelData before_cel = 3;
+  AnimationCelData after_cel = 4;
+  AnimationImageData before_image = 5;
+  AnimationImageData after_image = 6;
+  SelectionStateProto before_selection = 7;
+  SelectionStateProto after_selection = 8;
 }

@@ -1,7 +1,5 @@
 package com.instasprite.app.ui.gallery.component
 
-import com.instasprite.app.utils.pixelDp
-
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -32,7 +30,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,21 +43,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
-import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.gallery.contract.SpriteListEvent
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.DummyData
+import com.instasprite.app.utils.pixelDp
 
 
 @Composable
@@ -68,11 +63,13 @@ fun SpriteList(
     onSpriteListEvent: (SpriteListEvent) -> Unit,
     spriteList: List<SpriteWithMeta>,
     layoutMode: GalleryLayoutMode = GalleryLayoutMode.List,
+    playingSpriteId: String? = null,
+    playbackSprite: Sprite? = null,
     onIsScrolledChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
+    onOpenDrawing: (Sprite, String?) -> Unit,
 ) {
-    val context = LocalContext.current
 
     AnimatedContent(
         targetState = layoutMode,
@@ -90,22 +87,33 @@ fun SpriteList(
                     items(
                         items = spriteList,
                         key = { it.sprite.id }
-                    ) { (sprite, meta) ->
+                    ) { item ->
+                        val (sprite, meta) = item
                         SpriteCard(
                             onDelete = {
-                                onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id))
+                                onSpriteListEvent(
+                                    SpriteListEvent.OpenDeleteDialog(
+                                        meta!!.spriteName,
+                                        sprite.id
+                                    )
+                                )
                             },
                             onRename = {
                                 onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id))
                             },
                             onEdit = {
-                                onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context))
+                                onOpenDrawing(sprite, meta?.spriteName)
                             },
                             onClick = {
                                 onSpriteListEvent(SpriteListEvent.OpenPager(sprite))
                             },
                             sprite = sprite,
                             meta = meta,
+                            hasAnimation = item.hasAnimation,
+                            playing = playingSpriteId == sprite.id,
+                            playbackSprite = playbackSprite?.takeIf { it.id == sprite.id },
+                            onPlay = { onSpriteListEvent(SpriteListEvent.TogglePlayback(sprite.id)) },
+                            onStop = { onSpriteListEvent(SpriteListEvent.StopPlayback(sprite.id)) },
                             modifier = Modifier.animateItem()
                         )
                     }
@@ -131,10 +139,21 @@ fun SpriteList(
                         val (sprite, meta) = spriteWithMeta
                         SpriteGridCard(
                             spriteWithMeta = spriteWithMeta,
+                            playing = playingSpriteId == sprite.id,
+                            playbackSprite = playbackSprite?.takeIf { it.id == sprite.id },
+                            onPlay = { onSpriteListEvent(SpriteListEvent.TogglePlayback(sprite.id)) },
+                            onStop = { onSpriteListEvent(SpriteListEvent.StopPlayback(sprite.id)) },
                             layoutMode = GalleryLayoutMode.StaggeredGrid,
-                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context)) },
+                            onEdit = { onOpenDrawing(sprite, meta?.spriteName) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
-                            onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
+                            onDelete = {
+                                onSpriteListEvent(
+                                    SpriteListEvent.OpenDeleteDialog(
+                                        meta!!.spriteName,
+                                        sprite.id
+                                    )
+                                )
+                            },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
                             modifier = Modifier.animateItem()
                         )
@@ -161,10 +180,21 @@ fun SpriteList(
                         val (sprite, meta) = spriteWithMeta
                         SpriteGridCard(
                             spriteWithMeta = spriteWithMeta,
+                            playing = playingSpriteId == sprite.id,
+                            playbackSprite = playbackSprite?.takeIf { it.id == sprite.id },
+                            onPlay = { onSpriteListEvent(SpriteListEvent.TogglePlayback(sprite.id)) },
+                            onStop = { onSpriteListEvent(SpriteListEvent.StopPlayback(sprite.id)) },
                             layoutMode = GalleryLayoutMode.SquareGrid,
-                            onEdit = { onSpriteListEvent(SpriteListEvent.OpenDrawingScreen(meta?.spriteName, sprite, context)) },
+                            onEdit = { onOpenDrawing(sprite, meta?.spriteName) },
                             onRename = { onSpriteListEvent(SpriteListEvent.OpenRenameDialog(sprite.id)) },
-                            onDelete = { onSpriteListEvent(SpriteListEvent.OpenDeleteDialog(meta!!.spriteName, sprite.id)) },
+                            onDelete = {
+                                onSpriteListEvent(
+                                    SpriteListEvent.OpenDeleteDialog(
+                                        meta!!.spriteName,
+                                        sprite.id
+                                    )
+                                )
+                            },
                             onClick = { onSpriteListEvent(SpriteListEvent.OpenPager(sprite)) },
                             modifier = Modifier.animateItem()
                         )
@@ -183,6 +213,11 @@ private fun SpriteCard(
     onClick: () -> Unit = {},
     sprite: Sprite,
     meta: SpriteMeta?,
+    hasAnimation: Boolean = false,
+    playing: Boolean = false,
+    playbackSprite: Sprite? = null,
+    onPlay: () -> Unit = {},
+    onStop: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var showDropdown by remember { mutableStateOf(false) }
@@ -213,10 +248,15 @@ private fun SpriteCard(
                     .padding(10.pixelDp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = meta?.spriteName ?: stringResource(R.string.untitled),
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
+                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                    if (hasAnimation) SpritePlaybackButton(playing, onPlay)
+                    Text(
+                        text = meta?.spriteName ?: stringResource(R.string.untitled),
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
                 Box {
                     IconButton(
@@ -226,7 +266,7 @@ private fun SpriteCard(
                             .size(26.pixelDp)
                     ) {
                         PixelIcon(
-                            icon =R.drawable.ic_three_dots,
+                            icon = R.drawable.ic_three_dots,
                             contentDescription = stringResource(R.string.options),
                             tint = AppTheme.colors.TextColorLight
                         )
@@ -251,7 +291,10 @@ private fun SpriteCard(
                 }
             }
 
-            AsyncCanvasPreviewer(
+            GallerySpritePreview(
+                playing = playing,
+                playbackSprite = playbackSprite,
+                onStop = onStop,
                 sprite = sprite,
                 meta = meta,
                 modifier = Modifier
@@ -323,6 +366,7 @@ private fun SpriteListListPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
+            onOpenDrawing = { _, _ -> },
             spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.List
         )
@@ -335,6 +379,7 @@ private fun SpriteListStaggeredPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
+            onOpenDrawing = { _, _ -> },
             spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.StaggeredGrid
         )
@@ -347,6 +392,7 @@ private fun SpriteListSquareGridPreview() {
     InstaSpriteTheme {
         SpriteList(
             onSpriteListEvent = {},
+            onOpenDrawing = { _, _ -> },
             spriteList = DummyData.previewSprites,
             layoutMode = GalleryLayoutMode.SquareGrid
         )

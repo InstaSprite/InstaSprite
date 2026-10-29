@@ -188,7 +188,14 @@ private fun SingleLinePalettePreview(
             .toInt().coerceAtLeast(1)
         val h = itemPx.toInt().coerceAtLeast(1)
 
-        renderPaletteBitmap(colors, totalW, h, itemPx, spacingPx, checkerPx) { index, itemPx, spacingPx ->
+        renderPaletteBitmap(
+            colors,
+            totalW,
+            h,
+            itemPx,
+            spacingPx,
+            checkerPx
+        ) { index, itemPx, spacingPx ->
             val x = index * (itemPx + spacingPx)
             Offset(x, 0f)
         }
@@ -241,7 +248,8 @@ private fun MultiLinePalettePreview(
         val availableWidthPx = with(density) { maxWidth.toPx() }
 
         val spacingPx = with(density) { config.itemSpacing.toPx() }
-        val itemPx = (availableWidthPx - spacingPx * (effectiveColorsPerLine - 1).coerceAtLeast(0)) / effectiveColorsPerLine
+        val itemPx =
+            (availableWidthPx - spacingPx * (effectiveColorsPerLine - 1).coerceAtLeast(0)) / effectiveColorsPerLine
         val checkerPx = with(density) { 4.pixelDp.toPx() }
 
         val totalW = availableWidthPx.toInt().coerceAtLeast(1)
@@ -249,7 +257,14 @@ private fun MultiLinePalettePreview(
             .toInt().coerceAtLeast(1)
 
         val paletteBitmap = remember(colors, lines, totalW, totalH, effectiveColorsPerLine) {
-            renderPaletteBitmap(colors, totalW, totalH, itemPx, spacingPx, checkerPx) { index, itemPx, spacingPx ->
+            renderPaletteBitmap(
+                colors,
+                totalW,
+                totalH,
+                itemPx,
+                spacingPx,
+                checkerPx
+            ) { index, itemPx, spacingPx ->
                 val col = index % effectiveColorsPerLine
                 val row = index / effectiveColorsPerLine
                 val x = col * (itemPx + spacingPx)
@@ -297,7 +312,8 @@ private fun renderPaletteBitmap(
             val rows = (itemPx / checkerPx).toInt() + 1
             for (row in 0 until rows) {
                 for (col in 0 until cols) {
-                    paint.color = if ((row + col) % 2 == 0) 0xFFAAAAAA.toInt() else 0xFFFFFFFF.toInt()
+                    paint.color =
+                        if ((row + col) % 2 == 0) 0xFFAAAAAA.toInt() else 0xFFFFFFFF.toInt()
                     canvas.drawRect(
                         x + col * checkerPx,
                         y + row * checkerPx,
@@ -388,6 +404,7 @@ private fun Preview() {
         )
     }
 }
+
 @Preview
 @Composable
 private fun PreviewPreview() {

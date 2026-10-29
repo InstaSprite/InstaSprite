@@ -1,13 +1,15 @@
 package com.instasprite.app.domain.tool
 
 import androidx.compose.ui.graphics.Color
+import com.instasprite.app.domain.model.Cel
+import com.instasprite.app.domain.model.TileCoord
 import com.instasprite.app.domain.usecase.PixelCanvasUseCase
 
 data class StrokeUpdate(
     val isFullPreview: Boolean = false,
-    val overlayPixels: IntArray? = null,
-    val mainLayerPixels: IntArray? = null,
-    val updatedSelectionMask: BooleanArray? = null
+    val updatedSelectionMask: BooleanArray? = null,
+    val mainLayerTiles: Map<TileCoord, IntArray>? = null,
+    val previewRegions: List<Cel>? = null
 )
 
 interface StrokeTool : Tool {
@@ -44,9 +46,7 @@ interface StrokeTool : Tool {
     fun cancelPending(canvas: PixelCanvasUseCase): StrokeUpdate? = null
 }
 
-interface ShapeTool : StrokeTool {
-
-}
+interface ShapeTool : StrokeTool
 
 inline fun forEachBrushPixel(
     row: Int,

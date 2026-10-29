@@ -10,7 +10,6 @@ import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.TileCoord
 import com.instasprite.app.utils.TILE_SIZE
 import com.instasprite.app.utils.pixelToTileCoord
-import java.util.LinkedHashMap
 
 class PixelCanvasUseCase(
     private val pixelCanvasRepository: PixelCanvasRepository,
@@ -18,17 +17,39 @@ class PixelCanvasUseCase(
 ) {
     private var tileChangeTracker: TileChangeTracker? = null
 
+    val animation get() = pixelCanvasRepository.animation
+    val activeFrameId get() = pixelCanvasRepository.activeFrameId
+    fun selectFrame(id: String) = pixelCanvasRepository.selectFrame(id)
+    fun insertFrame(empty: Boolean = false, linked: Boolean = false) =
+        pixelCanvasRepository.insertFrame(empty, linked)
+
+    fun reorderFrame(frameId: String, toIndex: Int) =
+        pixelCanvasRepository.reorderFrame(frameId, toIndex)
+
+    fun deleteFrame() = pixelCanvasRepository.deleteFrame()
+    fun setFrameDuration(value: Int) = pixelCanvasRepository.setFrameDuration(value)
+    fun setPosterFrame() = pixelCanvasRepository.setPosterFrame()
+    fun clearCel() = pixelCanvasRepository.clearCel()
+    fun copyPreviousCel(linked: Boolean) = pixelCanvasRepository.copyPreviousCel(linked)
+    fun unlinkCel() = pixelCanvasRepository.unlinkCel()
+
     fun getLayers(): List<Layer> = pixelCanvasRepository.layers
     fun getActiveLayerId(): String = pixelCanvasRepository.activeLayerId
     fun addLayer(name: String) = pixelCanvasRepository.addLayer(name)
     fun removeLayer(id: String) = pixelCanvasRepository.removeLayer(id)
     fun setActiveLayer(id: String) = pixelCanvasRepository.setActiveLayer(id)
     fun toggleVisibility(id: String) = pixelCanvasRepository.toggleVisibility(id)
+    fun toggleClipping(id: String) = pixelCanvasRepository.toggleClipping(id)
     fun toggleLock(id: String) = pixelCanvasRepository.toggleLock(id)
     fun mergeLayerDown(id: String) = pixelCanvasRepository.mergeLayerDown(id)
-    fun reorderLayer(fromIndex: Int, toIndex: Int) = pixelCanvasRepository.reorderLayer(fromIndex, toIndex)
-    fun setLayerOpacity(id: String, opacity: Float) = pixelCanvasRepository.setLayerOpacity(id, opacity)
-    fun setLayerBlendMode(id: String, mode: com.instasprite.app.domain.model.BlendMode) = pixelCanvasRepository.setLayerBlendMode(id, mode)
+    fun reorderLayer(fromIndex: Int, toIndex: Int) =
+        pixelCanvasRepository.reorderLayer(fromIndex, toIndex)
+
+    fun setLayerOpacity(id: String, opacity: Float) =
+        pixelCanvasRepository.setLayerOpacity(id, opacity)
+
+    fun setLayerBlendMode(id: String, mode: com.instasprite.app.domain.model.BlendMode) =
+        pixelCanvasRepository.setLayerBlendMode(id, mode)
 
     fun getCanvasWidth(): Int {
         return pixelCanvasRepository.width
@@ -73,12 +94,29 @@ class PixelCanvasUseCase(
     }
 
     fun setCanvas(sprite: Sprite) {
-        pixelCanvasRepository.setCanvasData(sprite.width, sprite.height, sprite.layers)
+        pixelCanvasRepository.setSprite(sprite)
     }
 
     fun setAllPixels(pixels: IntArray, ignoreSelection: Boolean = false) {
         captureActiveLayerReplacement(pixels, ignoreSelection)
         pixelCanvasRepository.setAllPixels(pixels, ignoreSelection)
+    }
+
+    fun setActiveLayerTiles(tiles: Map<TileCoord, IntArray>) {
+        val layer =
+            pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId }
+                ?: return
+        if (layer.isLocked || !layer.isVisible) return
+        tileChangeTracker?.let { tracker ->
+            for (coord in layer.tiles.keys + tiles.keys) {
+                val before = layer.tiles[coord]
+                val after = tiles[coord]
+                if (before == null || after == null || !before.contentEquals(after)) {
+                    tracker.captureIfNeeded(layer.id, coord, before ?: emptyTile())
+                }
+            }
+        }
+        pixelCanvasRepository.setActiveLayerTiles(tiles)
     }
 
     fun batchSetPixels(indices: IntArray, colors: IntArray, count: Int, blend: Boolean = true) {
@@ -96,7 +134,12 @@ class PixelCanvasUseCase(
         return pixelCanvasRepository.getCompositedPixelAt(row, col)
     }
 
-    fun getPreviewCompositedPixelAt(row: Int, col: Int, overlayColor: Int, blend: Boolean = true): Int {
+    fun getPreviewCompositedPixelAt(
+        row: Int,
+        col: Int,
+        overlayColor: Int,
+        blend: Boolean = true
+    ): Int {
         return pixelCanvasRepository.getPreviewCompositedPixelAt(row, col, overlayColor, blend)
     }
 
@@ -104,7 +147,12 @@ class PixelCanvasUseCase(
         startRow: Int, startCol: Int,
         regionHeight: Int, regionWidth: Int
     ): IntArray {
-        return pixelCanvasRepository.getAllPixelsInRegion(startRow, startCol, regionHeight, regionWidth)
+        return pixelCanvasRepository.getAllPixelsInRegion(
+            startRow,
+            startCol,
+            regionHeight,
+            regionWidth
+        )
     }
 
     fun getSprite(): Sprite {
@@ -134,7 +182,9 @@ class PixelCanvasUseCase(
 
     private fun captureActiveTileBeforeMutation(row: Int, col: Int) {
         val tracker = tileChangeTracker ?: return
-        val layer = pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId } ?: return
+        val layer =
+            pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId }
+                ?: return
         if (layer.isLocked || !layer.isVisible) return
         if (row !in 0 until pixelCanvasRepository.height || col !in 0 until pixelCanvasRepository.width) return
 
@@ -149,7 +199,9 @@ class PixelCanvasUseCase(
         }
 
         val tracker = tileChangeTracker ?: return
-        val layer = pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId } ?: return
+        val layer =
+            pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId }
+                ?: return
         if (layer.isLocked || !layer.isVisible) return
         val width = pixelCanvasRepository.width
         val height = pixelCanvasRepository.height
@@ -188,7 +240,9 @@ class PixelCanvasUseCase(
 
     private fun captureBatchPixelChanges(indices: IntArray, colorsSize: Int, count: Int) {
         val tracker = tileChangeTracker ?: return
-        val layer = pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId } ?: return
+        val layer =
+            pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId }
+                ?: return
         if (layer.isLocked || !layer.isVisible) return
         val writeCount = minOf(count, indices.size, colorsSize)
         if (writeCount <= 0) return
@@ -206,9 +260,14 @@ class PixelCanvasUseCase(
         }
     }
 
-    private fun captureActiveLayerReplacement(newPixels: IntArray, ignoreSelection: Boolean = false) {
+    private fun captureActiveLayerReplacement(
+        newPixels: IntArray,
+        ignoreSelection: Boolean = false
+    ) {
         val tracker = tileChangeTracker ?: return
-        val layer = pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId } ?: return
+        val layer =
+            pixelCanvasRepository.layers.firstOrNull { it.id == pixelCanvasRepository.activeLayerId }
+                ?: return
         if (layer.isLocked || !layer.isVisible) return
         val width = pixelCanvasRepository.width
         val height = pixelCanvasRepository.height
