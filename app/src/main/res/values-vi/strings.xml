@@ -510,29 +510,29 @@
 
     <!-- Tutorial Strings -->
     <string name="tut_welcome_title">Chào mừng đến với InstaSprite!</string>
-    <string name="tut_welcome_desc">Bạn có muốn tham gia một vòng hướng dẫn nhanh về không gian vẽ không?</string>
+    <string name="tut_welcome_desc">Khám phá nhanh cách vẽ, quản lý lớp và tạo hoạt ảnh. Bạn có thể xem lại từ menu dự án.</string>
     <string name="tut_btn_show">Xem Hướng dẫn</string>
     <string name="tut_btn_skip">Bỏ qua</string>
     <string name="tut_btn_next">Tiếp</string>
     <string name="tut_btn_finish">Hoàn tất</string>
     <string name="tut_canvas_title">Khung vẽ</string>
-    <string name="tut_canvas_desc">Đây là khu vực vẽ. Bạn có thể di chuyển và thu phóng bằng cử 2 ngón.</string>
+    <string name="tut_canvas_desc">Vẽ tranh pixel tại đây. Dùng hai ngón tay để thu phóng và di chuyển. Ở chế độ con trỏ, đặt con trỏ rồi nhấn Dùng công cụ để vẽ.</string>
     <string name="tut_color_palette_title">Màu sắc</string>
-    <string name="tut_color_palette_desc">Chọn một màu để vẽ.</string>
+    <string name="tut_color_palette_desc">Chạm vào ô màu để chọn màu vẽ. Các màu dùng gần đây luôn ở ngay bên cạnh.</string>
     <string name="tut_color_wheel_title">Bộ chọn màu</string>
-    <string name="tut_color_wheel_desc">Tuỳ chỉnh màu.</string>
+    <string name="tut_color_wheel_desc">Chạm vào màu đang dùng để mở bộ chọn màu và chọn màu tùy chỉnh.</string>
     <string name="tut_canvas_menu_title">Tùy chọn khung vẽ</string>
     <string name="tut_canvas_menu_desc">Đổi kích thước, lật hoặc xoay khung vẽ.</string>
     <string name="tut_tool_button_title">Công cụ đang dùng</string>
-    <string name="tut_tool_button_desc">Chọn công cụ vẽ.</string>
+    <string name="tut_tool_button_desc">Chạm để chuyển giữa bút, tẩy, tô màu, vùng chọn và các công cụ khác.</string>
     <string name="tut_tool_option_title">Cài đặt công cụ</string>
-    <string name="tut_tool_option_desc">Bạn có thể tinh chỉnh tùy chọn công cụ tại đây.</string>
+    <string name="tut_tool_option_desc">Điều chỉnh công cụ đang dùng, gồm kích thước bút và các tùy chọn vẽ.</string>
     <string name="tut_undo_redo_title">Hoàn tác &amp; Làm lại</string>
     <string name="tut_undo_redo_desc">Hoàn tác hoặc làm lại thao tác gần nhất.</string>
     <string name="tut_project_menu_title">Menu Dự án</string>
-    <string name="tut_project_menu_desc">Lưu, tải, xuất tác phẩm và thiết lập tùy chọn vẽ.</string>
+    <string name="tut_project_menu_desc">Lưu dự án có thể chỉnh sửa, tải tranh hoặc xuất ảnh, GIF hay bảng sprite. Bạn cũng có thể xem lại hướng dẫn tại đây.</string>
     <string name="tut_layer_toggle_title">Lớp</string>
-    <string name="tut_layer_toggle_desc">Quản lý các lớp vẽ.</string>
+    <string name="tut_layer_toggle_desc">Mở bảng lớp để thêm, sắp xếp, ẩn hoặc khóa lớp.</string>
     <string name="onboarding_next">Tiếp theo</string>
     <string name="onboarding_get_started">Bắt đầu</string>
     <string name="onboarding_welcome_title">Chào mừng đến với\nInstaSprite!</string>
@@ -623,4 +623,12 @@
     <string name="export_option_gif">Ảnh động GIF</string>
     <string name="export_option_sheet">Sprite sheet (PNG)</string>
     <string name="export_option_project">Dự án sprite (.isprite)</string>
+    <string name="tut_btn_back">Trước</string>
+    <string name="tut_progress">%1$d / %2$d</string>
+    <string name="tut_timeline_frames_title">Khung hình</string>
+    <string name="tut_timeline_frames_desc">Chạm vào khung hình để vẽ. Vuốt thanh để xem thêm khung. Chạm + để thêm khung, hoặc giữ + để thêm khung trống. Giữ rồi kéo khung để đổi thứ tự. Mũi tên lên mở dòng thời gian đầy đủ.</string>
+    <string name="tut_timeline_cels_title">Lớp qua các khung hình</string>
+    <string name="tut_timeline_cels_desc">Mỗi cột là một khung hình, mỗi hàng là một lớp. Chạm ô để chọn cả hai. Nút mắt và khóa hoạt động như trong bảng lớp. Kéo tay nắm phía trên để đổi chiều cao.</string>
+    <string name="tut_timeline_playback_title">Thời gian và phát</string>
+    <string name="tut_timeline_playback_desc">Nút phát xem trước hoạt ảnh khi có ít nhất hai khung. Chạm thời gian mili giây dưới lưới để đổi thời lượng khung đang chọn. Menu dòng thời gian có tùy chọn bóng khung, nhân bản và xóa. Mũi tên xuống thu gọn dòng thời gian.</string>
 </resources>

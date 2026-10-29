@@ -128,6 +128,13 @@ fun ToolSelector(
                 onDismissRequest = { menuListVisible = false }
             ) {
                 DropdownMenuItem(
+                    text = { Text(stringResource(R.string.tut_btn_show)) },
+                    onClick = {
+                        menuListVisible = false
+                        onToolSelectorEvent(ToolSelectorEvent.ShowTutorial)
+                    }
+                )
+                DropdownMenuItem(
                     text = { Text(text = stringResource(R.string.save)) },
                     onClick = {
                         onToolSelectorEvent(ToolSelectorEvent.OpenSaveISpriteDialog)

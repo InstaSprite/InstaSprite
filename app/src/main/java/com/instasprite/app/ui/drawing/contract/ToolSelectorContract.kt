@@ -5,6 +5,7 @@ import com.instasprite.app.domain.tool.DitherPattern
 import com.instasprite.app.domain.tool.ToolType
 
 sealed interface ToolSelectorEvent {
+    data object ShowTutorial : ToolSelectorEvent
     data class SetDitherPattern(val pattern: DitherPattern) : ToolSelectorEvent
     data class SetDitherBackground(val color: Color) : ToolSelectorEvent
     data class SelectTool(val tool: ToolType) : ToolSelectorEvent

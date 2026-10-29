@@ -77,6 +77,8 @@ import com.instasprite.app.ui.drawing.timeline.TimelinePreviewData
 import com.instasprite.app.ui.drawing.timeline.TimelineSheet
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
+import com.instasprite.app.ui.drawing.tutorial.DrawingTutorialStep
+import com.instasprite.app.ui.drawing.tutorial.drawingTutorialSequence
 import com.instasprite.app.ui.tutorial.SpotlightOverlay
 import com.instasprite.app.ui.tutorial.TutorialEvent
 import com.instasprite.app.ui.tutorial.TutorialState
@@ -221,6 +223,15 @@ private fun DrawingScreenContent(
     }
 
     var showTimeline by rememberSaveable { mutableStateOf(false) }
+    val timelineStep = tutorialState.currentStep in listOf(
+        DrawingTutorialStep.TIMELINE_CELS, DrawingTutorialStep.TIMELINE_PLAYBACK
+    )
+    val timelineExpanded = if (tutorialState.showTutorial) timelineStep else showTimeline
+    val timelineTutorialModifier = Modifier.onGloballyPositioned { coordinates ->
+        val step = if (tutorialState.showTutorial && timelineStep) tutorialState.currentStep!!
+            else DrawingTutorialStep.TIMELINE_FRAMES
+        event.onTutorialEvent(TutorialEvent.OnBoundsChanged(step, coordinates.boundsInRoot()))
+    }
     val closeTimeline = {
         showTimeline = false
     }
@@ -310,7 +321,7 @@ private fun DrawingScreenContent(
                     modifier = Modifier.background(AppTheme.colors.BackgroundColor)
                 ) {
                     canvasState.animation?.let { animation ->
-                        if (showTimeline) {
+                        if (timelineExpanded) {
                             TimelineSheet(
                                 animation,
                                 canvasState.layers,
@@ -320,6 +331,7 @@ private fun DrawingScreenContent(
                                 timelineMaxHeight,
                                 event.onTimelineEvent,
                                 closeTimeline,
+                                modifier = timelineTutorialModifier,
                                 onLayerEvent = event.onLayerEvent,
                                 onionSkinEnabled = uiState.onionSkinEnabled,
                                 reorderReset = uiState.timelineReorderReset
@@ -333,7 +345,7 @@ private fun DrawingScreenContent(
                                 uiState.isPlaying,
                                 event.onTimelineEvent,
                                 { showTimeline = true },
-                                Modifier.height(30.pixelDp),
+                                timelineTutorialModifier.height(30.pixelDp),
                                 expanded = false,
                                 onLayerEvent = event.onLayerEvent,
                                 onionSkinEnabled = uiState.onionSkinEnabled,
@@ -533,7 +545,9 @@ private fun DrawingScreenContent(
                 currentStep = tutorialState.currentStep,
                 activeRect = tutorialState.bounds[tutorialState.currentStep]
                     ?: androidx.compose.ui.geometry.Rect.Zero,
-                isLastStep = tutorialState.currentStep == com.instasprite.app.ui.drawing.tutorial.drawingTutorialSequence.last(),
+                stepIndex = drawingTutorialSequence.indexOf(tutorialState.currentStep),
+                stepCount = drawingTutorialSequence.size,
+                onBack = { event.onTutorialEvent(TutorialEvent.OnPreviousStep) },
                 onNext = { event.onTutorialEvent(TutorialEvent.OnNextStep) },
                 onSkip = { event.onTutorialEvent(TutorialEvent.OnDismiss) }
             )

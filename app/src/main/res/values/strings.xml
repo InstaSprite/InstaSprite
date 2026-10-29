@@ -509,29 +509,29 @@
 
     <!-- Tutorial Strings -->
     <string name="tut_welcome_title">Welcome to InstaSprite!</string>
-    <string name="tut_welcome_desc">Would you like a quick tour of the drawing workspace?</string>
+    <string name="tut_welcome_desc">Take a quick tour of drawing, layers, and animation. You can replay it from the project menu.</string>
     <string name="tut_btn_show">Show Tutorial</string>
     <string name="tut_btn_skip">Skip</string>
     <string name="tut_btn_next">Next</string>
     <string name="tut_btn_finish">Finish</string>
     <string name="tut_canvas_title">Canvas</string>
-    <string name="tut_canvas_desc">Draw your pixel here, you can zoom and pan with 2 finger gesture.</string>
+    <string name="tut_canvas_desc">Create your pixel art here. Use two fingers to zoom and pan. In cursor mode, position the cursor and press Use tool to draw.</string>
     <string name="tut_color_palette_title">Colors</string>
-    <string name="tut_color_palette_desc">Select a color to draw with.</string>
+    <string name="tut_color_palette_desc">Tap a swatch to choose your drawing color. Your recent colors stay close at hand.</string>
     <string name="tut_color_wheel_title">Color Picker</string>
-    <string name="tut_color_wheel_desc">Pick a custom color.</string>
+    <string name="tut_color_wheel_desc">Tap the active color to open the color picker and choose a custom color.</string>
     <string name="tut_canvas_menu_title">Canvas Options</string>
     <string name="tut_canvas_menu_desc">Resize, flip, or rotate the canvas.</string>
     <string name="tut_tool_button_title">Active Tool</string>
-    <string name="tut_tool_button_desc">Select your drawing tool.</string>
+    <string name="tut_tool_button_desc">Tap to switch between pencil, eraser, fill, selection, and other tools.</string>
     <string name="tut_tool_option_title">Tool Settings</string>
-    <string name="tut_tool_option_desc">You can tweak tool options here.</string>
+    <string name="tut_tool_option_desc">Adjust the active tool here, including brush size and drawing options.</string>
     <string name="tut_undo_redo_title">Undo &amp; Redo</string>
     <string name="tut_undo_redo_desc">Undo or redo your last action.</string>
     <string name="tut_project_menu_title">Project Menu</string>
-    <string name="tut_project_menu_desc">Save, load, export your artwork, and adjust drawing settings.</string>
+    <string name="tut_project_menu_desc">Save an editable project, load artwork, or export an image, GIF, or sprite sheet. You can replay this tour here.</string>
     <string name="tut_layer_toggle_title">Layers</string>
-    <string name="tut_layer_toggle_desc">Manage your artwork layers.</string>
+    <string name="tut_layer_toggle_desc">Open the layer panel to add, reorder, hide, or lock layers.</string>
 
     <string name="onboarding_next">Next</string>
     <string name="onboarding_get_started">Get Started</string>
@@ -622,4 +622,12 @@
     <string name="export_option_gif">Animated GIF</string>
     <string name="export_option_sheet">Sprite sheet (PNG)</string>
     <string name="export_option_project">Sprite project (.isprite)</string>
+    <string name="tut_btn_back">Back</string>
+    <string name="tut_progress">%1$d of %2$d</string>
+    <string name="tut_timeline_frames_title">Frames</string>
+    <string name="tut_timeline_frames_desc">Tap a frame to draw on it. Swipe the strip to see more frames. Tap + to add a frame, or hold + for an empty frame. Hold and drag a frame to reorder it. The up arrow opens the full timeline.</string>
+    <string name="tut_timeline_cels_title">Layers across frames</string>
+    <string name="tut_timeline_cels_desc">Each column is a frame; each row is a layer. Tap a cell to select both. Eye and lock buttons work like the layer panel. Drag the top handle to resize the timeline.</string>
+    <string name="tut_timeline_playback_title">Timing and playback</string>
+    <string name="tut_timeline_playback_desc">Play previews your animation once it has two or more frames. Tap the time in milliseconds below the grid to change the selected frame duration. Open the timeline menu for onion skin, duplicate, and delete. The down arrow collapses the timeline.</string>
 </resources>

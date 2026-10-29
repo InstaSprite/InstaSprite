@@ -571,6 +571,9 @@ class DrawingViewModel @AssistedInject constructor(
                 is ToolSelectorEvent.OpenSaveImageDialog -> openDialog(DrawingDialog.SaveImage)
                 is ToolSelectorEvent.OpenSaveISpriteDialog -> openDialog(DrawingDialog.SaveISprite)
                 is ToolSelectorEvent.OpenLoadISpriteDialog -> openDialog(DrawingDialog.LoadISprite)
+                ToolSelectorEvent.ShowTutorial -> tutorialManager.onEvent(
+                    com.instasprite.app.ui.tutorial.TutorialEvent.OnStartTutorial
+                )
                 is ToolSelectorEvent.OpenDrawingSettingsDialog -> openDialog(DrawingDialog.DrawingSettings)
                 ToolSelectorEvent.OpenDitherColorWheel -> openDialog(DrawingDialog.DitherColorWheel)
                 is ToolSelectorEvent.SelectTool -> selectTool(type = event.tool)

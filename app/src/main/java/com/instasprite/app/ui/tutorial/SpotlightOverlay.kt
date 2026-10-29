@@ -1,47 +1,52 @@
 package com.instasprite.app.ui.tutorial
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import com.instasprite.app.R
+import com.instasprite.app.ui.drawing.tutorial.DrawingTutorialStep
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.pixelDp
 import kotlin.math.roundToInt
 
@@ -49,157 +54,85 @@ import kotlin.math.roundToInt
 fun SpotlightOverlay(
     currentStep: TutorialStep,
     activeRect: Rect,
-    isLastStep: Boolean,
+    stepIndex: Int,
+    stepCount: Int,
+    onBack: () -> Unit,
     onNext: () -> Unit,
     onSkip: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var overlayBounds by remember { mutableStateOf(Rect.Zero) }
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
+    var popupHeight by remember { mutableIntStateOf(0) }
+    val density = LocalDensity.current
+    val direction = LocalLayoutDirection.current
+    val shape = MaterialTheme.shapes.small
+    val scroll = key(currentStep) { rememberScrollState() }
+    BackHandler { if (stepIndex > 0) onBack() else onSkip() }
+    BoxWithConstraints(
+        modifier.fillMaxSize().safeDrawingPadding().onGloballyPositioned { overlayBounds = it.boundsInRoot() }
             .pointerInput(Unit) { detectTapGestures { } }
     ) {
-        val layoutDirection = LocalLayoutDirection.current
-        val overlayShape = MaterialTheme.shapes.small
-
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .onGloballyPositioned { coords ->
-                    overlayBounds = coords.boundsInRoot()
-                }
-        ) {
-            val layerId = drawContext.canvas.nativeCanvas.saveLayer(null, null)
-
-            drawRect(
-                color = Color.Black.copy(alpha = 0.9f),
-                size = size
-            )
-
+        val relative = activeRect.translate(-overlayBounds.left, -overlayBounds.top)
+        Canvas(Modifier.fillMaxSize()) {
+            val layer = drawContext.canvas.nativeCanvas.saveLayer(null, null)
+            drawRect(Color.Black.copy(alpha = 0.78f))
             if (activeRect != Rect.Zero && overlayBounds != Rect.Zero) {
-                // Offset the target rect by the overlay's own position in root
-                val relativeRect = activeRect.translate(-overlayBounds.left, -overlayBounds.top)
-
-                val padding = 4.pixelDp.toPx()
-                val targetSize = androidx.compose.ui.geometry.Size(
-                    relativeRect.width + padding * 2,
-                    relativeRect.height + padding * 2
+                val padding = 3.pixelDp.toPx()
+                val outline = shape.createOutline(
+                    androidx.compose.ui.geometry.Size(relative.width + padding * 2, relative.height + padding * 2),
+                    direction, this
                 )
-
-                val outline = overlayShape.createOutline(
-                    size = targetSize,
-                    layoutDirection = layoutDirection,
-                    density = this
-                )
-
-                val path = (outline as Outline.Generic).path
-
-                translate(
-                    left = relativeRect.left - padding,
-                    top = relativeRect.top - padding
-                ) {
-                    drawPath(
-                        path = path,
-                        color = Color.Transparent,
-                        blendMode = BlendMode.Clear
-                    )
+                translate(relative.left - padding, relative.top - padding) {
+                    drawOutline(outline, Color.Transparent, blendMode = BlendMode.Clear)
                 }
             }
-
-            drawContext.canvas.nativeCanvas.restoreToCount(layerId)
+            drawContext.canvas.nativeCanvas.restoreToCount(layer)
         }
-
-        val density = LocalDensity.current
-        val config = LocalConfiguration.current
-
-        if (activeRect != Rect.Zero) {
-            val title = stringResource(currentStep.titleRes)
-            val description = stringResource(currentStep.descriptionRes)
-
-            val screenHeight = with(density) { config.screenHeightDp.dp.toPx() }
-            val spaceBelow = screenHeight - activeRect.bottom
-            val spaceAbove = activeRect.top
-
-            val isBelow = spaceBelow > spaceAbove
-            val relativeRect = if (overlayBounds != Rect.Zero) {
-                activeRect.translate(-overlayBounds.left, -overlayBounds.top)
-            } else {
-                activeRect
+        val margin = 8.pixelDp
+        val availableHeight = (maxHeight - margin * 2).coerceAtLeast(1.pixelDp)
+        Column(
+            Modifier.fillMaxWidth().padding(horizontal = margin)
+                .heightIn(max = availableHeight)
+                .onGloballyPositioned { popupHeight = it.size.height }
+                .offset {
+                    val gap = with(density) { margin.toPx() }.roundToInt()
+                    val bottom = (overlayBounds.height.roundToInt() - popupHeight - gap).coerceAtLeast(gap)
+                    val y = if (activeRect == Rect.Zero) bottom / 2
+                        else if (overlayBounds.height - relative.bottom > relative.top) relative.bottom.roundToInt() + gap
+                        else relative.top.roundToInt() - popupHeight - gap
+                    IntOffset(0, y.coerceIn(gap, bottom))
+                }
+                .background(AppTheme.colors.DialogColor, shape)
+                .padding(8.pixelDp)
+        ) {
+            Column(Modifier.weight(1f, fill = false).verticalScroll(scroll)) {
+                Text(stringResource(R.string.tut_progress, stepIndex + 1, stepCount),
+                    color = AppTheme.colors.Subtext0Color, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(currentStep.titleRes), color = AppTheme.colors.LinkColor,
+                    style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(4.pixelDp))
+                Text(stringResource(currentStep.descriptionRes), color = AppTheme.colors.TextColorLight,
+                    style = MaterialTheme.typography.bodyMedium)
             }
-
-            var popupHeight by remember { mutableIntStateOf(0) }
-            val navBarInsets = WindowInsets.systemBars
-
-            Box(
-                modifier = Modifier
-                    .onGloballyPositioned { popupHeight = it.size.height }
-                    .offset {
-                        val navBarHeight = navBarInsets.getBottom(density)
-                        val maxBottomY = screenHeight.roundToInt() - popupHeight - 24.pixelDp.toPx()
-                            .roundToInt() - navBarHeight
-                        val yOffset = if (isBelow) {
-                            (relativeRect.bottom + 20.pixelDp.toPx()).roundToInt()
-                        } else {
-                            (relativeRect.top - popupHeight - 20.pixelDp.toPx()).roundToInt()
-                        }
-
-                        // Fallback clamp if popupHeight is 0 (initial frame)
-                        val safeMax = maxOf(24.pixelDp.toPx().roundToInt(), maxBottomY)
-                        IntOffset(
-                            x = 0,
-                            y = yOffset.coerceIn(24.pixelDp.toPx().roundToInt(), safeMax)
-                        )
-                    }
-                    .padding(horizontal = 24.pixelDp)
-                    .background(AppTheme.colors.BackgroundColor, MaterialTheme.shapes.small)
-                    .padding(8.pixelDp)
-            ) {
-                Column {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = AppTheme.colors.LinkColor
-                    )
-                    Spacer(modifier = Modifier.height(4.pixelDp))
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = AppTheme.colors.TextColorLight
-                    )
-                    Spacer(modifier = Modifier.height(16.pixelDp))
-
-                    Row(
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Button(
-                            onClick = onSkip,
-                            shape = MaterialTheme.shapes.small,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = AppTheme.colors.TextColorLight
-                            )
-                        ) {
-                            Text(stringResource(R.string.tut_btn_skip))
-                        }
-                        Button(
-                            onClick = onNext,
-                            shape = MaterialTheme.shapes.small,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AppTheme.colors.AccentButtonColor,
-                                contentColor = Color.White
-                            )
-                        ) {
-                            val btnText =
-                                if (isLastStep) stringResource(R.string.tut_btn_finish) else stringResource(
-                                    R.string.tut_btn_next
-                                )
-                            Text(text = btnText, color = AppTheme.colors.TextColorDark)
-                        }
-                    }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton(onClick = onSkip) { Text(stringResource(R.string.tut_btn_skip), color = AppTheme.colors.Subtext0Color) }
+                TextButton(onClick = onBack, enabled = stepIndex > 0) {
+                    Text(stringResource(R.string.tut_btn_back), color = if (stepIndex > 0) AppTheme.colors.TextColorLight else AppTheme.colors.Subtext0Color)
+                }
+                TextButton(onClick = onNext) {
+                    Text(stringResource(if (stepIndex == stepCount - 1) R.string.tut_btn_finish else R.string.tut_btn_next),
+                        color = AppTheme.colors.LinkColor)
                 }
             }
         }
+    }
+}
+
+@Preview(name = "Timeline tutorial", widthDp = 360, heightDp = 640)
+@Preview(name = "Short tutorial", widthDp = 640, heightDp = 320, fontScale = 1.3f)
+@Composable
+private fun SpotlightOverlayPreview() {
+    InstaSpriteTheme {
+        SpotlightOverlay(DrawingTutorialStep.TIMELINE_CELS, Rect.Zero, 9, 12, {}, {}, {})
     }
 }
