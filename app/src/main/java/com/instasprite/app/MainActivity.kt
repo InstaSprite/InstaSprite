@@ -50,27 +50,8 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-                androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
-            ) { isGranted ->
-                if (!isGranted) {
-                    android.util.Log.w("MainActivity", "Notification permission denied")
-                }
-            }
-
             LaunchedEffect(Unit) {
                 ColorPaletteRepository.prepopulatePalettesIfNeeded(this@MainActivity)
-
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                    val permission = android.Manifest.permission.POST_NOTIFICATIONS
-                    if (androidx.core.content.ContextCompat.checkSelfPermission(
-                            this@MainActivity,
-                            permission
-                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-                    ) {
-                        permissionLauncher.launch(permission)
-                    }
-                }
             }
 
             val settings by settingsDataStore.data.collectAsState(
