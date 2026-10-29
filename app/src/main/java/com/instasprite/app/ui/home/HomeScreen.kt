@@ -25,6 +25,9 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -78,6 +81,11 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { galleryViewModel.stopPreview() }
+    DisposableEffect(galleryViewModel) { onDispose { galleryViewModel.stopPreview() } }
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != 0) galleryViewModel.stopPreview()
+    }
     val galleryUiState by galleryViewModel.uiState.collectAsStateWithLifecycle()
     val galleryDialogState by galleryViewModel.dialogState.collectAsStateWithLifecycle()
     val sortedSprites by galleryViewModel.sortedAndFilteredSprites.collectAsStateWithLifecycle()

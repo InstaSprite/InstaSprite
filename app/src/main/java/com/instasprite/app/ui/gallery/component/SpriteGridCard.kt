@@ -34,7 +34,6 @@ import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
-import com.instasprite.app.ui.components.composable.AsyncCanvasPreviewer
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.gallery.GalleryLayoutMode
 import com.instasprite.app.ui.theme.AppTheme
@@ -45,6 +44,10 @@ import com.instasprite.app.utils.pixelDp
 fun SpriteGridCard(
     spriteWithMeta: SpriteWithMeta,
     layoutMode: GalleryLayoutMode,
+    playing: Boolean = false,
+    playbackSprite: Sprite? = null,
+    onPlay: () -> Unit = {},
+    onStop: () -> Unit = {},
     onEdit: () -> Unit = {},
     onRename: () -> Unit = {},
     onDelete: () -> Unit = {},
@@ -80,11 +83,13 @@ fun SpriteGridCard(
                     .fillMaxWidth()
                     .background(AppTheme.colors.BackgroundColor.copy(0.9f))
             ) {
-                Box(
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .padding(horizontal = 6.pixelDp, vertical = 2.pixelDp)
+                        .weight(1f)
+                        .padding(horizontal = 6.pixelDp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (spriteWithMeta.hasAnimation) SpritePlaybackButton(playing, onPlay)
                     Text(
                         text = meta?.spriteName ?: stringResource(R.string.untitled),
                         color = Color.White,
@@ -92,7 +97,7 @@ fun SpriteGridCard(
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.align(Alignment.CenterStart)
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 Box {
@@ -116,7 +121,10 @@ fun SpriteGridCard(
                 }
             }
 
-            AsyncCanvasPreviewer(
+            GallerySpritePreview(
+                playing = playing,
+                playbackSprite = playbackSprite,
+                onStop = onStop,
                 sprite = sprite,
                 meta = meta,
                 modifier = Modifier
@@ -149,7 +157,8 @@ private fun SpriteGridCardStaggeredPreview() {
                         )
                     )
                 ),
-                meta = SpriteMeta(spriteId = "1", spriteName = "My Sprite")
+                meta = SpriteMeta(spriteId = "1", spriteName = "My Sprite"),
+                hasAnimation = true
             ),
             layoutMode = GalleryLayoutMode.StaggeredGrid
         )

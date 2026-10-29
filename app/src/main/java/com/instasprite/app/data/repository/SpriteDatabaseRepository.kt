@@ -88,7 +88,7 @@ class SpriteDatabaseRepository @Inject constructor(
                         layers = emptyList(),
                         colorPalette = proto?.colorPaletteList
                     )
-                )
+                ).copy(hasAnimation = (proto?.framesCount ?: 0) > 1)
             }
         }
     }

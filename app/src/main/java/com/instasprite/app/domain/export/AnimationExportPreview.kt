@@ -15,6 +15,21 @@ data class ExportPreviewPixels(
 )
 
 object AnimationExportPreview {
+    fun renderFrame(
+        sprite: Sprite,
+        frameId: String,
+        checkCancelled: () -> Unit = {}
+    ): ExportPreviewPixels {
+        val animation = requireNotNull(sprite.animation)
+        val frame = animation.frames.first { it.id == frameId }
+        val singleFrame = sprite.copy(animation = animation.copy(
+            frames = listOf(frame),
+            cels = animation.cels.filter { it.frameId == frameId },
+            posterFrameId = frameId
+        ))
+        return render(singleFrame, AnimationExportFormat.SPRITE_SHEET, 100, 1, frameId, checkCancelled)
+    }
+
     fun render(
         sprite: Sprite,
         format: AnimationExportFormat,

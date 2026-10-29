@@ -26,6 +26,8 @@ import com.instasprite.app.utils.AppSettings
 import com.instasprite.app.utils.CanvasMemoryException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -63,7 +65,9 @@ data class GalleryState(
     val showSearchBar: Boolean = false,
     val showImagePager: Boolean = false,
     val layoutMode: GalleryLayoutMode = GalleryLayoutMode.List,
-    val drawingDestination: DrawingDestination? = null
+    val drawingDestination: DrawingDestination? = null,
+    val playingSpriteId: String? = null,
+    val playbackSprite: Sprite? = null
 )
 
 @HiltViewModel
@@ -168,8 +172,43 @@ class GalleryViewModel @Inject constructor(
         }
     }
 
+    private var playbackLoadJob: Job? = null
+
+    fun stopPreview() {
+        playbackLoadJob?.cancel()
+        playbackLoadJob = null
+        _uiState.update { it.copy(playingSpriteId = null, playbackSprite = null) }
+    }
+
+    private fun togglePreview(spriteId: String) {
+        val stop = _uiState.value.playingSpriteId == spriteId
+        stopPreview()
+        if (stop) return
+        _uiState.update { it.copy(playingSpriteId = spriteId) }
+        playbackLoadJob = viewModelScope.launch {
+            try {
+                val sprite = withContext(ioDispatcher) {
+                    spriteDatabaseRepository.loadSprite(spriteId)
+                }
+                requireNotNull(sprite)
+                require((sprite.animation?.frames?.size ?: 0) > 1)
+                _uiState.update { it.copy(playbackSprite = sprite) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e("GalleryViewModel", "Failed to load animation", e)
+                _uiState.update { it.copy(playingSpriteId = null, playbackSprite = null) }
+                Toast.makeText(context, R.string.error_action_failed, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     fun onSpriteListEvent(event: SpriteListEvent) {
         when (event) {
+            is SpriteListEvent.TogglePlayback -> togglePreview(event.spriteId)
+            is SpriteListEvent.StopPlayback -> {
+                if (_uiState.value.playingSpriteId == event.spriteId) stopPreview()
+            }
             is SpriteListEvent.OpenDeleteDialog ->
                 openDialog(
                     GalleryDialog.DeleteSpriteConfirm(
@@ -178,7 +217,10 @@ class GalleryViewModel @Inject constructor(
                     )
                 )
 
-            is SpriteListEvent.OpenPager -> toggleImagePager(event.sprite)
+            is SpriteListEvent.OpenPager -> {
+                stopPreview()
+                toggleImagePager(event.sprite)
+            }
             is SpriteListEvent.OpenRenameDialog -> openDialog(GalleryDialog.Rename(event.spriteId))
         }
     }

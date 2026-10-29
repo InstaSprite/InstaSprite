@@ -18,6 +18,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -74,6 +77,8 @@ fun GalleryScreen(
     UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
     UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
 
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.stopPreview() }
+    DisposableEffect(viewModel) { onDispose { viewModel.stopPreview() } }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
     val sprites by viewModel.sprites.collectAsStateWithLifecycle()
@@ -189,6 +194,8 @@ fun GalleryPageContent(
                 onOpenDrawing = event.onOpenDrawing,
                 spriteList = spriteList,
                 layoutMode = uiState.layoutMode,
+                playingSpriteId = uiState.playingSpriteId,
+                playbackSprite = uiState.playbackSprite,
                 onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
                 modifier = Modifier.padding(horizontal = 6.pixelDp, vertical = 4.pixelDp)
@@ -267,6 +274,8 @@ private fun GalleryScreenContent(
                     onOpenDrawing = event.onOpenDrawing,
                     spriteList = spriteList,
                     layoutMode = uiState.layoutMode,
+                    playingSpriteId = uiState.playingSpriteId,
+                    playbackSprite = uiState.playbackSprite,
                     onIsScrolledChange = { isScrolled = it },
                     lazyListState = lazyListState,
                     modifier = Modifier.padding(horizontal = 6.pixelDp)
