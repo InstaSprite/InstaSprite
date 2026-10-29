@@ -115,7 +115,9 @@ fun AnimationTimeline(
                         animation, activeFrameId, activeLayerId, isPlaying,
                         onSelect = { onEvent(TimelineEvent.Select(it)) },
                         onDelete = { onEvent(TimelineEvent.Delete) },
-                        onAdd = { onEvent(TimelineEvent.Append) }, modifier = Modifier.weight(1f)
+                        onAdd = { onEvent(TimelineEvent.Append) },
+                        onInsertEmpty = { onEvent(TimelineEvent.Insert(empty = true)) },
+                        modifier = Modifier.weight(1f)
                     )
                     TimelineToolbarButton(
                         R.drawable.ic_arrow_head_up,
@@ -192,6 +194,7 @@ fun AnimationTimeline(
                 ) {
                     itemsIndexed(animation.frames, key = { _, value -> value.id }) { index, value ->
                         var deleteMenu by remember { mutableStateOf(false) }
+                        var celMenuLayerId by remember { mutableStateOf<String?>(null) }
                         val current = value.id == activeFrameId
                         Column(
                             Modifier
@@ -259,33 +262,41 @@ fun AnimationTimeline(
                                                 ?.let { cells[layer.id to it.id] }
                                             val next = animation.frames.getOrNull(index + 1)
                                                 ?.let { cells[layer.id to it.id] }
-                                            TimelineCelCell(
-                                                hasCel = cel != null,
-                                                isLinked = linked,
-                                                linkLeft = cel != null && previous?.dataId == cel.dataId,
-                                                linkRight = cel != null && next?.dataId == cel.dataId,
-                                                isSelected = selected,
-                                                description = description,
-                                                onLongClick = {
-                                                    onEvent(
-                                                        TimelineEvent.Select(
-                                                            value.id,
-                                                            layer.id
+                                            Box(propagateMinConstraints = true) {
+                                                TimelineCelCell(
+                                                    hasCel = cel != null,
+                                                    isLinked = linked,
+                                                    linkLeft = cel != null && previous?.dataId == cel.dataId,
+                                                    linkRight = cel != null && next?.dataId == cel.dataId,
+                                                    isSelected = selected,
+                                                    description = description,
+                                                    onLongClick = {
+                                                        if (!isPlaying) {
+                                                            onEvent(TimelineEvent.Select(value.id, layer.id))
+                                                            celMenuLayerId = layer.id
+                                                        }
+                                                    },
+                                                    onClick = {
+                                                        onEvent(
+                                                            TimelineEvent.Select(
+                                                                value.id,
+                                                                layer.id
+                                                            )
                                                         )
-                                                    )
-                                                    menu = true
-                                                },
-                                                onClick = {
-                                                    onEvent(
-                                                        TimelineEvent.Select(
-                                                            value.id,
-                                                            layer.id
-                                                        )
-                                                    )
-                                                },
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                            )
+                                                    },
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                )
+                                                TimelineCelMenu(
+                                                    expanded = celMenuLayerId == layer.id && !isPlaying,
+                                                    enabled = selected && !layer.isLocked,
+                                                    hasCel = cel != null,
+                                                    isLinked = linked,
+                                                    hasPreviousCel = previous != null,
+                                                    onDismiss = { celMenuLayerId = null },
+                                                    onEvent = onEvent
+                                                )
+                                            }
                                         }.single().measure(
                                             Constraints.fixed(
                                                 constraints.maxWidth,
@@ -306,7 +317,9 @@ fun AnimationTimeline(
                         TimelineToolbarButton(
                             R.drawable.ic_plus, stringResource(R.string.animation_add),
                             { onEvent(TimelineEvent.Append) },
-                            enabled = !isPlaying && animation.frames.size < Animation.MAX_FRAMES
+                            enabled = !isPlaying && animation.frames.size < Animation.MAX_FRAMES,
+                            onLongClickLabel = stringResource(R.string.animation_insert_empty),
+                            onLongClick = { onEvent(TimelineEvent.Insert(empty = true)) }
                         )
                     }
                 }
@@ -377,32 +390,21 @@ fun AnimationTimeline(
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(if (onionSkinEnabled) R.string.onion_skin_on else R.string.onion_skin_off)) },
-                                onClick = { onEvent(TimelineEvent.ToggleOnionSkin) })
+                                onClick = { menu = false; onEvent(TimelineEvent.ToggleOnionSkin) })
                             val actions = listOf(
                                 R.string.animation_duplicate to TimelineEvent.Insert(),
-                                R.string.animation_empty to TimelineEvent.Insert(empty = true),
                                 R.string.animation_linked to TimelineEvent.Insert(linked = true),
-                                R.string.animation_delete to TimelineEvent.Delete,
-                                R.string.animation_copy_cel to TimelineEvent.CopyPrevious,
-                                R.string.animation_link_cel to TimelineEvent.LinkPrevious,
-                                R.string.animation_unlink to TimelineEvent.Unlink,
-                                R.string.animation_clear to TimelineEvent.ClearCel,
                                 R.string.animation_poster to TimelineEvent.SetPoster
                             )
                             actions.forEach { (label, event) ->
                                 val enabled = when (event) {
-                                    TimelineEvent.Delete -> animation.frames.size > 1
                                     is TimelineEvent.Insert -> animation.frames.size < Animation.MAX_FRAMES
-                                    TimelineEvent.CopyPrevious, TimelineEvent.LinkPrevious -> activeIndex > 0
                                     else -> true
                                 }
                                 DropdownMenuItem(
                                     text = { Text(stringResource(label)) }, enabled = enabled,
                                     onClick = { menu = false; onEvent(event) })
                             }
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.animation_duration)) },
-                                onClick = { menu = false; durationFrameId = activeFrameId })
                         }
                     }
                     TimelineToolbarButton(

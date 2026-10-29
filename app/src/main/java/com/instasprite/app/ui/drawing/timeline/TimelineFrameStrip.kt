@@ -44,6 +44,7 @@ internal fun TimelineFrameStrip(
     onSelect: (String) -> Unit,
     onDelete: () -> Unit,
     onAdd: () -> Unit,
+    onInsertEmpty: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scroll = rememberLazyListState()
@@ -126,7 +127,9 @@ internal fun TimelineFrameStrip(
                 Box(Modifier.size(28.pixelDp), contentAlignment = Alignment.Center) {
                     TimelineToolbarButton(
                         R.drawable.ic_plus, stringResource(R.string.animation_add),
-                        onAdd, enabled = !isPlaying && animation.frames.size < Animation.MAX_FRAMES
+                        onAdd, enabled = !isPlaying && animation.frames.size < Animation.MAX_FRAMES,
+                        onLongClickLabel = stringResource(R.string.animation_insert_empty),
+                        onLongClick = onInsertEmpty
                     )
                 }
             }
@@ -139,6 +142,6 @@ internal fun TimelineFrameStrip(
 @Composable
 private fun TimelineFrameStripPreview() {
     InstaSpriteTheme {
-        TimelineFrameStrip(TimelinePreviewData.animation, "frame-2", "character", false, {}, {}, {})
+        TimelineFrameStrip(TimelinePreviewData.animation, "frame-2", "character", false, {}, {}, {}, {})
     }
 }

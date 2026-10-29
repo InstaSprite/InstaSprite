@@ -1,7 +1,7 @@
 package com.instasprite.app.ui.drawing.timeline
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -22,13 +22,18 @@ internal fun TimelineToolbarButton(
     description: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    active: Boolean = false
+    active: Boolean = false,
+    onLongClickLabel: String? = null,
+    onLongClick: (() -> Unit)? = null
 ) {
     val colors = AppTheme.colors
     Box(
         Modifier
             .size(22.pixelDp)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+            .combinedClickable(
+                enabled = enabled, role = Role.Button, onClick = onClick,
+                onLongClickLabel = onLongClickLabel, onLongClick = onLongClick
+            ),
         contentAlignment = Alignment.Center
     ) {
         PixelIcon(

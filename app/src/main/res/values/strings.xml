@@ -614,4 +614,5 @@
     <string name="drawing_autosave_failed">Autosave failed. Tap to retry.</string>
     <string name="drawing_recovery_saved">Last completed edits saved for recovery.</string>
     <string name="drawing_recovery_failed">Could not save recovery data.</string>
+    <string name="animation_insert_empty">Insert empty frame after current frame</string>
 </resources>
