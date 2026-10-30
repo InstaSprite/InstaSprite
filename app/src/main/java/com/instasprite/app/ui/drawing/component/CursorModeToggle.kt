@@ -22,7 +22,7 @@ fun CursorModeToggle(
     modifier: Modifier = Modifier
 ) {
     val containerColor = if (isCursorMode) {
-        AppTheme.colors.LinkColor
+        AppTheme.colors.blue
     } else {
         Color.Transparent
     }

@@ -78,7 +78,7 @@ fun InputDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     CircularProgressIndicator(
-                        color = AppTheme.colors.SelectedColor,
+                        color = AppTheme.colors.purple,
                     )
                 }
             } else {
@@ -93,11 +93,11 @@ fun InputDialog(
                                 inputStates[index].value = it
                                 onInputChanged(inputStates.map { state -> state.value })
                             },
-                            label = { Text(field.label, color = AppTheme.colors.SelectedColor) },
+                            label = { Text(field.label, color = AppTheme.colors.purple) },
                             placeholder = {
                                 if (field.placeholder.isNotBlank())
                                     Text(
-                                        field.placeholder, color = AppTheme.colors.Subtext0Color,
+                                        field.placeholder, color = AppTheme.colors.textMuted,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                             },
@@ -105,7 +105,7 @@ fun InputDialog(
                                 field.suffix?.let {
                                     Text(
                                         it,
-                                        color = AppTheme.colors.LinkColor,
+                                        color = AppTheme.colors.blue,
                                         modifier = Modifier.padding(horizontal = 10.pixelDp)
                                     )
                                 }
@@ -117,7 +117,7 @@ fun InputDialog(
                                 if (!field.validator(inputStates[index].value)) {
                                     Text(
                                         field.errorMessage,
-                                        color = AppTheme.colors.DismissButtonColor
+                                        color = AppTheme.colors.red
                                     )
                                 }
                             },

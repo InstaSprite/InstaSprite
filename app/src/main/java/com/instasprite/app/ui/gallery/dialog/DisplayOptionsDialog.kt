@@ -119,11 +119,11 @@ private fun DropdownField(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            containerColor = AppTheme.colors.DropDownMenuColor
+            containerColor = AppTheme.colors.surfaceContainer
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option, color = AppTheme.colors.TextColorLight) },
+                    text = { Text(option, color = AppTheme.colors.onSurface) },
                     onClick = {
                         onOptionSelected(option)
                         expanded = false

@@ -148,11 +148,11 @@ fun DrawingScreen(
 
 
     if (uiState.showLayerDrawer) {
-        UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColorDarker)
-        UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColorDarker)
+        UiUtils.SetStatusBarColor(AppTheme.colors.surfaceInset)
+        UiUtils.SetNavigationBarColor(AppTheme.colors.surfaceInset)
     } else {
-        UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColor)
-        UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColor)
+        UiUtils.SetStatusBarColor(AppTheme.colors.background)
+        UiUtils.SetNavigationBarColor(AppTheme.colors.background)
     }
 
     DrawingScreenDialogs(dialogState, viewModel, onNavigateToPalette)
@@ -243,7 +243,7 @@ private fun DrawingScreenContent(
 
     val coroutineScope = rememberCoroutineScope()
     var toolSizeValue by remember { mutableIntStateOf(uiState.toolSize) }
-    val canvasBorderColor = AppTheme.colors.BackgroundColor
+    val canvasBorderColor = AppTheme.colors.background
 
     var undoBounds by remember { mutableStateOf(androidx.compose.ui.geometry.Rect.Zero) }
     var redoBounds by remember { mutableStateOf(androidx.compose.ui.geometry.Rect.Zero) }
@@ -273,9 +273,9 @@ private fun DrawingScreenContent(
                     if (uiState.autosaveFailed) {
                         Text(
                             text = stringResource(R.string.drawing_autosave_failed),
-                            color = AppTheme.colors.TextColorLight,
+                            color = AppTheme.colors.onSurface,
                             modifier = Modifier.fillMaxWidth()
-                                .background(AppTheme.colors.BackgroundColorDarker)
+                                .background(AppTheme.colors.surfaceInset)
                                 .clickable(onClick = event.onRetryAutosave)
                                 .padding(6.pixelDp)
                         )
@@ -290,7 +290,7 @@ private fun DrawingScreenContent(
                                     )
                                 )
                             }
-                            .background(AppTheme.colors.BackgroundColor)
+                            .background(AppTheme.colors.background)
                             .padding(horizontal = 6.pixelDp, vertical = 2.pixelDp),
                         activeColorModifier = Modifier.onGloballyPositioned { coords ->
                             event.onTutorialEvent(
@@ -318,7 +318,7 @@ private fun DrawingScreenContent(
             },
             bottomBar = {
                 Column(
-                    modifier = Modifier.background(AppTheme.colors.BackgroundColor)
+                    modifier = Modifier.background(AppTheme.colors.background)
                 ) {
                     canvasState.animation?.let { animation ->
                         if (timelineExpanded) {
@@ -458,10 +458,10 @@ private fun DrawingScreenContent(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(AppTheme.colors.BackgroundColorDarker),
+                        .background(AppTheme.colors.surfaceInset),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
+                    CircularProgressIndicator(color = AppTheme.colors.purple)
                 }
             } else {
                 Box(
@@ -469,7 +469,7 @@ private fun DrawingScreenContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                        .background(AppTheme.colors.BackgroundColorDarker)
+                        .background(AppTheme.colors.surfaceInset)
 
                 ) {
                     if (canvasState.selectionState != null && !uiState.showLayerDrawer) {

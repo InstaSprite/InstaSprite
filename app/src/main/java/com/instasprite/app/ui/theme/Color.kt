@@ -181,145 +181,138 @@ object Catppuccin {
     }
 
     fun toAppColors(palette: CatppuccinColors): AppColors = AppColors(
-        BackgroundColor = palette.Base,
-        BackgroundColorDarker = palette.Crust,
+        background = palette.Base,
+        surfaceInset = palette.Crust,
 
-        Foreground0Color = palette.Surface0,
-        Foreground1Color = palette.Surface1,
-        Foreground2Color = palette.Surface2,
+        surface = palette.Surface0,
+        surfaceRaised = palette.Surface1,
+        surfaceHighest = palette.Surface2,
 
-        TextColorLight = palette.Text,
-        Subtext0Color = palette.Overlay1,
-        Subtext1Color = palette.Overlay2,
-        TextColorDark = palette.Mantle,
+        onSurface = palette.Text,
+        textMuted = palette.Overlay1,
+        textSecondary = palette.Overlay2,
+        onAccent = palette.Mantle,
 
-        SelectedColor = palette.Mauve,
-        AccentButtonColor = palette.Green,
-        DismissButtonColor = palette.Red,
-        LinkColor = palette.Blue,
-        WarningColor = palette.Peach,
-        InfoColor = palette.Flamingo,
-        SecondaryAccentColor = palette.Lavender,
-        ErrorDarkColor = palette.Maroon,
+        purple = palette.Mauve,
+        green = palette.Green,
+        red = palette.Red,
+        blue = palette.Blue,
+        orange = palette.Peach,
+        lightPink = palette.Flamingo,
+        lightBlue = palette.Lavender,
+        mutedRed = palette.Maroon,
 
-        BarColor = palette.Mantle,
-        DialogColor = palette.Mantle,
+        surfaceContainer = palette.Mantle,
 
-        InactiveColor = palette.Overlay0,
+        textDisabled = palette.Overlay0,
     )
 }
 
 data class AppColors(
-    val BackgroundColor: Color,
-    val BackgroundColorDarker: Color,
+    val background: Color,
+    val surfaceInset: Color,
 
-    val Foreground0Color: Color,
-    val Foreground1Color: Color,
-    val Foreground2Color: Color,
+    val surface: Color,
+    val surfaceRaised: Color,
+    val surfaceHighest: Color,
 
-    val TextColorLight: Color,
-    val Subtext0Color: Color,
-    val Subtext1Color: Color,
-    val TextColorDark: Color,
+    val onSurface: Color,
+    val textMuted: Color,
+    val textSecondary: Color,
+    val onAccent: Color,
 
-    val SelectedColor: Color,
-    val AccentButtonColor: Color,
-    val DismissButtonColor: Color,
-    val LinkColor: Color,
-    val WarningColor: Color,
-    val InfoColor: Color,
-    val SecondaryAccentColor: Color,
-    val ErrorDarkColor: Color,
+    val purple: Color,
+    val green: Color,
+    val red: Color,
+    val blue: Color,
+    val orange: Color,
+    val lightPink: Color,
+    val lightBlue: Color,
+    val mutedRed: Color,
 
-    val BarColor: Color,
-    val DialogColor: Color,
+    val surfaceContainer: Color,
 
-    val InactiveColor: Color,
+    val textDisabled: Color,
 
-    val CanvasChecker1Color: Color = Color(0xFF808080),
-    val CanvasChecker2Color: Color = Color(0xFFC0C0C0),
+    val canvasCheckerDark: Color = Color(0xFF808080),
+    val canvasCheckerLight: Color = Color(0xFFC0C0C0),
 ) {
-    // Derived aliases for backward compatibility
-    val TopBarColor: Color get() = BarColor
-    val BottomBarColor: Color get() = BarColor
-    val DropDownMenuColor: Color get() = BarColor
-
     @Composable
     fun outlineTextFieldColors() =
         OutlinedTextFieldDefaults.colors(
 
             // Container
-            focusedContainerColor = BackgroundColor,
-            disabledContainerColor = BackgroundColor,
-            unfocusedContainerColor = BackgroundColor,
-            errorContainerColor = BackgroundColor,
+            focusedContainerColor = background,
+            disabledContainerColor = background,
+            unfocusedContainerColor = background,
+            errorContainerColor = background,
 
             // Text Colors
-            focusedTextColor = TextColorLight,
-            unfocusedTextColor = TextColorLight,
-            disabledTextColor = TextColorLight,
-            errorTextColor = DismissButtonColor,
+            focusedTextColor = onSurface,
+            unfocusedTextColor = onSurface,
+            disabledTextColor = onSurface,
+            errorTextColor = red,
 
             // Cursor
-            cursorColor = TextColorLight,
-            errorCursorColor = DismissButtonColor,
+            cursorColor = onSurface,
+            errorCursorColor = red,
 
             // Indicator (border)
-            focusedBorderColor = Foreground2Color,
-            unfocusedBorderColor = Foreground2Color,
-            disabledBorderColor = Foreground2Color,
-            errorBorderColor = DismissButtonColor,
+            focusedBorderColor = surfaceHighest,
+            unfocusedBorderColor = surfaceHighest,
+            disabledBorderColor = surfaceHighest,
+            errorBorderColor = red,
 
             // Leading Icons
-            focusedLeadingIconColor = AccentButtonColor,
-            unfocusedLeadingIconColor = AccentButtonColor,
-            disabledLeadingIconColor = AccentButtonColor,
-            errorLeadingIconColor = DismissButtonColor,
+            focusedLeadingIconColor = green,
+            unfocusedLeadingIconColor = green,
+            disabledLeadingIconColor = green,
+            errorLeadingIconColor = red,
 
             // Trailing Icons
-            focusedTrailingIconColor = LinkColor,
-            unfocusedTrailingIconColor = LinkColor,
-            disabledTrailingIconColor = LinkColor,
-            errorTrailingIconColor = DismissButtonColor,
+            focusedTrailingIconColor = blue,
+            unfocusedTrailingIconColor = blue,
+            disabledTrailingIconColor = blue,
+            errorTrailingIconColor = red,
 
             // Labels
-            focusedLabelColor = SelectedColor,
-            unfocusedLabelColor = SelectedColor,
-            disabledLabelColor = SelectedColor,
-            errorLabelColor = DismissButtonColor,
+            focusedLabelColor = purple,
+            unfocusedLabelColor = purple,
+            disabledLabelColor = purple,
+            errorLabelColor = red,
 
             // Placeholders
-            focusedPlaceholderColor = Subtext1Color,
-            unfocusedPlaceholderColor = Subtext1Color,
-            disabledPlaceholderColor = Subtext1Color,
-            errorPlaceholderColor = DismissButtonColor,
+            focusedPlaceholderColor = textSecondary,
+            unfocusedPlaceholderColor = textSecondary,
+            disabledPlaceholderColor = textSecondary,
+            errorPlaceholderColor = red,
 
             // Supporting Text
-            focusedSupportingTextColor = Subtext1Color,
-            unfocusedSupportingTextColor = Subtext1Color,
-            disabledSupportingTextColor = Subtext1Color,
-            errorSupportingTextColor = DismissButtonColor,
+            focusedSupportingTextColor = textSecondary,
+            unfocusedSupportingTextColor = textSecondary,
+            disabledSupportingTextColor = textSecondary,
+            errorSupportingTextColor = red,
 
             // Prefix
-            focusedPrefixColor = Subtext1Color,
-            unfocusedPrefixColor = Subtext1Color,
-            disabledPrefixColor = Subtext1Color,
-            errorPrefixColor = DismissButtonColor,
+            focusedPrefixColor = textSecondary,
+            unfocusedPrefixColor = textSecondary,
+            disabledPrefixColor = textSecondary,
+            errorPrefixColor = red,
 
             // Suffix
-            focusedSuffixColor = Subtext1Color,
-            unfocusedSuffixColor = Subtext1Color,
-            disabledSuffixColor = Subtext1Color,
-            errorSuffixColor = DismissButtonColor,
+            focusedSuffixColor = textSecondary,
+            unfocusedSuffixColor = textSecondary,
+            disabledSuffixColor = textSecondary,
+            errorSuffixColor = red,
         )
 
     @Composable
     fun sliderColors() = SliderDefaults.colors(
-        thumbColor = LinkColor,
-        activeTrackColor = LinkColor,
-        inactiveTrackColor = Foreground0Color,
-        activeTickColor = BackgroundColor,
-        inactiveTickColor = LinkColor
+        thumbColor = blue,
+        activeTrackColor = blue,
+        inactiveTrackColor = surface,
+        activeTickColor = background,
+        inactiveTickColor = blue
     )
 }
 

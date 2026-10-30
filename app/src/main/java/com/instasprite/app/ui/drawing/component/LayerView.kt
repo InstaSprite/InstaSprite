@@ -70,9 +70,9 @@ fun LayerView(
 ) {
 
     val backgroundColor = if (isActive)
-        AppTheme.colors.BackgroundColor
+        AppTheme.colors.background
     else
-        AppTheme.colors.BackgroundColorDarker
+        AppTheme.colors.surfaceInset
 
     val previewSize = with(LocalDensity.current) { 66.pixelDp.roundToPx().coerceAtLeast(1) }
     val bitmapImage = remember(layer.tiles, canvasWidth, canvasHeight, previewSize) {
@@ -107,7 +107,7 @@ fun LayerView(
                     modifier = Modifier
                         .height(66.pixelDp)
                         .width(6.pixelDp)
-                        .background(AppTheme.colors.WarningColor)
+                        .background(AppTheme.colors.orange)
                 )
                 Spacer(modifier = Modifier.width(2.pixelDp))
             }
@@ -147,7 +147,7 @@ fun LayerView(
                 ) {
                     Text(
                         text = layer.name,
-                        color = AppTheme.colors.TextColorLight,
+                        color = AppTheme.colors.onSurface,
                         fontSize = 14.sp
                     )
                     var showDeleteConfirm by remember { mutableStateOf(false) }
@@ -159,7 +159,7 @@ fun LayerView(
                         PixelIcon(
                             icon = R.drawable.ic_trash,
                             contentDescription = stringResource(R.string.delete_layer),
-                            tint = AppTheme.colors.DismissButtonColor,
+                            tint = AppTheme.colors.red,
                         )
                     }
 
@@ -170,7 +170,7 @@ fun LayerView(
                             highlightText = layer.name,
                             confirmButtonText = stringResource(R.string.delete),
                             dismissButtonText = stringResource(R.string.cancel),
-                            highlightTextColor = AppTheme.colors.DismissButtonColor,
+                            highlightTextColor = AppTheme.colors.red,
                             hasQuestionMark = true,
                             onConfirm = {
                                 showDeleteConfirm = false
@@ -185,7 +185,7 @@ fun LayerView(
 
                 Text(
                     text = layer.blendMode.toString().uppercase(),
-                    color = AppTheme.colors.TextColorLight,
+                    color = AppTheme.colors.onSurface,
                     fontSize = 14.sp
                 )
 
@@ -200,7 +200,7 @@ fun LayerView(
                         PixelIcon(
                             icon = if (layer.isVisible) R.drawable.ic_visible_on else R.drawable.ic_visible_off,
                             contentDescription = stringResource(R.string.toggle_visibility),
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = AppTheme.colors.onSurface,
                         )
                     }
                     IconButton(
@@ -210,7 +210,7 @@ fun LayerView(
                         PixelIcon(
                             icon = if (layer.isLocked) R.drawable.ic_lock else R.drawable.ic_lock_unlock,
                             contentDescription = stringResource(R.string.toggle_lock),
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = AppTheme.colors.onSurface,
                             modifier = Modifier.size(14.pixelDp)
                         )
                     }
@@ -223,7 +223,7 @@ fun LayerView(
                         PixelIcon(
                             icon = R.drawable.ic_three_dots,
                             contentDescription = "Layer Options",
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = AppTheme.colors.onSurface,
                         )
                     }
 
@@ -262,7 +262,7 @@ fun LayerView(
         ) {
             Text(
                 text = "${(localOpacity * 100).toInt()}%",
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 fontSize = 11.sp,
                 modifier = Modifier.width(24.pixelDp)
             )
@@ -304,7 +304,7 @@ private fun PreviewActive() {
                     width = 16,
                     height = 16,
                     pixels = IntArray(16 * 16) {
-                        AppTheme.colors.InfoColor.toArgb()
+                        AppTheme.colors.lightPink.toArgb()
                     }
                 )
             ),
@@ -334,7 +334,7 @@ private fun PreviewInactive() {
                     width = 16,
                     height = 16,
                     pixels = IntArray(16 * 16) {
-                        AppTheme.colors.ErrorDarkColor.toArgb()
+                        AppTheme.colors.mutedRed.toArgb()
                     }
                 )
             ),
@@ -364,7 +364,7 @@ private fun PreviewClipping() {
                     width = 16,
                     height = 16,
                     pixels = IntArray(16 * 16) {
-                        AppTheme.colors.InfoColor.toArgb()
+                        AppTheme.colors.lightPink.toArgb()
                     }
                 ),
                 isClipping = true

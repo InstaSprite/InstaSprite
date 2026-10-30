@@ -27,14 +27,14 @@ fun CustomDialog(
     onConfirm: (() -> Unit)?,
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
-    confirmButtonColor: Color = AppTheme.colors.AccentButtonColor,
+    confirmButtonColor: Color = AppTheme.colors.green,
     scrollable: Boolean = false,
     dismissEnabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = { if (dismissEnabled) onDismiss() },
-        containerColor = AppTheme.colors.DialogColor,
+        containerColor = AppTheme.colors.surfaceContainer,
         title = {
             if (title != null) {
                 Box(
@@ -43,7 +43,7 @@ fun CustomDialog(
                 ) {
                     Text(
                         text = title,
-                        color = AppTheme.colors.TextColorLight,
+                        color = AppTheme.colors.onSurface,
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -67,12 +67,12 @@ fun CustomDialog(
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor)
             ) {
-                Text(confirmButtonText, color = AppTheme.colors.TextColorDark)
+                Text(confirmButtonText, color = AppTheme.colors.onAccent)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss, enabled = dismissEnabled) {
-                Text(dismissButtonText, color = AppTheme.colors.TextColorLight)
+                Text(dismissButtonText, color = AppTheme.colors.onSurface)
             }
         }
     )

@@ -123,7 +123,7 @@ fun FileImportDialog(
                     label = {
                         Text(
                             stringResource(R.string.import_location),
-                            color = AppTheme.colors.SelectedColor
+                            color = AppTheme.colors.purple
                         )
                     },
                     readOnly = true,
@@ -132,7 +132,7 @@ fun FileImportDialog(
                         PixelIcon(
                             icon = R.drawable.ic_folder,
                             contentDescription = stringResource(R.string.choose_file),
-                            tint = AppTheme.colors.LinkColor,
+                            tint = AppTheme.colors.blue,
                             modifier = Modifier.noRippleClickable {
                                 filePickerLauncher.launch(arrayOf("text/plain"))
                             }

@@ -18,15 +18,15 @@ fun InstaSpriteTheme(
     val typography = buildCatppuccinTypography(appColors, appFont)
 
     val colorScheme = darkColorScheme(
-        primary = appColors.SelectedColor,
-        secondary = appColors.AccentButtonColor,
-        tertiary = appColors.SecondaryAccentColor,
-        background = appColors.BackgroundColor,
-        surface = appColors.Foreground0Color,
-        onPrimary = appColors.TextColorDark,
-        onSecondary = appColors.TextColorDark,
-        onBackground = appColors.TextColorLight,
-        onSurface = appColors.TextColorLight,
+        primary = appColors.purple,
+        secondary = appColors.green,
+        tertiary = appColors.lightBlue,
+        background = appColors.background,
+        surface = appColors.surface,
+        onPrimary = appColors.onAccent,
+        onSecondary = appColors.onAccent,
+        onBackground = appColors.onSurface,
+        onSurface = appColors.onSurface,
     )
 
     val shapes = Shapes(

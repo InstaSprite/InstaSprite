@@ -32,7 +32,7 @@ internal fun ExportOptionsDialog(
         content = {
             Column {
                 if (isLoading) {
-                    CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
+                    CircularProgressIndicator(color = AppTheme.colors.purple)
                 } else {
                     val options = listOf(
                         GalleryExportFormat.IMAGE to R.string.export_option_image,
@@ -43,7 +43,7 @@ internal fun ExportOptionsDialog(
                     options.forEach { (format, label) ->
                         if (format != GalleryExportFormat.SPRITE_SHEET || hasAnimation) {
                             TextButton(onClick = { onSelect(format) }, modifier = Modifier.fillMaxWidth()) {
-                                Text(stringResource(label), color = AppTheme.colors.TextColorLight)
+                                Text(stringResource(label), color = AppTheme.colors.onSurface)
                             }
                         }
                     }

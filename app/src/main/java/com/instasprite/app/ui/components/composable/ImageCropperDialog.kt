@@ -56,11 +56,11 @@ fun ImageCropperDialog(
     ImageCropperDialog(
         state = cropState,
         style = CropperStyle(
-            backgroundColor = AppTheme.colors.BackgroundColorDarker,
-            overlay = AppTheme.colors.BackgroundColorDarker.copy(alpha = 0.7f),
-            rectColor = AppTheme.colors.SelectedColor,
+            backgroundColor = AppTheme.colors.surfaceInset,
+            overlay = AppTheme.colors.surfaceInset.copy(alpha = 0.7f),
+            rectColor = AppTheme.colors.purple,
             guidelines = CropperStyleGuidelines(
-                color = AppTheme.colors.Subtext0Color.copy(alpha = 0.5f)
+                color = AppTheme.colors.textMuted.copy(alpha = 0.5f)
             ),
             aspects = listOf(aspectRatio),
             shapes = null,
@@ -73,7 +73,7 @@ fun ImageCropperDialog(
                         text = stringResource(R.string.crop_image),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = AppTheme.colors.TextColorLight
+                        color = AppTheme.colors.onSurface
                     )
                 },
                 navigationIcon = {
@@ -81,7 +81,7 @@ fun ImageCropperDialog(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = AppTheme.colors.TextColorLight
+                            tint = AppTheme.colors.onSurface
                         )
                     }
                 },
@@ -90,7 +90,7 @@ fun ImageCropperDialog(
                         Icon(
                             painter = painterResource(com.mr0xf00.easycrop.R.drawable.restore),
                             contentDescription = null,
-                            tint = AppTheme.colors.TextColorLight
+                            tint = AppTheme.colors.onSurface
                         )
                     }
                     IconButton(
@@ -101,14 +101,14 @@ fun ImageCropperDialog(
                             imageVector = Icons.Default.Done,
                             contentDescription = stringResource(R.string.save),
                             tint = if (!state.accepted)
-                                AppTheme.colors.AccentButtonColor
+                                AppTheme.colors.green
                             else
-                                AppTheme.colors.InactiveColor
+                                AppTheme.colors.textDisabled
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.BackgroundColorDarker
+                    containerColor = AppTheme.colors.surfaceInset
                 )
             )
         }

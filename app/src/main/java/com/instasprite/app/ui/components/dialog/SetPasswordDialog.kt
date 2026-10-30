@@ -63,12 +63,12 @@ fun SetPasswordDialog(
         else
             stringResource(R.string.setting_password),
         dismissButtonText = stringResource(R.string.cancel),
-        confirmButtonColor = AppTheme.colors.AccentButtonColor,
+        confirmButtonColor = AppTheme.colors.green,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(R.string.set_password_description),
-                color = colors.Subtext0Color
+                color = colors.textMuted
             )
 
             Spacer(modifier = Modifier.height(10.pixelDp))
@@ -85,14 +85,14 @@ fun SetPasswordDialog(
                     IconToggleButton(
                         checked = isPasswordVisible,
                         colors = IconButtonDefaults.iconToggleButtonColors().copy(
-                            checkedContentColor = AppTheme.colors.LinkColor,
-                            contentColor = AppTheme.colors.InactiveColor,
+                            checkedContentColor = AppTheme.colors.blue,
+                            contentColor = AppTheme.colors.textDisabled,
                         ),
                         onCheckedChange = { isPasswordVisible = it },
                     ) {
                         PixelIcon(
                             icon = if (isPasswordVisible) R.drawable.ic_visible_on else R.drawable.ic_visible_off,
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = AppTheme.colors.onSurface,
                         )
                     }
                 },

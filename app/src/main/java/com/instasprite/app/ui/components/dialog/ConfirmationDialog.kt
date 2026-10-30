@@ -15,7 +15,7 @@ fun ConfirmationDialog(
     highlightText: String,
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
-    highlightTextColor: Color = AppTheme.colors.DismissButtonColor,
+    highlightTextColor: Color = AppTheme.colors.red,
     hasQuestionMark: Boolean = true,
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit = {}

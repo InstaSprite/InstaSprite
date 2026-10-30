@@ -69,7 +69,7 @@ fun ToolSelector(
 
             DropdownMenu(
                 expanded = toolListVisible,
-                containerColor = AppTheme.colors.DropDownMenuColor,
+                containerColor = AppTheme.colors.surfaceContainer,
                 onDismissRequest = { toolListVisible = false }
             ) {
                 tools.reversed().forEach { tool ->
@@ -124,7 +124,7 @@ fun ToolSelector(
 
             DropdownMenu(
                 expanded = menuListVisible,
-                containerColor = AppTheme.colors.DropDownMenuColor,
+                containerColor = AppTheme.colors.surfaceContainer,
                 onDismissRequest = { menuListVisible = false }
             ) {
                 DropdownMenuItem(
@@ -193,7 +193,7 @@ fun ToolItem(
 ) {
     Button(
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) AppTheme.colors.Foreground0Color else Color.Transparent
+            containerColor = if (selected) AppTheme.colors.surface else Color.Transparent
         ),
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(1.pixelDp),

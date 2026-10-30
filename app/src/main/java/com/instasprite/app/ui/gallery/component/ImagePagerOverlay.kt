@@ -111,7 +111,7 @@ fun ImagePagerOverlay(
                                 PixelIcon(
                                     icon = R.drawable.ic_three_dots,
                                     contentDescription = stringResource(R.string.more),
-                                    tint = AppTheme.colors.TextColorLight,
+                                    tint = AppTheme.colors.onSurface,
                                 )
                             }
 
@@ -146,7 +146,7 @@ fun ImagePagerOverlay(
                     spriteWithMetaData = currentSprite,
                     modifier = Modifier
                         .height(120.pixelDp)
-                        .background(AppTheme.colors.BackgroundColor)
+                        .background(AppTheme.colors.background)
                 )
             }
         ) { innerPadding ->
@@ -156,7 +156,7 @@ fun ImagePagerOverlay(
                 key = { index -> spriteList[index].sprite.id },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(AppTheme.colors.BackgroundColorDarker)
+                    .background(AppTheme.colors.surfaceInset)
             ) { page ->
                 val spriteWithMeta = spriteList[page]
 
@@ -246,7 +246,7 @@ private fun BottomBar(
                     onClick = onExportTap,
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.SelectedColor
+                        containerColor = AppTheme.colors.purple
                     )
                 ) {
                     Row(
@@ -255,12 +255,12 @@ private fun BottomBar(
                         PixelIcon(
                             icon = R.drawable.ic_down_arrow,
                             contentDescription = stringResource(R.string.export_title),
-                            tint = AppTheme.colors.TextColorDark,
+                            tint = AppTheme.colors.onAccent,
                         )
                         Spacer(modifier = Modifier.width(6.pixelDp))
                         Text(
                             text = stringResource(R.string.export_title),
-                            color = AppTheme.colors.TextColorDark
+                            color = AppTheme.colors.onAccent
                         )
                     }
                 }
@@ -269,7 +269,7 @@ private fun BottomBar(
                     onClick = onEditButtonTap,
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.AccentButtonColor
+                        containerColor = AppTheme.colors.green
                     ),
                 ) {
                     Row(
@@ -278,12 +278,12 @@ private fun BottomBar(
                         PixelIcon(
                             icon = R.drawable.ic_edit,
                             contentDescription = stringResource(R.string.edit_sprite),
-                            tint = AppTheme.colors.TextColorDark,
+                            tint = AppTheme.colors.onAccent,
                         )
                         Spacer(modifier = Modifier.width(6.pixelDp))
                         Text(
                             text = stringResource(R.string.edit),
-                            color = AppTheme.colors.TextColorDark
+                            color = AppTheme.colors.onAccent
                         )
                     }
                 }
@@ -302,7 +302,7 @@ private fun PagerDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        containerColor = AppTheme.colors.DropDownMenuColor
+        containerColor = AppTheme.colors.surfaceContainer
     ) {
         DropdownMenuItem(
             text = {
@@ -312,7 +312,7 @@ private fun PagerDropdownMenu(
                 PixelIcon(
                     icon = R.drawable.ic_trash,
                     contentDescription = stringResource(R.string.delete_sprite),
-                    tint = AppTheme.colors.TextColorLight,
+                    tint = AppTheme.colors.onSurface,
                 )
             },
             onClick = {

@@ -41,8 +41,8 @@ internal fun TimelineLayerRow(
         modifier
             .fillMaxWidth()
             .height(16.pixelDp)
-            .background(if (isActive) colors.BackgroundColor else colors.BackgroundColorDarker)
-            .timelineGridBorder(colors.Foreground0Color)
+            .background(if (isActive) colors.background else colors.surfaceInset)
+            .timelineGridBorder(colors.surface)
             .clickable(onClick = onClick)
             .padding(horizontal = 3.pixelDp),
         verticalAlignment = Alignment.CenterVertically
@@ -51,27 +51,27 @@ internal fun TimelineLayerRow(
             PixelIcon(
                 if (layer.isVisible) R.drawable.ic_visible_on else R.drawable.ic_visible_off,
                 contentDescription = stringResource(R.string.toggle_visibility),
-                tint = if (layer.isVisible) colors.TextColorLight else colors.Subtext1Color
+                tint = if (layer.isVisible) colors.onSurface else colors.textSecondary
             )
         }
         IconButton(onClick = onLockToggle, modifier = Modifier.size(16.pixelDp)) {
             PixelIcon(
                 if (layer.isLocked) R.drawable.ic_lock else R.drawable.ic_lock_unlock,
                 contentDescription = stringResource(R.string.toggle_lock),
-                tint = colors.TextColorLight
+                tint = colors.onSurface
             )
         }
         if (layer.isClipping) {
             PixelIcon(
                 R.drawable.ic_down_arrow,
                 contentDescription = stringResource(R.string.clipping_layer),
-                tint = colors.TextColorLight
+                tint = colors.onSurface
             )
         }
         Text(
             layer.name, maxLines = 1, overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.labelSmall,
-            color = colors.TextColorLight
+            color = colors.onSurface
         )
     }
 }

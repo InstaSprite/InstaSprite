@@ -48,7 +48,7 @@ fun CanvasPreviewer(
     var modifier = modifier
 
     if (showBorder) {
-        modifier = modifier.border(4.pixelDp, AppTheme.colors.BackgroundColorDarker)
+        modifier = modifier.border(4.pixelDp, AppTheme.colors.surfaceInset)
     }
 
     Image(

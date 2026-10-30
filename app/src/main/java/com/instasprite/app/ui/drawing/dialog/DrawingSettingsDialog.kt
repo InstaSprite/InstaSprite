@@ -54,7 +54,7 @@ fun DrawingSettingsDialog(
                 Spacer(modifier = Modifier.width(8.pixelDp))
                 Text(
                     text = stringResource(R.string.cursor_mode),
-                    color = colors.TextColorLight,
+                    color = colors.onSurface,
                     fontSize = 14.sp,
                     modifier = Modifier.weight(1f)
                 )
@@ -62,9 +62,9 @@ fun DrawingSettingsDialog(
                     checked = isCursorMode,
                     onCheckedChange = onCursorModeChange,
                     colors = CheckboxDefaults.colors(
-                        checkedColor = colors.LinkColor,
-                        uncheckedColor = colors.Subtext0Color,
-                        checkmarkColor = colors.TextColorDark
+                        checkedColor = colors.blue,
+                        uncheckedColor = colors.textMuted,
+                        checkmarkColor = colors.onAccent
                     )
                 )
             }
@@ -82,7 +82,7 @@ fun DrawingSettingsDialog(
                 Spacer(modifier = Modifier.width(8.pixelDp))
                 Text(
                     text = stringResource(R.string.canvas_preview),
-                    color = colors.TextColorLight,
+                    color = colors.onSurface,
                     fontSize = 14.sp,
                     modifier = Modifier.weight(1f)
                 )
@@ -90,9 +90,9 @@ fun DrawingSettingsDialog(
                     checked = showCanvasPreview,
                     onCheckedChange = onShowCanvasPreviewChange,
                     colors = CheckboxDefaults.colors(
-                        checkedColor = colors.LinkColor,
-                        uncheckedColor = colors.Subtext0Color,
-                        checkmarkColor = colors.TextColorDark
+                        checkedColor = colors.blue,
+                        uncheckedColor = colors.textMuted,
+                        checkmarkColor = colors.onAccent
                     )
                 )
             }

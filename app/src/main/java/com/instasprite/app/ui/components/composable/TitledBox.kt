@@ -24,7 +24,7 @@ fun TitledBox(
     title: String,
     modifier: Modifier = Modifier,
     titleBackgroundColor: Color = Color.Unspecified,
-    titleColor: Color = AppTheme.colors.TextColorLight,
+    titleColor: Color = AppTheme.colors.onSurface,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -56,7 +56,7 @@ fun TitledBox(
 private fun Preview() {
     TitledBox(
         title = "Title",
-        titleBackgroundColor = AppTheme.colors.BackgroundColor,
+        titleBackgroundColor = AppTheme.colors.background,
         modifier = Modifier
     ) {
         Text(text = stringResource(R.string.test))

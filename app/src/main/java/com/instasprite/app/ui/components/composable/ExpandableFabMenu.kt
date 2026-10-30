@@ -78,12 +78,12 @@ data class FabMenuColors(
     companion object {
         @Composable
         fun defaults(
-            fab: Color = AppTheme.colors.TextColorLight,
-            fabIcon: Color = AppTheme.colors.TextColorDark,
-            itemIcon: Color = AppTheme.colors.LinkColor,
-            itemBackground: Color = AppTheme.colors.BackgroundColor,
-            itemIconBackground: Color = AppTheme.colors.Foreground0Color,
-            label: Color = AppTheme.colors.TextColorLight,
+            fab: Color = AppTheme.colors.onSurface,
+            fabIcon: Color = AppTheme.colors.onAccent,
+            itemIcon: Color = AppTheme.colors.blue,
+            itemBackground: Color = AppTheme.colors.background,
+            itemIconBackground: Color = AppTheme.colors.surface,
+            label: Color = AppTheme.colors.onSurface,
             scrim: Color = Color.Black.copy(alpha = 0.8f),
         ) = FabMenuColors(fab, fabIcon, itemIcon, itemBackground, itemIconBackground, label, scrim)
     }
@@ -310,7 +310,7 @@ private fun Preview() {
         Box(
             modifier = Modifier
                 .size(166.pixelDp, 234.pixelDp)
-                .background(AppTheme.colors.BackgroundColorDarker),
+                .background(AppTheme.colors.surfaceInset),
             contentAlignment = Alignment.BottomCenter
         ) {
             ExpandableFabMenu(

@@ -31,7 +31,7 @@ fun Bar(
     middleSlot: (@Composable () -> Unit)? = null,
     rightSlot: (@Composable () -> Unit)? = null,
     height: Dp = 38.pixelDp,
-    backgroundColor: Color = AppTheme.colors.BackgroundColor,
+    backgroundColor: Color = AppTheme.colors.background,
     space: Dp = 10.pixelDp
 ) {
     Box(
@@ -68,14 +68,14 @@ private fun Preview() {
             middleSlot = {
                 Text(
                     text = stringResource(R.string.test_test_alo_alo),
-                    color = AppTheme.colors.TextColorLight
+                    color = AppTheme.colors.onSurface
                 )
             },
             rightSlot = {
                 PixelIcon(
                     icon = R.drawable.ic_three_dots,
                     contentDescription = stringResource(R.string.more),
-                    tint = AppTheme.colors.TextColorLight,
+                    tint = AppTheme.colors.onSurface,
                 )
             }
         )

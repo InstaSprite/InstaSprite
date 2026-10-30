@@ -56,7 +56,7 @@ fun GalleryScreenDialogs(
                     highlightText = dialog.spriteName,
                     confirmButtonText = stringResource(R.string.delete),
                     dismissButtonText = stringResource(R.string.cancel),
-                    highlightTextColor = AppTheme.colors.DismissButtonColor,
+                    highlightTextColor = AppTheme.colors.red,
                     hasQuestionMark = true,
                     onConfirm = {
                         viewModel.deleteSpriteById(dialog.spriteId)

@@ -28,7 +28,7 @@ fun TopBar(
                 text = title,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = AppTheme.colors.TextColorLight
+                color = AppTheme.colors.onSurface
             )
         },
         navigationIcon = {
@@ -37,14 +37,14 @@ fun TopBar(
                     PixelIcon(
                         icon = R.drawable.ic_left_arrow,
                         contentDescription = stringResource(R.string.back),
-                        tint = AppTheme.colors.DismissButtonColor
+                        tint = AppTheme.colors.red
                     )
                 }
             }
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = AppTheme.colors.BackgroundColor
+            containerColor = AppTheme.colors.background
         ),
         modifier = modifier
     )

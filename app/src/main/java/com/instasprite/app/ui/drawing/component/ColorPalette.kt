@@ -140,7 +140,7 @@ fun ColorPalette(
                     PixelIcon(
                         icon = R.drawable.ic_three_dots,
                         contentDescription = stringResource(R.string.show_opts),
-                        tint = AppTheme.colors.TextColorLight,
+                        tint = AppTheme.colors.onSurface,
                     )
                 }
 
@@ -174,7 +174,7 @@ private fun ActiveColor(
             .background(activeColor)
             .border(
                 width = 2.pixelDp,
-                color = AppTheme.colors.BackgroundColorDarker
+                color = AppTheme.colors.surfaceInset
             )
             .clickable(
                 onClick = onClick
@@ -199,7 +199,7 @@ private fun CanvasMenuDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        modifier = modifier.background(AppTheme.colors.DropDownMenuColor)
+        modifier = modifier.background(AppTheme.colors.surfaceContainer)
     ) {
         DropdownMenuItem(
             text = {

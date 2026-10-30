@@ -37,7 +37,7 @@ fun SettingItem(
         PixelIcon(
             icon = icon,
             contentDescription = title,
-            tint = AppTheme.colors.TextColorLight,
+            tint = AppTheme.colors.onSurface,
         )
 
         Spacer(modifier = Modifier.width(10.pixelDp))
@@ -49,13 +49,13 @@ fun SettingItem(
                 text = title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = AppTheme.colors.TextColorLight
+                color = AppTheme.colors.onSurface
             )
             Spacer(modifier = Modifier.height(2.pixelDp))
             Text(
                 text = subtitle,
                 fontSize = 14.sp,
-                color = AppTheme.colors.Subtext0Color
+                color = AppTheme.colors.textMuted
             )
         }
 

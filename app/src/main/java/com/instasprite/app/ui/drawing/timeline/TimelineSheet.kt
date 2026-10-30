@@ -55,7 +55,7 @@ fun TimelineSheet(
     Surface(
         modifier
             .height(height)
-            .fillMaxWidth(), color = AppTheme.colors.BackgroundColor
+            .fillMaxWidth(), color = AppTheme.colors.background
     ) {
         Column {
             Box(
@@ -76,7 +76,7 @@ fun TimelineSheet(
                 Box(
                     Modifier
                         .size(22.pixelDp, 2.pixelDp)
-                        .background(AppTheme.colors.Foreground2Color)
+                        .background(AppTheme.colors.surfaceHighest)
                 )
             }
             AnimationTimeline(

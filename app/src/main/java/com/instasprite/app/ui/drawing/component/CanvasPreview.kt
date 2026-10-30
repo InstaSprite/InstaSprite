@@ -133,11 +133,11 @@ fun CanvasPreview(
                     Box(
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.small)
-                            .background(AppTheme.colors.BackgroundColor)
+                            .background(AppTheme.colors.background)
                     ) {
                         Text(
                             text = "Preview",
-                            color = AppTheme.colors.TextColorLight,
+                            color = AppTheme.colors.onSurface,
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier
                                 .padding(4.pixelDp)
@@ -148,7 +148,7 @@ fun CanvasPreview(
                         onClick = { isExpanded = false },
                         shape = MaterialTheme.shapes.small,
                         colors = IconButtonColors(
-                            containerColor = AppTheme.colors.BackgroundColor,
+                            containerColor = AppTheme.colors.background,
                             contentColor = Color.Unspecified,
                             disabledContainerColor = Color.Unspecified,
                             disabledContentColor = Color.Unspecified
@@ -156,7 +156,7 @@ fun CanvasPreview(
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_close,
-                            tint = AppTheme.colors.DismissButtonColor
+                            tint = AppTheme.colors.red
                         )
                     }
                 }
@@ -170,7 +170,7 @@ fun CanvasPreview(
                     .padding(bottom = 2.pixelDp)
                     .zIndex(5f)
                     .clip(MaterialTheme.shapes.small)
-                    .background(AppTheme.colors.BackgroundColor)
+                    .background(AppTheme.colors.background)
             ) {
                 Spacer(modifier = Modifier.width(2.pixelDp))
 
@@ -207,7 +207,7 @@ fun CanvasPreview(
 
                 Text(
                     text = "${(sizeMultiplier * 100).roundToInt()}%",
-                    color = AppTheme.colors.TextColorLight,
+                    color = AppTheme.colors.onSurface,
                     style = MaterialTheme.typography.labelMedium,
                 )
 
@@ -223,7 +223,7 @@ fun CanvasPreview(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(AppTheme.colors.BackgroundColorDarker)
+                    .background(AppTheme.colors.surfaceInset)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
@@ -239,10 +239,10 @@ fun CanvasPreview(
                 .scale(animScale)
                 .width(scaledPreviewSize)
                 .aspectRatio(aspectRatio)
-                .background(AppTheme.colors.Foreground0Color)
+                .background(AppTheme.colors.surface)
                 .border(
                     (2 / animScale).pixelDp,
-                    AppTheme.colors.BackgroundColor, RectangleShape
+                    AppTheme.colors.background, RectangleShape
                 )
                 .clipToBounds()
         ) {
@@ -305,7 +305,7 @@ private fun CanvasPreviewPreview() {
         Box(
             modifier = Modifier
                 .size(300.pixelDp)
-                .background(AppTheme.colors.Subtext0Color)
+                .background(AppTheme.colors.textMuted)
         ) {
             CanvasPreview(
                 imageBitmap = bitmap,

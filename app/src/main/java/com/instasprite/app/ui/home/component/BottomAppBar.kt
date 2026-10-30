@@ -37,7 +37,7 @@ fun HomeBottomBar(
     modifier: Modifier = Modifier
 ) {
     BottomAppBar(
-        containerColor = AppTheme.colors.BottomBarColor,
+        containerColor = AppTheme.colors.surfaceContainer,
         modifier = modifier
 //            .clip(
 //                BottomNavShape(
@@ -90,7 +90,7 @@ fun BottomBarItem(
         if (title != null) {
             Text(
                 text = title,
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 fontSize = 9.sp,
                 maxLines = 1
             )
@@ -162,13 +162,13 @@ private fun HomeBottomBarPreview() {
                     icon = R.drawable.ic_menu,
                     title = stringResource(R.string.menu),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight,
+                    iconTint = AppTheme.colors.onSurface,
                 )
                 BottomBarItem(
                     icon = R.drawable.ic_palette,
                     title = stringResource(R.string.palette),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight,
+                    iconTint = AppTheme.colors.onSurface,
                 )
             },
             rightItems = {
@@ -176,13 +176,13 @@ private fun HomeBottomBarPreview() {
                     icon = R.drawable.ic_search,
                     title = stringResource(R.string.search),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight
+                    iconTint = AppTheme.colors.onSurface
                 )
                 BottomBarItem(
                     icon = R.drawable.ic_sort,
                     title = stringResource(R.string.sort),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight
+                    iconTint = AppTheme.colors.onSurface
                 )
             }
         )

@@ -49,7 +49,7 @@ private fun SymmetryToggle(icon: Int, description: String, active: Boolean, onTo
         modifier = Modifier
             .size(24.pixelDp)
             .clip(MaterialTheme.shapes.small)
-            .background(if (active) colors.AccentButtonColor else colors.BackgroundColorDarker)
+            .background(if (active) colors.green else colors.surfaceInset)
             .toggleable(value = active, role = Role.Checkbox, onValueChange = { onToggle() }),
         contentAlignment = Alignment.Center
     ) {

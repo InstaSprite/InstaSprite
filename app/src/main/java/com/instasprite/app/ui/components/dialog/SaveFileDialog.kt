@@ -105,7 +105,7 @@ fun SaveFileDialog(
                     label = {
                         Text(
                             stringResource(R.string.save_location),
-                            color = AppTheme.colors.SelectedColor
+                            color = AppTheme.colors.purple
                         )
                     },
                     supportingText = {},
@@ -115,7 +115,7 @@ fun SaveFileDialog(
                         PixelIcon(
                             icon = R.drawable.ic_home,
                             contentDescription = stringResource(R.string.choose_folder),
-                            tint = AppTheme.colors.LinkColor,
+                            tint = AppTheme.colors.blue,
                         )
                     },
                     colors = AppTheme.colors.outlineTextFieldColors(),

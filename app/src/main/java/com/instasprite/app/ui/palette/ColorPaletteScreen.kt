@@ -155,7 +155,7 @@ private fun ColorPaletteSelectionContent(
                                 PixelIcon(
                                     icon = R.drawable.ic_search,
                                     contentDescription = "Search",
-                                    tint = AppTheme.colors.WarningColor
+                                    tint = AppTheme.colors.orange
                                 )
                             }
                         }
@@ -176,7 +176,7 @@ private fun ColorPaletteSelectionContent(
                             placeholder = {
                                 Text(
                                     text = stringResource(R.string.search_palette),
-                                    color = AppTheme.colors.Subtext0Color
+                                    color = AppTheme.colors.textMuted
                                 )
                             },
                             singleLine = true,
@@ -192,24 +192,24 @@ private fun ColorPaletteSelectionContent(
                                     PixelIcon(
                                         icon = R.drawable.ic_close,
                                         contentDescription = "Clear",
-                                        tint = AppTheme.colors.DismissButtonColor,
+                                        tint = AppTheme.colors.red,
                                     )
                                 }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(AppTheme.colors.BackgroundColor),
+                                .background(AppTheme.colors.background),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = AppTheme.colors.BackgroundColor,
-                                disabledContainerColor = AppTheme.colors.BackgroundColor,
-                                unfocusedContainerColor = AppTheme.colors.BackgroundColor,
-                                focusedTextColor = AppTheme.colors.TextColorLight,
-                                unfocusedTextColor = AppTheme.colors.TextColorLight,
-                                cursorColor = AppTheme.colors.TextColorLight,
-                                focusedBorderColor = AppTheme.colors.WarningColor,
-                                unfocusedBorderColor = AppTheme.colors.WarningColor,
-                                unfocusedPlaceholderColor = AppTheme.colors.WarningColor,
-                                focusedPlaceholderColor = AppTheme.colors.Subtext0Color
+                                focusedContainerColor = AppTheme.colors.background,
+                                disabledContainerColor = AppTheme.colors.background,
+                                unfocusedContainerColor = AppTheme.colors.background,
+                                focusedTextColor = AppTheme.colors.onSurface,
+                                unfocusedTextColor = AppTheme.colors.onSurface,
+                                cursorColor = AppTheme.colors.onSurface,
+                                focusedBorderColor = AppTheme.colors.orange,
+                                unfocusedBorderColor = AppTheme.colors.orange,
+                                unfocusedPlaceholderColor = AppTheme.colors.orange,
+                                focusedPlaceholderColor = AppTheme.colors.textMuted
                             ),
                         )
                     }
@@ -224,7 +224,7 @@ private fun ColorPaletteSelectionContent(
                     onCreateNewPalette = onCreateNewPalette,
                 )
             },
-            containerColor = AppTheme.colors.BackgroundColorDarker
+            containerColor = AppTheme.colors.surfaceInset
         ) { innerPadding ->
             Box(
                 modifier = Modifier
@@ -248,17 +248,17 @@ private fun ColorPaletteSelectionContent(
                             Text(
                                 text = if (palette.id == defaultPaletteId) "Default" else "Set Default",
                                 color = if (palette.id == defaultPaletteId)
-                                    AppTheme.colors.AccentButtonColor
+                                    AppTheme.colors.green
                                 else
-                                    AppTheme.colors.TextColorLight.copy(alpha = 0.8f),
+                                    AppTheme.colors.onSurface.copy(alpha = 0.8f),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .background(
                                         if (palette.id == defaultPaletteId)
-                                            AppTheme.colors.AccentButtonColor.copy(alpha = 0.15f)
+                                            AppTheme.colors.green.copy(alpha = 0.15f)
                                         else
-                                            AppTheme.colors.TextColorLight.copy(alpha = 0.05f),
+                                            AppTheme.colors.onSurface.copy(alpha = 0.05f),
                                         shape = MaterialTheme.shapes.extraSmall
                                     )
                                     .noRippleClickable { onSetDefault(palette) }
@@ -274,9 +274,9 @@ private fun ColorPaletteSelectionContent(
                                         icon = R.drawable.ic_heart,
                                         contentDescription = "Toggle favorite",
                                         tint = if (palette.isFavorite)
-                                            AppTheme.colors.DismissButtonColor
+                                            AppTheme.colors.red
                                         else
-                                            AppTheme.colors.TextColorLight.copy(alpha = 0.4f),
+                                            AppTheme.colors.onSurface.copy(alpha = 0.4f),
                                     )
                                 }
 
@@ -287,7 +287,7 @@ private fun ColorPaletteSelectionContent(
                                     PixelIcon(
                                         icon = R.drawable.ic_edit,
                                         contentDescription = "Edit Palette",
-                                        tint = AppTheme.colors.AccentButtonColor,
+                                        tint = AppTheme.colors.green,
                                     )
                                 }
                                 IconButton(
@@ -297,7 +297,7 @@ private fun ColorPaletteSelectionContent(
                                     PixelIcon(
                                         icon = R.drawable.ic_trash,
                                         contentDescription = stringResource(R.string.delete_palette),
-                                        tint = AppTheme.colors.DismissButtonColor,
+                                        tint = AppTheme.colors.red,
                                     )
                                 }
                             }
@@ -353,7 +353,7 @@ private fun PaletteBottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.pixelDp)
-            .background(AppTheme.colors.BackgroundColor),
+            .background(AppTheme.colors.background),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -389,9 +389,9 @@ private fun PaletteTab(
 ) {
     val textColor by animateColorAsState(
         targetValue = if (isSelected)
-            AppTheme.colors.AccentButtonColor
+            AppTheme.colors.green
         else
-            AppTheme.colors.TextColorLight.copy(alpha = 0.5f),
+            AppTheme.colors.onSurface.copy(alpha = 0.5f),
         animationSpec = tween(200)
     )
 

@@ -38,25 +38,25 @@ fun buildCatppuccinTypography(
 
     return Typography().run {
         copy(
-            displayLarge = displayLarge.withPixelFont(selectedFont, colors.TextColorLight),
-            displayMedium = displayMedium.withPixelFont(selectedFont, colors.TextColorLight),
-            displaySmall = displaySmall.withPixelFont(selectedFont, colors.TextColorLight),
+            displayLarge = displayLarge.withPixelFont(selectedFont, colors.onSurface),
+            displayMedium = displayMedium.withPixelFont(selectedFont, colors.onSurface),
+            displaySmall = displaySmall.withPixelFont(selectedFont, colors.onSurface),
 
-            headlineLarge = headlineLarge.withPixelFont(selectedFont, colors.TextColorLight),
-            headlineMedium = headlineMedium.withPixelFont(selectedFont, colors.TextColorLight),
-            headlineSmall = headlineSmall.withPixelFont(selectedFont, colors.TextColorLight),
+            headlineLarge = headlineLarge.withPixelFont(selectedFont, colors.onSurface),
+            headlineMedium = headlineMedium.withPixelFont(selectedFont, colors.onSurface),
+            headlineSmall = headlineSmall.withPixelFont(selectedFont, colors.onSurface),
 
-            titleLarge = titleLarge.withPixelFont(selectedFont, colors.Subtext1Color),
-            titleMedium = titleMedium.withPixelFont(selectedFont, colors.Subtext1Color),
-            titleSmall = titleSmall.withPixelFont(selectedFont, colors.Subtext1Color),
+            titleLarge = titleLarge.withPixelFont(selectedFont, colors.textSecondary),
+            titleMedium = titleMedium.withPixelFont(selectedFont, colors.textSecondary),
+            titleSmall = titleSmall.withPixelFont(selectedFont, colors.textSecondary),
 
-            bodyLarge = bodyLarge.withPixelFont(selectedFont, colors.TextColorLight),
-            bodyMedium = bodyMedium.withPixelFont(selectedFont, colors.TextColorLight),
-            bodySmall = bodySmall.withPixelFont(selectedFont, colors.TextColorLight),
+            bodyLarge = bodyLarge.withPixelFont(selectedFont, colors.onSurface),
+            bodyMedium = bodyMedium.withPixelFont(selectedFont, colors.onSurface),
+            bodySmall = bodySmall.withPixelFont(selectedFont, colors.onSurface),
 
-            labelLarge = labelLarge.withPixelFont(selectedFont, colors.TextColorLight),
-            labelMedium = labelMedium.withPixelFont(selectedFont, colors.TextColorLight),
-            labelSmall = labelSmall.withPixelFont(selectedFont, colors.TextColorLight),
+            labelLarge = labelLarge.withPixelFont(selectedFont, colors.onSurface),
+            labelMedium = labelMedium.withPixelFont(selectedFont, colors.onSurface),
+            labelSmall = labelSmall.withPixelFont(selectedFont, colors.onSurface),
         )
     }
 }

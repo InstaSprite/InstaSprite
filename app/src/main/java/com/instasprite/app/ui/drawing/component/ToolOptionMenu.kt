@@ -23,13 +23,13 @@ fun ToolOptionMenu(
 ) {
     TitledBox(
         title = stringResource(id = selectedTool.nameRes),
-        titleBackgroundColor = AppTheme.colors.BackgroundColorDarker,
+        titleBackgroundColor = AppTheme.colors.surfaceInset,
         modifier = modifier
     ) {
         LazyRow(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AppTheme.colors.BackgroundColor),
+                .background(AppTheme.colors.background),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.pixelDp),
             contentPadding = PaddingValues(horizontal = 6.pixelDp)

@@ -159,19 +159,19 @@ fun CreateCanvasScreen(
                             end = 8.pixelDp
                         ),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AppTheme.colors.AccentButtonColor
+                            containerColor = AppTheme.colors.green
                         ),
                         shape = MaterialTheme.shapes.small,
                     ) {
                         Text(
                             stringResource(R.string.create_canvas),
-                            color = AppTheme.colors.TextColorDark
+                            color = AppTheme.colors.onAccent
                         )
                     }
                 }
             )
         },
-        containerColor = AppTheme.colors.BackgroundColorDarker
+        containerColor = AppTheme.colors.surfaceInset
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -215,7 +215,7 @@ fun CreateCanvasScreen(
                         Text(
                             text = stringResource(R.string.tap_to_change),
                             fontSize = 12.sp,
-                            color = AppTheme.colors.Subtext0Color
+                            color = AppTheme.colors.textMuted
                         )
                     },
                 )

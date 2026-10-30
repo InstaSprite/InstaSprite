@@ -133,7 +133,7 @@ private fun PaletteEditorContent(
     onColorsReordered: (List<Color>) -> Unit
 ) {
     Scaffold(
-        containerColor = AppTheme.colors.BackgroundColorDarker,
+        containerColor = AppTheme.colors.surfaceInset,
         topBar = {
             TopBar(
                 title = title,
@@ -143,11 +143,11 @@ private fun PaletteEditorContent(
                         onClick = onSaveClick,
                         enabled = !isSaving,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AppTheme.colors.AccentButtonColor
+                            containerColor = AppTheme.colors.green
                         ),
                         shape = MaterialTheme.shapes.small,
                     ) {
-                        Text(stringResource(R.string.save), color = AppTheme.colors.TextColorDark)
+                        Text(stringResource(R.string.save), color = AppTheme.colors.onAccent)
                     }
                 }
             )
@@ -169,7 +169,7 @@ private fun PaletteEditorContent(
                     text = stringResource(R.string.palette_preview),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AppTheme.colors.Subtext0Color
+                    color = AppTheme.colors.textMuted
                 )
 
                 Spacer(modifier = Modifier.height(6.pixelDp))
@@ -177,7 +177,7 @@ private fun PaletteEditorContent(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(AppTheme.colors.BackgroundColor)
+                        .background(AppTheme.colors.background)
                         .padding(2.pixelDp)
                 ) {
                     if (colors.isEmpty()) {
@@ -189,7 +189,7 @@ private fun PaletteEditorContent(
                         ) {
                             Text(
                                 text = stringResource(R.string.no_colors_added_yet),
-                                color = AppTheme.colors.Subtext0Color,
+                                color = AppTheme.colors.textMuted,
                                 fontSize = 14.sp
                             )
                         }
@@ -197,7 +197,7 @@ private fun PaletteEditorContent(
                         PalettePreview(
                             colors = colors,
                             config = ColorPaletteConfig(
-                                backgroundColor = AppTheme.colors.BackgroundColorDarker,
+                                backgroundColor = AppTheme.colors.surfaceInset,
                                 isInteractive = false
                             ),
                             lines = 3,
@@ -227,10 +227,10 @@ private fun PaletteEditorContent(
                         .fillMaxWidth()
                         .padding(bottom = 16.pixelDp)
                         .clip(MaterialTheme.shapes.small)
-                        .background(AppTheme.colors.BackgroundColor)
+                        .background(AppTheme.colors.background)
                         .border(
                             1.pixelDp,
-                            AppTheme.colors.Foreground2Color,
+                            AppTheme.colors.surfaceHighest,
                             MaterialTheme.shapes.small
                         )
                         .clickable { onAddColorClick() }
@@ -240,7 +240,7 @@ private fun PaletteEditorContent(
                 ) {
                     Text(
                         text = stringResource(R.string.add_color),
-                        color = AppTheme.colors.AccentButtonColor,
+                        color = AppTheme.colors.green,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -251,10 +251,10 @@ private fun PaletteEditorContent(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(AppTheme.colors.BackgroundColorDarker.copy(alpha = 0.6f)),
+                        .background(AppTheme.colors.surfaceInset.copy(alpha = 0.6f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = AppTheme.colors.SelectedColor)
+                    CircularProgressIndicator(color = AppTheme.colors.purple)
                 }
             }
         }
@@ -371,12 +371,12 @@ private fun ReorderableColorsList(
                     text = stringResource(R.string.colors_count, colors.size),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AppTheme.colors.TextColorLight
+                    color = AppTheme.colors.onSurface
                 )
                 Text(
                     text = stringResource(R.string.tap_color_to_edit),
                     fontSize = 12.sp,
-                    color = AppTheme.colors.Subtext0Color
+                    color = AppTheme.colors.textMuted
                 )
             }
         }
@@ -399,7 +399,7 @@ private fun ReorderableColorsList(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(AppTheme.colors.BackgroundColor)
+                        .background(AppTheme.colors.background)
                         .padding(vertical = 2.pixelDp, horizontal = 6.pixelDp)
                         .clip(MaterialTheme.shapes.medium)
                 ) {
@@ -411,7 +411,7 @@ private fun ReorderableColorsList(
                     ) {
                         PixelIcon(
                             icon = R.drawable.ic_grab_handle,
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = AppTheme.colors.onSurface,
                             contentDescription = stringResource(R.string.reorder)
                         )
                     }
@@ -438,7 +438,7 @@ private fun ReorderableColorsList(
                         PixelIcon(
                             icon = R.drawable.ic_trash,
                             contentDescription = stringResource(R.string.delete_color),
-                            tint = AppTheme.colors.ErrorDarkColor
+                            tint = AppTheme.colors.mutedRed
                         )
                     }
                 }
@@ -465,7 +465,7 @@ private fun ColorBlock(
             .background(color)
             .border(
                 width = 2.pixelDp,
-                color = AppTheme.colors.BackgroundColorDarker
+                color = AppTheme.colors.surfaceInset
             )
             .clickable(
                 onClick = onClick

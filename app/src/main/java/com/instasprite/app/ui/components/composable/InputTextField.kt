@@ -59,14 +59,14 @@ fun InputTextField(
         },
         label = {
             Text(
-                inputField.label, color = AppTheme.colors.SelectedColor,
+                inputField.label, color = AppTheme.colors.purple,
                 style = MaterialTheme.typography.bodySmall
             )
         },
         placeholder = {
             if (inputField.placeholder.isNotBlank())
                 Text(
-                    inputField.placeholder, color = AppTheme.colors.Subtext0Color,
+                    inputField.placeholder, color = AppTheme.colors.textMuted,
                     style = MaterialTheme.typography.bodyMedium
                 )
         },
@@ -78,7 +78,7 @@ fun InputTextField(
                 inputField.suffix?.let {
                     Text(
                         it,
-                        color = AppTheme.colors.LinkColor,
+                        color = AppTheme.colors.blue,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -110,7 +110,7 @@ fun InputTextField(
         supportingText = {
             if (hasTyped && !inputField.validator(value)) {
                 Text(
-                    inputField.errorMessage, color = AppTheme.colors.DismissButtonColor,
+                    inputField.errorMessage, color = AppTheme.colors.red,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

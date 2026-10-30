@@ -95,7 +95,7 @@ fun ColorPaletteView(
 ) {
     with(config) {
         val resolvedBg =
-            if (backgroundColor == Color.Unspecified) AppTheme.colors.BackgroundColorDarker else backgroundColor
+            if (backgroundColor == Color.Unspecified) AppTheme.colors.surfaceInset else backgroundColor
         Box(
             contentAlignment = Alignment.CenterStart,
             modifier = modifier
@@ -143,7 +143,7 @@ fun PalettePreview(
     if (colorCount == 0) return
 
     val resolvedBg = if (config.backgroundColor == Color.Unspecified) {
-        AppTheme.colors.BackgroundColorDarker
+        AppTheme.colors.surfaceInset
     } else {
         config.backgroundColor
     }

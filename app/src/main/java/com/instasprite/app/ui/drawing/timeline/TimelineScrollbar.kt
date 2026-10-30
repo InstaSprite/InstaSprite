@@ -33,7 +33,7 @@ internal fun TimelineScrollbar(state: LazyListState, itemWidth: Dp, modifier: Mo
             0f,
             1f
         ) * (size.width - thumbWidth)
-        drawRect(colors.Foreground0Color)
-        drawRect(colors.Foreground2Color, Offset(x, 0f), Size(thumbWidth, size.height))
+        drawRect(colors.surface)
+        drawRect(colors.surfaceHighest, Offset(x, 0f), Size(thumbWidth, size.height))
     }
 }

@@ -42,7 +42,7 @@ fun NumberStepper(
     ) {
         Text(
             label,
-            color = AppTheme.colors.TextColorLight,
+            color = AppTheme.colors.onSurface,
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -57,7 +57,7 @@ fun NumberStepper(
                 PixelIcon(
                     icon = R.drawable.ic_minus_border,
                     contentDescription = stringResource(R.string.decrease),
-                    tint = AppTheme.colors.LinkColor
+                    tint = AppTheme.colors.blue
                 )
             }
 
@@ -86,7 +86,7 @@ fun NumberStepper(
                 PixelIcon(
                     icon = R.drawable.ic_plus_border,
                     contentDescription = stringResource(R.string.increase),
-                    tint = AppTheme.colors.LinkColor
+                    tint = AppTheme.colors.blue
                 )
             }
         }

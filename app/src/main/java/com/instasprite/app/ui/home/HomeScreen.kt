@@ -73,8 +73,8 @@ fun HomeScreen(
     onOpenAbout: () -> Unit,
     galleryViewModel: GalleryViewModel = hiltViewModel()
 ) {
-    UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
-    UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
+    UiUtils.SetStatusBarColor(AppTheme.colors.surfaceContainer)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.surfaceContainer)
 
     val tabs = HomeTab.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -179,11 +179,11 @@ fun HomeScreen(
                 topBar = {
                     PrimaryTabRow(
                         selectedTabIndex = pagerState.currentPage,
-                        containerColor = AppTheme.colors.TopBarColor,
-                        contentColor = AppTheme.colors.TextColorLight,
+                        containerColor = AppTheme.colors.surfaceContainer,
+                        contentColor = AppTheme.colors.onSurface,
                         indicator = {
                             TabRowDefaults.SecondaryIndicator(
-                                color = AppTheme.colors.SelectedColor,
+                                color = AppTheme.colors.purple,
                                 modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
 
                                 )
@@ -198,9 +198,9 @@ fun HomeScreen(
                                     Text(
                                         text = androidx.compose.ui.res.stringResource(tab.titleRes),
                                         color = if (pagerState.currentPage == index)
-                                            AppTheme.colors.TextColorLight
+                                            AppTheme.colors.onSurface
                                         else
-                                            AppTheme.colors.Subtext0Color
+                                            AppTheme.colors.textMuted
                                     )
                                 }
                             )
@@ -288,13 +288,13 @@ private fun HomeScreenBottomBar(
                 icon = R.drawable.ic_menu,
                 title = stringResource(R.string.menu),
                 onClick = onMenuClick,
-                iconTint = AppTheme.colors.TextColorLight,
+                iconTint = AppTheme.colors.onSurface,
             )
             BottomBarItem(
                 icon = R.drawable.ic_palette,
                 title = stringResource(R.string.palette),
                 onClick = onPaletteClick,
-                iconTint = AppTheme.colors.TextColorLight,
+                iconTint = AppTheme.colors.onSurface,
             )
         },
         rightItems = {
@@ -302,13 +302,13 @@ private fun HomeScreenBottomBar(
                 icon = R.drawable.ic_search,
                 title = stringResource(R.string.search),
                 onClick = onSearchClick,
-                iconTint = AppTheme.colors.TextColorLight
+                iconTint = AppTheme.colors.onSurface
             )
             BottomBarItem(
                 icon = R.drawable.ic_sort,
                 title = stringResource(R.string.sort),
                 onClick = onSortClick,
-                iconTint = AppTheme.colors.TextColorLight
+                iconTint = AppTheme.colors.onSurface
             )
         },
         modifier = Modifier.height(48.pixelDp)

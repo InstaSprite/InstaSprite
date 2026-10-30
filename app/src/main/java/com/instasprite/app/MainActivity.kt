@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(AppTheme.colors.BackgroundColor)
+                        .background(AppTheme.colors.background)
                         .windowInsetsPadding(WindowInsets.safeDrawing)
                 ) {
 

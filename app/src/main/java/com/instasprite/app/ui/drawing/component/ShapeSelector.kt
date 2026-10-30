@@ -46,8 +46,8 @@ fun ShapeSelector(
         Button(
             onClick = { expanded = true },
             colors = ButtonDefaults.buttonColors(
-                containerColor = AppTheme.colors.BackgroundColorDarker,
-                contentColor = AppTheme.colors.TextColorLight
+                containerColor = AppTheme.colors.surfaceInset,
+                contentColor = AppTheme.colors.onSurface
             ),
             shape = MaterialTheme.shapes.small,
             contentPadding = PaddingValues(horizontal = 8.pixelDp, vertical = 1.pixelDp),
@@ -64,14 +64,14 @@ fun ShapeSelector(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(AppTheme.colors.BackgroundColor)
+            modifier = Modifier.background(AppTheme.colors.background)
         ) {
             shapeTools.forEach { tool ->
                 DropdownMenuItem(
                     text = {
                         Text(
                             stringResource(id = tool.nameRes),
-                            color = AppTheme.colors.TextColorLight
+                            color = AppTheme.colors.onSurface
                         )
                     },
                     leadingIcon = {

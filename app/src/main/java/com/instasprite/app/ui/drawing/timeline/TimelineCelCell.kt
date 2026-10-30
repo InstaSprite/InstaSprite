@@ -34,13 +34,13 @@ internal fun TimelineCelCell(
     onLongClick: () -> Unit = {}
 ) {
     val colors = AppTheme.colors
-    val background = if (isSelected) colors.SelectedColor else colors.BackgroundColorDarker
-    val ink = if (isSelected) colors.TextColorDark else colors.TextColorLight
+    val background = if (isSelected) colors.purple else colors.surfaceInset
+    val ink = if (isSelected) colors.onAccent else colors.onSurface
 
     Box(
         modifier
             .background(background)
-            .timelineGridBorder(colors.Foreground0Color)
+            .timelineGridBorder(colors.surface)
             .semantics { contentDescription = description; selected = isSelected }
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
         Canvas(Modifier.matchParentSize()) {

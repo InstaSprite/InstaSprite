@@ -74,8 +74,8 @@ fun GalleryScreen(
     onNavigateToLoadImage: () -> Unit,
     viewModel: GalleryViewModel = hiltViewModel()
 ) {
-    UiUtils.SetStatusBarColor(AppTheme.colors.TopBarColor)
-    UiUtils.SetNavigationBarColor(AppTheme.colors.BottomBarColor)
+    UiUtils.SetStatusBarColor(AppTheme.colors.surfaceContainer)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.surfaceContainer)
 
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.stopPreview() }
     DisposableEffect(viewModel) { onDispose { viewModel.stopPreview() } }
@@ -187,7 +187,7 @@ fun GalleryPageContent(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
-            .background(AppTheme.colors.BackgroundColorDarker)
+            .background(AppTheme.colors.surfaceInset)
             .animateContentSize()
     ) {
         if (spriteList.isNotEmpty()) {
@@ -268,7 +268,7 @@ private fun GalleryScreenContent(
                     .padding(innerPadding)
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .background(AppTheme.colors.BackgroundColorDarker)
+                    .background(AppTheme.colors.surfaceInset)
                     .animateContentSize()
             ) {
                 SpriteList(

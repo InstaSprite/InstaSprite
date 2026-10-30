@@ -74,13 +74,13 @@ fun LospecImportDialog(
                     label = {
                         Text(
                             stringResource(R.string.lospec_url),
-                            color = AppTheme.colors.SelectedColor
+                            color = AppTheme.colors.purple
                         )
                     },
                     placeholder = {
                         Text(
                             stringResource(R.string.https_lospec_com_palette_list_example),
-                            color = AppTheme.colors.Subtext0Color,
+                            color = AppTheme.colors.textMuted,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -151,13 +151,13 @@ fun LospecImportDialog(
                     },
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.AccentButtonColor
+                        containerColor = AppTheme.colors.green
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = stringResource(R.string.fetch_palette),
-                        color = AppTheme.colors.TextColorDark
+                        color = AppTheme.colors.onAccent
                     )
                 }
             }

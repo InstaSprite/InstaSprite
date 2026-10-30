@@ -29,8 +29,8 @@ fun ToolSizeOption(
         Button(
             onClick = { expanded = true },
             colors = ButtonDefaults.buttonColors(
-                containerColor = AppTheme.colors.BackgroundColorDarker,
-                contentColor = AppTheme.colors.TextColorLight
+                containerColor = AppTheme.colors.surfaceInset,
+                contentColor = AppTheme.colors.onSurface
             ),
             shape = MaterialTheme.shapes.small,
             contentPadding = PaddingValues(horizontal = 8.pixelDp, vertical = 1.pixelDp),

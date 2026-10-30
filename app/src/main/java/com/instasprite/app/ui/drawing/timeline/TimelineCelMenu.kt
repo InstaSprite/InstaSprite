@@ -26,7 +26,7 @@ internal fun TimelineCelMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        modifier = Modifier.background(AppTheme.colors.BackgroundColor)
+        modifier = Modifier.background(AppTheme.colors.background)
     ) {
         val actions = listOf(
             Triple(R.string.animation_copy_cel, TimelineEvent.CopyPrevious, hasPreviousCel),

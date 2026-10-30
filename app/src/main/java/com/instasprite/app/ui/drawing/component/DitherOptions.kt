@@ -64,7 +64,7 @@ fun DitherOptions(
     val patternListState = rememberLazyListState()
     val colors = AppTheme.colors
     val buttonColors = ButtonDefaults.buttonColors(
-        containerColor = colors.BackgroundColorDarker, contentColor = colors.TextColorLight
+        containerColor = colors.surfaceInset, contentColor = colors.onSurface
     )
     val description = stringResource(R.string.dither_pattern)
     Box {
@@ -85,7 +85,7 @@ fun DitherOptions(
             expanded = patternsExpanded, onDismissRequest = { patternsExpanded = false },
             modifier = Modifier
                 .width(200.pixelDp)
-                .background(colors.BackgroundColor)
+                .background(colors.background)
         ) {
             DitherMenuContent(brush, foreground, palette, onEvent, patternListState)
         }
@@ -108,7 +108,7 @@ private fun DitherMenuContent(
         ) {
             Text(
                 stringResource(R.string.dither_background),
-                color = colors.TextColorLight,
+                color = colors.onSurface,
                 fontSize = 12.sp,
                 modifier = Modifier.weight(1f)
             )
@@ -148,10 +148,10 @@ private fun DitherMenuContent(
             Box(
                 modifier = Modifier
                     .size(26.pixelDp)
-                    .background(colors.BackgroundColorDarker)
+                    .background(colors.surfaceInset)
                     .border(
                         1.pixelDp,
-                        if (brush.pattern == pattern) colors.AccentButtonColor else colors.Subtext0Color,
+                        if (brush.pattern == pattern) colors.green else colors.textMuted,
                     )
                     .semantics { contentDescription = description }
                     .selectable(
@@ -214,7 +214,7 @@ private fun DitherMenuPreview() {
     InstaSpriteTheme {
         Column(Modifier
             .width(200.pixelDp)
-            .background(AppTheme.colors.BackgroundColor)) {
+            .background(AppTheme.colors.background)) {
             DitherMenuContent(
                 DitherBrush(DitherPattern.Shade50), Color.Black,
                 listOf(Color.White, Color.Red, Color.Blue), {}, rememberLazyListState()

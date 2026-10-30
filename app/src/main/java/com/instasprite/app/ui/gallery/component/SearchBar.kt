@@ -57,7 +57,7 @@ fun SearchBar(
         placeholder = {
             Text(
                 text = stringResource(R.string.search_sprites),
-                color = AppTheme.colors.Subtext0Color
+                color = AppTheme.colors.textMuted
             )
         },
         singleLine = true,
@@ -73,7 +73,7 @@ fun SearchBar(
                 PixelIcon(
                     icon = R.drawable.ic_close,
                     contentDescription = stringResource(R.string.dismiss),
-                    tint = AppTheme.colors.DismissButtonColor,
+                    tint = AppTheme.colors.red,
                 )
             }
         },
@@ -84,16 +84,16 @@ fun SearchBar(
                 isFocused = it.isFocused
             },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = AppTheme.colors.BackgroundColor,
-            disabledContainerColor = AppTheme.colors.BackgroundColor,
-            unfocusedContainerColor = AppTheme.colors.BackgroundColor,
-            focusedTextColor = AppTheme.colors.TextColorLight,
-            unfocusedTextColor = AppTheme.colors.TextColorLight,
-            cursorColor = AppTheme.colors.TextColorLight,
-            focusedBorderColor = AppTheme.colors.WarningColor,
-            unfocusedBorderColor = AppTheme.colors.WarningColor,
-            unfocusedPlaceholderColor = AppTheme.colors.WarningColor,
-            focusedPlaceholderColor = AppTheme.colors.Subtext0Color
+            focusedContainerColor = AppTheme.colors.background,
+            disabledContainerColor = AppTheme.colors.background,
+            unfocusedContainerColor = AppTheme.colors.background,
+            focusedTextColor = AppTheme.colors.onSurface,
+            unfocusedTextColor = AppTheme.colors.onSurface,
+            cursorColor = AppTheme.colors.onSurface,
+            focusedBorderColor = AppTheme.colors.orange,
+            unfocusedBorderColor = AppTheme.colors.orange,
+            unfocusedPlaceholderColor = AppTheme.colors.orange,
+            focusedPlaceholderColor = AppTheme.colors.textMuted
         ),
     )
 

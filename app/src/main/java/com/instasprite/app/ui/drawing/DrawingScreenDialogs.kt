@@ -162,7 +162,7 @@ fun DrawingScreenDialogs(
                 androidx.compose.material3.Text(
                     text = stringResource(R.string.tut_welcome_desc),
                     style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                    color = com.instasprite.app.ui.theme.AppTheme.colors.TextColorLight
+                    color = com.instasprite.app.ui.theme.AppTheme.colors.onSurface
                 )
             }
         )

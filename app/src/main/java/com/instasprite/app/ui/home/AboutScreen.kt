@@ -48,8 +48,8 @@ fun AboutScreen(
     val colors = AppTheme.colors
     val context = LocalContext.current
 
-    UiUtils.SetStatusBarColor(colors.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(colors.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(colors.surfaceInset)
+    UiUtils.SetNavigationBarColor(colors.surfaceInset)
 
     Scaffold(
         topBar = {
@@ -63,7 +63,7 @@ fun AboutScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(colors.BackgroundColor)
+                .background(colors.background)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -84,14 +84,14 @@ fun AboutScreen(
                 text = stringResource(R.string.app_name),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = colors.TextColorLight
+                color = colors.onSurface
             )
 
             // Version
             Text(
                 text = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
                 fontSize = 14.sp,
-                color = colors.Subtext0Color
+                color = colors.textMuted
             )
 
             Spacer(modifier = Modifier.height(6.pixelDp))
@@ -100,7 +100,7 @@ fun AboutScreen(
             Text(
                 text = stringResource(R.string.pixel_art_creation_social_sharing),
                 fontSize = 14.sp,
-                color = colors.Subtext1Color,
+                color = colors.textSecondary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.pixelDp)
             )
@@ -138,25 +138,25 @@ fun AboutScreen(
             ) {
                 AboutInfoCard(
                     icon = R.drawable.ic_profile,
-                    iconTint = colors.InfoColor,
+                    iconTint = colors.lightPink,
                     label = "Developer",
                     value = "pBuoc"
                 )
 
-                HorizontalDivider(color = colors.Foreground1Color, thickness = 1.pixelDp)
+                HorizontalDivider(color = colors.surfaceRaised, thickness = 1.pixelDp)
 
                 AboutInfoCard(
                     icon = R.drawable.ic_palette,
-                    iconTint = colors.SelectedColor,
+                    iconTint = colors.purple,
                     label = "Theme",
                     value = "Catppuccin"
                 )
 
-                HorizontalDivider(color = colors.Foreground1Color, thickness = 1.pixelDp)
+                HorizontalDivider(color = colors.surfaceRaised, thickness = 1.pixelDp)
 
                 AboutInfoCard(
                     icon = R.drawable.ic_edit,
-                    iconTint = colors.AccentButtonColor,
+                    iconTint = colors.green,
                     label = "Built with",
                     value = "Jetpack Compose"
                 )
@@ -167,7 +167,7 @@ fun AboutScreen(
             Text(
                 text = stringResource(R.string.made_with_3_and_lots_of_pixels),
                 fontSize = 12.sp,
-                color = colors.Subtext0Color,
+                color = colors.textMuted,
             )
 
             Spacer(modifier = Modifier.height(16.pixelDp))
@@ -201,7 +201,7 @@ private fun AboutInfoCard(
         Text(
             text = label,
             fontSize = 14.sp,
-            color = colors.Subtext0Color,
+            color = colors.textMuted,
             modifier = Modifier.weight(1f)
         )
 
@@ -209,7 +209,7 @@ private fun AboutInfoCard(
             text = value,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = colors.TextColorLight
+            color = colors.onSurface
         )
     }
 }
@@ -233,7 +233,7 @@ private fun AboutLinkCard(
         Text(
             text = label,
             fontSize = 14.sp,
-            color = colors.TextColorLight,
+            color = colors.onSurface,
             modifier = Modifier.weight(1f)
         )
 

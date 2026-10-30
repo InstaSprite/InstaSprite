@@ -38,9 +38,9 @@ internal fun TimelineToolbarButton(
     ) {
         PixelIcon(
             icon, contentDescription = description, tint = when {
-                !enabled -> colors.Subtext1Color
-                active -> colors.AccentButtonColor
-                else -> colors.TextColorLight
+                !enabled -> colors.textSecondary
+                active -> colors.green
+                else -> colors.onSurface
             }
         )
     }

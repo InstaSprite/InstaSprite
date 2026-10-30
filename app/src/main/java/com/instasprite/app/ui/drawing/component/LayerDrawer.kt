@@ -82,7 +82,7 @@ fun LayerDrawer(
     Column(
         modifier = modifier
             .fillMaxHeight()
-            .background(AppTheme.colors.BackgroundColorDarker)
+            .background(AppTheme.colors.surfaceInset)
             .padding(8.pixelDp)
     ) {
         Row(
@@ -93,7 +93,7 @@ fun LayerDrawer(
         ) {
             Text(
                 text = stringResource(R.string.layers),
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.weight(1f)
@@ -111,15 +111,15 @@ fun LayerDrawer(
             items(layersList, key = { it.id }) { layer ->
 
                 val dragIndicatorBgColor = if (layer.id == activeLayerId) {
-                    AppTheme.colors.LinkColor
+                    AppTheme.colors.blue
                 } else {
-                    AppTheme.colors.BackgroundColor
+                    AppTheme.colors.background
                 }
 
                 val dragIndicatorColor = if (layer.id == activeLayerId) {
-                    AppTheme.colors.TextColorDark
+                    AppTheme.colors.onAccent
                 } else {
-                    AppTheme.colors.TextColorLight
+                    AppTheme.colors.onSurface
                 }
 
                 ReorderableItem(
@@ -179,13 +179,13 @@ fun LayerDrawer(
         }
 
         Spacer(modifier = Modifier.height(6.pixelDp))
-        HorizontalDivider(color = AppTheme.colors.SelectedColor)
+        HorizontalDivider(color = AppTheme.colors.purple)
 
         Bar(
             leftSlot = {
                 BackButton(
                     onClick = onBack,
-                    color = AppTheme.colors.TextColorLight
+                    color = AppTheme.colors.onSurface
                 )
             },
             rightSlot = {
@@ -193,17 +193,17 @@ fun LayerDrawer(
                     onClick = { onEvent(LayerEvent.AddLayer) },
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.AccentButtonColor
+                        containerColor = AppTheme.colors.green
                     )
                 ) {
                     PixelIcon(
                         icon = R.drawable.ic_plus,
                         contentDescription = stringResource(R.string.add_layer),
-                        tint = AppTheme.colors.TextColorDark
+                        tint = AppTheme.colors.onAccent
                     )
                 }
             },
-            backgroundColor = AppTheme.colors.BackgroundColorDarker
+            backgroundColor = AppTheme.colors.surfaceInset
         )
     }
 }
@@ -226,7 +226,7 @@ private fun Preview() {
                         width = 16,
                         height = 16,
                         pixels = IntArray(16 * 16) {
-                            AppTheme.colors.ErrorDarkColor.toArgb()
+                            AppTheme.colors.mutedRed.toArgb()
                         }
                     )
                 ),
@@ -239,7 +239,7 @@ private fun Preview() {
                         width = 16,
                         height = 16,
                         pixels = IntArray(16 * 16) {
-                            AppTheme.colors.SelectedColor.toArgb()
+                            AppTheme.colors.purple.toArgb()
                         }
                     )
                 )

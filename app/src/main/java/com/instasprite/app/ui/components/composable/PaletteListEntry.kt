@@ -34,7 +34,7 @@ fun PaletteListEntry(
     val itemModifier = modifier
         .fillMaxWidth()
         .clip(MaterialTheme.shapes.medium)
-        .background(AppTheme.colors.BackgroundColor)
+        .background(AppTheme.colors.background)
         .clickable(onClick = onClick)
         .padding(8.pixelDp)
 
@@ -48,12 +48,12 @@ fun PaletteListEntry(
                     text = palette.name,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = AppTheme.colors.TextColorLight
+                    color = AppTheme.colors.onSurface
                 )
                 Text(
                     text = "by ${palette.author}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = AppTheme.colors.Subtext0Color
+                    color = AppTheme.colors.textMuted
                 )
             }
 

@@ -46,7 +46,7 @@ fun JumpToTopButton(
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = AppTheme.colors.BackgroundColorDarker
+            containerColor = AppTheme.colors.surfaceInset
         ),
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(1.pixelDp),
@@ -55,7 +55,7 @@ fun JumpToTopButton(
         PixelIcon(
             icon = R.drawable.ic_up_arrow,
             contentDescription = stringResource(R.string.jump_to_top),
-            tint = AppTheme.colors.TextColorLight,
+            tint = AppTheme.colors.onSurface,
             modifier = Modifier
                 .rotate(rotation.value)
         )

@@ -194,7 +194,7 @@ fun ColorWheelDialog(
                             .size(26.pixelDp)
                             .border(
                                 width = 2.pixelDp,
-                                color = AppTheme.colors.BackgroundColorDarker
+                                color = AppTheme.colors.surfaceInset
                             )
                     )
                 }
@@ -248,7 +248,7 @@ fun ColorWheelDialog(
                             updateColorFromHex()
                         },
                         label = "Hex",
-                        labelColor = AppTheme.colors.SelectedColor,
+                        labelColor = AppTheme.colors.purple,
                         placeholder = "FF000000",
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -268,7 +268,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "R",
-                            labelColor = AppTheme.colors.DismissButtonColor,
+                            labelColor = AppTheme.colors.red,
                             placeholder = "0",
                             modifier = Modifier.weight(1f),
                             keyboardType = KeyboardType.Number
@@ -285,7 +285,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "G",
-                            labelColor = AppTheme.colors.AccentButtonColor,
+                            labelColor = AppTheme.colors.green,
                             placeholder = "0",
                             modifier = Modifier.weight(1f),
                             keyboardType = KeyboardType.Number
@@ -302,7 +302,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "B",
-                            labelColor = AppTheme.colors.LinkColor,
+                            labelColor = AppTheme.colors.blue,
                             placeholder = "0",
                             modifier = Modifier.weight(1f),
                             keyboardType = KeyboardType.Number
@@ -319,7 +319,7 @@ fun ColorWheelDialog(
                                 updateColorFromRGB()
                             },
                             label = "A",
-                            labelColor = AppTheme.colors.TextColorLight,
+                            labelColor = AppTheme.colors.onSurface,
                             placeholder = "255",
                             modifier = Modifier.weight(1f),
                             keyboardType = KeyboardType.Number
@@ -331,14 +331,14 @@ fun ColorWheelDialog(
                     Button(
                         onClick = onOpenPaletteScreen,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AppTheme.colors.AccentButtonColor
+                            containerColor = AppTheme.colors.green
                         ),
                         shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = stringResource(R.string.choose_another_palette),
-                            color = AppTheme.colors.TextColorDark
+                            color = AppTheme.colors.onAccent
                         )
                     }
                 }
@@ -366,7 +366,7 @@ private fun ColorInputTextField(
         placeholder = {
             Text(
                 placeholder,
-                color = AppTheme.colors.Subtext0Color,
+                color = AppTheme.colors.textMuted,
                 style = MaterialTheme.typography.bodyLarge
             )
         },
@@ -395,7 +395,7 @@ private fun HueBar(
         modifier = modifier
             .border(
                 width = 2.pixelDp,
-                color = AppTheme.colors.BackgroundColorDarker
+                color = AppTheme.colors.surfaceInset
             )
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
@@ -476,7 +476,7 @@ private fun AlphaBar(
 
     Canvas(
         modifier = modifier
-            .border(width = 2.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
+            .border(width = 2.pixelDp, color = AppTheme.colors.surfaceInset)
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
     ) {
@@ -552,7 +552,7 @@ private fun ValueBar(
 
     Canvas(
         modifier = modifier
-            .border(width = 2.pixelDp, color = AppTheme.colors.BackgroundColorDarker)
+            .border(width = 2.pixelDp, color = AppTheme.colors.surfaceInset)
             .clip(RectangleShape)
             .emitDragGesture(interactionSource)
     ) {
@@ -622,7 +622,7 @@ private fun SatValPanel(
             .height(134.pixelDp)
             .border(
                 width = 2.pixelDp,
-                color = AppTheme.colors.BackgroundColorDarker,
+                color = AppTheme.colors.surfaceInset,
                 shape = RectangleShape
             )
             .emitDragGesture(interactionSource)

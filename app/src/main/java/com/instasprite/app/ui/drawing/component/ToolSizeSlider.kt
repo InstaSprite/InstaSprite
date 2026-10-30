@@ -28,7 +28,7 @@ fun ToolSizeSlider(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .background(
-                color = AppTheme.colors.BackgroundColor,
+                color = AppTheme.colors.background,
             )
             .height(height)
     ) {
@@ -38,7 +38,7 @@ fun ToolSizeSlider(
         ) {
             Text(
                 text = "${toolSizeValue}px",
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
             )
         }
 

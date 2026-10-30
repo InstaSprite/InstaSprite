@@ -68,7 +68,7 @@ fun SpriteGridCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.small)
-            .background(AppTheme.colors.BackgroundColor)
+            .background(AppTheme.colors.background)
             .combinedClickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
@@ -81,7 +81,7 @@ fun SpriteGridCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(AppTheme.colors.BackgroundColor.copy(0.9f))
+                    .background(AppTheme.colors.background.copy(0.9f))
             ) {
                 Row(
                     modifier = Modifier
@@ -108,7 +108,7 @@ fun SpriteGridCard(
                         PixelIcon(
                             icon = R.drawable.ic_three_dots,
                             contentDescription = stringResource(R.string.options),
-                            tint = AppTheme.colors.TextColorLight
+                            tint = AppTheme.colors.onSurface
                         )
                     }
                     SpriteDropdownMenu(
@@ -153,7 +153,7 @@ private fun SpriteGridCardStaggeredPreview() {
                                 y = 0,
                                 width = 16,
                                 height = 24,
-                                pixels = IntArray(16 * 24) { AppTheme.colors.SelectedColor.hashCode() })
+                                pixels = IntArray(16 * 24) { AppTheme.colors.purple.hashCode() })
                         )
                     )
                 ),
@@ -182,7 +182,7 @@ private fun SpriteGridCardSquarePreview() {
                                 y = 0,
                                 width = 32,
                                 height = 32,
-                                pixels = IntArray(32 * 32) { AppTheme.colors.AccentButtonColor.hashCode() })
+                                pixels = IntArray(32 * 32) { AppTheme.colors.green.hashCode() })
                         )
                     )
                 ),

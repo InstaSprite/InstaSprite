@@ -67,8 +67,8 @@ fun OnboardingScreen(
     val coroutineScope = rememberCoroutineScope()
     val colors = AppTheme.colors
 
-    UiUtils.SetStatusBarColor(colors.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(colors.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(colors.surfaceInset)
+    UiUtils.SetNavigationBarColor(colors.surfaceInset)
 
     Scaffold(
         bottomBar = {
@@ -90,7 +90,7 @@ fun OnboardingScreen(
                                 .size(8.pixelDp)
                                 .clip(MaterialTheme.shapes.small)
                                 .background(
-                                    if (isSelected) colors.LinkColor else colors.Foreground2Color
+                                    if (isSelected) colors.blue else colors.surfaceHighest
                                 )
                         )
                     }
@@ -109,20 +109,20 @@ fun OnboardingScreen(
                     },
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.AccentButtonColor,
-                        contentColor = colors.TextColorDark
+                        containerColor = colors.green,
+                        contentColor = colors.onAccent
                     )
                 ) {
                     Text(
                         text = if (pagerState.currentPage < 2) stringResource(R.string.onboarding_next) else stringResource(
                             R.string.onboarding_get_started
                         ),
-                        color = colors.TextColorDark
+                        color = colors.onAccent
                     )
                 }
             }
         },
-        containerColor = colors.BackgroundColorDarker
+        containerColor = colors.surfaceInset
     ) { innerPadding ->
         HorizontalPager(
             state = pagerState,
@@ -160,7 +160,7 @@ fun WelcomePage() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colors.BackgroundColorDarker)
+                .background(colors.surfaceInset)
                 .padding(8.pixelDp),
             contentAlignment = Alignment.Center
         ) {
@@ -178,7 +178,7 @@ fun WelcomePage() {
                 Text(
                     text = stringResource(R.string.onboarding_welcome_title),
                     style = MaterialTheme.typography.titleLarge,
-                    color = colors.TextColorLight,
+                    color = colors.onSurface,
                     textAlign = TextAlign.Center
                 )
 
@@ -208,7 +208,7 @@ fun WelcomePage() {
                 Text(
                     text = stringResource(R.string.onboarding_welcome_desc),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colors.Subtext0Color,
+                    color = colors.textMuted,
                     textAlign = TextAlign.Center
                 )
             }
@@ -235,8 +235,8 @@ fun AppearancePage(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.small)
-                .background(colors.BackgroundColorDarker)
-                .border(1.pixelDp, colors.LinkColor, MaterialTheme.shapes.small)
+                .background(colors.surfaceInset)
+                .border(1.pixelDp, colors.blue, MaterialTheme.shapes.small)
                 .padding(8.pixelDp),
             contentAlignment = Alignment.Center
         ) {
@@ -246,13 +246,13 @@ fun AppearancePage(
                 Text(
                     text = stringResource(R.string.onboarding_personalize_title),
                     style = MaterialTheme.typography.titleLarge,
-                    color = colors.TextColorLight
+                    color = colors.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.pixelDp))
                 Text(
                     text = stringResource(R.string.onboarding_personalize_desc),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colors.Subtext0Color,
+                    color = colors.textMuted,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(12.pixelDp))
@@ -262,7 +262,7 @@ fun AppearancePage(
                     text = stringResource(R.string.onboarding_font),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = colors.TextColorLight,
+                    color = colors.onSurface,
                     modifier = Modifier.align(Alignment.Start)
                 )
                 Spacer(modifier = Modifier.height(12.pixelDp))
@@ -291,7 +291,7 @@ fun AppearancePage(
                     text = stringResource(R.string.theme),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = colors.TextColorLight,
+                    color = colors.onSurface,
                     modifier = Modifier.align(Alignment.Start)
                 )
                 Spacer(modifier = Modifier.height(12.pixelDp))
@@ -336,8 +336,8 @@ fun CursorModePage(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.small)
-                .background(colors.BackgroundColorDarker)
-                .border(1.pixelDp, colors.LinkColor, MaterialTheme.shapes.small)
+                .background(colors.surfaceInset)
+                .border(1.pixelDp, colors.blue, MaterialTheme.shapes.small)
                 .padding(8.pixelDp),
             contentAlignment = Alignment.Center
         ) {
@@ -347,13 +347,13 @@ fun CursorModePage(
                 Text(
                     text = stringResource(R.string.onboarding_drawing_mode_title),
                     style = MaterialTheme.typography.titleLarge,
-                    color = colors.TextColorLight
+                    color = colors.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.pixelDp))
                 Text(
                     text = stringResource(R.string.onboarding_drawing_mode_desc),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colors.Subtext0Color,
+                    color = colors.textMuted,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.pixelDp))
@@ -382,7 +382,7 @@ fun CursorModePage(
                         .fillMaxWidth(0.7f)
                         .aspectRatio(3 / 4f)
                         .clip(MaterialTheme.shapes.small)
-                        .background(colors.Foreground1Color)
+                        .background(colors.surfaceRaised)
                 )
 
                 Spacer(modifier = Modifier.height(8.pixelDp))
@@ -392,10 +392,10 @@ fun CursorModePage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(MaterialTheme.shapes.small)
-                        .background(colors.BackgroundColor)
+                        .background(colors.background)
                         .border(
                             1.pixelDp,
-                            if (!uiState.isCursorMode) colors.LinkColor else colors.Foreground2Color,
+                            if (!uiState.isCursorMode) colors.blue else colors.surfaceHighest,
                             MaterialTheme.shapes.small
                         )
                         .clickable { onCursorModeSelected(false) }
@@ -405,13 +405,13 @@ fun CursorModePage(
                         RadioButton(
                             selected = !uiState.isCursorMode,
                             onClick = null,
-                            colors = RadioButtonDefaults.colors(selectedColor = colors.LinkColor)
+                            colors = RadioButtonDefaults.colors(selectedColor = colors.blue)
                         )
                         Spacer(modifier = Modifier.width(8.pixelDp))
                         Text(
                             text = stringResource(R.string.onboarding_touch_mode),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = colors.TextColorLight,
+                            color = colors.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -419,7 +419,7 @@ fun CursorModePage(
                     Text(
                         text = stringResource(R.string.onboarding_touch_mode_desc),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = colors.Subtext0Color,
+                        color = colors.textMuted,
                         modifier = Modifier.padding(start = 8.pixelDp)
                     )
                 }
@@ -431,10 +431,10 @@ fun CursorModePage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(MaterialTheme.shapes.small)
-                        .background(colors.BackgroundColor)
+                        .background(colors.background)
                         .border(
                             1.pixelDp,
-                            if (uiState.isCursorMode) colors.LinkColor else colors.Foreground2Color,
+                            if (uiState.isCursorMode) colors.blue else colors.surfaceHighest,
                             MaterialTheme.shapes.small
                         )
                         .clickable { onCursorModeSelected(true) }
@@ -444,13 +444,13 @@ fun CursorModePage(
                         RadioButton(
                             selected = uiState.isCursorMode,
                             onClick = null,
-                            colors = RadioButtonDefaults.colors(selectedColor = colors.LinkColor)
+                            colors = RadioButtonDefaults.colors(selectedColor = colors.blue)
                         )
                         Spacer(modifier = Modifier.width(8.pixelDp))
                         Text(
                             text = stringResource(R.string.onboarding_cursor_mode),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = colors.TextColorLight,
+                            color = colors.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -458,7 +458,7 @@ fun CursorModePage(
                     Text(
                         text = stringResource(R.string.onboarding_cursor_mode_desc),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = colors.Subtext0Color,
+                        color = colors.textMuted,
                         modifier = Modifier.padding(start = 8.pixelDp)
                     )
                 }

@@ -82,7 +82,7 @@ fun OtpDialog(
             description?.let {
                 Text(
                     text = it,
-                    color = AppTheme.colors.Subtext0Color,
+                    color = AppTheme.colors.textMuted,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 16.pixelDp)
@@ -166,9 +166,9 @@ private fun OtpTextField(
             .border(
                 width = 2.pixelDp,
                 color = if (isFocused || value.text.isNotEmpty()) {
-                    AppTheme.colors.AccentButtonColor
+                    AppTheme.colors.green
                 } else {
-                    AppTheme.colors.Foreground2Color
+                    AppTheme.colors.surfaceHighest
                 },
                 shape = MaterialTheme.shapes.small
             ),
@@ -182,7 +182,7 @@ private fun OtpTextField(
             textStyle = MaterialTheme.typography.headlineMedium.copy(
                 fontSize = 32.sp,
                 textAlign = TextAlign.Center,
-                color = AppTheme.colors.TextColorLight
+                color = AppTheme.colors.onSurface
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             singleLine = true,

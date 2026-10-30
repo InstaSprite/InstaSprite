@@ -66,7 +66,7 @@ fun OtpEnrollmentDialog(
         ) {
             Text(
                 text = context.getString(R.string.scan_qr_code_instruction),
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
@@ -80,14 +80,14 @@ fun OtpEnrollmentDialog(
             } else {
                 Text(
                     text = context.getString(R.string.failed_to_load_qr_code),
-                    color = AppTheme.colors.DismissButtonColor,
+                    color = AppTheme.colors.red,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             Text(
                 text = context.getString(R.string.or_enter_secret_manually),
-                color = AppTheme.colors.Subtext0Color,
+                color = AppTheme.colors.textMuted,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center
             )
@@ -101,7 +101,7 @@ fun OtpEnrollmentDialog(
                 ) {
                     Text(
                         text = secret,
-                        color = AppTheme.colors.AccentButtonColor,
+                        color = AppTheme.colors.green,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
                         fontFamily = FontFamily.Monospace
@@ -113,7 +113,7 @@ fun OtpEnrollmentDialog(
 
             Text(
                 text = context.getString(R.string.account_issuer_info, accountName, issuer),
-                color = AppTheme.colors.Subtext0Color,
+                color = AppTheme.colors.textMuted,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center
             )
@@ -122,7 +122,7 @@ fun OtpEnrollmentDialog(
 
             Text(
                 text = context.getString(R.string.after_scanning_instruction),
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp

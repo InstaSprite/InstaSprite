@@ -33,22 +33,22 @@ fun PixelPerfectOption(
         modifier = Modifier
             .height(24.pixelDp)
             .clip(MaterialTheme.shapes.small)
-            .background(colors.BackgroundColorDarker)
+            .background(colors.surfaceInset)
             .noRippleClickable(onToggle)
     ) {
         Spacer(modifier = Modifier.width(8.pixelDp))
         Text(
             text = stringResource(R.string.pixel_perfect),
-            color = colors.TextColorLight,
+            color = colors.onSurface,
             fontSize = 12.sp,
         )
         Checkbox(
             checked = isActive,
             onCheckedChange = { onToggle() },
             colors = CheckboxDefaults.colors(
-                checkedColor = colors.LinkColor,
-                uncheckedColor = colors.Subtext0Color,
-                checkmarkColor = colors.TextColorDark
+                checkedColor = colors.blue,
+                uncheckedColor = colors.textMuted,
+                checkmarkColor = colors.onAccent
             )
         )
     }

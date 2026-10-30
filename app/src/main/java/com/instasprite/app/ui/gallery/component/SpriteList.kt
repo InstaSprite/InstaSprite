@@ -231,7 +231,7 @@ private fun SpriteCard(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = AppTheme.colors.BackgroundColor,
+                containerColor = AppTheme.colors.background,
             ),
             modifier = Modifier
                 .padding(vertical = 6.pixelDp)
@@ -268,7 +268,7 @@ private fun SpriteCard(
                         PixelIcon(
                             icon = R.drawable.ic_three_dots,
                             contentDescription = stringResource(R.string.options),
-                            tint = AppTheme.colors.TextColorLight
+                            tint = AppTheme.colors.onSurface
                         )
                     }
 
@@ -321,7 +321,7 @@ internal fun SpriteDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        containerColor = AppTheme.colors.DropDownMenuColor,
+        containerColor = AppTheme.colors.surfaceContainer,
         modifier = modifier
     ) {
         DropdownMenuItem(
@@ -330,7 +330,7 @@ internal fun SpriteDropdownMenu(
                 PixelIcon(
                     icon = R.drawable.ic_info,
                     contentDescription = stringResource(R.string.rename),
-                    tint = AppTheme.colors.TextColorLight,
+                    tint = AppTheme.colors.onSurface,
                 )
             },
             onClick = onRename,
@@ -341,7 +341,7 @@ internal fun SpriteDropdownMenu(
                 PixelIcon(
                     icon = R.drawable.ic_edit,
                     contentDescription = stringResource(R.string.edit),
-                    tint = AppTheme.colors.TextColorLight
+                    tint = AppTheme.colors.onSurface
                 )
             },
             onClick = onEdit,
@@ -352,7 +352,7 @@ internal fun SpriteDropdownMenu(
                 PixelIcon(
                     icon = R.drawable.ic_trash,
                     contentDescription = stringResource(R.string.delete),
-                    tint = AppTheme.colors.TextColorLight
+                    tint = AppTheme.colors.onSurface
                 )
             },
             onClick = onDelete,
