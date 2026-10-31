@@ -182,7 +182,11 @@ private fun DitherPatternPreview(
     }
     Image(
         bitmap = bitmap, contentDescription = null, filterQuality = FilterQuality.None,
-        modifier = modifier.drawCheckerboard(8, 8)
+        modifier = modifier.drawCheckerboard(
+            4, 4,
+            checkerColor1 = Color(0xFF707070),
+            checkerColor2 = Color(0xFF909090)
+        )
     )
 }
 
@@ -192,6 +196,16 @@ private fun DitherOptionsPreview() {
     InstaSpriteTheme {
         Row(horizontalArrangement = Arrangement.spacedBy(4.pixelDp)) {
             DitherPattern.entries.forEach { DitherPatternPreview(it, Color.Black, Color.White) }
+        }
+    }
+}
+
+@Preview(name = "White dither patterns", showBackground = true)
+@Composable
+private fun WhiteDitherPatternsPreview() {
+    InstaSpriteTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.pixelDp)) {
+            DitherPattern.entries.forEach { DitherPatternPreview(it, Color.White, Color.Transparent) }
         }
     }
 }

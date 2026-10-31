@@ -26,9 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import com.instasprite.app.R
@@ -39,6 +41,7 @@ import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.pixelDp
 import com.instasprite.app.utils.toHexString
@@ -156,13 +159,21 @@ fun ColorPalette(
     }
 }
 
+internal fun activeColorTextColor(color: Color): Color {
+    val dark = color.compositeOver(Color(0xFF808080)).luminance()
+    val light = color.compositeOver(Color(0xFFC0C0C0)).luminance()
+    val blackContrast = (minOf(dark, light) + 0.05f) / 0.05f
+    val whiteContrast = 1.05f / (maxOf(dark, light) + 0.05f)
+    return if (blackContrast >= whiteContrast) Color.Black else Color.White
+}
+
 @Composable
 private fun ActiveColor(
     activeColor: Color,
     onClick: (() -> Unit),
     modifier: Modifier = Modifier
 ) {
-    val textColor = if (activeColor.luminance() < 0.4f) Color.White else Color.Black
+    val textColor = activeColorTextColor(activeColor)
     val showAlpha = activeColor.alpha < 1f
 
     Box(
@@ -185,6 +196,18 @@ private fun ActiveColor(
             color = textColor,
             style = MaterialTheme.typography.bodyLarge
         )
+    }
+}
+
+@Preview(name = "Active color contrast", showBackground = true)
+@Composable
+private fun ActiveColorPreview() {
+    InstaSpriteTheme {
+        Row {
+            listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f), Color.White).forEach {
+                ActiveColor(it, {}, Modifier.height(26.pixelDp).width(64.pixelDp))
+            }
+        }
     }
 }
 
