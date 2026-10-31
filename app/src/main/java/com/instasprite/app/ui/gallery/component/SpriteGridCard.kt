@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -121,17 +122,41 @@ fun SpriteGridCard(
                 }
             }
 
-            GallerySpritePreview(
-                playing = playing,
-                playbackSprite = playbackSprite,
-                onStop = onStop,
-                sprite = sprite,
-                meta = meta,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(cardAspectRatio),
-                onClick = onClick
-            )
+                    .aspectRatio(cardAspectRatio)
+                    .clipToBounds(),
+                contentAlignment = Alignment.Center
+            ) {
+                GallerySpritePreview(
+                    playing = playing,
+                    playbackSprite = playbackSprite,
+                    onStop = onStop,
+                    sprite = sprite,
+                    meta = meta,
+                    onClick = onClick
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "Non-square sprites in square grid", showBackground = true, widthDp = 411)
+@Composable
+private fun NonSquareGridCardsPreview() {
+    InstaSpriteTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.pixelDp)) {
+            listOf(64 to 128, 128 to 64, 17 to 29).forEach { (width, height) ->
+                val id = "$width-$height"
+                SpriteGridCard(
+                    spriteWithMeta = SpriteWithMeta(
+                        Sprite(id, width, height, emptyList()), SpriteMeta(id, "$width × $height")
+                    ),
+                    layoutMode = GalleryLayoutMode.SquareGrid,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
