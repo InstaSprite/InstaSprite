@@ -15,6 +15,7 @@ import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -79,7 +80,7 @@ class SpriteDatabaseRepository @Inject constructor(
                 require(proto.width > 0 && proto.height > 0)
                 val existing = metaDao.getMetaById(pending.name)
                 dao.save(
-                    com.instasprite.app.data.model.SpriteData(pending.name, proto.width, proto.height),
+                    com.instasprite.app.data.model.SpriteData(pending.name, proto.width, proto.height, proto.colorPaletteList, proto.framesCount.coerceAtLeast(1)),
                     SpriteMetaData(
                         pending.name, existing?.spriteName ?: proto.savedName,
                         existing?.createdAt ?: proto.savedCreatedAt,
@@ -118,13 +119,7 @@ class SpriteDatabaseRepository @Inject constructor(
     fun getAllSpritesWithMeta(): Flow<List<SpriteWithMeta>> {
         return dao.getAllSpritesWithMeta().map { list ->
             list.map { item ->
-                val proto = pixelDataSource.readData(item.sprite.id)
-                item.toDomain(
-                    sprite = item.sprite.toDomain(
-                        layers = emptyList(),
-                        colorPalette = proto?.colorPaletteList
-                    )
-                ).copy(hasAnimation = (proto?.framesCount ?: 0) > 1)
+                item.toDomain()
             }
         }
     }
@@ -138,7 +133,18 @@ class SpriteDatabaseRepository @Inject constructor(
 
     suspend fun cleanupOrphanedSpriteFiles() = fileMutex.withLock {
         recoverPendingSaves()
-        val activeIds = dao.getAllSprites().mapTo(mutableSetOf()) { it.id }
+        val sprites = dao.getAllSprites()
+        for (sprite in sprites.filter { it.frameCount == 0 }) {
+            try {
+                val proto = pixelDataSource.readData(sprite.id)
+                dao.insert(sprite.copy(colorPalette = proto.colorPaletteList, frameCount = proto.framesCount.coerceAtLeast(1)))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("SpriteDatabaseRepository", "Could not backfill sprite summary", e)
+            }
+        }
+        val activeIds = sprites.mapTo(mutableSetOf()) { it.id }
         val thumbnailIds = context.filesDir.listFiles().orEmpty()
             .mapNotNull { Regex("thumbnail_(.+)\\.png").matchEntire(it.name)?.groupValues?.get(1) }
         val pixelIds = File(context.filesDir, "datastore").listFiles().orEmpty()
