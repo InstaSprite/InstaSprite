@@ -632,5 +632,5 @@
     <string name="tut_timeline_playback_title">Thời gian và phát</string>
     <string name="tut_timeline_playback_desc">Nút phát xem trước hoạt ảnh khi có ít nhất hai khung. Chạm thời gian mili giây dưới lưới để đổi thời lượng khung đang chọn. Menu dòng thời gian có tùy chọn bóng khung, nhân bản và xóa. Mũi tên xuống thu gọn dòng thời gian.</string>
     <string name="crash_reports_title">Gửi báo cáo sự cố</string>
-    <string name="crash_reports_description">Báo cáo chẩn đoán tùy chọn giúp sửa lỗi. Báo cáo có thể chứa thông tin thiết bị và ứng dụng. Không chủ động thu thập tác phẩm hoặc tên dự án.</string>
+    <string name="crash_reports_description">Gửi báo cáo sự cố để giúp sửa lỗi ứng dụng.</string>
 </resources>
