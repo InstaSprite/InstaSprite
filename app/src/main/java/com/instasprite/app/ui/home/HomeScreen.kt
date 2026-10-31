@@ -17,20 +17,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -51,7 +51,7 @@ import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
 import com.instasprite.app.ui.home.component.BottomBarItem
 import com.instasprite.app.ui.home.component.HomeBottomBar
-import com.instasprite.app.ui.home.component.HomeDrawer
+import com.instasprite.app.ui.home.component.HomeMenuCard
 import com.instasprite.app.ui.home.component.HomeFab
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.UiUtils
@@ -78,7 +78,7 @@ fun HomeScreen(
 
     val tabs = HomeTab.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var menuExpanded by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { galleryViewModel.stopPreview() }
@@ -160,116 +160,109 @@ fun HomeScreen(
         )
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            HomeDrawer(
-                onSettingsClick = onOpenSetting,
-                onAboutClick = onOpenAbout,
-                onBackClick = {
-                    scope.launch {
-                        drawerState.close()
+    if (menuExpanded) {
+        HomeMenuCard(
+            onSettingsClick = onOpenSetting,
+            onAboutClick = onOpenAbout,
+            onDismiss = { menuExpanded = false }
+        )
+    }
+
+    Box {
+        Scaffold(
+            topBar = {
+                PrimaryTabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    containerColor = AppTheme.colors.surfaceContainer,
+                    contentColor = AppTheme.colors.onSurface,
+                    indicator = {
+                        TabRowDefaults.SecondaryIndicator(
+                            color = AppTheme.colors.purple,
+                            modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
+
+                            )
+                    },
+                    divider = {}
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        Tab(
+                            selected = pagerState.currentPage == index,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                            text = {
+                                Text(
+                                    text = androidx.compose.ui.res.stringResource(tab.titleRes),
+                                    color = if (pagerState.currentPage == index)
+                                        AppTheme.colors.onSurface
+                                    else
+                                        AppTheme.colors.textMuted
+                                )
+                            }
+                        )
                     }
                 }
-            )
-        }
-    ) {
-        Box {
-            Scaffold(
-                topBar = {
-                    PrimaryTabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        containerColor = AppTheme.colors.surfaceContainer,
-                        contentColor = AppTheme.colors.onSurface,
-                        indicator = {
-                            TabRowDefaults.SecondaryIndicator(
-                                color = AppTheme.colors.purple,
-                                modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
 
-                                )
-                        },
-                        divider = {}
-                    ) {
-                        tabs.forEachIndexed { index, tab ->
-                            Tab(
-                                selected = pagerState.currentPage == index,
-                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                                text = {
-                                    Text(
-                                        text = androidx.compose.ui.res.stringResource(tab.titleRes),
-                                        color = if (pagerState.currentPage == index)
-                                            AppTheme.colors.onSurface
-                                        else
-                                            AppTheme.colors.textMuted
-                                    )
-                                }
-                            )
-                        }
-                    }
-
-                    AnimatedVisibility(
-                        visible = galleryUiState.showSearchBar && pagerState.currentPage == 0,
-                        enter = slideInVertically(initialOffsetY = { -it }),
-                        exit = slideOutVertically(targetOffsetY = { -it }),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        SearchBar(
-                            onSearchBarEvent = galleryEvent.onSearchBarEvent,
-                            searchQuery = searchQuery,
-                        )
-                    }
-                },
-                bottomBar = {
-                    HomeScreenBottomBar(
-                        onMenuClick = { scope.launch { drawerState.open() } },
-                        onPaletteClick = onNavigateToPalette,
-                        onSearchClick = {
-                            galleryViewModel.toggleSearchBar()
-                        },
-                        onSortClick = {
-                            galleryViewModel.openDialog(GalleryDialog.DisplayOptions)
-                        }
-                    )
-                },
-            ) { innerPadding ->
-                HorizontalPager(
-                    state = pagerState,
+                AnimatedVisibility(
+                    visible = galleryUiState.showSearchBar && pagerState.currentPage == 0,
+                    enter = slideInVertically(initialOffsetY = { -it }),
+                    exit = slideOutVertically(targetOffsetY = { -it }),
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) { page ->
-                    when (page) {
-                        0 -> GalleryPageContent(
-                            uiState = galleryUiState,
-                            lazyListState = galleryListState,
-                            spriteList = sortedSprites,
-                            searchQuery = searchQuery,
-                            event = galleryEvent,
-                        )
+                        .fillMaxWidth()
+                ) {
+                    SearchBar(
+                        onSearchBarEvent = galleryEvent.onSearchBarEvent,
+                        searchQuery = searchQuery,
+                    )
+                }
+            },
+            bottomBar = {
+                HomeScreenBottomBar(
+                    onMenuClick = { menuExpanded = true },
+                    onPaletteClick = onNavigateToPalette,
+                    onSearchClick = {
+                        galleryViewModel.toggleSearchBar()
+                    },
+                    onSortClick = {
+                        galleryViewModel.openDialog(GalleryDialog.DisplayOptions)
                     }
+                )
+            },
+        ) { innerPadding ->
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) { page ->
+                when (page) {
+                    0 -> GalleryPageContent(
+                        uiState = galleryUiState,
+                        lazyListState = galleryListState,
+                        spriteList = sortedSprites,
+                        searchQuery = searchQuery,
+                        event = galleryEvent,
+                    )
                 }
             }
+        }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.pixelDp)
-                    .background(Color.Transparent),
-                contentAlignment = Alignment.Center,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 8.pixelDp)
+                .background(Color.Transparent),
+            contentAlignment = Alignment.Center,
+        ) {
+            AnimatedVisibility(
+                visible = pagerState.currentPage == 0,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut()
             ) {
-                AnimatedVisibility(
-                    visible = pagerState.currentPage == 0,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    HomeFab(
-                        onCreateCanvas = galleryEvent.onCreateNewCanvas,
-                        onLoadCanvas = galleryEvent.onLoadCanvas,
-                        onLoadImage = galleryEvent.onLoadImage,
-                    )
-                }
+                HomeFab(
+                    onCreateCanvas = galleryEvent.onCreateNewCanvas,
+                    onLoadCanvas = galleryEvent.onLoadCanvas,
+                    onLoadImage = galleryEvent.onLoadImage,
+                )
             }
         }
     }
