@@ -96,6 +96,7 @@ class SpriteDatabaseRepository @Inject constructor(
     suspend fun deleteSpriteById(spriteId: String) {
         dao.delete(spriteId)
         pixelDataSource.deleteDataStore(spriteId)
+        File(context.cacheDir, "history/$spriteId").deleteRecursively()
 
         val thumbnailFile = File(context.filesDir, "thumbnail_${spriteId}.png")
         if (thumbnailFile.exists()) {

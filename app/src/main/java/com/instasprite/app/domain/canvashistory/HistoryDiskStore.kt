@@ -4,8 +4,20 @@ import com.instasprite.app.HistoryEntryProto
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
+import java.util.UUID
 
 class HistoryDiskStore(private val historyDir: File) {
+    companion object {
+        fun retireAbandoned(cacheDir: File): List<File> {
+            val history = File(cacheDir, "history")
+            if (history.exists() && !history.renameTo(File(cacheDir, "history-abandoned-${UUID.randomUUID()}"))) {
+                throw IOException("Could not retire abandoned undo history")
+            }
+            return cacheDir.listFiles()?.filter { it.name.startsWith("history-abandoned-") }.orEmpty()
+        }
+    }
+
 
     init {
         val historyFileName = Regex("(undo|redo)_\\d+\\.pb")
