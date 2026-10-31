@@ -36,6 +36,10 @@ message ISprite {
   bool unfinished_session = 10;
   string active_frame_id = 11;
   string active_layer_id = 12;
+  string save_token = 13;
+  string saved_name = 14;
+  int64 saved_created_at = 15;
+  int64 saved_modified_at = 16;
 }
 
 message AnimationFrameData {
