@@ -102,6 +102,7 @@ fun ExpandableFabMenu(
     mainFabIconSize: Dp = 20.pixelDp,
     miniFabSize: Dp = 32.pixelDp,
     colors: FabMenuColors = FabMenuColors.defaults(),
+    button: (@Composable (onClick: () -> Unit) -> Unit)? = null,
 ) {
     val density = LocalDensity.current
     var expanded by remember { mutableStateOf(false) }
@@ -148,94 +149,95 @@ fun ExpandableFabMenu(
         }
     }
 
-    // keep Popup alive doing animation stuff
-    if (expandedState.currentState || expandedState.targetState) {
-        val transition = rememberTransition(expandedState, label = "fab_menu")
+    Box(
+        modifier = modifier.onGloballyPositioned { coordinates ->
+            fabSize = coordinates.size
+            fabOffset = coordinates.localToWindow(Offset.Zero)
+        }
+    ) {
+        if (expandedState.currentState || expandedState.targetState) {
+            val transition = rememberTransition(expandedState, label = "fab_menu")
 
-        val scrimAlpha by transition.animateFloat(
-            transitionSpec = {
-                tween(
-                    durationMillis = animationDurationMs,
-                    easing = FastOutSlowInEasing
-                )
-            },
-            label = "scrim_alpha"
-        ) { isExpanded -> if (isExpanded) 1f else 0f }
+            val scrimAlpha by transition.animateFloat(
+                transitionSpec = {
+                    tween(
+                        durationMillis = animationDurationMs,
+                        easing = FastOutSlowInEasing
+                    )
+                },
+                label = "scrim_alpha"
+            ) { isExpanded -> if (isExpanded) 1f else 0f }
 
-        Popup(
-            onDismissRequest = { expanded = false },
-            properties = PopupProperties(focusable = true)
-        ) {
-            Box(
-                modifier = Modifier
-
-                    .fillMaxSize()
-                    .background(colors.scrim.copy(alpha = colors.scrim.alpha * scrimAlpha))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { expanded = false }
-                    ),
+            Popup(
+                onDismissRequest = { expanded = false },
+                properties = PopupProperties(focusable = true)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(itemSpacing),
+                Box(
                     modifier = Modifier
-                        .wrapContentWidth()
-                        .onGloballyPositioned { coordinates ->
-                            columnSize = coordinates.size
-                        }
-                        .offset {
-                            itemOffset
-                        }
-                ) {
-                    items.forEachIndexed { index, item ->
-                        val delay = (items.size - 1 - index) * itemStaggerDelayMs
-                        val animProgress by transition.animateFloat(
-                            transitionSpec = {
-                                tween(
-                                    durationMillis = animationDurationMs,
-                                    delayMillis = delay,
-                                    easing = FastOutSlowInEasing
-                                )
-                            }
-                        ) { isExpanded -> if (isExpanded) 1f else 0f }
 
-                        FabItemView(
-                            item = item,
-                            animProgress = animProgress,
-                            fabSize = miniFabSize,
-                            colors = colors,
-                            onDismiss = { expanded = false },
-                            modifier = Modifier.width(itemWidth)
-                        )
+                        .fillMaxSize()
+                        .background(colors.scrim.copy(alpha = colors.scrim.alpha * scrimAlpha))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { expanded = false }
+                        ),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(itemSpacing),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .onGloballyPositioned { coordinates ->
+                                columnSize = coordinates.size
+                            }
+                            .offset {
+                                itemOffset
+                            }
+                    ) {
+                        items.forEachIndexed { index, item ->
+                            val delay = (items.size - 1 - index) * itemStaggerDelayMs
+                            val animProgress by transition.animateFloat(
+                                transitionSpec = {
+                                    tween(
+                                        durationMillis = animationDurationMs,
+                                        delayMillis = delay,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                }
+                            ) { isExpanded -> if (isExpanded) 1f else 0f }
+
+                            FabItemView(
+                                item = item,
+                                animProgress = animProgress,
+                                fabSize = miniFabSize,
+                                colors = colors,
+                                onDismiss = { expanded = false },
+                                modifier = Modifier.width(itemWidth)
+                            )
+                        }
                     }
                 }
             }
         }
-    }
 
-    FloatingActionButton(
-        onClick = { expanded = !expanded },
-        containerColor = colors.fab,
-        modifier = modifier
-            .size(mainFabSize)
-            .onGloballyPositioned { coordinates ->
-                val position = coordinates.localToWindow(Offset.Zero)
-                fabSize = coordinates.size
-                fabOffset = Offset(
-                    x = position.x,
-                    y = position.y
+        if (button != null) {
+            button { expanded = !expanded }
+        } else {
+            FloatingActionButton(
+                onClick = { expanded = !expanded },
+                containerColor = colors.fab,
+                modifier = Modifier.size(mainFabSize)
+            ) {
+                PixelIcon(
+                    icon = R.drawable.ic_plus,
+                    contentDescription = if (expanded) "Close menu" else "Open menu",
+                    tint = colors.fabIcon,
+                    modifier = Modifier
+                        .rotate(rotation)
                 )
             }
-    ) {
-        PixelIcon(
-            icon = R.drawable.ic_plus,
-            contentDescription = if (expanded) "Close menu" else "Open menu",
-            tint = colors.fabIcon,
-            modifier = Modifier
-                .rotate(rotation)
-        )
+        }
     }
 }
 

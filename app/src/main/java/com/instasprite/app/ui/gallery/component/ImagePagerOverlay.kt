@@ -26,6 +26,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
@@ -42,11 +44,17 @@ import com.instasprite.app.R
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.composable.AsyncImageZoomableOverlay
+import com.instasprite.app.ui.components.composable.ExpandableFabMenu
+import com.instasprite.app.ui.components.composable.FabMenuAlignment
+import com.instasprite.app.ui.components.composable.FabMenuColors
+import com.instasprite.app.ui.components.composable.FabMenuItem
 import com.instasprite.app.ui.components.composable.IntColorPaletteView
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.gallery.contract.ImagePagerEvent
+import com.instasprite.app.ui.gallery.contract.GalleryExportFormat
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.pixelDp
 import com.instasprite.app.utils.toDateString
@@ -141,8 +149,8 @@ fun ImagePagerOverlay(
                             onOpenDrawing(it.sprite, it.meta?.spriteName)
                         }
                     },
-                    onExportTap = {
-                        currentSprite?.let { onImagePagerEvent(ImagePagerEvent.OpenExportDialog(it)) }
+                    onExportTap = { format ->
+                        currentSprite?.let { onImagePagerEvent(ImagePagerEvent.Export(it, format)) }
                     },
                     spriteWithMetaData = currentSprite,
                     modifier = Modifier
@@ -199,7 +207,7 @@ fun ImagePagerOverlay(
 @Composable
 internal fun BottomBar(
     spriteWithMetaData: SpriteWithMeta?,
-    onExportTap: () -> Unit,
+    onExportTap: (GalleryExportFormat) -> Unit,
     onEditButtonTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -240,27 +248,42 @@ internal fun BottomBar(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Button(
-                    onClick = onExportTap,
-                    shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.purple
+                key(sprite.id) {
+                    ExpandableFabMenu(
+                        alignment = FabMenuAlignment.Start,
+                        colors = FabMenuColors.defaults(fab = AppTheme.colors.purple),
+                        button = { onClick ->
+                            Button(
+                                onClick = onClick,
+                                shape = MaterialTheme.shapes.small,
+                                colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.purple)
+                            ) {
+                                PixelIcon(
+                                    icon = R.drawable.ic_down_arrow,
+                                    contentDescription = null,
+                                    tint = AppTheme.colors.onAccent
+                                )
+                                Spacer(Modifier.width(6.pixelDp))
+                                Text(stringResource(R.string.export_title), color = AppTheme.colors.onAccent)
+                            }
+                        },
+                        items = buildList {
+                            add(FabMenuItem(R.drawable.ic_canvas, stringResource(R.string.export_option_image)) {
+                                onExportTap(GalleryExportFormat.IMAGE)
+                            })
+                            add(FabMenuItem(R.drawable.ic_arrow_head_right, stringResource(R.string.export_option_gif)) {
+                                onExportTap(GalleryExportFormat.GIF)
+                            })
+                            if (spriteWithMetaData.hasAnimation) {
+                                add(FabMenuItem(R.drawable.ic_layer, stringResource(R.string.export_option_sheet)) {
+                                    onExportTap(GalleryExportFormat.SPRITE_SHEET)
+                                })
+                            }
+                            add(FabMenuItem(R.drawable.ic_folder, stringResource(R.string.export_option_project)) {
+                                onExportTap(GalleryExportFormat.PROJECT)
+                            })
+                        }
                     )
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        PixelIcon(
-                            icon = R.drawable.ic_down_arrow,
-                            contentDescription = stringResource(R.string.export_title),
-                            tint = AppTheme.colors.onAccent,
-                        )
-                        Spacer(modifier = Modifier.width(6.pixelDp))
-                        Text(
-                            text = stringResource(R.string.export_title),
-                            color = AppTheme.colors.onAccent
-                        )
-                    }
                 }
 
                 Button(
@@ -290,6 +313,19 @@ internal fun BottomBar(
     }
 }
 
+
+@Preview
+@Composable
+private fun BottomBarPreview() {
+    InstaSpriteTheme {
+        BottomBar(
+            spriteWithMetaData = SpriteWithMeta(Sprite("preview", 16, 16, emptyList()), null, true),
+            onExportTap = {},
+            onEditButtonTap = {},
+            modifier = Modifier.height(120.pixelDp).background(AppTheme.colors.background)
+        )
+    }
+}
 
 @Composable
 private fun PagerDropdownMenu(

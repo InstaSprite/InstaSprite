@@ -171,9 +171,9 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenExportDialog -> {
+            is ImagePagerEvent.Export -> {
                 stopPreview()
-                openDialog(GalleryDialog.ExportOptions(event.sprite))
+                viewModelScope.launch { prepareExport(event.sprite, event.format) }
             }
         }
     }
@@ -305,7 +305,6 @@ class GalleryViewModel @Inject constructor(
                 requireNotNull(spriteDatabaseRepository.loadSprite(item.sprite.id))
             }
             require(format != GalleryExportFormat.SPRITE_SHEET || (sprite.animation?.frames?.size ?: 0) > 1)
-            closeTopDialog()
             openDialog(GalleryDialog.ExportFile(sprite, item.meta?.spriteName.orEmpty(), format))
         } catch (e: CancellationException) {
             throw e

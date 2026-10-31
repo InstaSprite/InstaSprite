@@ -2,19 +2,15 @@ package com.instasprite.app.ui.gallery
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.export.AnimationExportFormat
 import com.instasprite.app.ui.gallery.contract.GalleryExportFormat
-import com.instasprite.app.ui.gallery.dialog.ExportOptionsDialog
 import com.instasprite.app.ui.drawing.dialog.SaveAnimationDialog
 import com.instasprite.app.ui.drawing.dialog.SaveISpriteDialog
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
 import com.instasprite.app.domain.dialog.Dialog
-import com.instasprite.app.domain.model.SpriteWithMeta
 import com.instasprite.app.ui.components.dialog.ConfirmationDialog
 import com.instasprite.app.ui.drawing.dialog.LoadISpriteDialog
 import com.instasprite.app.ui.gallery.dialog.DisplayOptionsDialog
@@ -24,7 +20,6 @@ import com.instasprite.app.ui.theme.AppTheme
 
 
 sealed interface GalleryDialog : Dialog {
-    data class ExportOptions(val sprite: SpriteWithMeta) : GalleryDialog
     data class ExportFile(val sprite: Sprite, val name: String, val format: GalleryExportFormat) : GalleryDialog
     data class Rename(val spriteId: String) : GalleryDialog
     data class DeleteSpriteConfirm(val spriteName: String, val spriteId: String) : GalleryDialog
@@ -41,7 +36,6 @@ fun GalleryScreenDialogs(
     val spriteListOrder = viewModel.spriteListOrder.collectAsStateWithLifecycle().value
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val layoutMode = uiState.layoutMode
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         lastSavedUri = viewModel.getLastSavedLocation()
@@ -71,13 +65,6 @@ fun GalleryScreenDialogs(
                     onSpriteRename = viewModel::renameSprite,
                     onDismiss = viewModel::closeTopDialog
                 )
-
-            is GalleryDialog.ExportOptions -> ExportOptionsDialog(
-                hasAnimation = dialog.sprite.hasAnimation,
-                isLoading = uiState.isExporting,
-                onDismiss = viewModel::closeTopDialog,
-                onSelect = { format -> scope.launch { viewModel.prepareExport(dialog.sprite, format) } }
-            )
 
             is GalleryDialog.ExportFile -> {
                 val name = dialog.name.ifBlank { "Sprite" }
