@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
@@ -44,6 +45,7 @@ fun ToolSizeWheelPopup(
 
     Popup(
         alignment = Alignment.Center,
+        properties = PopupProperties(focusable = true),
         onDismissRequest = {
             val index = listState.firstVisibleItemIndex
                 .coerceIn(0, range.count() - 1)
