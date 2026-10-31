@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,6 +43,7 @@ fun SaveFileDialog(
     scrollable: Boolean = false
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     var folderUri by remember(lastSavedUri) { mutableStateOf<Uri?>(lastSavedUri) }
 
     LaunchedEffect(lastSavedUri) {
@@ -83,7 +85,7 @@ fun SaveFileDialog(
             if (folderUri == null) {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.choose_folder),
+                    resources.getString(R.string.choose_folder),
                     Toast.LENGTH_SHORT
                 ).show()
             } else {

@@ -38,6 +38,7 @@ fun DrawingScreenDialogs(
 ) {
     val scope = rememberCoroutineScope()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val canvasState = viewModel.canvasState.collectAsStateWithLifecycle().value
 
     var lastSavedUri = viewModel.lastSavedLocation.collectAsStateWithLifecycle().value
 
@@ -108,8 +109,8 @@ fun DrawingScreenDialogs(
             DrawingDialog.ResizeCanvas ->
                 ResizeCanvasDialog(
                     onDismiss = viewModel::closeTopDialog,
-                    currentCanvasWidth = viewModel.canvasState.value.width,
-                    currentCanvasHeight = viewModel.canvasState.value.height,
+                    currentCanvasWidth = canvasState.width,
+                    currentCanvasHeight = canvasState.height,
                     onResize = viewModel::resizeCanvas
                 )
 
