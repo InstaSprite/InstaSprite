@@ -35,7 +35,10 @@ jobs:
       - name: Decode google-services.json
         env:
           GOOGLE_SERVICES_BASE64: ${{ secrets.GOOGLE_SERVICES_BASE64 }}
-        run: echo $GOOGLE_SERVICES_BASE64 | base64 --decode > app/google-services.json
+        run: |
+          if [ -n "$GOOGLE_SERVICES_BASE64" ]; then
+            echo "$GOOGLE_SERVICES_BASE64" | base64 --decode > app/google-services.json
+          fi
 
       - name: Compile, test, and lint
         run: ./gradlew compileDevDebugKotlin testDevDebugUnitTest lintDevDebug --no-daemon -Pkotlin.compiler.execution.strategy=in-process

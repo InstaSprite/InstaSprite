@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.drawing
 
+import com.instasprite.app.data.diagnostics.CrashReports
 import android.content.Context
 import android.net.Uri
 import android.os.SystemClock
@@ -120,6 +121,7 @@ class DrawingViewModel @AssistedInject constructor(
     private val drawingScope = CoroutineScope(viewModelScope.coroutineContext + exceptionHandler)
 
     fun handleFatalError(t: Throwable) {
+        CrashReports.record("editor", t)
         if (t is CanvasMemoryException) {
             drawingScope.launch(Dispatchers.Main) {
                 Toast.makeText(
@@ -219,6 +221,7 @@ class DrawingViewModel @AssistedInject constructor(
             }
             pendingSpriteName = null
         },
+        onFailureCause = { CrashReports.record("autosave", it) },
         onFailure = { failed ->
             _uiState.value = _uiState.value.copy(autosaveFailed = failed)
         }

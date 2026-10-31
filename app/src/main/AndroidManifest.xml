@@ -22,6 +22,8 @@
             android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
             android:value="true" />
 
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"

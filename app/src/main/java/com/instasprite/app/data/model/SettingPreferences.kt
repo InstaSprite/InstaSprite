@@ -15,7 +15,8 @@ data class SettingPreferences(
     val gallerySettings: GallerySettings = GallerySettings(),
     val prepopulatedPaletteVersion: Int = 0,
     val defaultPaletteId: Int = -1,
-    val hasSeenOnboarding: Boolean = false
+    val hasSeenOnboarding: Boolean = false,
+    val crashReportsEnabled: Boolean = false
 )
 
 @Serializable

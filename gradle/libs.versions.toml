@@ -45,6 +45,7 @@ easycrop = "0.1.1"
 credentials = "1.6.0"
 playServicesCoroutines = "1.11.0"
 firebaseBom = "35.1.0"
+crashlyticsPlugin = "3.0.8"
 googleid = "1.2.1"
 coroutines = "1.11.0"
 workManager = "2.12.0"
@@ -112,7 +113,8 @@ play-services-auth-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-corout
 #androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 #firebase-auth = { module = "com.google.firebase:firebase-auth" }
 #firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
-#firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 #googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
@@ -124,6 +126,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
-#google-services = { id = "com.google.gms.google-services", version = "4.5.0" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }
+google-services = { id = "com.google.gms.google-services", version = "4.5.0" }
 
 

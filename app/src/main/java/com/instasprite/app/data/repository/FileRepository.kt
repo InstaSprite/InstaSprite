@@ -1,5 +1,6 @@
 package com.instasprite.app.data.repository
 
+import com.instasprite.app.data.diagnostics.CrashReports
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -98,6 +99,7 @@ class FileRepository(val context: Context) {
             return true
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
+            CrashReports.record("export", e)
             return false
         } finally {
             if (!complete) runCatching { file?.delete() }
@@ -129,6 +131,7 @@ class FileRepository(val context: Context) {
             }
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
+            CrashReports.record("import", e)
             e.printStackTrace()
             null
         } finally {

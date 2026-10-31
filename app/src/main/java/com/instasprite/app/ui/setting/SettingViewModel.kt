@@ -2,6 +2,7 @@ package com.instasprite.app.ui.setting
 
 import android.content.Context
 import android.content.Intent
+import com.instasprite.app.data.diagnostics.CrashReports
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.instasprite.app.ui.theme.AppFont
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingUiState(
+    val crashReportsEnabled: Boolean = false,
     val themeFlavour: ThemeFlavour = ThemeFlavour.MOCHA,
     val appFont: AppFont = AppFont.DETERMINATION,
     val showLanguageDialog: Boolean = false,
@@ -48,6 +50,7 @@ class SettingViewModel @Inject constructor(
         val selectedLanguage = if (index >= 0) languages[index] else ""
 
         _uiState.value = _uiState.value.copy(
+            crashReportsEnabled = AppSettings.getCrashReportsEnabled(context),
             themeFlavour = AppSettings.getThemeFlavour(context),
             appFont = AppSettings.getAppFont(context),
             supportedLocales = supportedLocales,
@@ -55,6 +58,14 @@ class SettingViewModel @Inject constructor(
             languageCodes = languageCodes,
             selectedLanguage = selectedLanguage
         )
+    }
+
+    fun setCrashReportsEnabled(enabled: Boolean) {
+        if (!CrashReports.available) return
+        if (!enabled) CrashReports.setEnabled(false)
+        AppSettings.setCrashReportsEnabled(context, enabled)
+        if (enabled) CrashReports.setEnabled(true)
+        _uiState.value = _uiState.value.copy(crashReportsEnabled = enabled)
     }
 
     fun setThemeFlavour(flavour: ThemeFlavour) {

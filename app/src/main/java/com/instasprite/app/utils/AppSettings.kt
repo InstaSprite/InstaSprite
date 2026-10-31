@@ -21,6 +21,12 @@ object AppSettings {
         return updateResources(context, settings.language)
     }
 
+    fun getCrashReportsEnabled(context: Context): Boolean = getPersistedSettings(context).crashReportsEnabled
+
+    fun setCrashReportsEnabled(context: Context, enabled: Boolean) {
+        persist(context) { it.copy(crashReportsEnabled = enabled) }
+    }
+
     fun getLanguage(context: Context): String {
         return getPersistedSettings(context).language
     }

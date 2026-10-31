@@ -11,6 +11,13 @@ plugins {
     id("kotlin-parcelize")
 }
 
+val firebaseConfigured = file("google-services.json").isFile ||
+        fileTree("src") { include("**/google-services.json") }.files.isNotEmpty()
+if (firebaseConfigured) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+}
+
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -23,6 +30,7 @@ android {
 
     defaultConfig {
         applicationId = "com.instasprite.app"
+        buildConfigField("boolean", "CRASH_REPORTING_CONFIGURED", firebaseConfigured.toString())
         minSdk = 26
         targetSdk = 36
         val ciVersionCode = project.findProperty("ciVersionCode")?.toString()?.toIntOrNull()
@@ -109,6 +117,8 @@ protobuf {
 }
 
 dependencies {
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
     // --- Core Android & Kotlin ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -630,4 +630,6 @@
     <string name="tut_timeline_cels_desc">Each column is a frame; each row is a layer. Tap a cell to select both. Eye and lock buttons work like the layer panel. Drag the top handle to resize the timeline.</string>
     <string name="tut_timeline_playback_title">Timing and playback</string>
     <string name="tut_timeline_playback_desc">Play previews your animation once it has two or more frames. Tap the time in milliseconds below the grid to change the selected frame duration. Open the timeline menu for onion skin, duplicate, and delete. The down arrow collapses the timeline.</string>
+    <string name="crash_reports_title">Send crash reports</string>
+    <string name="crash_reports_description">Optional diagnostic reports help fix crashes. Reports may include device and app information. Artwork and project names are not intentionally included.</string>
 </resources>

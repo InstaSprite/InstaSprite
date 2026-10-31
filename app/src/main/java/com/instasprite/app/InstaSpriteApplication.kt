@@ -2,6 +2,9 @@ package com.instasprite.app
 
 import android.app.Application
 import android.util.Log
+import com.instasprite.app.data.diagnostics.CrashReports
+import com.instasprite.app.di.settingsDataStore
+import kotlinx.coroutines.flow.first
 import com.instasprite.app.data.repository.SpriteDatabaseRepository
 import javax.inject.Inject
 import dagger.hilt.android.HiltAndroidApp
@@ -24,6 +27,7 @@ class InstaSpriteApplication : Application() {
             emptyList()
         }
         CoroutineScope(Dispatchers.IO).launch {
+            CrashReports.setEnabled(settingsDataStore.data.first().crashReportsEnabled)
             try {
                 spriteRepository.cleanupOrphanedSpriteFiles()
             } catch (e: Exception) {

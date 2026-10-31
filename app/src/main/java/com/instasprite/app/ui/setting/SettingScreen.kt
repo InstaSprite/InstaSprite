@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import com.instasprite.app.data.diagnostics.CrashReports
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -168,6 +170,21 @@ fun SettingScreen(
                 color = colors.surfaceRaised,
                 thickness = 1.pixelDp
             )
+
+            if (CrashReports.available) {
+                SettingItem(
+                    icon = R.drawable.ic_info,
+                    title = stringResource(R.string.crash_reports_title),
+                    subtitle = stringResource(R.string.crash_reports_description),
+                    onClick = { viewModel.setCrashReportsEnabled(!uiState.crashReportsEnabled) },
+                    trailing = {
+                        Checkbox(
+                            checked = uiState.crashReportsEnabled,
+                            onCheckedChange = viewModel::setCrashReportsEnabled
+                        )
+                    }
+                )
+            }
 
             // Language Selection Dialog
             if (uiState.showLanguageDialog) {
