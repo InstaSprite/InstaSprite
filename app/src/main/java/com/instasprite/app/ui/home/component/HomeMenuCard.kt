@@ -1,6 +1,7 @@
 package com.instasprite.app.ui.home.component
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -46,7 +47,12 @@ fun HomeMenuCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.pixelDp)
         ) {
-            PixelIcon(R.drawable.ic_launcher, modifier = Modifier.size(64.pixelDp))
+            PixelIcon(
+                R.drawable.ic_launcher,
+                modifier = Modifier
+                    .size(64.pixelDp)
+                    .border(2.pixelDp, colors.surface, MaterialTheme.shapes.small)
+            )
             Text(
                 stringResource(R.string.app_name),
                 style = MaterialTheme.typography.titleLarge,
@@ -103,7 +109,7 @@ private fun HomeMenuAction(
         PixelIcon(icon, tint = tint)
         Spacer(Modifier.width(8.pixelDp))
         Text(label, modifier = Modifier.weight(1f), textAlign = TextAlign.Start)
-//        PixelIcon(R.drawable.ic_right_arrow, tint = colors.textMuted)
+        PixelIcon(R.drawable.ic_right_arrow, tint = colors.textMuted)
     }
 }
 

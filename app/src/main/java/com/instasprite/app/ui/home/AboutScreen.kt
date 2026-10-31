@@ -2,6 +2,7 @@ package com.instasprite.app.ui.home
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,7 +76,8 @@ fun AboutScreen(
                 icon = R.drawable.ic_launcher,
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier
-                    .size(58.pixelDp)
+                    .size(64.pixelDp)
+                    .border(2.pixelDp, colors.surface, MaterialTheme.shapes.small)
             )
 
             Spacer(modifier = Modifier.height(10.pixelDp))

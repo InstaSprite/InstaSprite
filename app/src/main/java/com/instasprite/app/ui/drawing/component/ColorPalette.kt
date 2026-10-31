@@ -26,8 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +42,7 @@ import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.pixelDp
+import com.instasprite.app.utils.toContrastingTextColor
 import com.instasprite.app.utils.toHexString
 import kotlinx.coroutines.launch
 
@@ -159,13 +158,7 @@ fun ColorPalette(
     }
 }
 
-internal fun activeColorTextColor(color: Color): Color {
-    val dark = color.compositeOver(Color(0xFF808080)).luminance()
-    val light = color.compositeOver(Color(0xFFC0C0C0)).luminance()
-    val blackContrast = (minOf(dark, light) + 0.05f) / 0.05f
-    val whiteContrast = 1.05f / (maxOf(dark, light) + 0.05f)
-    return if (blackContrast >= whiteContrast) Color.Black else Color.White
-}
+
 
 @Composable
 private fun ActiveColor(
@@ -173,14 +166,14 @@ private fun ActiveColor(
     onClick: (() -> Unit),
     modifier: Modifier = Modifier
 ) {
-    val textColor = activeColorTextColor(activeColor)
+    val textColor = activeColor.toContrastingTextColor()
     val showAlpha = activeColor.alpha < 1f
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .then(
-                if (showAlpha) Modifier.drawCheckerboard() else Modifier
+                if (showAlpha) Modifier.drawCheckerboard(64f) else Modifier
             )
             .background(activeColor)
             .border(

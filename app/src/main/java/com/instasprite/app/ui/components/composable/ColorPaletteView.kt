@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -42,6 +41,7 @@ import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.pixelDp
+import com.instasprite.app.utils.toContrastingTextColor
 
 @Immutable
 data class ColorPaletteConfig(
@@ -340,7 +340,7 @@ fun ColorItem(
 ) {
     Box(
         modifier = modifier
-            .then(if (color.alpha < 1f) Modifier.drawCheckerboard() else Modifier)
+            .then(if (color.alpha < 1f) Modifier.drawCheckerboard(4,4) else Modifier)
             .background(color)
             .then(
                 if (onColorSelected != null) {
@@ -358,12 +358,11 @@ fun ActiveColorItem(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
-    val luminance = color.luminance()
-    val indicatorColor = if (luminance < 0.4f) Color.White else Color.Black
+    val indicatorColor = color.toContrastingTextColor()
 
     Box(
         modifier = modifier
-            .then(if (color.alpha < 1f) Modifier.drawCheckerboard() else Modifier)
+            .then(if (color.alpha < 1f) Modifier.drawCheckerboard(4,4) else Modifier)
             .background(color)
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
     ) {
@@ -385,7 +384,7 @@ private fun Preview() {
     InstaSpriteTheme {
         ColorPaletteView(
             colors = listOf(
-                Color.White,
+                Color.Transparent,
                 Color.Green,
                 Color.Blue,
                 Color.Yellow,
