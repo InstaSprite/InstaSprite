@@ -9,7 +9,13 @@ import com.instasprite.app.data.serializer.ISpriteSerializer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,28 +23,32 @@ import javax.inject.Singleton
 class ISpriteDatSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val dataStoreCache = mutableMapOf<String, DataStore<ISprite>>()
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val mutex = Mutex()
 
-    fun getDataStore(spriteId: String): DataStore<ISprite> {
-        return synchronized(dataStoreCache) {
-            dataStoreCache.getOrPut(spriteId) {
-                DataStoreFactory.create(
-                    serializer = ISpriteSerializer,
-                    scope = scope,
-                    produceFile = { context.dataStoreFile("sprite_pixels_$spriteId.pb") }
-                )
-            }
-        }
+    suspend fun readData(spriteId: String): ISprite = withDataStore(spriteId) { it.data.first() }
+
+    suspend fun writeData(spriteId: String, sprite: ISprite) {
+        withDataStore(spriteId) { it.updateData { sprite } }
     }
 
-    fun deleteDataStore(spriteId: String) {
-        synchronized(dataStoreCache) {
-            dataStoreCache.remove(spriteId)
+    private suspend fun <T> withDataStore(spriteId: String, block: suspend (DataStore<ISprite>) -> T): T =
+        mutex.withLock {
+            val job = SupervisorJob()
+            try {
+                val store = DataStoreFactory.create(
+                    serializer = ISpriteSerializer,
+                    scope = CoroutineScope(Dispatchers.IO + job),
+                    produceFile = { context.dataStoreFile("sprite_pixels_$spriteId.pb") }
+                )
+                block(store)
+            } finally {
+                withContext(NonCancellable) { job.cancelAndJoin() }
+            }
         }
+
+    suspend fun deleteDataStore(spriteId: String) = mutex.withLock {
         val file = context.dataStoreFile("sprite_pixels_$spriteId.pb")
-        if (file.exists()) {
-            file.delete()
-        }
+        if (file.exists()) file.delete()
+        Unit
     }
 }

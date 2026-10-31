@@ -47,7 +47,7 @@ class SpriteDatabaseRepository @Inject constructor(
             .setActiveFrameId(checkpoint.activeFrameId)
             .setActiveLayerId(checkpoint.activeLayerId)
             .build()
-        pixelDataSource.getDataStore(sprite.id).updateData { proto }
+        pixelDataSource.writeData(sprite.id, proto)
 
         if (updateThumbnail) ImageExporter.saveThumbnail(sprite, context)
 
@@ -59,7 +59,7 @@ class SpriteDatabaseRepository @Inject constructor(
 
     suspend fun loadDrawing(id: String): DrawingCheckpoint? {
         val entity = dao.getById(id) ?: return null
-        val proto = pixelDataSource.getDataStore(id).data.firstOrNull()
+        val proto = pixelDataSource.readData(id)
 
         if (proto != null) {
             val sprite = proto.toSprite()
@@ -82,7 +82,7 @@ class SpriteDatabaseRepository @Inject constructor(
     fun getAllSpritesWithMeta(): Flow<List<SpriteWithMeta>> {
         return dao.getAllSpritesWithMeta().map { list ->
             list.map { item ->
-                val proto = pixelDataSource.getDataStore(item.sprite.id).data.firstOrNull()
+                val proto = pixelDataSource.readData(item.sprite.id)
                 item.toDomain(
                     sprite = item.sprite.toDomain(
                         layers = emptyList(),
@@ -93,7 +93,7 @@ class SpriteDatabaseRepository @Inject constructor(
         }
     }
 
-    fun deleteSpriteById(spriteId: String) {
+    suspend fun deleteSpriteById(spriteId: String) {
         dao.delete(spriteId)
         pixelDataSource.deleteDataStore(spriteId)
 
