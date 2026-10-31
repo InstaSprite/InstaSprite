@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,7 +49,10 @@ class ISpriteDatSource @Inject constructor(
 
     suspend fun deleteDataStore(spriteId: String) = mutex.withLock {
         val file = context.dataStoreFile("sprite_pixels_$spriteId.pb")
-        if (file.exists()) file.delete()
+        val temporary = context.dataStoreFile("sprite_pixels_$spriteId.pb.tmp")
+        for (target in listOf(file, temporary)) {
+            if (target.exists() && !target.delete()) throw IOException("Could not delete sprite pixel file")
+        }
         Unit
     }
 }

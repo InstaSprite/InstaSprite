@@ -16,9 +16,11 @@ import com.instasprite.app.domain.model.SpriteMeta
 import com.instasprite.app.domain.model.SpriteWithMeta
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 class SpriteDatabaseRepository @Inject constructor(
@@ -27,9 +29,11 @@ class SpriteDatabaseRepository @Inject constructor(
     private val pixelDataSource: ISpriteDatSource,
     @ApplicationContext private val context: android.content.Context
 ) {
+    private val fileMutex = Mutex()
+
     suspend fun saveSprite(sprite: Sprite) = saveDrawing(DrawingCheckpoint(sprite), true)
 
-    suspend fun saveDrawing(checkpoint: DrawingCheckpoint, updateThumbnail: Boolean) {
+    suspend fun saveDrawing(checkpoint: DrawingCheckpoint, updateThumbnail: Boolean) = fileMutex.withLock {
         val sprite = checkpoint.sprite
         Log.d("ISpriteDatabaseRepository", "Saving sprite: ${sprite.id}")
         val now = System.currentTimeMillis()
@@ -93,15 +97,32 @@ class SpriteDatabaseRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteSpriteById(spriteId: String) {
+    suspend fun deleteSpriteById(spriteId: String) = fileMutex.withLock {
         dao.delete(spriteId)
-        pixelDataSource.deleteDataStore(spriteId)
-        File(context.cacheDir, "history/$spriteId").deleteRecursively()
+        deleteSpriteFiles(spriteId)
+    }
 
-        val thumbnailFile = File(context.filesDir, "thumbnail_${spriteId}.png")
-        if (thumbnailFile.exists()) {
-            thumbnailFile.delete()
+    suspend fun cleanupOrphanedSpriteFiles() = fileMutex.withLock {
+        val activeIds = dao.getAllSprites().mapTo(mutableSetOf()) { it.id }
+        val thumbnailIds = context.filesDir.listFiles().orEmpty()
+            .mapNotNull { Regex("thumbnail_(.+)\\.png").matchEntire(it.name)?.groupValues?.get(1) }
+        val pixelIds = File(context.filesDir, "datastore").listFiles().orEmpty()
+            .mapNotNull { Regex("sprite_pixels_(.+)\\.pb(?:\\.tmp)?").matchEntire(it.name)?.groupValues?.get(1) }
+        for (id in (thumbnailIds + pixelIds).toSet() - activeIds) {
+            try {
+                deleteSpriteFiles(id)
+            } catch (e: IOException) {
+                Log.w("SpriteDatabaseRepository", "Could not clean orphaned sprite files", e)
+            }
         }
+    }
+
+    private suspend fun deleteSpriteFiles(spriteId: String) {
+        pixelDataSource.deleteDataStore(spriteId)
+        val history = File(context.cacheDir, "history/$spriteId")
+        if (history.exists() && !history.deleteRecursively()) throw IOException("Could not delete sprite undo history")
+        val thumbnail = File(context.filesDir, "thumbnail_${spriteId}.png")
+        if (thumbnail.exists() && !thumbnail.delete()) throw IOException("Could not delete sprite thumbnail")
     }
 
     suspend fun changeName(spriteId: String, newName: String) {
