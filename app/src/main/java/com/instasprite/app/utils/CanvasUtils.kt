@@ -234,6 +234,15 @@ internal fun anchorSelectionOutline(
     }
 }
 
+internal fun DrawScope.drawCanvasHandle(center: Offset, handleSize: Float, strokeWidth: Float) {
+    val topLeft = center - Offset(handleSize / 2, handleSize / 2)
+    drawRect(Color.White, topLeft, Size(handleSize, handleSize))
+    drawRect(
+        Color.Black, topLeft, Size(handleSize, handleSize),
+        style = Stroke(width = strokeWidth)
+    )
+}
+
 fun DrawScope.drawSelectionOverlay(
     selectionState: SelectionState,
     showGrabHandle: Boolean,
@@ -254,7 +263,7 @@ fun DrawScope.drawSelectionOverlay(
         asAndroidPath().transform(matrix)
     }
 
-    val outlineWidth = 2.pixelDp.toPx() / scale
+    val outlineWidth = 2.pixelDp.toPx() / scale.coerceAtLeast(0.01f)
     val inset = minOf(outlineWidth / 2, visibleBounds.width / 4, visibleBounds.height / 4)
     val edgeBounds = Rect(
         visibleBounds.left + inset, visibleBounds.top + inset,
@@ -268,24 +277,25 @@ fun DrawScope.drawSelectionOverlay(
         scaledPath = anchorSelectionOutline(scaledPath, selectionBounds, edgeBounds, outlineWidth)
     }
 
-    val bgOutlineWidth = 2.pixelDp.toPx() / scale
-
     drawPath(
         path = scaledPath,
         color = Color.Black,
-        style = Stroke(width = bgOutlineWidth),
+        style = Stroke(width = outlineWidth),
 
         )
     drawPath(
         path = scaledPath,
         color = Color.White,
-        style = Stroke(width = outlineWidth)
+        style = Stroke(width = outlineWidth / 2)
     )
 
     if (showGrabHandle) {
         val b = selectionState.bounds
-        val handleSize = 10.pixelDp.toPx() / scale
-        val strokeWidth = 1.pixelDp.toPx() / scale
+        val handleSize = minOf(
+            10.pixelDp.toPx() / scale.coerceAtLeast(0.01f),
+            visibleBounds.width / 4,
+            visibleBounds.height / 4
+        )
 
         val left = b.left * pxW
         val right = b.right * pxW
@@ -306,17 +316,7 @@ fun DrawScope.drawSelectionOverlay(
         )
 
         for (pt in points) {
-            drawRect(
-                color = Color.White,
-                topLeft = Offset(pt.x - handleSize / 2, pt.y - handleSize / 2),
-                size = Size(handleSize, handleSize)
-            )
-            drawRect(
-                color = Color.Black,
-                topLeft = Offset(pt.x - handleSize / 2, pt.y - handleSize / 2),
-                size = Size(handleSize, handleSize),
-                style = Stroke(width = strokeWidth)
-            )
+            drawCanvasHandle(pt, handleSize, outlineWidth / 2)
         }
     }
 }

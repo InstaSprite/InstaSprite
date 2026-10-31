@@ -15,11 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +45,7 @@ import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.cursorPointerInput
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.drawCursorOverlay
+import com.instasprite.app.utils.drawCanvasHandle
 import com.instasprite.app.utils.drawSelectionOverlay
 import com.instasprite.app.utils.drawingPointerInput
 import com.instasprite.app.utils.pixelDp
@@ -226,12 +225,7 @@ fun PixelCanvas(
             )
 
             fun axisHandle(center: Offset) {
-                val topLeft = center - Offset(handleSize / 2, handleSize / 2)
-                drawRect(Color.White, topLeft, Size(handleSize, handleSize))
-                drawRect(
-                    Color.Black, topLeft, Size(handleSize, handleSize),
-                    style = Stroke(width = outlineWidth / 2)
-                )
+                drawCanvasHandle(center, handleSize, outlineWidth / 2)
             }
             if (activeSymmetry.horizontal && !visibleBounds.isEmpty) {
                 val x = (activeSymmetry.x(canvasWidth) * size.width / canvasWidth)
