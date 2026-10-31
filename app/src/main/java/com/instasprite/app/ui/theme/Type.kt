@@ -8,10 +8,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.instasprite.app.R
-import kotlinx.serialization.Serializable
 
 
-@Serializable
 enum class AppFont(val label: String) {
     DETERMINATION("Determination"),
     RETRON("Retron"),

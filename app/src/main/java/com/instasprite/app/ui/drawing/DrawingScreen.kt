@@ -357,12 +357,13 @@ private fun DrawingScreenContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .height(44.pixelDp)
-                            .padding(horizontal = 4.pixelDp)
+                            .height(32.pixelDp)
+                            .padding(horizontal = 2.pixelDp)
                     ) {
                         ToolOptionMenu(
                             selectedTool = uiState.selectedTool,
                             modifier = Modifier
+                                .background(AppTheme.colors.surfaceInset)
                                 .weight(8f)
                                 .onGloballyPositioned { coords ->
                                     event.onTutorialEvent(
@@ -372,7 +373,7 @@ private fun DrawingScreenContent(
                                         )
                                     )
                                 }
-                                .padding(horizontal = 4.pixelDp, vertical = 2.pixelDp)
+//                                .padding(horizontal = 2.pixelDp)
                         ) {
                             toolOptions(
                                 tool = uiState.selectedTool,

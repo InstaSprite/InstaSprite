@@ -24,7 +24,7 @@ import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun SymmetryOptions(symmetry: DrawingSymmetry, onEvent: (ToolSelectorEvent) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(2.pixelDp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.pixelDp)) {
         SymmetryToggle(
             R.drawable.ic_hflip,
             stringResource(R.string.mirror_left_right),
