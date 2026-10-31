@@ -2,8 +2,6 @@ package com.instasprite.app.ui.gallery
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -24,10 +22,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +35,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.instasprite.app.R
 import com.instasprite.app.domain.model.Sprite
 import com.instasprite.app.domain.model.SpriteWithMeta
-import com.instasprite.app.ui.components.composable.JumpToTopButton
 import com.instasprite.app.ui.components.composable.TopBar
 import com.instasprite.app.ui.gallery.component.ImagePagerOverlay
 import com.instasprite.app.ui.gallery.component.SearchBar
@@ -181,8 +176,6 @@ fun GalleryPageContent(
     modifier: Modifier = Modifier,
 ) {
 
-    var isScrolled by remember { mutableStateOf(false) }
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -198,21 +191,10 @@ fun GalleryPageContent(
                 layoutMode = uiState.layoutMode,
                 playingSpriteId = uiState.playingSpriteId.takeUnless { uiState.showImagePager },
                 playbackSprite = uiState.playbackSprite.takeUnless { uiState.showImagePager },
-                onIsScrolledChange = { isScrolled = it },
                 lazyListState = lazyListState,
                 modifier = Modifier.padding(horizontal = 6.pixelDp, vertical = 4.pixelDp)
             )
 
-            AnimatedVisibility(
-                visible = isScrolled,
-                enter = scaleIn(),
-                exit = scaleOut(),
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 6.pixelDp)
-            ) {
-                JumpToTopButton(listState = lazyListState)
-            }
         } else {
             Text(
                 text = stringResource(R.string.click_plus_to_create),
@@ -231,8 +213,6 @@ private fun GalleryScreenContent(
     searchQuery: String,
     event: GalleryScreenEvent,
 ) {
-    var isScrolled by remember { mutableStateOf(false) }
-
     Box {
         Scaffold(
             topBar = {
@@ -278,25 +258,12 @@ private fun GalleryScreenContent(
                     layoutMode = uiState.layoutMode,
                     playingSpriteId = uiState.playingSpriteId.takeUnless { uiState.showImagePager },
                     playbackSprite = uiState.playbackSprite.takeUnless { uiState.showImagePager },
-                    onIsScrolledChange = { isScrolled = it },
                     lazyListState = lazyListState,
                     modifier = Modifier.padding(horizontal = 6.pixelDp)
                 )
             }
         }
 
-        AnimatedVisibility(
-            visible = isScrolled,
-            enter = scaleIn(),
-            exit = scaleOut(),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 42.pixelDp)
-        ) {
-            JumpToTopButton(
-                listState = lazyListState
-            )
-        }
 
         Box(
             modifier = Modifier
