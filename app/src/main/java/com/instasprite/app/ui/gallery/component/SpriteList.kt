@@ -70,6 +70,7 @@ fun SpriteList(
     lazyListState: LazyListState = rememberLazyListState(),
     onOpenDrawing: (Sprite, String?) -> Unit,
 ) {
+    val untitledLabel = stringResource(R.string.untitled)
 
     AnimatedContent(
         targetState = layoutMode,
@@ -93,7 +94,7 @@ fun SpriteList(
                             onDelete = {
                                 onSpriteListEvent(
                                     SpriteListEvent.OpenDeleteDialog(
-                                        meta!!.spriteName,
+                                        meta?.spriteName ?: untitledLabel,
                                         sprite.id
                                     )
                                 )
@@ -149,7 +150,7 @@ fun SpriteList(
                             onDelete = {
                                 onSpriteListEvent(
                                     SpriteListEvent.OpenDeleteDialog(
-                                        meta!!.spriteName,
+                                        meta?.spriteName ?: untitledLabel,
                                         sprite.id
                                     )
                                 )
@@ -190,7 +191,7 @@ fun SpriteList(
                             onDelete = {
                                 onSpriteListEvent(
                                     SpriteListEvent.OpenDeleteDialog(
-                                        meta!!.spriteName,
+                                        meta?.spriteName ?: untitledLabel,
                                         sprite.id
                                     )
                                 )

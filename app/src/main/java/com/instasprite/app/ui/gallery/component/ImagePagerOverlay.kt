@@ -72,6 +72,7 @@ fun ImagePagerOverlay(
         pageCount = { spriteList.size })
 
     val currentSprite = spriteList.getOrNull(pagerState.currentPage)
+    val spriteName = currentSprite?.meta?.spriteName ?: stringResource(R.string.untitled)
     val onEvent by rememberUpdatedState(onImagePagerEvent)
     DisposableEffect(currentSprite?.sprite?.id) {
         val id = currentSprite?.sprite?.id
@@ -94,7 +95,7 @@ fun ImagePagerOverlay(
             topBar = {
                 var dropdownMenuVisible by remember { mutableStateOf(false) }
                 TopBar(
-                    title = currentSprite?.meta?.spriteName ?: "",
+                    title = spriteName,
                     onBackClick = { onDismiss(currentSprite?.sprite) },
                     actions = {
                         if (currentSprite?.hasAnimation == true) {
@@ -119,11 +120,11 @@ fun ImagePagerOverlay(
                                 expanded = dropdownMenuVisible,
                                 onDismiss = { dropdownMenuVisible = false },
                                 onDeleteButtonTap = {
-                                    currentSprite?.meta?.let {
+                                    currentSprite?.let {
                                         onImagePagerEvent(
                                             ImagePagerEvent.OpenDeleteDialog(
-                                                it.spriteName,
-                                                it.spriteId
+                                                spriteName,
+                                                it.sprite.id
                                             )
                                         )
                                     }
@@ -196,7 +197,7 @@ fun ImagePagerOverlay(
 }
 
 @Composable
-private fun BottomBar(
+internal fun BottomBar(
     spriteWithMetaData: SpriteWithMeta?,
     onExportTap: () -> Unit,
     onEditButtonTap: () -> Unit,
@@ -205,14 +206,9 @@ private fun BottomBar(
     if (spriteWithMetaData == null) return
 
     val sprite = spriteWithMetaData.sprite
-    val metadata = spriteWithMetaData.meta!!
+    val metadata = spriteWithMetaData.meta
 
-    val spriteName = metadata.spriteName
-    val dateCreated = metadata.createdAt.toDateString()
-    val dateModified = metadata.lastModifiedAt.toDateString()
-
-    val spriteWidth = sprite.width
-    val spriteHeight = sprite.height
+    val spriteName = metadata?.spriteName ?: stringResource(R.string.untitled)
 
     Box(
         modifier = modifier
@@ -224,7 +220,9 @@ private fun BottomBar(
                 .padding(8.pixelDp)
         ) {
             Text(text = stringResource(R.string.name) + ": " + spriteName)
-            Text(text = stringResource(R.string.sort_date_created) + ": " + dateCreated)
+            metadata?.let {
+                Text(text = stringResource(R.string.sort_date_created) + ": " + it.createdAt.toDateString())
+            }
 
             Spacer(modifier = Modifier.height(8.pixelDp))
 
