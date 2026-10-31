@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
+import com.google.protobuf.CodedInputStream
 import com.instasprite.app.ISprite
+import com.instasprite.app.utils.SpriteReadBudget
 import com.instasprite.app.data.mapper.toISprite
 import com.instasprite.app.data.mapper.toSprite
 import com.instasprite.app.domain.model.Sprite
@@ -118,9 +120,12 @@ class FileRepository(val context: Context) {
 
                 val finalStream = if (isGzipped) GZIPInputStream(pushbackStream) else pushbackStream
 
-                val proto = ISprite.parseFrom(finalStream)
+                val budget = SpriteReadBudget()
+                val codedInput = CodedInputStream.newInstance(budget.limit(finalStream))
+                codedInput.setSizeLimit(64 * 1024 * 1024)
+                val proto = ISprite.parseFrom(codedInput)
 
-                proto.toSprite()
+                proto.toSprite(budget)
             }
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
