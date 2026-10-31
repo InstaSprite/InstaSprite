@@ -98,7 +98,7 @@ fun AboutScreen(
 
             // Tagline
             Text(
-                text = stringResource(R.string.pixel_art_creation_social_sharing),
+                text = stringResource(R.string.pixel_art_editor_tagline),
                 fontSize = 14.sp,
                 color = colors.textSecondary,
                 textAlign = TextAlign.Center,

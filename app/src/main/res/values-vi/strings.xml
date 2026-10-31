@@ -354,7 +354,7 @@
     <string name="sort_date_created_desc">Ngày tạo (Mới nhất)</string>
     <string name="sort_date_modified">Ngày chỉnh sửa</string>
     <string name="sort_date_modified_desc">Ngày chỉnh sửa (Mới nhất)</string>
-    <string name="pixel_art_creation_social_sharing">Sáng tạo nghệ thuật pixel &amp; chia sẻ</string>
+    <string name="pixel_art_editor_tagline">Trình chỉnh sửa ảnh pixel</string>
     <string name="made_with_3_and_lots_of_pixels">Được làm với &lt;3 và rất nhiều pixel</string>
     <string name="floating_action_button">Nút hành động nổi</string>
     <string name="load_canvas">Tải bản vẽ</string>

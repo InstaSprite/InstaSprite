@@ -356,7 +356,7 @@
     <string name="sort_date_created_desc">Date Created Desc</string>
     <string name="sort_date_modified">Date Modified</string>
     <string name="sort_date_modified_desc">Date Modified Desc</string>
-    <string name="pixel_art_creation_social_sharing">Pixel art creation &amp; social sharing</string>
+    <string name="pixel_art_editor_tagline">Pixel art editor</string>
     <string name="made_with_3_and_lots_of_pixels">Made with &lt;3 and lots of pixels</string>
     <string name="floating_action_button">Floating action button</string>
     <string name="load_image">Load Image</string>
