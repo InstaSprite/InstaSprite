@@ -13,6 +13,8 @@ plugins {
 
 val firebaseConfigured = file("google-services.json").isFile ||
         fileTree("src") { include("**/google-services.json") }.files.isNotEmpty()
+val releaseSigningConfigured = listOf("KEYSTORE_PASSWORD", "KEY_ALIAS", "KEY_PASSWORD")
+    .all { !System.getenv(it).isNullOrBlank() }
 if (firebaseConfigured) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
@@ -70,7 +72,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (releaseSigningConfigured) signingConfigs.getByName("release") else null
         }
         debug {
             isDebuggable = true

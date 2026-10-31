@@ -53,6 +53,12 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          for name in KEYSTORE_FILE KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing release signing variable: $name"
+              exit 1
+            fi
+          done
           VERSION_CODE=$((${{ github.run_number }} + 3))
           ./gradlew bundleProdRelease -PciVersionCode=$VERSION_CODE
 
