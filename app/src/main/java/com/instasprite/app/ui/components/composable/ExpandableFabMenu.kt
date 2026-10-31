@@ -24,7 +24,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,8 +34,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +50,6 @@ import androidx.compose.ui.window.PopupProperties
 import com.instasprite.app.R
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
-import com.instasprite.app.utils.Constants.PIXEL_DP
 import com.instasprite.app.utils.noRippleClickable
 import com.instasprite.app.utils.pixelDp
 import kotlin.math.roundToInt
@@ -58,6 +58,24 @@ enum class FabMenuAlignment {
     Start,
     Center,
     End
+}
+
+internal fun fabMenuOffset(
+    anchorPosition: Offset,
+    anchorSize: IntSize,
+    popupPosition: Offset,
+    menuSize: IntSize,
+    alignment: FabMenuAlignment,
+    spacing: Int
+): IntOffset {
+    if (!anchorPosition.isSpecified || !popupPosition.isSpecified) return IntOffset.Zero
+    val anchor = anchorPosition - popupPosition
+    val x = when (alignment) {
+        FabMenuAlignment.Start -> anchor.x.roundToInt()
+        FabMenuAlignment.Center -> anchor.x.roundToInt() + (anchorSize.width - menuSize.width) / 2
+        FabMenuAlignment.End -> anchor.x.roundToInt() + anchorSize.width - menuSize.width
+    }
+    return IntOffset(x, anchor.y.roundToInt() - menuSize.height - spacing)
 }
 
 data class FabMenuItem(
@@ -104,7 +122,7 @@ fun ExpandableFabMenu(
     colors: FabMenuColors = FabMenuColors.defaults(),
     button: (@Composable (onClick: () -> Unit) -> Unit)? = null,
 ) {
-    val density = LocalDensity.current
+    val menuSpacing = with(LocalDensity.current) { 8.pixelDp.roundToPx() }
     var expanded by remember { mutableStateOf(false) }
     val expandedState = remember { MutableTransitionState(false) }
     expandedState.targetState = expanded
@@ -113,49 +131,18 @@ fun ExpandableFabMenu(
         targetValue = if (expanded) 135f else 0f,
         animationSpec = tween(durationMillis = animationDurationMs, easing = FastOutSlowInEasing)
     )
-    var fabOffset by remember { mutableStateOf(Offset.Zero) }
+    var fabOffset by remember { mutableStateOf(Offset.Unspecified) }
     var fabSize by remember { mutableStateOf(IntSize.Zero) }
     var columnSize by remember { mutableStateOf(IntSize.Zero) }
-
-    val itemOffset by remember(
-        fabOffset,
-        fabSize,
-        columnSize,
-        alignment,
-        items.size
-    ) {
-        derivedStateOf {
-            val itemSpacingPx = with(density) {
-                itemSpacing.roundToPx()
-            }
-
-            val alignedX = when (alignment) {
-                FabMenuAlignment.Start ->
-                    fabOffset.x.roundToInt()
-
-                FabMenuAlignment.Center ->
-                    fabOffset.x.roundToInt() + (fabSize.width - columnSize.width) / 2
-
-                FabMenuAlignment.End ->
-                    fabOffset.x.roundToInt() + fabSize.width - columnSize.width
-            }
-
-            val alignedY =
-                fabOffset.y.roundToInt() -
-                        columnSize.height -
-                        itemSpacingPx * (items.size + 1) * PIXEL_DP
-
-            IntOffset(alignedX, alignedY.toInt())
-        }
-    }
 
     Box(
         modifier = modifier.onGloballyPositioned { coordinates ->
             fabSize = coordinates.size
-            fabOffset = coordinates.localToWindow(Offset.Zero)
+            fabOffset = coordinates.positionOnScreen()
         }
     ) {
         if (expandedState.currentState || expandedState.targetState) {
+            var popupOffset by remember { mutableStateOf(Offset.Unspecified) }
             val transition = rememberTransition(expandedState, label = "fab_menu")
 
             val scrimAlpha by transition.animateFloat(
@@ -176,6 +163,7 @@ fun ExpandableFabMenu(
                     modifier = Modifier
 
                         .fillMaxSize()
+                        .onGloballyPositioned { popupOffset = it.positionOnScreen() }
                         .background(colors.scrim.copy(alpha = colors.scrim.alpha * scrimAlpha))
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
@@ -188,11 +176,12 @@ fun ExpandableFabMenu(
                         verticalArrangement = Arrangement.spacedBy(itemSpacing),
                         modifier = Modifier
                             .wrapContentWidth()
+                            .alpha(if (popupOffset.isSpecified && fabOffset.isSpecified && columnSize != IntSize.Zero) 1f else 0f)
                             .onGloballyPositioned { coordinates ->
                                 columnSize = coordinates.size
                             }
                             .offset {
-                                itemOffset
+                                fabMenuOffset(fabOffset, fabSize, popupOffset, columnSize, alignment, menuSpacing)
                             }
                     ) {
                         items.forEachIndexed { index, item ->
