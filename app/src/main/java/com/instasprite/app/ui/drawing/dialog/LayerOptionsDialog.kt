@@ -80,14 +80,14 @@ fun LayerOptionsDialog(
                     .aspectRatio(1f),
                 contentAlignment = Alignment.Center
             ) {
-                if (layerImage != null) {
+                if (layerImage != null && canvasWidth > 0 && canvasHeight > 0) {
                     Image(
                         bitmap = layerImage,
-                        contentDescription = "Layer Preview",
-                        contentScale = ContentScale.FillWidth,
+                        contentDescription = stringResource(R.string.layer_preview),
+                        contentScale = ContentScale.Fit,
                         filterQuality = FilterQuality.None,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .aspectRatio(canvasWidth.toFloat() / canvasHeight)
                             .drawCheckerboard(
                                 canvasWidth = canvasWidth,
                                 canvasHeight = canvasHeight
@@ -192,7 +192,7 @@ fun LayerOptionsDialog(
     }
 }
 
-@Preview
+@Preview(name = "Portrait layer options")
 @Composable
 private fun PreviewLayerOptionsDialog() {
     InstaSpriteTheme {
@@ -204,9 +204,9 @@ private fun PreviewLayerOptionsDialog() {
                 isClipping = true,
                 tiles = emptyMap()
             ),
-            layerImage = null,
+            layerImage = remember { ImageBitmap(16, 32) },
             canvasWidth = 16,
-            canvasHeight = 16,
+            canvasHeight = 32,
             canMergeDown = true,
             canClip = true,
             onToggleClipping = {},

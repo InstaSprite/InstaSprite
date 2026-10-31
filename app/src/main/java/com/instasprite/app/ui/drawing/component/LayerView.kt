@@ -121,10 +121,10 @@ fun LayerView(
                     Image(
                         bitmap = bitmapImage,
                         contentDescription = stringResource(R.string.layer_preview),
-                        contentScale = ContentScale.FillWidth,
+                        contentScale = ContentScale.Fit,
                         filterQuality = FilterQuality.None,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .aspectRatio(canvasWidth.toFloat() / canvasHeight)
                             .drawCheckerboard(
                                 canvasWidth = canvasWidth,
                                 canvasHeight = canvasHeight
@@ -288,6 +288,28 @@ fun LayerView(
         }
     }
 
+}
+
+@Preview(name = "Non-square layer previews")
+@Composable
+private fun NonSquareLayersPreview() {
+    InstaSpriteTheme {
+        Column {
+            listOf(64 to 128, 128 to 64, 17 to 29).forEach { (width, height) ->
+                LayerView(
+                    layer = Layer("$width-$height", "$width × $height", tiles = emptyMap()),
+                    onEvent = {},
+                    canvasWidth = width,
+                    canvasHeight = height,
+                    isActive = false,
+                    onClick = {},
+                    onVisibilityToggle = {},
+                    onLockToggle = {},
+                    onDelete = {}
+                )
+            }
+        }
+    }
 }
 
 @Preview
