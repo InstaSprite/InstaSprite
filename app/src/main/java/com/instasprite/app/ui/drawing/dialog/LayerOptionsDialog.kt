@@ -80,14 +80,14 @@ fun LayerOptionsDialog(
                     .aspectRatio(1f),
                 contentAlignment = Alignment.Center
             ) {
-                if (layerImage != null) {
+                if (layerImage != null && canvasWidth > 0 && canvasHeight > 0) {
                     Image(
                         bitmap = layerImage,
-                        contentDescription = "Layer Preview",
-                        contentScale = ContentScale.FillWidth,
+                        contentDescription = stringResource(R.string.layer_preview),
+                        contentScale = ContentScale.Fit,
                         filterQuality = FilterQuality.None,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .aspectRatio(canvasWidth.toFloat() / canvasHeight)
                             .drawCheckerboard(
                                 canvasWidth = canvasWidth,
                                 canvasHeight = canvasHeight
@@ -118,14 +118,14 @@ fun LayerOptionsDialog(
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    containerColor = AppTheme.colors.DropDownMenuColor
+                    containerColor = AppTheme.colors.surfaceContainer
                 ) {
                     blendModeOptions.forEach { mode ->
                         DropdownMenuItem(
                             text = {
                                 Text(
                                     mode.name.lowercase().replaceFirstChar { it.uppercase() },
-                                    color = AppTheme.colors.TextColorLight
+                                    color = AppTheme.colors.onSurface
                                 )
                             },
                             onClick = {
@@ -152,16 +152,16 @@ fun LayerOptionsDialog(
             ) {
                 Text(
                     stringResource(R.string.clip_to_layer_below),
-                    color = AppTheme.colors.TextColorLight, modifier = Modifier.weight(1f)
+                    color = AppTheme.colors.onSurface, modifier = Modifier.weight(1f)
                 )
                 Checkbox(
                     checked = layer.isClipping,
                     onCheckedChange = null,
                     enabled = canClip || layer.isClipping,
                     colors = CheckboxDefaults.colors(
-                        checkedColor = AppTheme.colors.LinkColor,
-                        uncheckedColor = AppTheme.colors.Subtext0Color,
-                        checkmarkColor = AppTheme.colors.TextColorDark
+                        checkedColor = AppTheme.colors.blue,
+                        uncheckedColor = AppTheme.colors.textMuted,
+                        checkmarkColor = AppTheme.colors.onAccent
                     )
                 )
             }
@@ -176,15 +176,15 @@ fun LayerOptionsDialog(
                         onDismiss()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.SelectedColor,
-                        contentColor = AppTheme.colors.TextColorDark
+                        containerColor = AppTheme.colors.purple,
+                        contentColor = AppTheme.colors.onAccent
                     ),
                     shape = MaterialTheme.shapes.small,
                     modifier = Modifier
                 ) {
                     Text(
                         text = stringResource(R.string.merge_down),
-                        color = AppTheme.colors.TextColorDark,
+                        color = AppTheme.colors.onAccent,
                     )
                 }
             }
@@ -192,7 +192,7 @@ fun LayerOptionsDialog(
     }
 }
 
-@Preview
+@Preview(name = "Portrait layer options")
 @Composable
 private fun PreviewLayerOptionsDialog() {
     InstaSpriteTheme {
@@ -204,9 +204,9 @@ private fun PreviewLayerOptionsDialog() {
                 isClipping = true,
                 tiles = emptyMap()
             ),
-            layerImage = null,
+            layerImage = remember { ImageBitmap(16, 32) },
             canvasWidth = 16,
-            canvasHeight = 16,
+            canvasHeight = 32,
             canMergeDown = true,
             canClip = true,
             onToggleClipping = {},

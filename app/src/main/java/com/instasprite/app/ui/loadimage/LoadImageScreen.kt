@@ -139,16 +139,16 @@ fun LoadImageScreenContent(
                     Button(
                         onClick = event.onConfirm,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AppTheme.colors.AccentButtonColor,
-                            disabledContainerColor = AppTheme.colors.Foreground0Color
+                            containerColor = AppTheme.colors.green,
+                            disabledContainerColor = AppTheme.colors.surface
                         ),
                         shape = MaterialTheme.shapes.small,
                         enabled = isCreateButtonEnabled
                     ) {
                         val textColor = if (isCreateButtonEnabled) {
-                            AppTheme.colors.TextColorDark
+                            AppTheme.colors.onAccent
                         } else {
-                            AppTheme.colors.TextColorLight
+                            AppTheme.colors.onSurface
                         }
 
                         Text(stringResource(R.string.create), color = textColor)
@@ -156,7 +156,7 @@ fun LoadImageScreenContent(
                 }
             )
         },
-        containerColor = AppTheme.colors.BackgroundColorDarker
+        containerColor = AppTheme.colors.surfaceInset
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -177,7 +177,7 @@ fun LoadImageScreenContent(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxSize()
-                    .background(AppTheme.colors.BackgroundColor)
+                    .background(AppTheme.colors.background)
                     .padding(8.pixelDp),
             ) {
                 ImageConfigView(

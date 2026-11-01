@@ -1,6 +1,8 @@
 package com.instasprite.app
 
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.slideInHorizontally
@@ -12,10 +14,15 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -30,6 +37,7 @@ import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.AppSettings
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,46 +63,61 @@ class MainActivity : ComponentActivity() {
             }
 
             val settings by settingsDataStore.data.collectAsState(
-                initial = SettingPreferences()
+                initial = SettingPreferences(language = resources.configuration.locales[0].language)
             )
 
-            InstaSpriteTheme(flavour = settings.themeFlavour, appFont = settings.appFont) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(AppTheme.colors.BackgroundColor)
-                        .windowInsetsPadding(WindowInsets.safeDrawing)
-                ) {
+            val configuration = LocalConfiguration.current
+            val localizedContext = remember(configuration, settings.language) {
+                ContextThemeWrapper(this@MainActivity, R.style.Theme_InstaSprite).apply {
+                    applyOverrideConfiguration(Configuration(configuration).apply {
+                        setLocale(Locale.forLanguageTag(settings.language))
+                    })
+                }
+            }
 
-                    val currentEntry = navigator.backStack.lastOrNull()
+            CompositionLocalProvider(
+                LocalContext provides localizedContext,
+                LocalConfiguration provides localizedContext.resources.configuration,
+                LocalResources provides localizedContext.resources
+            ) {
+                InstaSpriteTheme(flavour = settings.themeFlavour, appFont = settings.appFont) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(AppTheme.colors.background)
+                            .windowInsetsPadding(WindowInsets.safeDrawing)
+                    ) {
 
-                    LaunchedEffect(currentEntry) {
-                        navigator.onTransitionComplete()
+                        val currentEntry = navigator.backStack.lastOrNull()
+
+                        LaunchedEffect(currentEntry) {
+                            navigator.onTransitionComplete()
+                        }
+
+                        NavDisplay(
+                            backStack = navigator.backStack,
+                            onBack = { navigator.goBack() },
+                            entryDecorators = listOf(
+                                rememberSaveableStateHolderNavEntryDecorator(),
+                                rememberViewModelStoreNavEntryDecorator()
+                            ),
+                            entryProvider = entryProvider {
+                                entryProviderScopes.forEach { builder -> this.builder() }
+                            },
+                            transitionSpec = {
+                                slideInHorizontally(initialOffsetX = { it }) togetherWith
+                                        slideOutHorizontally(targetOffsetX = { -it })
+                            },
+                            popTransitionSpec = {
+                                slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                                        slideOutHorizontally(targetOffsetX = { it })
+                            },
+                            predictivePopTransitionSpec = {
+                                slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                                        slideOutHorizontally(targetOffsetX = { it })
+                            },
+                        )
                     }
-
-                    NavDisplay(
-                        backStack = navigator.backStack,
-                        onBack = { navigator.goBack() },
-                        entryDecorators = listOf(
-                            rememberSaveableStateHolderNavEntryDecorator(),
-                            rememberViewModelStoreNavEntryDecorator()
-                        ),
-                        entryProvider = entryProvider {
-                            entryProviderScopes.forEach { builder -> this.builder() }
-                        },
-                        transitionSpec = {
-                            slideInHorizontally(initialOffsetX = { it }) togetherWith
-                                    slideOutHorizontally(targetOffsetX = { -it })
-                        },
-                        popTransitionSpec = {
-                            slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                                    slideOutHorizontally(targetOffsetX = { it })
-                        },
-                        predictivePopTransitionSpec = {
-                            slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                                    slideOutHorizontally(targetOffsetX = { it })
-                        },
-                    )
                 }
             }
         }

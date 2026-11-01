@@ -47,8 +47,8 @@ class SplashScreenActivity : ComponentActivity() {
 @Composable
 @Preview
 fun SplashScreen() {
-    UiUtils.SetStatusBarColor(AppTheme.colors.BackgroundColor)
-    UiUtils.SetNavigationBarColor(AppTheme.colors.BackgroundColor)
+    UiUtils.SetStatusBarColor(AppTheme.colors.background)
+    UiUtils.SetNavigationBarColor(AppTheme.colors.background)
     Box(
         modifier = Modifier
             .fillMaxSize()

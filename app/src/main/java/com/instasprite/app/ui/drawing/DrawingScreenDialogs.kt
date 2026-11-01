@@ -38,6 +38,7 @@ fun DrawingScreenDialogs(
 ) {
     val scope = rememberCoroutineScope()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val canvasState = viewModel.canvasState.collectAsStateWithLifecycle().value
 
     var lastSavedUri = viewModel.lastSavedLocation.collectAsStateWithLifecycle().value
 
@@ -108,8 +109,8 @@ fun DrawingScreenDialogs(
             DrawingDialog.ResizeCanvas ->
                 ResizeCanvasDialog(
                     onDismiss = viewModel::closeTopDialog,
-                    currentCanvasWidth = viewModel.canvasState.value.width,
-                    currentCanvasHeight = viewModel.canvasState.value.height,
+                    currentCanvasWidth = canvasState.width,
+                    currentCanvasHeight = canvasState.height,
                     onResize = viewModel::resizeCanvas
                 )
 
@@ -162,7 +163,7 @@ fun DrawingScreenDialogs(
                 androidx.compose.material3.Text(
                     text = stringResource(R.string.tut_welcome_desc),
                     style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                    color = com.instasprite.app.ui.theme.AppTheme.colors.TextColorLight
+                    color = com.instasprite.app.ui.theme.AppTheme.colors.onSurface
                 )
             }
         )

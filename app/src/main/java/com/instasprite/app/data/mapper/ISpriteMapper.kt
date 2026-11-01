@@ -15,6 +15,7 @@ import com.instasprite.app.domain.model.Cel
 import com.instasprite.app.domain.model.CelImage
 import com.instasprite.app.domain.model.Layer
 import com.instasprite.app.domain.model.Sprite
+import com.instasprite.app.utils.SpriteReadBudget
 import com.instasprite.app.utils.celToTiles
 import com.instasprite.app.utils.decodeTilesFromByteArray
 import com.instasprite.app.utils.encodeTilesToByteArray
@@ -63,7 +64,7 @@ fun Sprite.toISprite(): ISprite {
     return builder.build()
 }
 
-fun ISprite.toSprite(): Sprite {
+fun ISprite.toSprite(budget: SpriteReadBudget? = null): Sprite {
     require(formatVersion in 0..3) { "Unsupported sprite format: $formatVersion" }
     require(width > 0 && height > 0 && width.toLong() * height <= 16_777_216) { "Invalid canvas size" }
     require(framesCount <= Animation.MAX_FRAMES)
@@ -88,8 +89,8 @@ fun ISprite.toSprite(): Sprite {
             isClipping = layerData.isClipping,
             tiles = when {
                 layerData.hasCel() -> {
-                    val decodedTiles = decodeTilesFromByteArray(layerData.cel.pixels.toByteArray())
-                    decodedTiles ?: celToTiles(layerData.cel.toDomain())
+                    val decodedTiles = decodeTilesFromByteArray(layerData.cel.pixels.toByteArray(), budget)
+                    decodedTiles ?: celToTiles(layerData.cel.toDomain(budget))
                 }
 
                 !layerData.pixels.isEmpty -> celToTiles(
@@ -98,7 +99,7 @@ fun ISprite.toSprite(): Sprite {
                         y = 0,
                         width = width,
                         height = height,
-                        pixels = layerData.pixels.toIntArray()
+                        pixels = layerData.pixels.toIntArray(budget)
                     )
                 )
 
@@ -124,7 +125,7 @@ fun ISprite.toSprite(): Sprite {
             },
             cels = celsList.map { AnimationCel(it.id, it.layerId, it.frameId, it.dataId) },
             images = imagesList.map {
-                CelImage(it.id, requireNotNull(decodeTilesFromByteArray(it.tiles.toByteArray())))
+                CelImage(it.id, requireNotNull(decodeTilesFromByteArray(it.tiles.toByteArray(), budget)))
             }.also { images -> require(images.map { it.id }.distinct().size == images.size) }
                 .associateBy { it.id },
             posterFrameId = posterFrameId
@@ -137,14 +138,15 @@ fun ISprite.toSprite(): Sprite {
     )
 }
 
-private fun CelData.toDomain(): Cel {
+private fun CelData.toDomain(budget: SpriteReadBudget?): Cel {
     val pixelBytes = if (pixels.isEmpty) {
         ByteArray(0)
     } else {
-        ungzip(pixels.toByteArray())
+        ungzip(pixels.toByteArray(), budget)
     }
 
     val pixelBuffer = ByteBuffer.wrap(pixelBytes).order(ByteOrder.LITTLE_ENDIAN)
+    budget?.consume(pixelBytes.size.toLong())
     val pixelArray = IntArray(pixelBytes.size / Int.SIZE_BYTES)
     pixelBuffer.asIntBuffer().get(pixelArray)
 
@@ -157,8 +159,9 @@ private fun CelData.toDomain(): Cel {
     )
 }
 
-private fun ByteString.toIntArray(): IntArray {
+private fun ByteString.toIntArray(budget: SpriteReadBudget?): IntArray {
     val byteBuffer = asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN)
+    budget?.consume(size().toLong())
     val intArray = IntArray(size() / Int.SIZE_BYTES)
     byteBuffer.asIntBuffer().get(intArray)
     return intArray
@@ -173,10 +176,10 @@ private fun gzip(input: ByteArray): ByteArray {
     return output.toByteArray()
 }
 
-private fun ungzip(input: ByteArray): ByteArray {
+private fun ungzip(input: ByteArray, budget: SpriteReadBudget?): ByteArray {
     ByteArrayInputStream(input).use { byteStream ->
         GZIPInputStream(byteStream).use { gzip ->
-            return gzip.readBytes()
+            return (budget?.limit(gzip) ?: gzip).readBytes()
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.instasprite.app.data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
@@ -14,5 +15,7 @@ data class SpriteData(
     val id: String = "",
 
     val width: Int,
-    val height: Int
+    val height: Int,
+    val colorPalette: List<Int>? = null,
+    @ColumnInfo(defaultValue = "0") val frameCount: Int = 0
 )

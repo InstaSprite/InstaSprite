@@ -34,9 +34,9 @@ fun CursorDrawButton(
     var isPressed by remember { mutableStateOf(false) }
 
     val backgroundColor = if (isPressed) {
-        AppTheme.colors.Foreground1Color
+        AppTheme.colors.surfaceRaised
     } else {
-        AppTheme.colors.Foreground0Color
+        AppTheme.colors.surface
     }
 
     Box(

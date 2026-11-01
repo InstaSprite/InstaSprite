@@ -45,7 +45,7 @@ fun ProcessedImagePreview(
                         it.drawCheckerboard(processedBitmap.width, processedBitmap.height)
                     } else it
                 }
-                .background(AppTheme.colors.BackgroundColorDarker)
+                .background(AppTheme.colors.surfaceInset)
                 .clickable(enabled = true, onClick = onLaunchImagePicker),
             contentAlignment = Alignment.Center
         ) {
@@ -65,13 +65,13 @@ fun ProcessedImagePreview(
                     PixelIcon(
                         icon = R.drawable.ic_plus_border,
                         contentDescription = stringResource(R.string.add_image),
-                        tint = AppTheme.colors.WarningColor,
+                        tint = AppTheme.colors.orange,
                         scale = 3f
                     )
 
                     Text(
                         stringResource(R.string.tap_to_select_image),
-                        color = AppTheme.colors.Subtext0Color,
+                        color = AppTheme.colors.textMuted,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -81,10 +81,10 @@ fun ProcessedImagePreview(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(AppTheme.colors.BackgroundColorDarker.copy(alpha = 0.5f)),
+                        .background(AppTheme.colors.surfaceInset.copy(alpha = 0.5f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = AppTheme.colors.AccentButtonColor)
+                    CircularProgressIndicator(color = AppTheme.colors.green)
                 }
             }
         }

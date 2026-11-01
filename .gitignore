@@ -64,3 +64,6 @@ captures/
 # Kotlin
 .kotlin
 /app/release/
+
+# Local Firebase configuration
+google-services.json

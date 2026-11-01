@@ -10,7 +10,7 @@ import com.instasprite.app.domain.model.SpriteMeta as DomainSpriteMetadata
 
 fun SpriteData.toDomain(
     layers: List<Layer> = emptyList(),
-    colorPalette: List<Int>? = null
+    colorPalette: List<Int>? = this.colorPalette
 ): Sprite {
     return Sprite(
         id = this.id,
@@ -25,7 +25,9 @@ fun Sprite.toEntity(): SpriteData {
     return SpriteData(
         id = this.id,
         width = this.width,
-        height = this.height
+        height = this.height,
+        colorPalette = colorPalette,
+        frameCount = animation?.frames?.size ?: 1
     )
 }
 
@@ -50,13 +52,15 @@ fun DomainSpriteMetadata.toEntity(): EntitySpriteMetaData {
 fun SpriteWithMetaData.toDomain(): SpriteWithMeta {
     return SpriteWithMeta(
         sprite = this.sprite.toDomain(),
-        meta = this.meta?.toDomain()
+        meta = this.meta?.toDomain(),
+        hasAnimation = this.sprite.frameCount > 1
     )
 }
 
 fun SpriteWithMetaData.toDomain(sprite: Sprite): SpriteWithMeta {
     return SpriteWithMeta(
         sprite = sprite,
-        meta = this.meta?.toDomain()
+        meta = this.meta?.toDomain(),
+        hasAnimation = this.sprite.frameCount > 1
     )
 }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +42,7 @@ fun OtpEnrollmentDialog(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val qrBitmap = remember(qrCodeBase64) {
         try {
             val decodedBytes = Base64.decode(qrCodeBase64, Base64.DEFAULT)
@@ -51,11 +53,11 @@ fun OtpEnrollmentDialog(
     }
 
     CustomDialog(
-        title = context.getString(R.string.enable_two_factor_authentication),
+        title = resources.getString(R.string.enable_two_factor_authentication),
         onDismiss = onDismiss,
         onConfirm = onGotIt,
-        confirmButtonText = context.getString(R.string.got_it),
-        dismissButtonText = context.getString(R.string.cancel),
+        confirmButtonText = resources.getString(R.string.got_it),
+        dismissButtonText = resources.getString(R.string.cancel),
     ) {
         Column(
             modifier = modifier
@@ -65,8 +67,8 @@ fun OtpEnrollmentDialog(
             verticalArrangement = Arrangement.spacedBy(10.pixelDp)
         ) {
             Text(
-                text = context.getString(R.string.scan_qr_code_instruction),
-                color = AppTheme.colors.TextColorLight,
+                text = resources.getString(R.string.scan_qr_code_instruction),
+                color = AppTheme.colors.onSurface,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
@@ -74,20 +76,20 @@ fun OtpEnrollmentDialog(
             if (qrBitmap != null) {
                 Image(
                     bitmap = qrBitmap,
-                    contentDescription = context.getString(R.string.qr_code_for_otp),
+                    contentDescription = resources.getString(R.string.qr_code_for_otp),
                     modifier = Modifier.size(166.pixelDp)
                 )
             } else {
                 Text(
-                    text = context.getString(R.string.failed_to_load_qr_code),
-                    color = AppTheme.colors.DismissButtonColor,
+                    text = resources.getString(R.string.failed_to_load_qr_code),
+                    color = AppTheme.colors.red,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             Text(
-                text = context.getString(R.string.or_enter_secret_manually),
-                color = AppTheme.colors.Subtext0Color,
+                text = resources.getString(R.string.or_enter_secret_manually),
+                color = AppTheme.colors.textMuted,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center
             )
@@ -101,7 +103,7 @@ fun OtpEnrollmentDialog(
                 ) {
                     Text(
                         text = secret,
-                        color = AppTheme.colors.AccentButtonColor,
+                        color = AppTheme.colors.green,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
                         fontFamily = FontFamily.Monospace
@@ -112,8 +114,8 @@ fun OtpEnrollmentDialog(
             Spacer(modifier = Modifier.height(6.pixelDp))
 
             Text(
-                text = context.getString(R.string.account_issuer_info, accountName, issuer),
-                color = AppTheme.colors.Subtext0Color,
+                text = resources.getString(R.string.account_issuer_info, accountName, issuer),
+                color = AppTheme.colors.textMuted,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center
             )
@@ -121,8 +123,8 @@ fun OtpEnrollmentDialog(
             Spacer(modifier = Modifier.height(6.pixelDp))
 
             Text(
-                text = context.getString(R.string.after_scanning_instruction),
-                color = AppTheme.colors.TextColorLight,
+                text = resources.getString(R.string.after_scanning_instruction),
+                color = AppTheme.colors.onSurface,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp

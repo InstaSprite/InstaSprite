@@ -253,7 +253,7 @@ class DrawingEngine(
         }
         val newSel = SelectionState(
             mask = newMask,
-            bounds = android.graphics.Rect(0, 0, w, h),
+            bounds = SelectionState.computeBounds(newMask, w, h),
             canvasWidth = w,
             canvasHeight = h
         )

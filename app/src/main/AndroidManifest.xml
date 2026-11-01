@@ -18,14 +18,22 @@
         android:theme="@style/Theme.InstaSprite"
         tools:targetApi="31">
 
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.InstaSprite">
         </activity>
         <activity
             android:name=".SplashScreenActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.InstaSprite.SplashScreen">
             <intent-filter>

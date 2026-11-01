@@ -108,13 +108,13 @@ internal fun AnimationExportPreviewView(
     Column {
         Text(
             stringResource(R.string.animation_export_preview),
-            color = AppTheme.colors.TextColorLight
+            color = AppTheme.colors.onSurface
         )
         val image = preview
         if (scale == null || columns == null || failed) {
             Text(
                 stringResource(R.string.export_preview_unavailable),
-                color = AppTheme.colors.Subtext0Color
+                color = AppTheme.colors.textMuted
             )
         } else if (image == null) {
             CircularProgressIndicator()
@@ -138,7 +138,7 @@ internal fun AnimationExportPreviewView(
                     image.pixels.exportWidth,
                     image.pixels.exportHeight
                 ),
-                color = AppTheme.colors.TextColorLight
+                color = AppTheme.colors.onSurface
             )
             if (format == AnimationExportFormat.GIF) {
                 Text(
@@ -147,7 +147,7 @@ internal fun AnimationExportPreviewView(
                         image.index + 1,
                         sprite.animation?.frames?.size ?: 1
                     ),
-                    color = AppTheme.colors.Subtext0Color
+                    color = AppTheme.colors.textMuted
                 )
             }
         }

@@ -1,5 +1,6 @@
 package com.instasprite.app.ui.gallery
 
+import com.instasprite.app.data.diagnostics.CrashReports
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -170,9 +171,9 @@ class GalleryViewModel @Inject constructor(
                 )
             )
 
-            is ImagePagerEvent.OpenExportDialog -> {
+            is ImagePagerEvent.Export -> {
                 stopPreview()
-                openDialog(GalleryDialog.ExportOptions(event.sprite))
+                viewModelScope.launch { prepareExport(event.sprite, event.format) }
             }
         }
     }
@@ -304,11 +305,11 @@ class GalleryViewModel @Inject constructor(
                 requireNotNull(spriteDatabaseRepository.loadSprite(item.sprite.id))
             }
             require(format != GalleryExportFormat.SPRITE_SHEET || (sprite.animation?.frames?.size ?: 0) > 1)
-            closeTopDialog()
             openDialog(GalleryDialog.ExportFile(sprite, item.meta?.spriteName.orEmpty(), format))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            CrashReports.record("prepare_export", e)
             Log.e("GalleryViewModel", "Failed to prepare export", e)
             Toast.makeText(context, R.string.export_failed, Toast.LENGTH_SHORT).show()
         } finally {
@@ -351,6 +352,7 @@ class GalleryViewModel @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            CrashReports.record("export", e)
             Log.e("GalleryViewModel", "Failed to export sprite", e)
             if (e is CanvasMemoryException) {
                 Toast.makeText(context, R.string.operation_memory_limit, Toast.LENGTH_LONG).show()

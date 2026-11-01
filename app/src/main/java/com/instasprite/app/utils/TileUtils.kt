@@ -194,9 +194,9 @@ fun encodeTilesToByteArray(tiles: Map<TileCoord, IntArray>): ByteArray {
     return gzip(output.toByteArray())
 }
 
-fun decodeTilesFromByteArray(bytes: ByteArray): Map<TileCoord, IntArray>? {
+fun decodeTilesFromByteArray(bytes: ByteArray, budget: SpriteReadBudget? = null): Map<TileCoord, IntArray>? {
     if (bytes.isEmpty()) return emptyMap()
-    val raw = ungzip(bytes)
+    val raw = ungzip(bytes, budget)
     if (raw.size < 16) return null
     val header = ByteBuffer.wrap(raw).order(ByteOrder.LITTLE_ENDIAN)
     val magic = header.int
@@ -206,10 +206,12 @@ fun decodeTilesFromByteArray(bytes: ByteArray): Map<TileCoord, IntArray>? {
     val tileSize = header.int
     if (tileSize != TILE_SIZE) return null
     val count = header.int
+    if (count < 0 || count > header.remaining() / 24) return null
+    budget?.consume(count.toLong() * TILE_SIZE * TILE_SIZE * 4)
     val result = LinkedHashMap<TileCoord, IntArray>(count)
 
     repeat(count) {
-        if (header.remaining() < 20) return null
+        if (header.remaining() < 24) return null
         val tileX = header.int
         val tileY = header.int
         val tileWidth = header.int
@@ -217,7 +219,7 @@ fun decodeTilesFromByteArray(bytes: ByteArray): Map<TileCoord, IntArray>? {
         val pixelCount = header.int
         val runCount = header.int
         if (tileWidth != TILE_SIZE || tileHeight != TILE_SIZE || pixelCount != TILE_SIZE * TILE_SIZE) return null
-        if (header.remaining() < runCount * 8) return null
+        if (runCount < 0 || runCount > pixelCount || runCount > header.remaining() / 8) return null
         val pixels = decodeRle(header, pixelCount, runCount)
         result[TileCoord(tileX, tileY)] = pixels
     }
@@ -250,12 +252,14 @@ private fun decodeRle(buffer: ByteBuffer, pixelCount: Int, runCount: Int): IntAr
     repeat(runCount) {
         val len = buffer.int
         val px = buffer.int
-        val end = minOf(offset + len, pixelCount)
+        require(len > 0 && len <= pixelCount - offset) { "Invalid tile run" }
+        val end = offset + len
         for (i in offset until end) {
             pixels[i] = px
         }
         offset = end
     }
+    require(offset == pixelCount) { "Incomplete tile run" }
     return pixels
 }
 
@@ -268,10 +272,10 @@ private fun gzip(input: ByteArray): ByteArray {
     return output.toByteArray()
 }
 
-private fun ungzip(input: ByteArray): ByteArray {
+private fun ungzip(input: ByteArray, budget: SpriteReadBudget?): ByteArray {
     ByteArrayInputStream(input).use { byteStream ->
         GZIPInputStream(byteStream).use { gzip ->
-            return gzip.readBytes()
+            return (budget?.limit(gzip) ?: gzip).readBytes()
         }
     }
 }

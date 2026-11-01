@@ -7,12 +7,14 @@ import kotlinx.coroutines.sync.withLock
 
 class CanvasAutosave(
     private val persist: suspend (DrawingCheckpoint, Boolean) -> Unit,
-    private val onFailure: (Boolean) -> Unit
+    private val onFailure: (Boolean) -> Unit,
+    private val onFailureCause: (Throwable) -> Unit = {}
 ) {
     private val mutex = Mutex()
     private var latest: DrawingCheckpoint? = null
     private var revision = 0L
     private var savedRevision = -1L
+    private var failureReported = false
 
     fun update(checkpoint: DrawingCheckpoint) {
         latest = checkpoint
@@ -33,6 +35,7 @@ class CanvasAutosave(
         try {
             persist(checkpoint.copy(unfinishedSession = !finished), finished)
             savedRevision = savingRevision
+            failureReported = false
             onFailure(false)
             true
         } catch (e: CancellationException) {
@@ -41,6 +44,10 @@ class CanvasAutosave(
             onFailure(true)
             false
         } catch (e: Exception) {
+            if (!failureReported) {
+                failureReported = true
+                onFailureCause(e)
+            }
             onFailure(true)
             false
         }

@@ -37,15 +37,15 @@ fun HomeDrawer(
 ) {
     val drawerItemColors = NavigationDrawerItemDefaults.colors(
         unselectedContainerColor = Color.Transparent,
-        selectedContainerColor = AppTheme.colors.Foreground0Color,
-        unselectedIconColor = AppTheme.colors.TextColorLight,
-        selectedIconColor = AppTheme.colors.TextColorLight,
-        unselectedTextColor = AppTheme.colors.TextColorLight,
-        selectedTextColor = AppTheme.colors.TextColorLight,
+        selectedContainerColor = AppTheme.colors.surface,
+        unselectedIconColor = AppTheme.colors.onSurface,
+        selectedIconColor = AppTheme.colors.onSurface,
+        unselectedTextColor = AppTheme.colors.onSurface,
+        selectedTextColor = AppTheme.colors.onSurface,
     )
 
     ModalDrawerSheet(
-        drawerContainerColor = AppTheme.colors.TopBarColor,
+        drawerContainerColor = AppTheme.colors.surfaceContainer,
         drawerShape = RectangleShape,
         modifier = modifier.fillMaxWidth(0.9f)
     ) {
@@ -73,7 +73,7 @@ fun HomeDrawer(
                 text = stringResource(R.string.app_name),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.bodyLarge,
-                color = AppTheme.colors.TextColorLight
+                color = AppTheme.colors.onSurface
             )
 
             HomeDrawerItem(
@@ -87,7 +87,7 @@ fun HomeDrawer(
             Spacer(modifier = Modifier.weight(1f))
 
             HorizontalDivider(
-                color = AppTheme.colors.Foreground2Color,
+                color = AppTheme.colors.surfaceHighest,
                 modifier = Modifier.padding(vertical = 6.pixelDp)
             )
 
@@ -125,7 +125,7 @@ private fun HomeDrawerItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 PixelIcon(
                     icon = icon,
-                    tint = AppTheme.colors.TextColorLight,
+                    tint = AppTheme.colors.onSurface,
                 )
                 Spacer(modifier = Modifier.width(8.pixelDp))
                 Text(text = label)

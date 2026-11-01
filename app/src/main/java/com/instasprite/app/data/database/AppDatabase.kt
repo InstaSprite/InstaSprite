@@ -16,7 +16,7 @@ import com.instasprite.app.data.model.SpriteMetaData
         SpriteData::class,
         SpriteMetaData::class,
         ColorPaletteData::class
-    ], version = 8, exportSchema = false
+    ], version = 9, exportSchema = false
 )
 @TypeConverters(
     value = [
@@ -40,6 +40,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE sprite_data ADD COLUMN colorPalette BLOB")
+                db.execSQL("ALTER TABLE sprite_data ADD COLUMN frameCount INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -49,6 +56,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     .addMigrations(
                         MIGRATION_1_2,
+                        MIGRATION_8_9,
                     )
                     .build()
                 INSTANCE = instance

@@ -6,7 +6,7 @@ sealed interface ImagePagerEvent {
     data class TogglePlayback(val spriteId: String) : ImagePagerEvent
     data class StopPlayback(val spriteId: String) : ImagePagerEvent
     data class OpenDeleteDialog(val spriteName: String, val spriteId: String) : ImagePagerEvent
-    data class OpenExportDialog(val sprite: SpriteWithMeta) : ImagePagerEvent
+    data class Export(val sprite: SpriteWithMeta, val format: GalleryExportFormat) : ImagePagerEvent
 }
 
 

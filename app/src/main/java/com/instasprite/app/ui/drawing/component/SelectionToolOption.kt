@@ -41,7 +41,7 @@ fun SelectionToolOption(
                 modifier = Modifier
                     .height(24.pixelDp)
                     .clip(MaterialTheme.shapes.small)
-                    .background(AppTheme.colors.BackgroundColor)
+                    .background(AppTheme.colors.background)
                     .padding(horizontal = 2.pixelDp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(2.pixelDp)
@@ -52,7 +52,7 @@ fun SelectionToolOption(
                 ) {
                     Text(
                         text = stringResource(R.string.clear),
-                        color = AppTheme.colors.DismissButtonColor
+                        color = AppTheme.colors.red
                     )
                 }
 
@@ -62,7 +62,7 @@ fun SelectionToolOption(
                 ) {
                     Text(
                         text = stringResource(R.string.invert),
-                        color = AppTheme.colors.TextColorLight
+                        color = AppTheme.colors.onSurface
                     )
                 }
 
@@ -77,7 +77,7 @@ fun SelectionToolOption(
                     )
                     Text(
                         text = stringResource(R.string.append),
-                        color = AppTheme.colors.TextColorLight
+                        color = AppTheme.colors.onSurface
                     )
                 }
             }

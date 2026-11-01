@@ -11,6 +11,15 @@ plugins {
     id("kotlin-parcelize")
 }
 
+val firebaseConfigured = file("google-services.json").isFile ||
+        fileTree("src") { include("**/google-services.json") }.files.isNotEmpty()
+val releaseSigningConfigured = listOf("KEYSTORE_PASSWORD", "KEY_ALIAS", "KEY_PASSWORD")
+    .all { !System.getenv(it).isNullOrBlank() }
+if (firebaseConfigured) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+}
+
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -23,6 +32,7 @@ android {
 
     defaultConfig {
         applicationId = "com.instasprite.app"
+        buildConfigField("boolean", "CRASH_REPORTING_CONFIGURED", firebaseConfigured.toString())
         minSdk = 26
         targetSdk = 36
         val ciVersionCode = project.findProperty("ciVersionCode")?.toString()?.toIntOrNull()
@@ -62,7 +72,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (releaseSigningConfigured) signingConfigs.getByName("release") else null
         }
         debug {
             isDebuggable = true
@@ -109,6 +119,8 @@ protobuf {
 }
 
 dependencies {
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
     // --- Core Android & Kotlin ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

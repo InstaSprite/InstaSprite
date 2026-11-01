@@ -24,7 +24,7 @@ import com.instasprite.app.utils.pixelDp
 
 @Composable
 fun SymmetryOptions(symmetry: DrawingSymmetry, onEvent: (ToolSelectorEvent) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(2.pixelDp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.pixelDp)) {
         SymmetryToggle(
             R.drawable.ic_hflip,
             stringResource(R.string.mirror_left_right),
@@ -49,7 +49,7 @@ private fun SymmetryToggle(icon: Int, description: String, active: Boolean, onTo
         modifier = Modifier
             .size(24.pixelDp)
             .clip(MaterialTheme.shapes.small)
-            .background(if (active) colors.AccentButtonColor else colors.BackgroundColorDarker)
+            .background(if (active) colors.green else colors.surfaceInset)
             .toggleable(value = active, role = Role.Checkbox, onValueChange = { onToggle() }),
         contentAlignment = Alignment.Center
     ) {

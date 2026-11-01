@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.instasprite.app.R
 import com.instasprite.app.ui.components.composable.PixelIcon
 import com.instasprite.app.ui.theme.AppTheme
@@ -44,6 +45,7 @@ fun ToolSizeWheelPopup(
 
     Popup(
         alignment = Alignment.Center,
+        properties = PopupProperties(focusable = true),
         onDismissRequest = {
             val index = listState.firstVisibleItemIndex
                 .coerceIn(0, range.count() - 1)
@@ -55,7 +57,7 @@ fun ToolSizeWheelPopup(
             modifier = Modifier
                 .width(46.pixelDp)
                 .height(wheelHeight),
-            color = AppTheme.colors.BackgroundColor,
+            color = AppTheme.colors.background,
             shape = MaterialTheme.shapes.medium,
             shadowElevation = 8.pixelDp
         ) {
@@ -116,13 +118,13 @@ fun ToolSizeWheelPicker(
                 .align(Alignment.Center)
                 .fillMaxWidth()
                 .height(itemHeight)
-                .background(AppTheme.colors.BackgroundColorDarker)
+                .background(AppTheme.colors.surfaceInset)
         ) {
             PixelIcon(
                 icon = R.drawable.ic_arrow_head_right,
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.CenterStart),
-                tint = AppTheme.colors.AccentButtonColor
+                tint = AppTheme.colors.green
             )
         }
 
@@ -147,7 +149,7 @@ fun ToolSizeWheelPicker(
                     Text(
                         text = "$value px",
                         fontSize = 12.sp,
-                        color = AppTheme.colors.TextColorLight
+                        color = AppTheme.colors.onSurface
                     )
                 }
             }

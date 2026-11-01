@@ -4,28 +4,24 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
 import com.instasprite.app.ui.theme.AppTheme
 import com.instasprite.app.utils.pixelDp
-import kotlinx.coroutines.launch
 
 @Composable
 fun JumpToTopButton(
-    listState: LazyListState,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val rotation = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
@@ -36,17 +32,9 @@ fun JumpToTopButton(
     }
 
     Button(
-        onClick = {
-            coroutineScope.launch {
-                if (listState.firstVisibleItemIndex > 10) {
-                    listState.scrollToItem(0)
-                } else {
-                    listState.animateScrollToItem(0)
-                }
-            }
-        },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = AppTheme.colors.BackgroundColorDarker
+            containerColor = AppTheme.colors.surfaceInset
         ),
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(1.pixelDp),
@@ -55,7 +43,7 @@ fun JumpToTopButton(
         PixelIcon(
             icon = R.drawable.ic_up_arrow,
             contentDescription = stringResource(R.string.jump_to_top),
-            tint = AppTheme.colors.TextColorLight,
+            tint = AppTheme.colors.onSurface,
             modifier = Modifier
                 .rotate(rotation.value)
         )

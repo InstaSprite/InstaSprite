@@ -51,8 +51,8 @@ fun ImageConfigView(
 
         PrimaryTabRow(
             selectedTabIndex = uiState.selectedTabIndex,
-            containerColor = AppTheme.colors.BackgroundColor,
-            contentColor = AppTheme.colors.TextColorLight
+            containerColor = AppTheme.colors.background,
+            contentColor = AppTheme.colors.onSurface
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
@@ -61,12 +61,12 @@ fun ImageConfigView(
                     text = {
                         Text(
                             title,
-                            color = AppTheme.colors.TextColorLight,
+                            color = AppTheme.colors.onSurface,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
-                    selectedContentColor = AppTheme.colors.AccentButtonColor,
-                    unselectedContentColor = AppTheme.colors.TextColorLight
+                    selectedContentColor = AppTheme.colors.green,
+                    unselectedContentColor = AppTheme.colors.onSurface
                 )
             }
         }
@@ -124,15 +124,15 @@ private fun AdvancedSettingTab(
         ) {
             Text(
                 stringResource(R.string.enable_dithering),
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 style = MaterialTheme.typography.bodyMedium
             )
             Switch(
                 checked = uiState.config.enableDithering,
                 onCheckedChange = { event.onConfigEvent(ImageConfigEvent.DitheringChange(it)) },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = AppTheme.colors.TextColorDark,
-                    checkedTrackColor = AppTheme.colors.AccentButtonColor
+                    checkedThumbColor = AppTheme.colors.onAccent,
+                    checkedTrackColor = AppTheme.colors.green
                 )
             )
         }
@@ -146,15 +146,15 @@ private fun AdvancedSettingTab(
         ) {
             Text(
                 stringResource(R.string.apply_custom_palette),
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 style = MaterialTheme.typography.bodyMedium
             )
             Switch(
                 checked = uiState.applyPalette,
                 onCheckedChange = { event.onConfigEvent(ImageConfigEvent.ApplyPaletteChange(it)) },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = AppTheme.colors.TextColorDark,
-                    checkedTrackColor = AppTheme.colors.AccentButtonColor
+                    checkedThumbColor = AppTheme.colors.onAccent,
+                    checkedTrackColor = AppTheme.colors.green
                 )
             )
         }

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import com.instasprite.app.data.diagnostics.CrashReports
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -50,8 +52,8 @@ fun SettingScreen(
     val uiState by viewModel.uiState.collectAsState()
     val colors = AppTheme.colors
 
-    UiUtils.SetStatusBarColor(colors.BackgroundColorDarker)
-    UiUtils.SetNavigationBarColor(colors.BackgroundColorDarker)
+    UiUtils.SetStatusBarColor(colors.surfaceInset)
+    UiUtils.SetNavigationBarColor(colors.surfaceInset)
 
     Scaffold(
         topBar = {
@@ -65,7 +67,7 @@ fun SettingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(colors.BackgroundColor)
+                .background(colors.background)
                 .verticalScroll(rememberScrollState())
         ) {
             // Font Selection Section
@@ -73,7 +75,7 @@ fun SettingScreen(
                 text = "Font",
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
-                color = colors.Subtext0Color,
+                color = colors.textMuted,
                 modifier = Modifier.padding(
                     start = 10.pixelDp,
                     top = 10.pixelDp,
@@ -104,7 +106,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.height(8.pixelDp))
 
             HorizontalDivider(
-                color = colors.Foreground1Color,
+                color = colors.surfaceRaised,
                 thickness = 1.pixelDp
             )
 
@@ -113,7 +115,7 @@ fun SettingScreen(
                 text = stringResource(R.string.theme),
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
-                color = colors.Subtext0Color,
+                color = colors.textMuted,
                 modifier = Modifier.padding(
                     start = 10.pixelDp,
                     top = 10.pixelDp,
@@ -145,7 +147,7 @@ fun SettingScreen(
             Spacer(modifier = Modifier.height(8.pixelDp))
 
             HorizontalDivider(
-                color = colors.Foreground1Color,
+                color = colors.surfaceRaised,
                 thickness = 1.pixelDp
             )
 
@@ -159,15 +161,30 @@ fun SettingScreen(
                     PixelIcon(
                         icon = R.drawable.ic_right_arrow,
                         contentDescription = stringResource(R.string.select_language),
-                        tint = colors.Subtext0Color,
+                        tint = colors.textMuted,
                     )
                 }
             )
 
             HorizontalDivider(
-                color = colors.Foreground1Color,
+                color = colors.surfaceRaised,
                 thickness = 1.pixelDp
             )
+
+            if (CrashReports.available) {
+                SettingItem(
+                    icon = R.drawable.ic_info,
+                    title = stringResource(R.string.crash_reports_title),
+                    subtitle = stringResource(R.string.crash_reports_description),
+                    onClick = { viewModel.setCrashReportsEnabled(!uiState.crashReportsEnabled) },
+                    trailing = {
+                        Checkbox(
+                            checked = uiState.crashReportsEnabled,
+                            onCheckedChange = viewModel::setCrashReportsEnabled
+                        )
+                    }
+                )
+            }
 
             // Language Selection Dialog
             if (uiState.showLanguageDialog) {
@@ -195,14 +212,14 @@ fun SettingScreen(
                                         viewModel.selectLanguage(index)
                                     },
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = colors.SelectedColor,
-                                        unselectedColor = colors.Subtext0Color
+                                        selectedColor = colors.purple,
+                                        unselectedColor = colors.textMuted
                                     )
                                 )
                                 Spacer(modifier = Modifier.width(6.pixelDp))
                                 Text(
                                     text = language,
-                                    color = colors.TextColorLight
+                                    color = colors.onSurface
                                 )
                             }
                         }

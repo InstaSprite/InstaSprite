@@ -37,7 +37,7 @@ fun HomeBottomBar(
     modifier: Modifier = Modifier
 ) {
     BottomAppBar(
-        containerColor = AppTheme.colors.BottomBarColor,
+        containerColor = AppTheme.colors.surfaceContainer,
         modifier = modifier
 //            .clip(
 //                BottomNavShape(
@@ -90,7 +90,7 @@ fun BottomBarItem(
         if (title != null) {
             Text(
                 text = title,
-                color = AppTheme.colors.TextColorLight,
+                color = AppTheme.colors.onSurface,
                 fontSize = 9.sp,
                 maxLines = 1
             )
@@ -106,21 +106,24 @@ fun HomeFab(
     onLoadCanvas: () -> Unit,
     onLoadImage: () -> Unit,
 ) {
-    val menuItems = remember(onCreateCanvas, onLoadCanvas, onLoadImage) {
+    val newSpriteLabel = stringResource(R.string.new_canvas)
+    val loadSpriteLabel = stringResource(R.string.load_canvas)
+    val loadImageLabel = stringResource(R.string.load_image)
+    val menuItems = remember(onCreateCanvas, onLoadCanvas, onLoadImage, newSpriteLabel, loadSpriteLabel, loadImageLabel) {
         listOf(
             FabMenuItem(
                 icon = R.drawable.ic_edit,
-                label = "New Canvas",
+                label = newSpriteLabel,
                 onClick = onCreateCanvas
             ),
             FabMenuItem(
                 icon = R.drawable.ic_folder,
-                label = "Load Canvas",
+                label = loadSpriteLabel,
                 onClick = onLoadCanvas
             ),
             FabMenuItem(
                 icon = R.drawable.ic_canvas,
-                label = "Load Image",
+                label = loadImageLabel,
                 onClick = onLoadImage
             )
         )
@@ -162,13 +165,13 @@ private fun HomeBottomBarPreview() {
                     icon = R.drawable.ic_menu,
                     title = stringResource(R.string.menu),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight,
+                    iconTint = AppTheme.colors.onSurface,
                 )
                 BottomBarItem(
                     icon = R.drawable.ic_palette,
                     title = stringResource(R.string.palette),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight,
+                    iconTint = AppTheme.colors.onSurface,
                 )
             },
             rightItems = {
@@ -176,13 +179,13 @@ private fun HomeBottomBarPreview() {
                     icon = R.drawable.ic_search,
                     title = stringResource(R.string.search),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight
+                    iconTint = AppTheme.colors.onSurface
                 )
                 BottomBarItem(
                     icon = R.drawable.ic_sort,
                     title = stringResource(R.string.sort),
                     onClick = {},
-                    iconTint = AppTheme.colors.TextColorLight
+                    iconTint = AppTheme.colors.onSurface
                 )
             }
         )

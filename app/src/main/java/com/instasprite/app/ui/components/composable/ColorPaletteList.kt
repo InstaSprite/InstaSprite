@@ -33,7 +33,7 @@ fun ColorPaletteList(
     LazyColumn(
         state = lazyListState,
         modifier = modifier
-            .background(AppTheme.colors.BackgroundColorDarker),
+            .background(AppTheme.colors.surfaceInset),
         contentPadding = PaddingValues(10.pixelDp),
         verticalArrangement = Arrangement.spacedBy(8.pixelDp)
     ) {
@@ -79,12 +79,12 @@ private fun PreviewColorPaletteListWithOption() {
 
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.WarningColor
+                        containerColor = AppTheme.colors.orange
                     ),
                 ) {
                     Text(
                         text = stringResource(R.string.test),
-                        color = AppTheme.colors.TextColorDark
+                        color = AppTheme.colors.onAccent
                     )
                 }
             }

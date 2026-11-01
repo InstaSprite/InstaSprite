@@ -102,26 +102,26 @@ fun SpotlightOverlay(
                         else relative.top.roundToInt() - popupHeight - gap
                     IntOffset(0, y.coerceIn(gap, bottom))
                 }
-                .background(AppTheme.colors.DialogColor, shape)
+                .background(AppTheme.colors.surfaceContainer, shape)
                 .padding(8.pixelDp)
         ) {
             Column(Modifier.weight(1f, fill = false).verticalScroll(scroll)) {
                 Text(stringResource(R.string.tut_progress, stepIndex + 1, stepCount),
-                    color = AppTheme.colors.Subtext0Color, style = MaterialTheme.typography.labelSmall)
-                Text(stringResource(currentStep.titleRes), color = AppTheme.colors.LinkColor,
+                    color = AppTheme.colors.textMuted, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(currentStep.titleRes), color = AppTheme.colors.blue,
                     style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(4.pixelDp))
-                Text(stringResource(currentStep.descriptionRes), color = AppTheme.colors.TextColorLight,
+                Text(stringResource(currentStep.descriptionRes), color = AppTheme.colors.onSurface,
                     style = MaterialTheme.typography.bodyMedium)
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton(onClick = onSkip) { Text(stringResource(R.string.tut_btn_skip), color = AppTheme.colors.Subtext0Color) }
+                TextButton(onClick = onSkip) { Text(stringResource(R.string.tut_btn_skip), color = AppTheme.colors.textMuted) }
                 TextButton(onClick = onBack, enabled = stepIndex > 0) {
-                    Text(stringResource(R.string.tut_btn_back), color = if (stepIndex > 0) AppTheme.colors.TextColorLight else AppTheme.colors.Subtext0Color)
+                    Text(stringResource(R.string.tut_btn_back), color = if (stepIndex > 0) AppTheme.colors.onSurface else AppTheme.colors.textMuted)
                 }
                 TextButton(onClick = onNext) {
                     Text(stringResource(if (stepIndex == stepCount - 1) R.string.tut_btn_finish else R.string.tut_btn_next),
-                        color = AppTheme.colors.LinkColor)
+                        color = AppTheme.colors.blue)
                 }
             }
         }

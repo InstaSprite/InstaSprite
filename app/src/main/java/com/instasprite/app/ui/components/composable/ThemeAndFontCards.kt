@@ -35,13 +35,13 @@ fun FlavourCard(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
-    val borderColor = if (isSelected) colors.SelectedColor else colors.Foreground1Color
+    val borderColor = if (isSelected) colors.purple else colors.surfaceRaised
 
     Column(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
             .border(1.pixelDp, borderColor, MaterialTheme.shapes.small)
-            .background(previewColors.BackgroundColor)
+            .background(previewColors.background)
             .clickable(onClick = onClick)
             .padding(6.pixelDp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -52,10 +52,10 @@ fun FlavourCard(
             modifier = Modifier.padding(vertical = 2.pixelDp)
         ) {
             listOf(
-                previewColors.SelectedColor,
-                previewColors.AccentButtonColor,
-                previewColors.DismissButtonColor,
-                previewColors.LinkColor,
+                previewColors.purple,
+                previewColors.green,
+                previewColors.red,
+                previewColors.blue,
             ).forEach { color ->
                 Box(
                     modifier = Modifier
@@ -72,7 +72,7 @@ fun FlavourCard(
             text = label,
             fontSize = 11.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = previewColors.TextColorLight,
+            color = previewColors.onSurface,
         )
     }
 }
@@ -85,7 +85,7 @@ fun FontCard(
     modifier: Modifier = Modifier
 ) {
     val colors = AppTheme.colors
-    val borderColor = if (isSelected) colors.SelectedColor else colors.Foreground1Color
+    val borderColor = if (isSelected) colors.purple else colors.surfaceRaised
 
     val typography = buildCatppuccinTypography(colors, font)
 
@@ -93,7 +93,7 @@ fun FontCard(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
             .border(1.pixelDp, borderColor, MaterialTheme.shapes.small)
-            .background(colors.BackgroundColorDarker)
+            .background(colors.surfaceInset)
             .clickable(onClick = onClick)
             .padding(6.pixelDp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -101,7 +101,7 @@ fun FontCard(
         Text(
             text = "Aa",
             style = typography.titleLarge,
-            color = if (isSelected) colors.SelectedColor else colors.TextColorLight,
+            color = if (isSelected) colors.purple else colors.onSurface,
         )
 
         Spacer(modifier = Modifier.height(4.pixelDp))
@@ -111,7 +111,7 @@ fun FontCard(
             style = typography.bodyMedium,
             fontSize = 11.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = colors.TextColorLight,
+            color = colors.onSurface,
         )
     }
 }

@@ -31,14 +31,14 @@ fun MaintenanceScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(AppTheme.colors.BackgroundColorDarker),
+            .background(AppTheme.colors.surfaceInset),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         PixelIcon(
             icon = R.drawable.ic_wrench,
             contentDescription = null,
-            tint = AppTheme.colors.WarningColor,
+            tint = AppTheme.colors.orange,
             scale = 2f,
         )
 
@@ -46,7 +46,7 @@ fun MaintenanceScreen(
 
         Text(
             text = stringResource(R.string.error_maintenance_title),
-            color = AppTheme.colors.TextColorLight,
+            color = AppTheme.colors.onSurface,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -57,7 +57,7 @@ fun MaintenanceScreen(
 
         Text(
             text = stringResource(R.string.error_maintenance_desc),
-            color = AppTheme.colors.Subtext0Color,
+            color = AppTheme.colors.textMuted,
             fontSize = 14.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.pixelDp)
@@ -69,13 +69,13 @@ fun MaintenanceScreen(
             onClick = onReload,
             shape = MaterialTheme.shapes.small,
             colors = ButtonDefaults.buttonColors(
-                containerColor = AppTheme.colors.LinkColor,
-                contentColor = AppTheme.colors.BackgroundColorDarker
+                containerColor = AppTheme.colors.blue,
+                contentColor = AppTheme.colors.surfaceInset
             )
         ) {
             Text(
                 text = stringResource(R.string.reload),
-                color = AppTheme.colors.TextColorDark,
+                color = AppTheme.colors.onAccent,
                 fontWeight = FontWeight.Bold
             )
         }

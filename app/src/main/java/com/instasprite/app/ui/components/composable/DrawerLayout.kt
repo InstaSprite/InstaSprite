@@ -87,7 +87,7 @@ fun DrawerLayout(
                     Modifier
                         .fillMaxHeight()
                         .width(width)
-                        .background(AppTheme.colors.BackgroundColor)
+                        .background(AppTheme.colors.background)
                         .clickable(
                             // block click passing thru drawer content
                             indication = null,

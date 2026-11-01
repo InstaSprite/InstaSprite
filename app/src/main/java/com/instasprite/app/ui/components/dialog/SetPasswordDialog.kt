@@ -13,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -36,6 +38,7 @@ fun SetPasswordDialog(
     var password by remember { mutableStateOf("") }
     val colors = AppTheme.colors
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     var isPasswordVisible by remember { mutableStateOf(false) }
 
@@ -43,14 +46,15 @@ fun SetPasswordDialog(
         if (isPasswordVisible) VisualTransformation.None
         else PasswordVisualTransformation('*')
 
-    val passwordInputTextField = remember {
+    val configuration = LocalConfiguration.current
+    val passwordInputTextField = remember(configuration, errorText) {
         InputField(
-            label = context.getString(R.string.password),
+            label = resources.getString(R.string.password),
             validator = { password ->
                 password.length >= 6 && password.any { it.isDigit() } && password.any { !it.isLetterOrDigit() }
             },
             keyboardType = KeyboardType.Password,
-            errorMessage = errorText ?: context.getString(R.string.password_validation_error)
+            errorMessage = errorText ?: resources.getString(R.string.password_validation_error)
         )
     }
 
@@ -63,12 +67,12 @@ fun SetPasswordDialog(
         else
             stringResource(R.string.setting_password),
         dismissButtonText = stringResource(R.string.cancel),
-        confirmButtonColor = AppTheme.colors.AccentButtonColor,
+        confirmButtonColor = AppTheme.colors.green,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(R.string.set_password_description),
-                color = colors.Subtext0Color
+                color = colors.textMuted
             )
 
             Spacer(modifier = Modifier.height(10.pixelDp))
@@ -85,14 +89,14 @@ fun SetPasswordDialog(
                     IconToggleButton(
                         checked = isPasswordVisible,
                         colors = IconButtonDefaults.iconToggleButtonColors().copy(
-                            checkedContentColor = AppTheme.colors.LinkColor,
-                            contentColor = AppTheme.colors.InactiveColor,
+                            checkedContentColor = AppTheme.colors.blue,
+                            contentColor = AppTheme.colors.textDisabled,
                         ),
                         onCheckedChange = { isPasswordVisible = it },
                     ) {
                         PixelIcon(
                             icon = if (isPasswordVisible) R.drawable.ic_visible_on else R.drawable.ic_visible_off,
-                            tint = AppTheme.colors.TextColorLight,
+                            tint = AppTheme.colors.onSurface,
                         )
                     }
                 },

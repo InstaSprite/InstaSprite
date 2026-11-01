@@ -106,14 +106,14 @@ private fun Preview() {
                 modifier = Modifier
                     .size(width = 134.pixelDp, height = 40.pixelDp)
                     .clip(PixelShape(3))
-                    .background(AppTheme.colors.LinkColor)
+                    .background(AppTheme.colors.blue)
             )
             Box(
                 modifier = Modifier
                     .size(width = 134.pixelDp, height = 40.pixelDp)
-                    .border(width = 2.pixelDp, AppTheme.colors.LinkColor, PixelShape(2))
+                    .border(width = 2.pixelDp, AppTheme.colors.blue, PixelShape(2))
                     .clip(PixelShape(2))
-                    .background(AppTheme.colors.BackgroundColor)
+                    .background(AppTheme.colors.background)
             )
         }
     }

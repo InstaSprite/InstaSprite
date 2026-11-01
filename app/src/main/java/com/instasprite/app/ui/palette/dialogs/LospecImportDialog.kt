@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.instasprite.app.R
@@ -37,6 +38,7 @@ fun LospecImportDialog(
     var paletteUrl by remember { mutableStateOf("") }
     var previewColors by remember { mutableStateOf<ColorPalette?>(null) }
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
 
     CustomDialog(
@@ -47,14 +49,14 @@ fun LospecImportDialog(
                 onImport(previewColors!!)
                 Toast.makeText(
                     context,
-                    context.getString(R.string.palette_imported_successfully),
+                    resources.getString(R.string.palette_imported_successfully),
                     Toast.LENGTH_SHORT
                 ).show()
                 onDismiss()
             } else {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.please_fetch_a_palette_first),
+                    resources.getString(R.string.please_fetch_a_palette_first),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -74,13 +76,13 @@ fun LospecImportDialog(
                     label = {
                         Text(
                             stringResource(R.string.lospec_url),
-                            color = AppTheme.colors.SelectedColor
+                            color = AppTheme.colors.purple
                         )
                     },
                     placeholder = {
                         Text(
                             stringResource(R.string.https_lospec_com_palette_list_example),
-                            color = AppTheme.colors.Subtext0Color,
+                            color = AppTheme.colors.textMuted,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -105,7 +107,7 @@ fun LospecImportDialog(
                             if (trimmedUrl.isBlank()) {
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.please_enter_a_lospec_url),
+                                    resources.getString(R.string.please_enter_a_lospec_url),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return@launch
@@ -116,7 +118,7 @@ fun LospecImportDialog(
                             ) {
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.please_enter_a_valid_lospec_palette_url),
+                                    resources.getString(R.string.please_enter_a_valid_lospec_palette_url),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 return@launch
@@ -127,7 +129,7 @@ fun LospecImportDialog(
                                 if (palette == null) {
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.no_palette_found),
+                                        resources.getString(R.string.no_palette_found),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     previewColors = null
@@ -135,7 +137,7 @@ fun LospecImportDialog(
                                     previewColors = palette
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.palette_loaded_successfully),
+                                        resources.getString(R.string.palette_loaded_successfully),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -143,7 +145,7 @@ fun LospecImportDialog(
                                 previewColors = null
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.an_error_occurred_while_importing_the_palette),
+                                    resources.getString(R.string.an_error_occurred_while_importing_the_palette),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -151,13 +153,13 @@ fun LospecImportDialog(
                     },
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AppTheme.colors.AccentButtonColor
+                        containerColor = AppTheme.colors.green
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = stringResource(R.string.fetch_palette),
-                        color = AppTheme.colors.TextColorDark
+                        color = AppTheme.colors.onAccent
                     )
                 }
             }

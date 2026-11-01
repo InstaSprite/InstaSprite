@@ -106,7 +106,7 @@ fun LoadISpriteDialog(
                         label = {
                             Text(
                                 stringResource(R.string.file),
-                                color = AppTheme.colors.SelectedColor
+                                color = AppTheme.colors.purple
                             )
                         },
                         readOnly = true,
@@ -115,7 +115,7 @@ fun LoadISpriteDialog(
                             PixelIcon(
                                 icon = R.drawable.ic_folder,
                                 contentDescription = stringResource(R.string.choose_file),
-                                tint = AppTheme.colors.LinkColor
+                                tint = AppTheme.colors.blue
                             )
                         },
                         colors = AppTheme.colors.outlineTextFieldColors(),
@@ -171,7 +171,7 @@ fun LoadISpriteDialog(
                     Spacer(Modifier.height(16.pixelDp))
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
-                        color = AppTheme.colors.SelectedColor
+                        color = AppTheme.colors.purple
                     )
                 }
             }

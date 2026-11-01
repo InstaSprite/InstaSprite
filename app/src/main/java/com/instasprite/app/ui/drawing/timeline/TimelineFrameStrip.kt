@@ -92,7 +92,7 @@ internal fun TimelineFrameStrip(
                             .semantics { selected = active }
                             .drawBehind {
                                 if (active) drawLine(
-                                    colors.LinkColor,
+                                    colors.blue,
                                     Offset(3.pixelDp.toPx(), 1.pixelDp.toPx()),
                                     Offset(size.width - 3.pixelDp.toPx(), 1.pixelDp.toPx()),
                                     2.pixelDp.toPx()
@@ -110,7 +110,7 @@ internal fun TimelineFrameStrip(
                     ) {
                         Text(
                             (frameIndex + 1).toString(), style = MaterialTheme.typography.labelSmall,
-                            color = colors.TextColorLight
+                            color = colors.onSurface
                         )
                         val celDescription = stringResource(
                             when {
@@ -127,7 +127,7 @@ internal fun TimelineFrameStrip(
                         ) {
                             if (cel != null) PixelIcon(
                                 R.drawable.ic_small_circle_shape,
-                                tint = colors.TextColorLight
+                                tint = colors.onSurface
                             )
                         }
 

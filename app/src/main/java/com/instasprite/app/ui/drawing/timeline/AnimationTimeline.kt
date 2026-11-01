@@ -104,7 +104,7 @@ fun AnimationTimeline(
         Column(
             Modifier
                 .fillMaxSize()
-                .background(colors.BackgroundColorDarker)
+                .background(colors.surfaceInset)
         ) {
             if (!expanded) {
                 Row(
@@ -143,14 +143,14 @@ fun AnimationTimeline(
                     Modifier
                         .width(76.pixelDp)
                         .fillMaxHeight()
-                        .timelineGridBorder(colors.Foreground0Color, top = true, left = true)
+                        .timelineGridBorder(colors.surface, top = true, left = true)
                 ) {
                     Row(
                         Modifier
                             .height(22.pixelDp)
                             .fillMaxWidth()
-                            .background(colors.BackgroundColor)
-                            .timelineGridBorder(colors.Foreground0Color),
+                            .background(colors.background)
+                            .timelineGridBorder(colors.surface),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -212,8 +212,8 @@ fun AnimationTimeline(
                                     .width(22.pixelDp)
                                     .fillMaxHeight()
                                     .timelineGridBorder(
-                                        colors.Foreground0Color,
-                                        topColor = if (current) colors.SelectedColor else colors.Foreground0Color,
+                                        colors.surface,
+                                        topColor = if (current) colors.purple else colors.surface,
                                         top = true
                                     )
                             ) {
@@ -221,8 +221,8 @@ fun AnimationTimeline(
                                     Modifier
                                         .fillMaxWidth()
                                         .height(22.pixelDp)
-                                        .background(colors.BackgroundColor)
-                                        .timelineGridBorder(colors.Foreground0Color)
+                                        .background(colors.background)
+                                        .timelineGridBorder(colors.surface)
                                         .frameReorderActions(value.id, index, frames.size, !isPlaying) {
                                             onEvent(it)
                                         }
@@ -236,7 +236,7 @@ fun AnimationTimeline(
                                 ) {
                                     Text(
                                         (index + 1).toString(),
-                                        color = colors.TextColorLight,
+                                        color = colors.onSurface,
                                         style = MaterialTheme.typography.labelMedium
                                     )
 
@@ -348,7 +348,7 @@ fun AnimationTimeline(
                     Modifier
                         .fillMaxWidth()
                         .height(22.pixelDp)
-                        .background(colors.BackgroundColorDarker)
+                        .background(colors.surfaceInset)
                         .padding(horizontal = 3.pixelDp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(1.pixelDp)
@@ -370,7 +370,7 @@ fun AnimationTimeline(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f, fill = false),
-                                color = colors.TextColorLight
+                                color = colors.onSurface
                             )
                             Text(
                                 stringResource(
@@ -380,7 +380,7 @@ fun AnimationTimeline(
                                 ),
                                 style = MaterialTheme.typography.labelMedium,
                                 maxLines = 1,
-                                color = colors.TextColorLight
+                                color = colors.onSurface
                             )
                             Text(
                                 stringResource(R.string.animation_frame_time, frame.durationMs),
@@ -397,7 +397,7 @@ fun AnimationTimeline(
                         )
                         DropdownMenu(
                             expanded = menu, onDismissRequest = { menu = false },
-                            modifier = Modifier.background(colors.BackgroundColor)
+                            modifier = Modifier.background(colors.background)
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(if (onionSkinEnabled) R.string.onion_skin_on else R.string.onion_skin_off)) },

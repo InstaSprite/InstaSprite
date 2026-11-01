@@ -41,7 +41,7 @@ fun ColorPaletteScreenDialogs(
                     highlightText = dialog.palette.name,
                     confirmButtonText = stringResource(R.string.delete),
                     dismissButtonText = stringResource(R.string.cancel),
-                    highlightTextColor = AppTheme.colors.DismissButtonColor,
+                    highlightTextColor = AppTheme.colors.red,
                     hasQuestionMark = true,
                     onConfirm = {
                         viewModel.deletePalette(dialog.palette)

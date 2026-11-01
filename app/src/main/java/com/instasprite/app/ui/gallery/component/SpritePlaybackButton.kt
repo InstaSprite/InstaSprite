@@ -16,7 +16,7 @@ internal fun SpritePlaybackButton(playing: Boolean, onClick: () -> Unit) {
     PixelIcon(
         if (playing) R.drawable.ic_animation_stop else R.drawable.ic_arrow_head_right,
         contentDescription = stringResource(if (playing) R.string.animation_stop else R.string.animation_play),
-        tint = if (playing) AppTheme.colors.DismissButtonColor else AppTheme.colors.LinkColor,
+        tint = if (playing) AppTheme.colors.red else AppTheme.colors.blue,
         modifier = Modifier.clickable { onClick() }
     )
 }

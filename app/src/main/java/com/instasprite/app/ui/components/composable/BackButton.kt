@@ -11,7 +11,7 @@ import com.instasprite.app.ui.theme.AppTheme
 @Composable
 fun BackButton(
     onClick: () -> Unit,
-    color: Color = AppTheme.colors.DismissButtonColor
+    color: Color = AppTheme.colors.red
 ) {
     IconButton(onClick = onClick) {
         PixelIcon(

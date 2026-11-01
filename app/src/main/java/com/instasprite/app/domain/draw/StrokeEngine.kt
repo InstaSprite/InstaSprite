@@ -221,9 +221,7 @@ class StrokeEngine(
         }
 
         if (tool is SelectionTool) {
-            if (selectionState == null) {
-                tool.clearSelection()
-            }
+            tool.currentSelection = selectionState
             if (tool is RectangleSelectionTool) {
                 tool.setZoomScale(zoomScale)
             }

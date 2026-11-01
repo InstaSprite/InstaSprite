@@ -26,9 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import com.instasprite.app.R
@@ -39,8 +39,10 @@ import com.instasprite.app.ui.drawing.contract.CanvasMenuEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteEvent
 import com.instasprite.app.ui.drawing.contract.ColorPaletteState
 import com.instasprite.app.ui.theme.AppTheme
+import com.instasprite.app.ui.theme.InstaSpriteTheme
 import com.instasprite.app.utils.drawCheckerboard
 import com.instasprite.app.utils.pixelDp
+import com.instasprite.app.utils.toContrastingTextColor
 import com.instasprite.app.utils.toHexString
 import kotlinx.coroutines.launch
 
@@ -140,7 +142,7 @@ fun ColorPalette(
                     PixelIcon(
                         icon = R.drawable.ic_three_dots,
                         contentDescription = stringResource(R.string.show_opts),
-                        tint = AppTheme.colors.TextColorLight,
+                        tint = AppTheme.colors.onSurface,
                     )
                 }
 
@@ -156,25 +158,27 @@ fun ColorPalette(
     }
 }
 
+
+
 @Composable
 private fun ActiveColor(
     activeColor: Color,
     onClick: (() -> Unit),
     modifier: Modifier = Modifier
 ) {
-    val textColor = if (activeColor.luminance() < 0.4f) Color.White else Color.Black
+    val textColor = activeColor.toContrastingTextColor()
     val showAlpha = activeColor.alpha < 1f
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .then(
-                if (showAlpha) Modifier.drawCheckerboard() else Modifier
+                if (showAlpha) Modifier.drawCheckerboard(64f) else Modifier
             )
             .background(activeColor)
             .border(
                 width = 2.pixelDp,
-                color = AppTheme.colors.BackgroundColorDarker
+                color = AppTheme.colors.surfaceInset
             )
             .clickable(
                 onClick = onClick
@@ -185,6 +189,18 @@ private fun ActiveColor(
             color = textColor,
             style = MaterialTheme.typography.bodyLarge
         )
+    }
+}
+
+@Preview(name = "Active color contrast", showBackground = true)
+@Composable
+private fun ActiveColorPreview() {
+    InstaSpriteTheme {
+        Row {
+            listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f), Color.White).forEach {
+                ActiveColor(it, {}, Modifier.height(26.pixelDp).width(64.pixelDp))
+            }
+        }
     }
 }
 
@@ -199,7 +215,7 @@ private fun CanvasMenuDropdownMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        modifier = modifier.background(AppTheme.colors.DropDownMenuColor)
+        modifier = modifier.background(AppTheme.colors.surfaceContainer)
     ) {
         DropdownMenuItem(
             text = {
