@@ -1,20 +1,16 @@
 package com.instasprite.app.ui.setting
 
 import android.content.Context
-import android.content.Intent
 import com.instasprite.app.data.diagnostics.CrashReports
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.instasprite.app.ui.theme.AppFont
 import com.instasprite.app.ui.theme.ThemeFlavour
 import com.instasprite.app.utils.AppSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingUiState(
@@ -98,24 +94,8 @@ class SettingViewModel @Inject constructor(
                 showLanguageDialog = false
             )
 
-            restartActivityWithNewLocale(newLanguageCode)
+            AppSettings.setLanguage(context, newLanguageCode)
         }
     }
 
-    private fun restartActivityWithNewLocale(newLanguageCode: String) {
-        AppSettings.setLanguage(context, newLanguageCode)
-
-        viewModelScope.launch {
-            delay(100)
-
-            val packageManager = context.packageManager
-            val intent = packageManager.getLaunchIntentForPackage(context.packageName)
-            val componentName = intent?.component
-
-            val mainIntent = Intent.makeRestartActivityTask(componentName)
-            context.startActivity(mainIntent)
-
-            Runtime.getRuntime().exit(0)
-        }
-    }
 }
