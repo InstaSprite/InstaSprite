@@ -106,21 +106,24 @@ fun HomeFab(
     onLoadCanvas: () -> Unit,
     onLoadImage: () -> Unit,
 ) {
-    val menuItems = remember(onCreateCanvas, onLoadCanvas, onLoadImage) {
+    val newSpriteLabel = stringResource(R.string.new_canvas)
+    val loadSpriteLabel = stringResource(R.string.load_canvas)
+    val loadImageLabel = stringResource(R.string.load_image)
+    val menuItems = remember(onCreateCanvas, onLoadCanvas, onLoadImage, newSpriteLabel, loadSpriteLabel, loadImageLabel) {
         listOf(
             FabMenuItem(
                 icon = R.drawable.ic_edit,
-                label = "New Canvas",
+                label = newSpriteLabel,
                 onClick = onCreateCanvas
             ),
             FabMenuItem(
                 icon = R.drawable.ic_folder,
-                label = "Load Canvas",
+                label = loadSpriteLabel,
                 onClick = onLoadCanvas
             ),
             FabMenuItem(
                 icon = R.drawable.ic_canvas,
-                label = "Load Image",
+                label = loadImageLabel,
                 onClick = onLoadImage
             )
         )

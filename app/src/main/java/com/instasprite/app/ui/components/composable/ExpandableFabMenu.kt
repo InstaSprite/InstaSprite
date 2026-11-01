@@ -285,7 +285,7 @@ private fun FabItemView(
 private fun FabItemViewPreview() {
     InstaSpriteTheme {
         FabItemView(
-            item = FabMenuItem(R.drawable.ic_edit, "New Canvas") {},
+            item = FabMenuItem(R.drawable.ic_edit, "New sprite") {},
             animProgress = 1f,
             colors = FabMenuColors.defaults(),
             onDismiss = {}
@@ -307,7 +307,7 @@ private fun Preview() {
             ExpandableFabMenu(
                 items = listOf(
 
-                    FabMenuItem(R.drawable.ic_edit, "Load Canvas") {},
+                    FabMenuItem(R.drawable.ic_edit, "Load ISprite") {},
                     FabMenuItem(R.drawable.ic_canvas, "Load Image") {},
                 ),
                 modifier = Modifier.padding(10.pixelDp)
