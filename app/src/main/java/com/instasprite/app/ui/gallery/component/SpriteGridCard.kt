@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -64,6 +65,9 @@ fun SpriteGridCard(
     } else {
         sprite.width.toFloat() / sprite.height.toFloat()
     }
+    val cropScale = if (layoutMode == GalleryLayoutMode.SquareGrid && sprite.width > 0 && sprite.height > 0) {
+        maxOf(sprite.width.toFloat() / sprite.height, sprite.height.toFloat() / sprite.width)
+    } else 1f
 
     Box(
         modifier = modifier
@@ -135,6 +139,7 @@ fun SpriteGridCard(
                     onStop = onStop,
                     sprite = sprite,
                     meta = meta,
+                    modifier = Modifier.graphicsLayer(scaleX = cropScale, scaleY = cropScale),
                     onClick = onClick
                 )
             }
