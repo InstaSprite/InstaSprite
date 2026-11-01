@@ -37,7 +37,7 @@ android {
         targetSdk = 36
         val ciVersionCode = project.findProperty("ciVersionCode")?.toString()?.toIntOrNull()
         versionCode = ciVersionCode ?: 3
-        versionName = "0.8.5"
+        versionName = "0.9.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
