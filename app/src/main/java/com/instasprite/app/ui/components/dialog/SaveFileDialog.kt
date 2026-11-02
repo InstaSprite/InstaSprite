@@ -71,7 +71,7 @@ fun SaveFileDialog(
     )
 
     val displayPath =
-        folderUri?.let { getFullPathFromTreeUri(it) } ?: stringResource(R.string.tap_to_select_file)
+        folderUri?.let { getFullPathFromTreeUri(it) } ?: stringResource(R.string.tap_to_select_folder)
 
     InputDialog(
         title = title,
