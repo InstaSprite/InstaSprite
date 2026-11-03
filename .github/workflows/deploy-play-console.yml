@@ -68,5 +68,5 @@ jobs:
           serviceAccountJson: play-store-service-account.json
           packageName: com.instasprite.app
           releaseFiles: app/build/outputs/bundle/prodRelease/app-prod-release.aab
-          tracks: testing-beta
+          tracks: beta
           status: completed
