@@ -1,4 +1,4 @@
-name: Deploy to Play Console (Closed Testing)
+name: Deploy to Play Console (Open Testing)
 
 on:
   workflow_dispatch:
